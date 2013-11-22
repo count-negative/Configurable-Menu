@@ -1,0 +1,6 @@
+{
+ "uuid": "configurableMenu@lestcape",
+ "name": "Menu",
+ "description": "A child of Main Cinnamon menu with onButtonPress action instead of onButtonRelease.",
+ "icon": "applications-other"
+}
