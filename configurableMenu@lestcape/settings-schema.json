@@ -6,7 +6,7 @@
         "tooltip": "Select a theme of paper menu.",
         "options": {
             "Classic": "classic",
-            "Double": "double"
+            "Stylized": "stylized"
         }
     },
    "menu-icon" : {

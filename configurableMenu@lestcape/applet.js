@@ -460,7 +460,7 @@ MyApplet.prototype = {
          case "classic":
             currentFather = this.searchBox;
             break;
-         case "double":
+         case "stylized":
             currentFather = this.searchBox;
             break;
       }
@@ -587,8 +587,8 @@ MyApplet.prototype = {
            case "classic":
                           this.loadClassic(); 
                           break;
-           case "double":
-                          this.loadDouble(); 
+           case "stylized":
+                          this.loadStylized(); 
                           break;
            default:
                           this.loadClassic(); 
@@ -797,7 +797,7 @@ MyApplet.prototype = {
       this.endBox.set_style("padding-right: 20px;");
    },
 
-   loadDouble: function() {
+   loadStylized: function() {
       let rightPane = new St.BoxLayout({ vertical: true });        
 //search
       this.searchBox = new St.BoxLayout({ vertical: false });//{ style_class: 'menu-search-box' });
