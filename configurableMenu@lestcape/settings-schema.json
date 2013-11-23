@@ -79,6 +79,64 @@
       "description": "Show favorites",
       "tooltip": "Choose whether or not to show favorites in the menu."
    },
+   "show-hover-icon" : {
+      "type" : "checkbox",
+      "default" : false,
+      "description": "Show hover icon",
+      "tooltip": "Choose whether or not to show hover icon in the menu."
+   },
+   "show-time" : {
+      "type" : "checkbox",
+      "default" : false,
+      "description": "Show time",
+      "tooltip": "Choose whether or not to show time in the menu."
+   },
+   "time-format" : {
+      "type" : "entry",
+      "default" : "%H:%M",
+      "indent": true,
+      "dependency": "show-time",
+      "description": "Time format",
+      "tooltip": "Choose the time format to show time in the menu."
+   },
+   "time-size" : {
+      "type": "spinbutton",
+      "default" : 15,
+      "min" : 4,
+      "max" : 20,
+      "step" : 1,
+      "units" : "pixels",
+      "indent": true,
+      "dependency": "show-time",
+      "description" : "Time size:",
+      "tooltip" : "Size of time font."
+   },
+   "show-date" : {
+      "type" : "checkbox",
+      "default" : false,
+      "description": "Show date",
+      "tooltip": "Choose whether or not to show date in the menu."
+   },
+   "date-format" : {
+      "type" : "entry",
+      "default" : "%A,%e %B",
+      "indent": true,
+      "dependency": "show-date",
+      "description": "Date format",
+      "tooltip": "Choose the date format to show time in the menu."
+   },
+   "date-size" : {
+      "type": "spinbutton",
+      "default" : 6,
+      "min" : 4,
+      "max" : 20,
+      "step" : 1,
+      "units" : "pixels",
+      "indent": true,
+      "dependency": "show-date",
+      "description" : "Date size:",
+      "tooltip" : "Size of date font."
+   },
    "controling-height" : {
       "type" : "checkbox",
       "default" : false,

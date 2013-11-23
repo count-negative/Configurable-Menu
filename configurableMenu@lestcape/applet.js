@@ -1,3 +1,36 @@
+// Applet : Configurable Menu      Version      : v0.1-Beta
+// O.S.   : Cinnamon               Release Date : 23 November 2013.
+// Author : Lester Carballo Pérez  Email        : lestcape@gmail.com
+//
+// Website : https://github.com/lestcape/Configurable-Menu
+//
+// This is a frock of Main Cinnamon menu applet with more configurable options.
+//
+// Skills including:
+//
+//    1- Can be active OnButtonPress action instead of OnButtonRelease.
+//    2- You can control the menu with scrolling the height.
+//    3- Support for theme change.
+//    4- Enable and disable favorites.
+//    5- Separate power button of favorites.
+//    6- And more for the future.
+//
+// This program is free software:
+//
+//    You can redistribute it and/or modify it under the terms of the
+//    GNU General Public License as published by the Free Software
+//    Foundation, either version 3 of the License, or (at your option)
+//    any later version.
+//
+//    This program is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
 /*
 const GMenu = imports.gi.GMenu;
 
@@ -7,7 +40,6 @@ const Util = imports.misc.util;
 const Tweener = imports.ui.tweener;
 
 const Meta = imports.gi.Meta;
-const GLib = imports.gi.GLib;
 const Pango = imports.gi.Pango;
 
 const ICON_SIZE = 16;
@@ -38,17 +70,164 @@ const Cinnamon = imports.gi.Cinnamon;
 const DocInfo = imports.misc.docInfo;
 const Lang = imports.lang;
 const AppFavorites = imports.ui.appFavorites;
+const GLib = imports.gi.GLib;
 
 const AppletPath = imports.ui.appletManager.applets['configurableMenu@lestcape'];
 const CinnamonMenu = AppletPath.cinnamonMenu;
 
 let appsys = Cinnamon.AppSystem.get_default();
-const MAX_FAV_ICON_SIZE = 24;
+const MAX_FAV_ICON_SIZE = 32;
+const HOVER_ICON_SIZE = 64;
 /*
 const LIB_PATH = '/usr/share/cinnamon/applets/menu@cinnamon.org';
 imports.searchPath.unshift(LIB_PATH);
 const CinnamonMenu = imports.applet;
 */
+
+function TimeAndDate(){
+    this._init();
+}
+
+TimeAndDate.prototype = {
+   _init: function(metadata){	
+      this.dateFormat = "%A,%e %B";
+      this.dateSize = "6pt";
+      this.timeFormat = "%H:%M";
+      this.timeSize = "15pt";
+      this.timeout = 0;
+
+      this._clockContainer = new St.BoxLayout({vertical:true, style_class: 'clock-container'});	
+      this._dateContainer =  new St.BoxLayout({vertical:false, style_class: 'date-container'});
+      this._timeContainer =  new St.BoxLayout({vertical:false, style_class: 'time-container'});
+
+      this._date = new St.Label();
+      this._time = new St.Label();
+      this._dateContainer.add(this._date);
+      this._timeContainer.add(this._time);
+
+      this._clockContainer.add(this._timeContainer, {x_fill: false, x_align: St.Align.MIDDLE});
+      this._clockContainer.add(this._dateContainer, {x_fill: false, x_align: St.Align.MIDDLE});
+
+      this.actor = this._clockContainer;
+      this._date.style="font-size: " + this.dateSize;
+      this._time.style="font-size: " + this.timeSize;
+   },
+
+   startTimer: function() {
+      if(this.timeout == 0) {
+         this.timeout = 1;
+         this._updateDate();
+      }
+   },
+
+   closeTimer: function() {
+      if(this.timeout > 0)
+         Mainloop.source_remove(this.timeout);
+      this.timeout = 0;
+   },
+
+   setDateFormat: function(format) {
+      this.dateFormat = format;
+      this.refrech();
+   },
+
+   setTimeFormat: function(format) {
+      this.timeFormat = format;
+      this.refrech();
+   },
+
+   setDateSize: function(size) {
+      this.dateSize = size + "pt";
+      this._date.style="font-size: " + this.dateSize;
+      this.refrech();
+   },
+
+   setTimeSize: function(size) {
+      this.timeSize = size + "pt";
+      this._time.style="font-size: " + this.timeSize;
+      this.refrech();
+   },
+
+   setClockVisible: function(visible) {
+      this._timeContainer.visible = visible;
+      if(visible)
+         this.startTimer();
+      else
+         this.closeTimer();
+   },
+
+   setDateVisible: function(visible) {
+      this._dateContainer.visible = visible;
+   },
+
+   setAlign: function(align) {
+      this._clockContainer.remove_actor(this._timeContainer);
+      this._clockContainer.remove_actor(this._dateContainer);
+      this._clockContainer.add(this._timeContainer, {x_fill: false, x_align: align});
+      this._clockContainer.add(this._dateContainer, {x_fill: false, x_align: align});
+      this.refrech();
+   },
+
+   refrech: function() {
+      let displayDate = new Date();
+      this._time.set_text(displayDate.toLocaleFormat(this.timeFormat));
+      this._date.set_text(displayDate.toLocaleFormat(this.dateFormat));
+   },
+   _updateDate: function() {
+      // let timeFormat = '%H:%M';
+      // let dateFormat = '%A,%e %B';
+      this.refrech();
+      if(this.timeout > 0)
+         this.timeout = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._updateDate));
+   }
+};
+
+
+function HoverIcon() {
+    this._init();
+}
+
+HoverIcon.prototype = {
+   _init: function () {
+      try {
+         this.face = new Gio.FileIcon({ file: Gio.file_new_for_path(GLib.get_home_dir() + '/.face')});
+         this.actor = new St.Bin();
+         this.icon = new St.Icon({
+            icon_size: HOVER_ICON_SIZE,
+            icon_type: St.IconType.FULLCOLOR
+         });
+         this.actor.child = this.icon;
+         this.refreshFace();
+      } catch(e) {
+         Main.notifyError("Error:",e.message);
+      }
+   },
+
+   refresh: function (icon) {
+      this.icon.set_icon_name(icon);
+   },
+
+   refreshFace: function () {
+      this.icon.set_gicon(this.face);
+   }
+//let networkIcon = networkApp.create_icon_texture(PLACES_ICON_SIZE);
+ //this._refresh('folder-home');
+//this.hoverIcon._refresh('system-log-out');
+//this.hoverIcon._refresh('screensaver');
+//folder-documents
+//folder-pictures
+//folder-music
+//folder-videos
+//computer
+//gnome-control-center
+//cinnamon-settings
+//synaptic
+//update-manager
+//terminal
+//help
+//system-shutdown
+//gconf-editor
+};
 
 function SystemButton(appsMenuButton, icon, nbFavorites) {
     this._init(appsMenuButton, icon, nbFavorites);
@@ -136,7 +315,8 @@ MyApplet.prototype = {
          //My Setting
          this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this._updateComplete, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "activate-on-press", "activateOnPress", null, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "show-favorites", "showFavorites", this._updateDisplay, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "show-favorites", "showFavorites", this._setVisibleFavorites, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "show-hover-icon", "showHoverIcon", this._setVisibleHoverIcon, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "controling-height", "controlingHeight", this._updateComplete, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "height", "height", this._updateComplete, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-favorites", "scrollFavoritesVisible", this._updateComplete, null);
@@ -173,6 +353,12 @@ MyApplet.prototype = {
          this._activeActor = null;
          this._applicationsBoxWidth = 0;
          this.menuIsOpening = false;
+         this.showTime = false;
+         this.timeFormat = "%H:%M";
+         this.timeSize = 15;
+         this.showDate = false;
+         this.dateFormat = "%A,%e %B";
+         this.dateSize = 6;
           
          this.RecentManager = new DocInfo.DocManager();
 
@@ -200,7 +386,17 @@ MyApplet.prototype = {
 //My Setting
          this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this._updateComplete, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "activate-on-press", "activateOnPress", null, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "show-favorites", "showFavorites", this._updateDisplay, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "show-favorites", "showFavorites", this._setVisibleFavorites, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "show-hover-icon", "showHoverIcon", this._setVisibleHoverIcon, null);
+         
+         this.settings.bindProperty(Settings.BindingDirection.IN, "show-time", "showTime", this._updateClock, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "time-format", "timeFormat", this._updateClock, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "time-size", "timeSize", this._updateClock, null);
+
+         this.settings.bindProperty(Settings.BindingDirection.IN, "show-date", "showDate", this._updateDate, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "date-format", "dateFormat", this._updateDate, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "date-size", "dateSize", this._updateDate, null);
+
          this.settings.bindProperty(Settings.BindingDirection.IN, "controling-height", "controlingHeight", this._updateComplete, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "height", "height", this._updateComplete, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-favorites", "scrollFavoritesVisible", this._updateComplete, null);
@@ -236,10 +432,6 @@ MyApplet.prototype = {
          this.lastAcResults = new Array();
 
          this._updateComplete();
-         this._refreshPlacesAndRecent();
-         this._updateActivateOnHover();
-         this._updateIconAndLabel();
-         this._update_hover_delay();
       }
       catch (e) {
          Main.notify("Error:", e.message);
@@ -253,21 +445,56 @@ MyApplet.prototype = {
       this.favoritesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
    },     
 
-   _updateDisplay: function() {
+   _setVisibleFavorites: function() {
+      this.favBoxWrapper.remove_actor(this.favoritesScrollBox);
       if(this.showFavorites) {
-         this.betterPanel.insert_actor(this.favoritesScrollBox, 0);
+         //this.betterPanel.insert_actor(this.favoritesBox, 0);
+         this.favBoxWrapper.insert_actor(this.favoritesScrollBox, 0);
          this._refreshFavs();
       }
-      else {
-         this.betterPanel.remove_actor(this.favoritesScrollBox);
+   },
+
+   _setVisibleHoverIcon: function() {
+      let currentFather;
+      switch(this.theme) {
+         case "classic":
+            currentFather = this.searchBox;
+            break;
+         case "double":
+            currentFather = this.searchBox;
+            break;
       }
+      if(currentFather) {
+         currentFather.remove_actor(this.hover.actor);
+         if(this.showHoverIcon)
+            currentFather.add(this.hover.actor, {x_fill: false, x_align: St.Align.MIDDLE, expand: true });
+      }
+   },
+
+   _updateClock: function() {
+      this.timeDate.setClockVisible(this.showTime);
+      this.timeDate.setTimeFormat(this.timeFormat);
+      this.timeDate.setTimeSize(this.timeSize);
+   },
+
+   _updateDate: function() {
+      this.timeDate.setDateVisible(this.showDate);
+      this.timeDate.setDateFormat(this.dateFormat);
+      this.timeDate.setDateSize(this.dateSize);
    },
 
    _updateComplete: function() {
       this._updateMenuSection();
       this._display();
-      this._updateDisplay();
+      this._setVisibleFavorites();
+      this._setVisibleHoverIcon();
+      this._updateClock();
+      this._updateDate();
       this._update_autoscroll();
+      this._refreshPlacesAndRecent();
+      this._updateActivateOnHover();
+      this._updateIconAndLabel();
+      this._update_hover_delay();
    },
 
    _updateHeight: function() {
@@ -353,7 +580,8 @@ MyApplet.prototype = {
         this.menu.addMenuItem(section);     
         
         this._session = new GnomeSession.SessionManager();
-        this._screenSaverProxy = new ScreenSaver.ScreenSaverProxy();      
+        this._screenSaverProxy = new ScreenSaver.ScreenSaverProxy();
+        this.timeDate = new TimeAndDate();
 
         switch(this.theme) {
            case "classic":
@@ -386,7 +614,7 @@ MyApplet.prototype = {
       }));
 
       let favoritesBox = new CinnamonMenu.FavoritesBox();
-      this.favoritesBox.add_actor(favoritesBox.actor, { y_align: St.Align.END, y_fill: false });
+      this.favoritesBox.add_actor(favoritesBox.actor);
          
       //Load favorites again
       this._favoritesButtons = new Array();
@@ -397,8 +625,9 @@ MyApplet.prototype = {
          let app = appSys.lookup_app(launchers[i]);
          if(app) {
             let button = new CinnamonMenu.FavoritesButton(this, app, launchers.length); // + 3 because we're adding 3 system buttons at the bottom
+            button.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(4)+"px;padding-right: "+(-5)+"px;margin:auto;";
             this._favoritesButtons[app] = button;
-            favoritesBox.actor.add_actor(button.actor, { y_align: St.Align.END, y_fill: false });
+            favoritesBox.actor.add(button.actor, { x_align: St.Align.MIDDLE, y_fill: false });
             button.actor.connect('enter-event', Lang.bind(this, function() {
                this._clearPrevCatSelection();
                this.selectedAppTitle.set_text(button.app.get_name());
@@ -449,7 +678,7 @@ MyApplet.prototype = {
          }                        
       }));
         
-      powerButtons.add_actor(button.actor, { y_align: St.Align.END, y_fill: false });                  
+      powerButtons.add_actor(button.actor);                  
         
       //Logout button
       let button = new SystemButton(this, "gnome-logout", 3);        
@@ -490,7 +719,8 @@ MyApplet.prototype = {
    loadClassic: function() {
       let rightPane = new St.BoxLayout({ vertical: true });        
 //search
-      this.searchBox = new St.BoxLayout();//{ style_class: 'menu-search-box' });
+      this.searchBox = new St.BoxLayout({ vertical: false });//{ style_class: 'menu-search-box' });
+      this.timerBox = new St.BoxLayout({ vertical: true });
       rightPane.add_actor(this.searchBox);
 
       this.searchEntry = new St.Entry({ name: 'menu-search-entry',
@@ -498,13 +728,19 @@ MyApplet.prototype = {
                                         track_hover: true,
                                         can_focus: true });
       this.searchEntry.set_secondary_icon(this._searchInactiveIcon);
-      this.searchBox.add(this.searchEntry, {y_fill: false, expand: false });
+
+      this.searchBox.add(this.timerBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
+      this.timerBox.add(this.timeDate.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
+      this.timerBox.add(this.searchEntry, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.searchActive = false;
       this.searchEntryText = this.searchEntry.clutter_text;
       this.searchEntryText.connect('text-changed', Lang.bind(this, this._onSearchTextChanged));
       this.searchEntryText.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this._previousSearchPattern = "";
 //search
+
+      this.hover = new HoverIcon();
+      this.searchBox.add(this.hover.actor, {x_fill: false, x_align: St.Align.MIDDLE, expand: true });
 
       this.categoriesApplicationsBox = new CinnamonMenu.CategoriesApplicationsBox();
       rightPane.add_actor(this.categoriesApplicationsBox.actor);
@@ -525,7 +761,7 @@ MyApplet.prototype = {
       this._updateVFade();
 
       this.favoritesScrollBox.add_actor(this.favoritesBox);
-      this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: false, expand: false });
+      this.favBoxWrapper.add(this.favoritesScrollBox, { y_align: St.Align.END, y_fill: true, expand: true });
       this.favBoxWrapper.add(this.powerButtons);
 
       this.categoriesScrollBox.add_actor(this.categoriesBox);
@@ -533,7 +769,7 @@ MyApplet.prototype = {
 
       this.betterPanel = new St.BoxLayout({ vertical: false });
 
-      this.betterPanel.add(this.favBoxWrapper, { x_fill: false, expand: false });
+      this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesScrollBox, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, expand: false });
 
@@ -548,7 +784,7 @@ MyApplet.prototype = {
       this.endBox = new St.BoxLayout({ vertical: false });
       this.selectedAppBox = new St.BoxLayout({ style_class: 'menu-selected-app-box', vertical: true });
       this.selectedAppTitle = new St.Label({ style_class: 'menu-selected-app-title', text: "" });
-      this.selectedAppBox.add_actor(this.selectedAppTitle);
+      this.selectedAppBox.add(this.selectedAppTitle);
       this.selectedAppDescription = new St.Label({ style_class: 'menu-selected-app-description', text: "" });
       this.selectedAppBox.add_actor(this.selectedAppDescription);
 
@@ -557,7 +793,7 @@ MyApplet.prototype = {
       this.catBoxIter = new CinnamonMenu.VisibleChildIterator(this, this.categoriesBox);
       this.categoriesBox._vis_iter = this.catBoxIter;
 
-      this.endBox.add(this.selectedAppBox, { x_fill: true, x_align: St.Align.END, expand: true });
+      this.endBox.add(this.selectedAppBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.endBox.set_style("padding-right: 20px;");
    },
 
@@ -565,6 +801,7 @@ MyApplet.prototype = {
       let rightPane = new St.BoxLayout({ vertical: true });        
 //search
       this.searchBox = new St.BoxLayout({ vertical: false });//{ style_class: 'menu-search-box' });
+      this.timerBox = new St.BoxLayout({ vertical: true });
       rightPane.add_actor(this.searchBox);
       this.searchEntry = new St.Entry({ name: 'menu-search-entry',
                                         hint_text: _("Type to search..."),
@@ -572,13 +809,19 @@ MyApplet.prototype = {
                                         can_focus: true });
       //this.searchEntry.set_width(260);
       this.searchEntry.set_secondary_icon(this._searchInactiveIcon);
-      this.searchBox.add(this.searchEntry, {x_fill: false, y_fill: false, expand: false });
+
+      this.searchBox.add(this.timerBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
+      this.timerBox.add(this.timeDate.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
+      this.timerBox.add(this.searchEntry, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.searchActive = false;
       this.searchEntryText = this.searchEntry.clutter_text;
       this.searchEntryText.connect('text-changed', Lang.bind(this, this._onSearchTextChanged));
       this.searchEntryText.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this._previousSearchPattern = "";
 //search
+
+      this.hover = new HoverIcon();
+      this.searchBox.add(this.hover.actor, {x_fill: false, x_align: St.Align.MIDDLE, expand: true });
 
       this.categoriesApplicationsBox = new CinnamonMenu.CategoriesApplicationsBox();
       rightPane.add_actor(this.categoriesApplicationsBox.actor);
@@ -598,14 +841,14 @@ MyApplet.prototype = {
       this._updateVFade();
 
       this.favoritesScrollBox.add_actor(this.favoritesBox);
-      this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: false, expand: false });
+      this.favBoxWrapper.add(this.favoritesScrollBox, { y_align: St.Align.END, y_fill: true, expand: true });
 
       this.categoriesScrollBox.add_actor(this.categoriesBox);
       this.applicationsScrollBox.add_actor(this.applicationsBox);
 
       this.betterPanel = new St.BoxLayout({ vertical: false });
 
-      this.betterPanel.add(this.favBoxWrapper, { x_fill: false, expand: false });
+      this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesScrollBox, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, expand: false });
 
@@ -630,14 +873,15 @@ MyApplet.prototype = {
       this.categoriesBox._vis_iter = this.catBoxIter;
 
       this.powerButtons = this._powerButtons(false);
-      
-      this.endBox.add(this.selectedAppBox, { x_fill: true, x_align: St.Align.END, expand: true });
+
+      this.endBox.add(this.selectedAppBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
       this.endBox.set_style("padding-right: 20px;");
    },
 
    _onOpenStateChanged: function(menu, open) {
       if(open) {
+         this.timeDate.startTimer();
          this.menuIsOpening = true;
          this.actor.add_style_pseudo_class('active');
          global.stage.set_key_focus(this.searchEntry);
@@ -661,6 +905,7 @@ MyApplet.prototype = {
          this._allAppsCategoryButton.actor.style_class = "menu-category-button-selected";
          Mainloop.idle_add(Lang.bind(this, this._initial_cat_selection));
       } else {
+         this.timeDate.closeTimer();
          this.actor.remove_style_pseudo_class('active');
          if(this.searchActive) {
             this.resetSearch();
