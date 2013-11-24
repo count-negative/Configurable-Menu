@@ -1189,6 +1189,8 @@ MyApplet.prototype = {
          this._allAppsCategoryButton.actor.style_class = "menu-category-button-selected";
          Mainloop.idle_add(Lang.bind(this, this._initial_cat_selection));
       } else {
+         this._systemButtons[this.sysButtSelected].setActive(false);
+         this.sysButtSelected = 0;
          this.timeDate.closeTimer();
          this.actor.remove_style_pseudo_class('active');
          if(this.searchActive) {
