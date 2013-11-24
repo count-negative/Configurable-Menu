@@ -1,6 +1,7 @@
 {
- "uuid": "configurableMenu@lestcape",
- "name": "Configurable Menu",
- "description": "This is a frock of Main Cinnamon menu applet with more configurable options.",
- "icon": "applications-other"
+    "last-edited": "1385246434", 
+    "description": "This is a frock of Main Cinnamon menu applet with more configurable options.", 
+    "icon": "applications-other", 
+    "uuid": "configurableMenu@lestcape", 
+    "name": "Configurable Menu"
 }
