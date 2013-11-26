@@ -1,5 +1,5 @@
-Applet : Configurable Menu      Version      : v0.1-Beta
-O.S.   : Cinnamon               Release Date : 23 November 2013.
+Applet : Configurable Menu      Version      : v0.2-Beta
+O.S.   : Cinnamon               Release Date : 26 November 2013.
 Author : Lester Carballo Pérez  Email        : lestcape@gmail.com
 
 Website : https://github.com/lestcape/Configurable-Menu
@@ -34,7 +34,7 @@ Installation Instructions:
 
    1- Download this applet from their website : https://github.com/lestcape/Configurable-Menu
    2- Unzip the downloaded file and copy the folder configurableMenu@lestcape at
-      /home/USERNAME/.local/share/cinnamon/desklets/ where USER is the user for your operating system.
+      /home/USERNAME/.local/share/cinnamon/applets/ where USER is the user for your operating system.
    3- Enable the applet in Cinnamon Settings and use it.
 
 Add new languages:
@@ -43,7 +43,7 @@ Add new languages:
 Change Log:
 
 0.2-Beta
-   - Fixed keyboard navegation, now it's better than the current Cinnamon menu.
+   - Added functionality and menu on hover icon.
 
 0.1- Beta
    - Initial release.

@@ -1,11 +1,11 @@
-Configurable Menu v0.1-Beta
+Configurable Menu v0.2-Beta
 ==============
 
-Applet: Configurable Menu Version: v0.1-Beta
+Applet: Configurable Menu Version: v0.2-Beta
 
 O.S.: Cinnamon 
 
-Release Date: 23 November 2013
+Release Date: 26 November 2013
 
 Author: Lester Carballo Pérez
 
@@ -59,7 +59,7 @@ Add new languages:
 Change Log:
 ==============
 0.2-Beta
-   - Fixed keyboard navegation, now it's better than the current Cinnamon menu.
+   - Added functionality and menu on hover icon.
 
 0.1-Beta
    - Initial release.
