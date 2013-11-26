@@ -48,7 +48,7 @@ You should have received a copy of the GNU General Public License along with thi
 Installation Instructions:
 --------------
 1. Download this applet from their website : https://github.com/lestcape/Configurable-Menu
-2. Unzip the downloaded file and copy the folder configurableMenu@lestcape at /home/USERNAME/.local/share/cinnamon/desklets/ where USER is the user for your operating system.
+2. Unzip the downloaded file and copy the folder configurableMenu@lestcape at /home/USERNAME/.local/share/cinnamon/applets/ where USER is the user for your operating system.
 3. Enable the applet in Cinnamon Settings and use it.
 
 
