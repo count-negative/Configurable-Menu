@@ -351,7 +351,8 @@ ApplicationButton.prototype = {
         GenericApplicationButton.prototype._init.call(this, appsMenuButton, app, true);
         this.category = new Array();
         this.actor.set_style_class_name('menu-application-button');
-        this.icon = this.app.create_icon_texture(APPLICATION_ICON_SIZE);
+
+        this.icon = this.app.create_icon_texture(APPLICATION_ICON_SIZE)
         this.addActor(this.icon);
         this.name = this.app.get_name();
         this.label = new St.Label({ text: this.name, style_class: 'menu-application-button-label' });
@@ -498,8 +499,9 @@ CategoryButton.prototype = {
 
         this.actor.set_style_class_name('menu-category-button');
         var label;
+        let icon = null;
         if (category) {
-            let icon = category.get_icon();
+            icon = category.get_icon();
             if (icon && icon.get_names)
                 this.icon_name = icon.get_names().toString();
             else
@@ -511,7 +513,7 @@ CategoryButton.prototype = {
         this.actor._delegate = this;
         this.label = new St.Label({ text: label, style_class: 'menu-category-button-label' });
         if (category && this.icon_name) {
-            this.icon = new St.Icon({icon_name: this.icon_name, icon_size: CATEGORY_ICON_SIZE, icon_type: St.IconType.FULLCOLOR});
+            this.icon = St.TextureCache.get_default().load_gicon(null, icon, CATEGORY_ICON_SIZE);
             this.addActor(this.icon);
             this.icon.realize();
         }
@@ -575,8 +577,9 @@ FavoritesButton.prototype = {
         if (icon_size>MAX_FAV_ICON_SIZE) icon_size = MAX_FAV_ICON_SIZE;
         this.actor.style = "padding-top: "+(icon_size/3)+"px;padding-bottom: "+(icon_size/3)+"px; margin:auto;"
 
-        this.actor.add_style_class_name('menu-favorites-button');
+        this.actor.add_style_class_name('menu-favorites-button');    
         let icon = app.create_icon_texture(icon_size);
+
         this.addActor(icon);
         icon.realize()
 
@@ -869,10 +872,18 @@ MyApplet.prototype = {
             this.lastAcResults = new Array();
 
             this.settings.bindProperty(Settings.BindingDirection.IN, "search-filesystem", "searchFilesystem", null, null);
+
+            St.TextureCache.get_default().connect("icon-theme-changed", Lang.bind(this, this.onIconThemeChanged));
         }
         catch (e) {
             global.logError(e);
         }
+    },
+
+    onIconThemeChanged: function() {
+        this._refreshApps();
+        this._refreshFavs();
+        this._refreshPlacesAndRecent;
     },
 
     openMenu: function() {

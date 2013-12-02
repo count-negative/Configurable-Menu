@@ -67,6 +67,30 @@
       "callback" : "_launch_editor",
       "tooltip" : "Press this button to customize your menu entries."
    },
+   "show-view-item" : {
+      "type" : "checkbox",
+      "default" : true,
+      "description": "Show view items control",
+      "tooltip": "Choose whether or not to show view items control."
+   },
+   "view-item" : {
+      "type" : "checkbox",
+      "default" : true,
+      "description": "View item of the menu in icon view",
+      "tooltip": "Enable view item of the menu in icon view and disable view item of the menu in list view."
+   },
+   "view-icon-count" : {
+      "type": "spinbutton",
+      "default" : 4,
+      "min" : 0,
+      "max" : 10,
+      "step" : 1,
+      "units" : "items",
+      "indent": true,
+      "dependency": "view-item",
+      "description" : "Number of columns in icon view:",
+      "tooltip" : "Set the number of columns in icon view."
+   },
    "activate-on-press" : {
       "type" : "checkbox",
       "default" : false,

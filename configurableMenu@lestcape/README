@@ -1,5 +1,5 @@
-Applet : Configurable Menu      Version      : v0.2-Beta
-O.S.   : Cinnamon               Release Date : 26 November 2013.
+Applet : Configurable Menu      Version      : v0.3-Beta
+O.S.   : Cinnamon               Release Date : 02 Dicember 2013.
 Author : Lester Carballo Pérez  Email        : lestcape@gmail.com
 
 Website : https://github.com/lestcape/Configurable-Menu
@@ -41,6 +41,9 @@ Add new languages:
   - Unsupported yet.
 
 Change Log:
+
+0.3-Beta
+   - Added view items.
 
 0.2-Beta
    - Added functionality and menu on hover icon.
