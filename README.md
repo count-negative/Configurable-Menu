@@ -1,11 +1,11 @@
-Configurable Menu v0.3-Beta
+Configurable Menu v0.4-Beta
 ==============
 
-Applet: Configurable Menu Version: v0.3-Beta
+Applet: Configurable Menu Version: v0.4-Beta
 
 O.S.: Cinnamon 
 
-Release Date: 02 Dicember 2013
+Release Date: 03 Dicember 2013
 
 Author: Lester Carballo Pérez
 
@@ -33,7 +33,9 @@ Skills including:
 
 5.	Separate power button of favorites.
 
-6.	And more for the future.
+6.	Different modes of view menu items.
+
+7.	And more for the future.
 
 
 This program is free software:
@@ -58,6 +60,12 @@ Add new languages:
 
 Change Log:
 ==============
+0.4-Beta
+   - Fixed bug in list view mode that cause lag when you change categories.
+   - Fixed bug in icon view mode when searching app.
+   - Option "allow path entry in the menu search box", now work again and it's better.
+   - Fixed some minors bugs.
+
 0.3-Beta
    - Added view items.
 

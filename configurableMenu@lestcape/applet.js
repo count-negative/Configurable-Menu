@@ -174,6 +174,7 @@ TimeAndDate.prototype = {
       this._time.set_text(displayDate.toLocaleFormat(this.timeFormat));
       this._date.set_text(displayDate.toLocaleFormat(this.dateFormat));
    },
+
    _updateDate: function() {
       // let timeFormat = '%H:%M';
       // let dateFormat = '%A,%e %B';
@@ -184,7 +185,7 @@ TimeAndDate.prototype = {
 };
 
 function VisibleChildIteratorExtended(parent, container, numberView) {
-    this._init(parent, container, numberView);
+   this._init(parent, container, numberView);
 }
 
 VisibleChildIteratorExtended.prototype = {
@@ -313,7 +314,7 @@ VisibleChildIteratorExtended.prototype = {
 };
 
 function HoverIcon(parent) {
-    this._init(parent);
+   this._init(parent);
 }
 
 HoverIcon.prototype = {
@@ -364,7 +365,6 @@ HoverIcon.prototype = {
       } catch(e) {
          Main.notifyError("Error:",e.message);
       }
-      
    },
 
    _onButtonReleaseEvent: function (actor, event) {
@@ -468,8 +468,115 @@ HoverIcon.prototype = {
    }
 };
 
+function TransientButtonExtended(appsMenuButton, pathOrCommand) {
+   this._init(appsMenuButton, pathOrCommand);
+}
+
+TransientButtonExtended.prototype = {
+   __proto__: CinnamonMenu.TransientButton.prototype,
+    
+   _init: function(appsMenuButton, pathOrCommand) {
+      let displayPath = pathOrCommand;
+      if(pathOrCommand.charAt(0) == '~') {
+         pathOrCommand = pathOrCommand.slice(1);
+         pathOrCommand = GLib.get_home_dir() + pathOrCommand;
+      }
+
+      this.isPath = pathOrCommand.substr(pathOrCommand.length - 1) == '/';
+      if(this.isPath) {
+         this.path = pathOrCommand;
+      } else {
+         let n = pathOrCommand.lastIndexOf('/');
+         if(n != 1) {
+            this.path = pathOrCommand.substr(0, n);
+         }
+      }
+
+      this.pathOrCommand = pathOrCommand;
+
+      this.appsMenuButton = appsMenuButton;
+      PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
+
+      let iconBox = new St.Bin();
+      this.file = Gio.file_new_for_path(this.pathOrCommand);
+      try {
+         this.handler = this.file.query_default_handler(null);
+         let icon_uri = this.file.get_uri();
+         let fileInfo = this.file.query_info(Gio.FILE_ATTRIBUTE_STANDARD_TYPE, Gio.FileQueryInfoFlags.NONE, null);
+         let contentType = Gio.content_type_guess(this.pathOrCommand, null);
+         let themedIcon = Gio.content_type_get_icon(contentType[0]);
+         this.icon = new St.Icon({gicon: themedIcon, icon_size: APPLICATION_ICON_SIZE, icon_type: St.IconType.FULLCOLOR });
+         this.actor.set_style_class_name('menu-application-button');
+      } catch (e) {
+         this.handler = null;
+         let iconName = this.isPath ? 'gnome-folder' : 'unknown';
+         this.icon = new St.Icon({icon_name: iconName, icon_size: APPLICATION_ICON_SIZE, icon_type: St.IconType.FULLCOLOR });
+         // @todo Would be nice to indicate we don't have a handler for this file.
+         this.actor.set_style_class_name('menu-application-button');
+      }
+
+      // We need this fake app to help appEnterEvent/appLeaveEvent 
+      // work with our search result.
+      this.app = {
+         get_app_info: {
+            get_filename: function() {
+               return pathOrCommand;
+            }
+         },
+         get_id: function() {
+            return -1;
+         },
+         get_description: function() {
+            return pathOrCommand;
+         },
+         get_name: function() {
+            return  '';
+         },
+         create_icon_texture: function(appIconSize) {
+            try {
+               let contentType = Gio.content_type_guess(pathOrCommand, null);
+               let themedIcon = Gio.content_type_get_icon(contentType[0]);
+               return new St.Icon({gicon: themedIcon, icon_size: appIconSize, icon_type: St.IconType.FULLCOLOR });
+            } catch (e) {
+               let isPath = pathOrCommand.substr(pathOrCommand.length - 1) == '/';
+               let iconName = isPath ? 'gnome-folder' : 'unknown';
+               return new St.Icon({icon_name: iconName, icon_size: appIconSize, icon_type: St.IconType.FULLCOLOR });
+            }
+         }
+      };
+
+      this.label = new St.Label({ text: displayPath, style_class: 'menu-application-button-label' });
+      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.container = new St.BoxLayout();
+      this.textBox = new St.BoxLayout({ vertical: false });
+      this.setVertical(false);
+
+      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.addActor(this.container);
+
+      this.isDraggableApp = false;
+   },
+
+   setVertical: function(vertical) {
+      this.container.set_vertical(vertical);
+      this.label.clutter_text.line_wrap = vertical;
+      if(vertical) {
+         this.textBox.set_width(4*APPLICATION_ICON_SIZE);
+         this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);
+      }
+      else {
+         this.textBox.set_width(-1);
+         this.textBox.set_height(-1);
+      }
+   }
+};
+
 function SystemButton(appsMenuButton, icon, nbFavorites, title, description, hoverIcon) {
-    this._init(appsMenuButton, icon, nbFavorites, title, description, hoverIcon);
+   this._init(appsMenuButton, icon, nbFavorites, title, description, hoverIcon);
 }
 
 SystemButton.prototype = {
@@ -517,223 +624,214 @@ SystemButton.prototype = {
 };
 
 function ApplicationButtonExtended(appsMenuButton, app) {
-    this._init(appsMenuButton, app);
+   this._init(appsMenuButton, app);
 }
 
 ApplicationButtonExtended.prototype = {
-    __proto__: CinnamonMenu.ApplicationButton.prototype,
+   __proto__: CinnamonMenu.ApplicationButton.prototype,
     
-    _init: function(appsMenuButton, app) {
-        CinnamonMenu.GenericApplicationButton.prototype._init.call(this, appsMenuButton, app, true);
-        this.category = new Array();
-        this.actor.set_style_class_name('menu-application-button');
-        this.icon = this.app.create_icon_texture(APPLICATION_ICON_SIZE);
-        this.name = this.app.get_name();
-        this.label = new St.Label({ text: this.name , style_class: 'menu-application-button-label' });
-        this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-        //this.label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        //this.label.clutter_text.set_justify (true);
-        this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
-        //  this.label.clutter_text.line-alignment = Pango.Alignment.RIGHT;
-        this.container = new St.BoxLayout();
-        this.textBox = new St.BoxLayout({ vertical: false });
-        this.setVertical(false);
+   _init: function(appsMenuButton, app) {
+      CinnamonMenu.GenericApplicationButton.prototype._init.call(this, appsMenuButton, app, true);
+      this.category = new Array();
+      this.actor.set_style_class_name('menu-application-button');
+      this.icon = this.app.create_icon_texture(APPLICATION_ICON_SIZE);
+      this.name = this.app.get_name();
+      this.label = new St.Label({ text: this.name , style_class: 'menu-application-button-label' });
+      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.container = new St.BoxLayout();
+      this.textBox = new St.BoxLayout({ vertical: false });
+      this.setVertical(false);
 
-        this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-        this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-        this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-        this.addActor(this.container);
-        this._draggable = DND.makeDraggable(this.actor);
-        this.isDraggableApp = true;
-        this.icon.realize();
-        this.label.realize();
-    },
+      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.addActor(this.container);
+      this._draggable = DND.makeDraggable(this.actor);
+      this.isDraggableApp = true;
+      this.icon.realize();
+      this.label.realize();
+   },
 
-    setVertical: function(vertical) {
-       this.container.set_vertical(vertical);
-       this.label.clutter_text.line_wrap = vertical;
-       if(vertical) {
-          this.textBox.set_width(4*APPLICATION_ICON_SIZE);
-          this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);
-          
-       }
-       else {
-          this.textBox.set_width(-1);
-          this.textBox.set_height(-1);
-       }
-    }
+   setVertical: function(vertical) {
+      this.container.set_vertical(vertical);
+      this.label.clutter_text.line_wrap = vertical;
+      if(vertical) {
+         this.textBox.set_width(4*APPLICATION_ICON_SIZE);
+         this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);    
+      }
+      else {
+         this.textBox.set_width(-1);
+         this.textBox.set_height(-1);
+      }
+   }
 };
 
 function PlaceButtonExtended(appsMenuButton, place, button_name) {
-    this._init(appsMenuButton, place, button_name);
+   this._init(appsMenuButton, place, button_name);
 }
 
 PlaceButtonExtended.prototype = {
-    __proto__: CinnamonMenu.PlaceButton.prototype,
+   __proto__: CinnamonMenu.PlaceButton.prototype,
 
-    _init: function(appsMenuButton, place, button_name) {
-        PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
-        this.appsMenuButton = appsMenuButton;
-        this.place = place;
-        this.button_name = button_name;
-        this.actor.set_style_class_name('menu-application-button');
-        this.actor._delegate = this;
-        this.label = new St.Label({ text: this.button_name, style_class: 'menu-application-button-label' });
-        //this.label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        //this.label.clutter_text.set_justify (true);
-        this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
-        //  this.label.clutter_text.line-alignment = Pango.Alignment.RIGHT;
-        this.container = new St.BoxLayout();
-        this.textBox = new St.BoxLayout({ vertical: false });
-        this.setVertical(false);
+   _init: function(appsMenuButton, place, button_name) {
+      PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
+      this.appsMenuButton = appsMenuButton;
+      this.place = place;
+      this.button_name = button_name;
+      this.actor.set_style_class_name('menu-application-button');
+      this.actor._delegate = this;
+      this.label = new St.Label({ text: this.button_name, style_class: 'menu-application-button-label' });
+      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.container = new St.BoxLayout();
+      this.textBox = new St.BoxLayout({ vertical: false });
+      this.setVertical(false);
 
-        this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-        this.icon = place.iconFactory(APPLICATION_ICON_SIZE);
-        if(!this.icon)
-           this.icon = new St.Icon({icon_name: "folder", icon_size: APPLICATION_ICON_SIZE, icon_type: St.IconType.FULLCOLOR});
-        if(this.icon)
-           this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-        this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.icon = place.iconFactory(APPLICATION_ICON_SIZE);
+      if(!this.icon)
+         this.icon = new St.Icon({icon_name: "folder", icon_size: APPLICATION_ICON_SIZE, icon_type: St.IconType.FULLCOLOR});
+      if(this.icon)
+         this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
 
-        this.addActor(this.container);
-        this.icon.realize();
-        this.label.realize();
-    },
+      this.addActor(this.container);
+      this.icon.realize();
+      this.label.realize();
+   },
 
-    setVertical: function(vertical) {
-       this.container.set_vertical(vertical);
-       this.label.clutter_text.line_wrap = vertical;
-       if(vertical) {
-          this.textBox.set_width(4*APPLICATION_ICON_SIZE);
-          this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);
-          
-       }
-       else {
-          this.textBox.set_width(-1);
-          this.textBox.set_height(-1);
-       }
-    }
+   setVertical: function(vertical) {
+      this.container.set_vertical(vertical);
+      this.label.clutter_text.line_wrap = vertical;
+      if(vertical) {
+         this.textBox.set_width(4*APPLICATION_ICON_SIZE);
+         this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);          
+      }
+      else {
+         this.textBox.set_width(-1);
+         this.textBox.set_height(-1);
+      }
+   }
 };
 
 function RecentButtonExtended(appsMenuButton, file) {
-    this._init(appsMenuButton, file);
+   this._init(appsMenuButton, file);
 }
 
 RecentButtonExtended.prototype = {
-    __proto__: CinnamonMenu.RecentButton.prototype,
+   __proto__: CinnamonMenu.RecentButton.prototype,
 
-    _init: function(appsMenuButton, file) {
-        PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
-        this.file = file;
-        this.appsMenuButton = appsMenuButton;
-        this.button_name = this.file.name;
-        this.actor.set_style_class_name('menu-application-button');
-        this.actor._delegate = this;
-        this.label = new St.Label({ text: this.button_name, style_class: 'menu-application-button-label' });
-        this.label.set_style("max-width: 250px;");
-        this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;
-        //this.label.clutter_text.set_justify (true);
-        this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
-        //  this.label.clutter_text.line-alignment = Pango.Alignment.RIGHT;
-        this.container = new St.BoxLayout();
-        this.textBox = new St.BoxLayout({ vertical: false });
-        this.setVertical(false);
+   _init: function(appsMenuButton, file) {
+      PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
+      this.file = file;
+      this.appsMenuButton = appsMenuButton;
+      this.button_name = this.file.name;
+      this.actor.set_style_class_name('menu-application-button');
+      this.actor._delegate = this;
+      this.label = new St.Label({ text: this.button_name, style_class: 'menu-application-button-label' });
+      this.label.set_style("max-width: 250px;");
+      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.container = new St.BoxLayout();
+      this.textBox = new St.BoxLayout({ vertical: false });
+      this.setVertical(false);
 
-        this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-        this.icon = file.createIcon(APPLICATION_ICON_SIZE);
-        this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-        this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.icon = file.createIcon(APPLICATION_ICON_SIZE);
+      this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
 
-        this.addActor(this.container);
-        this.icon.realize();
-        this.label.realize();
-    },
+      this.addActor(this.container);
+      this.icon.realize();
+      this.label.realize();
+   },
 
-    setVertical: function(vertical) {
-       this.container.set_vertical(vertical);
-       this.label.clutter_text.line_wrap = vertical;
-       if(vertical) {
-          this.textBox.set_width(4*APPLICATION_ICON_SIZE);
-          this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);
-          
-       }
-       else {
-          this.textBox.set_width(-1);
-          this.textBox.set_height(-1);
-       }
-    }
+   setVertical: function(vertical) {
+      this.container.set_vertical(vertical);
+      this.label.clutter_text.line_wrap = vertical;
+      if(vertical) {
+         this.textBox.set_width(4*APPLICATION_ICON_SIZE);
+         this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);
+      }
+      else {
+         this.textBox.set_width(-1);
+         this.textBox.set_height(-1);
+      }
+   }
 };
 
 function RecentClearButtonExtended(appsMenuButton) {
-    this._init(appsMenuButton);
+   this._init(appsMenuButton);
 }
 
 RecentClearButtonExtended.prototype = {
-    __proto__: CinnamonMenu.RecentClearButton.prototype,
+   __proto__: CinnamonMenu.RecentClearButton.prototype,
 
-    _init: function(appsMenuButton) {
-        PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
-        this.appsMenuButton = appsMenuButton;
-        this.actor.set_style_class_name('menu-application-button');
-        this.button_name = _("Clear list");
-        this.actor._delegate = this;
-        this.label = new St.Label({ text: this.button_name, style_class: 'menu-application-button-label' });
-        //this.label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-        //this.label.clutter_text.set_justify (true);
-        this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
-        //  this.label.clutter_text.line-alignment = Pango.Alignment.RIGHT;
-        this.container = new St.BoxLayout();
-        this.textBox = new St.BoxLayout({ vertical: false });
-        this.setVertical(false);
+   _init: function(appsMenuButton) {
+      PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
+      this.appsMenuButton = appsMenuButton;
+      this.actor.set_style_class_name('menu-application-button');
+      this.button_name = _("Clear list");
+      this.actor._delegate = this;
+      this.label = new St.Label({ text: this.button_name, style_class: 'menu-application-button-label' });
+      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.container = new St.BoxLayout();
+      this.textBox = new St.BoxLayout({ vertical: false });
+      this.setVertical(false);
 
-        this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-        this.icon = new St.Icon({ icon_name: 'edit-clear', icon_type: St.IconType.SYMBOLIC, icon_size: APPLICATION_ICON_SIZE });
-        this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-        this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.icon = new St.Icon({ icon_name: 'edit-clear', icon_type: St.IconType.SYMBOLIC, icon_size: APPLICATION_ICON_SIZE });
+      this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
 
-        this.addActor(this.container);
-        this.icon.realize();
-        this.label.realize();
-    },
+      this.addActor(this.container);
+      this.icon.realize();
+      this.label.realize();
+   },
 
-    setVertical: function(vertical) {
-       this.container.set_vertical(vertical);
-       this.label.clutter_text.line_wrap = vertical;
-       if(vertical) {
-          this.textBox.set_width(4*APPLICATION_ICON_SIZE);
-          this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);
-          
-       }
-       else {
-          this.textBox.set_width(-1);
-          this.textBox.set_height(-1);
-       }
-    }
+   setVertical: function(vertical) {
+      this.container.set_vertical(vertical);
+      this.label.clutter_text.line_wrap = vertical;
+      if(vertical) {
+         this.textBox.set_width(4*APPLICATION_ICON_SIZE);
+         this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);
+      }
+      else {
+         this.textBox.set_width(-1);
+         this.textBox.set_height(-1);
+      }
+   }
 };
 
 function FavoritesButtonExtended(appsMenuButton, app, nbFavorites) {
-    this._init(appsMenuButton, app, nbFavorites);
+   this._init(appsMenuButton, app, nbFavorites);
 }
 
 FavoritesButtonExtended.prototype = {
-    __proto__: CinnamonMenu.FavoritesButton.prototype,
+   __proto__: CinnamonMenu.FavoritesButton.prototype,
     
-    _init: function(appsMenuButton, app, nbFavorites) {
-        CinnamonMenu.GenericApplicationButton.prototype._init.call(this, appsMenuButton, app);
-        let monitorHeight = Main.layoutManager.primaryMonitor.height;
-        let real_size = (0.7*monitorHeight) / nbFavorites;
-        let icon_size = 0.6*real_size;
-        if (icon_size>MAX_FAV_ICON_SIZE) icon_size = MAX_FAV_ICON_SIZE;
-        this.actor.style = "padding-top: "+2+"px;padding-bottom: "+2+"px;padding-left: "+(2)+"px;padding-right: "+(2)+"px;margin:auto;";
+   _init: function(appsMenuButton, app, nbFavorites) {
+      CinnamonMenu.GenericApplicationButton.prototype._init.call(this, appsMenuButton, app);
+      let monitorHeight = Main.layoutManager.primaryMonitor.height;
+      let real_size = (0.7*monitorHeight) / nbFavorites;
+      let icon_size = 0.6*real_size;
+      if(icon_size>MAX_FAV_ICON_SIZE) icon_size = MAX_FAV_ICON_SIZE;
+      this.actor.style = "padding-top: "+2+"px;padding-bottom: "+2+"px;padding-left: "+(2)+"px;padding-right: "+(2)+"px;margin:auto;";
 
-        this.actor.add_style_class_name('menu-favorites-button');
-        let icon = app.create_icon_texture(icon_size);
-        this.addActor(icon);
-        icon.realize()
+      this.actor.add_style_class_name('menu-favorites-button');
+      let icon = app.create_icon_texture(icon_size);
+      this.addActor(icon);
+      icon.realize()
 
-        this._draggable = DND.makeDraggable(this.actor);     
-        this.isDraggableApp = true;
-    }
+      this._draggable = DND.makeDraggable(this.actor);     
+      this.isDraggableApp = true;
+   }
 };
 
 function MyApplet(orientation, panel_height, instance_id) {
@@ -984,20 +1082,17 @@ MyApplet.prototype = {
 
    _navegationInit: function(symbol) {
       let item_actor;
+      this._previousTreeSelectedActor = this.catBoxIter.getFirstVisible();
       if(symbol == Clutter.Tab) {
          if(this.showHoverIcon)
             this.fav_actor = this.hover.actor;
          else
             this.fav_actor = this.powerButtons;
          Mainloop.idle_add(Lang.bind(this, this._putFocus));
-      } else if(symbol == Clutter.KEY_Up) {
-         this._activeContainer = this.applicationsBox;
-         item_actor = this.appBoxIter.getLastVisible();
-      } else if (symbol == Clutter.KEY_Down) {
+      } else if((symbol == Clutter.KEY_Right)||(symbol == Clutter.KEY_Up)||(symbol == Clutter.KEY_Down)) {
          this._activeContainer = this.applicationsBox;
          item_actor = this.appBoxIter.getFirstVisible();
       }
-     
       //global.stage.set_key_focus(this.powerButtons);
       this._selectedItemIndex = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
       this._selectedColumnIndex = this.appBoxIter.getInternalIndexOfChild(item_actor);
@@ -1029,7 +1124,7 @@ MyApplet.prototype = {
       }
       else if(symbol == Clutter.KEY_Left) {//&& !this.searchActive
          this._previousSelectedActor = this.applicationsBox.get_child_at_index(index).get_child_at_index(0);
-         item_actor = (this._previousTreeSelectedActor != null) ? this._previousTreeSelectedActor : this.catBoxIter.getFirstVisible();
+         item_actor = (this._previousTreeSelectedActor) ? this._previousTreeSelectedActor : this.catBoxIter.getFirstVisible();
          index = this.catBoxIter.getAbsoluteIndexOfChild(item_actor);
          this._previousTreeSelectedActor = item_actor;
       } else if((symbol == Clutter.KEY_Return) || (symbol == Clutter.KP_Enter)) {
@@ -1073,7 +1168,7 @@ MyApplet.prototype = {
       else if(symbol == Clutter.KEY_Left) {//&& !this.searchActive
          if(columnIndex == 0) {
             this._previousSelectedActor = this.applicationsBox.get_child_at_index(index).get_child_at_index(0);
-            item_actor = (this._previousTreeSelectedActor != null) ? this._previousTreeSelectedActor : this.catBoxIter.getFirstVisible();
+            item_actor = (this._previousTreeSelectedActor) ? this._previousTreeSelectedActor : this.catBoxIter.getFirstVisible();
             index = this.catBoxIter.getAbsoluteIndexOfChild(item_actor);
             this._previousTreeSelectedActor = item_actor;
          } else {
@@ -1264,91 +1359,46 @@ MyApplet.prototype = {
                visibleAppButtons.push(this._applicationsButtons[i]);
             }
          }
-         let valance = Math.floor(visibleAppButtons.length/this.iconViewCount);
-         if(valance * 4 < visibleAppButtons.length)
-            valance++;
-         let currValue;
-         for(let i = 0; i < valance; i++) {
-            viewBox = new St.BoxLayout({ vertical: false });
-            for(let j = 0; j < this.iconViewCount; j++) {
-               currValue = (i*(this.iconViewCount) + j);
-               if(currValue < visibleAppButtons.length) {
-                  viewBox.add_actor(visibleAppButtons[currValue].actor);
-                  viewBox.add_actor(visibleAppButtons[currValue].menu.actor);
-               }
-            }
-            this.applicationsBox.add_actor(viewBox);
-         }
-//place
-         visibleAppButtons = new Array();
          for(let i = 0; i < this._placesButtons.length; i++) {
             if(this._placesButtons[i].actor.visible) {
                this._placesButtons[i].setVertical(this.iconView);
                visibleAppButtons.push(this._placesButtons[i]);
             }
          }
-         valance = Math.floor(visibleAppButtons.length/this.iconViewCount);
-         if(valance * 4 < visibleAppButtons.length)
-            valance++;
-         for(let i = 0; i < valance; i++) {
-            viewBox = new St.BoxLayout({ vertical: false });
-            for(let j = 0; j < this.iconViewCount; j++) {
-               currValue = (i*(this.iconViewCount) + j);
-               if(currValue < visibleAppButtons.length) {
-                  viewBox.add_actor(visibleAppButtons[currValue].actor);
-               }
-            }
-            this.applicationsBox.add_actor(viewBox);
-         }
-//recent
-         visibleAppButtons = new Array();
          for(let i = 0; i < this._recentButtons.length; i++) {
             if(this._recentButtons[i].actor.visible) {
                this._recentButtons[i].setVertical(this.iconView);
                visibleAppButtons.push(this._recentButtons[i]);
             }
          }
-         valance = Math.floor(visibleAppButtons.length/this.iconViewCount);
+         for(let i = 0; i < this._transientButtons.length; i++) {
+            if(this._transientButtons[i].actor.visible) {
+               this._transientButtons[i].setVertical(this.iconView);
+               visibleAppButtons.push(this._transientButtons[i]);
+            }
+         }
+
+         let valance = Math.floor(visibleAppButtons.length/this.iconViewCount);
          if(valance * 4 < visibleAppButtons.length)
             valance++;
+         let currValue, falseActor;
          for(let i = 0; i < valance; i++) {
             viewBox = new St.BoxLayout({ vertical: false });
             for(let j = 0; j < this.iconViewCount; j++) {
                currValue = (i*(this.iconViewCount) + j);
                if(currValue < visibleAppButtons.length) {
                   viewBox.add_actor(visibleAppButtons[currValue].actor);
+                  if(visibleAppButtons[currValue].menu)
+                     viewBox.add_actor(visibleAppButtons[currValue].menu.actor);
+                  else {//Remplace menu actor by a hide false actor.
+                     falseActor = new St.BoxLayout();
+                     falseActor.hide();
+                     viewBox.add_actor(falseActor);
+                  }
                }
             }
             this.applicationsBox.add_actor(viewBox);
          }
-//transient      
-         for(let i = 0; i < this._transientButtons.length; i ++) {
-            if(this._transientButtons[i].actor.visible) {
-               viewBox = new St.BoxLayout({ vertical: false});
-               viewBox.add_actor(this._transientButtons[i].actor);
-               this.applicationsBox.add_actor(viewBox);
-            }
-         }
-         this.applicationsBox.set_width(this.iconViewCount*this._applicationsBoxWidth + 42);
-      } else {
-         for(let i = 0; i < this._applicationsButtons.length; i++) {
-            this._applicationsButtons[i].setVertical(this.iconView);
-            viewBox = new St.BoxLayout({ vertical: true});
-            viewBox.add_actor(this._applicationsButtons[i].actor);
-            viewBox.add_actor(this._applicationsButtons[i].menu.actor);
-            this.applicationsBox.add_actor(viewBox);
-         }
-         for(let i = 0; i < this._placesButtons.length; i ++) {
-            viewBox = new St.BoxLayout({ vertical: true});
-            viewBox.add_actor(this._placesButtons[i].actor);
-            this.applicationsBox.add_actor(viewBox);
-         }
-         for(let i = 0; i < this._recentButtons.length; i ++) {
-            viewBox = new St.BoxLayout({ vertical: true});
-            viewBox.add_actor(this._recentButtons[i].actor);
-            this.applicationsBox.add_actor(viewBox);
-         }
-         this.applicationsBox.set_width(this._applicationsBoxWidth + 42);
       }
       } catch(e) {
         Main.notify("Error", e.message);
@@ -1784,14 +1834,29 @@ MyApplet.prototype = {
          }
       }
 
+      for(indexT in this._transientButtons) {
+         if(this._transientButtons[indexT].actor.visible) {
+            this._appLeaveEvent(0, 0, this._transientButtons[indexT]);
+            this._transientButtons[indexT].actor.visible = false;//.hide();
+         }
+      }
+
       if(autocompletes) {
+         let viewBox;
          for(let i = 0; i < autocompletes.length; i++) {
-            let button = new TransientButton(this, autocompletes[i]);
+            let button = new TransientButtonExtended(this, autocompletes[i]);
             button.actor.connect('realize', Lang.bind(this, this._onApplicationButtonRealized));
             button.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, button));
             this._addEnterEvent(button, Lang.bind(this, this._appEnterEvent, button));
             this._transientButtons.push(button);
+            button.actor.visible = true;
             button.actor.realize();
+            if(!this.iconView) {
+               button.setVertical(this.iconView);
+               viewBox = new St.BoxLayout({ vertical: true });
+               viewBox.add_actor(button.actor);
+               this.applicationsBox.add_actor(viewBox);
+            }
          }
       }
       this._updateView();
@@ -1855,6 +1920,7 @@ MyApplet.prototype = {
       this._transientButtons = new Array();
       this._applicationsButtonFromApp = new Object(); 
       this._applicationsBoxWidth = 0;
+      this._activeContainer = null;
       //Remove all categories
       this.categoriesBox.destroy_all_children();
 
@@ -1948,7 +2014,16 @@ MyApplet.prototype = {
          let sr = a.app.get_name().toLowerCase() > b.app.get_name().toLowerCase();
          return sr;
       });
-       
+
+      if(!this.iconView) {
+         for(let i = 0; i < this._applicationsButtons.length; i++) {
+            this._applicationsButtons[i].setVertical(this.iconView);
+            viewBox = new St.BoxLayout({ vertical: true});
+            viewBox.add_actor(this._applicationsButtons[i].actor);
+            viewBox.add_actor(this._applicationsButtons[i].menu.actor);
+            this.applicationsBox.add_actor(viewBox);
+         }
+      }
       this._refreshPlacesAndRecent();
 
       this._clearPrevCatSelection(this._allAppsCategoryButton.actor);
@@ -2101,6 +2176,21 @@ MyApplet.prototype = {
          }
       }
       this._setCategoriesButtonActive(!this.searchActive);
+
+      if(!this.iconView) {
+         for(let i = 0; i < this._placesButtons.length; i ++) {
+            this._placesButtons[i].setVertical(this.iconView);
+            viewBox = new St.BoxLayout({ vertical: true});
+            viewBox.add_actor(this._placesButtons[i].actor);
+            this.applicationsBox.add_actor(viewBox);
+         }
+         for(let i = 0; i < this._recentButtons.length; i ++) {
+            this._recentButtons[i].setVertical(this.iconView);
+            viewBox = new St.BoxLayout({ vertical: true});
+            viewBox.add_actor(this._recentButtons[i].actor);
+            this.applicationsBox.add_actor(viewBox);
+         }
+      }
    },
 
 //systemButtons
@@ -2241,7 +2331,7 @@ MyApplet.prototype = {
       let _callback = Lang.bind(this, function() {
          try {
             let parent = button.actor.get_parent();
-            if(parent != this.categoriesBox)
+            if((parent)&&(parent != this.categoriesBox))
                parent = parent.get_parent();
             if(this._activeContainer !== this.applicationsBox && parent !== this._activeContainer) {
                this._previousTreeItemIndex = this._selectedItemIndex;
@@ -2252,7 +2342,7 @@ MyApplet.prototype = {
                parent !== this._activeContainer && button !== this._previousTreeSelectedActor) {
                this._previousTreeSelectedActor.style_class = "menu-category-button";
             }
-            if(parent != this._activeContainer) {
+            if((parent)&&(parent != this._activeContainer)) {
                 parent._vis_iter.reloadVisible();
             }
             let _maybePreviousActor = this._activeActor;
@@ -2266,11 +2356,13 @@ MyApplet.prototype = {
             }
             this._activeContainer = parent;
             this._activeActor = button.actor;
-            this._selectedItemIndex = this._activeContainer._vis_iter.getAbsoluteIndexOfChild(this._activeActor);
-            this._selectedColumnIndex = this._activeContainer._vis_iter.getInternalIndexOfChild(this._activeActor);
+            if(this._activeContainer) {
+               this._selectedItemIndex = this._activeContainer._vis_iter.getAbsoluteIndexOfChild(this._activeActor);
+               this._selectedColumnIndex = this._activeContainer._vis_iter.getInternalIndexOfChild(this._activeActor);
+            }
             callback();
          } catch(e) {
-            Main.notify("error", e.message);
+            Main.notify("error3", e.message);
          }
       });
       button.connect('enter-event', _callback);
