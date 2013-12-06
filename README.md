@@ -60,6 +60,10 @@ Add new languages:
 
 Change Log:
 ==============
+0.5-Beta
+   - Added Dragon theme to put the categories horizontally.
+   - Implementation of horizontal auto scrolling(do not exist in cinnamon).
+
 0.4-Beta
    - Fixed bug in list view mode that cause lag when you change categories.
    - Fixed bug in icon view mode when searching app.

@@ -41,7 +41,6 @@ const FileUtils = imports.misc.fileUtils;
 
 
 const ICON_SIZE = 16;
-const CATEGORY_ICON_SIZE = 22;
 
 const USER_DESKTOP_PATH = FileUtils.getUserDesktopDir();
 
@@ -79,6 +78,7 @@ const MAX_FAV_ICON_SIZE = 32;
 const HOVER_ICON_SIZE = 68;
 const APPLICATION_ICON_SIZE = 22;
 const MAX_RECENT_FILES = 20;
+const CATEGORY_ICON_SIZE = 22;
 /*
 const LIB_PATH = '/usr/share/cinnamon/applets/menu@cinnamon.org';
 imports.searchPath.unshift(LIB_PATH);
@@ -834,6 +834,150 @@ FavoritesButtonExtended.prototype = {
    }
 };
 
+function CategoryButtonExtended(app) {
+   this._init(app);
+}
+
+CategoryButtonExtended.prototype = {
+   __proto__: CinnamonMenu.CategoryButton.prototype,
+
+   _init: function(category) {
+      PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
+
+      this.actor.set_style_class_name('menu-category-button');
+      var label;
+      let icon = null;
+      if(category) {
+         icon = category.get_icon();
+         if(icon && icon.get_names)
+            this.icon_name = icon.get_names().toString();
+         else
+            this.icon_name = "";
+         label = category.get_name();
+      } else
+         label = _("All Applications");
+        
+      this.actor._delegate = this;
+      this.label = new St.Label({ text: label, style_class: 'menu-category-button-label' });
+      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.container = new St.BoxLayout();
+      this.textBox = new St.BoxLayout({ vertical: false });
+      this.setVertical(false);
+
+      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      if(category && this.icon_name) {
+         this.icon = St.TextureCache.get_default().load_gicon(null, icon, CATEGORY_ICON_SIZE);
+         this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+         this.icon.realize();
+      }
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+
+      this.addActor(this.container);
+      this.label.realize();
+   },
+
+   setVertical: function(vertical) {
+      this.container.set_vertical(vertical);
+    /*  this.label.clutter_text.line_wrap = vertical;
+      if(vertical) {
+         this.textBox.set_width(4*APPLICATION_ICON_SIZE);
+         this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);    
+      }
+      else {
+         this.textBox.set_width(-1);
+         this.textBox.set_height(-1);
+      }*/
+   }
+};
+
+function PlaceCategoryButtonExtended(app) {
+    this._init(app);
+}
+
+PlaceCategoryButtonExtended.prototype = {
+   __proto__: CinnamonMenu.PlaceCategoryButton.prototype,
+
+   _init: function(category) {
+      PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
+      this.actor.set_style_class_name('menu-category-button');
+      this.actor._delegate = this;
+      this.label = new St.Label({ text: _("Places"), style_class: 'menu-category-button-label' });
+      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.container = new St.BoxLayout();
+      this.textBox = new St.BoxLayout({ vertical: false });
+      this.setVertical(false);
+
+      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.icon = new St.Icon({icon_name: "folder", icon_size: CATEGORY_ICON_SIZE, icon_type: St.IconType.FULLCOLOR});
+      this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+
+      this.addActor(this.container);
+      this.icon.realize();
+      this.label.realize();
+   },
+
+   setVertical: function(vertical) {
+      this.container.set_vertical(vertical);
+     /* this.label.clutter_text.line_wrap = vertical;
+      if(vertical) {
+         this.textBox.set_width(4*APPLICATION_ICON_SIZE);
+         this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);    
+      }
+      else {
+         this.textBox.set_width(-1);
+         this.textBox.set_height(-1);
+      }*/
+   }
+};
+
+function RecentCategoryButtonExtended(app) {
+   this._init(app);
+}
+
+RecentCategoryButtonExtended.prototype = {
+   __proto__: CinnamonMenu.RecentCategoryButton.prototype,
+
+   _init: function(category) {
+      PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
+      this.actor.set_style_class_name('menu-category-button');
+      this.actor._delegate = this;
+      this.label = new St.Label({ text: _("Recent Files"), style_class: 'menu-category-button-label' });
+      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.container = new St.BoxLayout();
+      this.textBox = new St.BoxLayout({ vertical: false });
+      this.setVertical(false);
+
+      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.icon = new St.Icon({icon_name: "folder-recent", icon_size: CATEGORY_ICON_SIZE, icon_type: St.IconType.FULLCOLOR});
+      this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+
+      this.addActor(this.container);
+      this.icon.realize();
+      this.label.realize();
+   },
+
+   setVertical: function(vertical) {
+      this.container.set_vertical(vertical);
+     /* this.label.clutter_text.line_wrap = vertical;
+      if(vertical) {
+         this.textBox.set_width(4*APPLICATION_ICON_SIZE);
+         this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);    
+      }
+      else {
+         this.textBox.set_width(-1);
+         this.textBox.set_height(-1);
+      }*/
+   }
+};
+
 function MyApplet(orientation, panel_height, instance_id) {
    this._init(orientation, panel_height, instance_id);
 }
@@ -1462,7 +1606,7 @@ MyApplet.prototype = {
       this._updateClock();
       this._updateDate();
       this._update_autoscroll();
-      this._refreshPlacesAndRecent();
+      //this._refreshPlacesAndRecent();
       this._updateActivateOnHover();
       this._updateIconAndLabel();
       this._update_hover_delay();
@@ -1470,20 +1614,30 @@ MyApplet.prototype = {
 
    _updateHeight: function() {
       if(this.controlingHeight) {
-         let oldHeight = this.betterPanel.get_height();
          this.betterPanel.set_height(this.height);
-         if(this.scrollFavoritesVisible)
-            this.favBoxWrapper.set_height(-1);
-         else
+         if(this.scrollFavoritesVisible) {
+            this.favBoxWrapper.set_height(this.height +  this.searchBox.get_height());
+            this.favoritesBox.set_height(-1);
+         }
+         else {
             this.favoritesBox.set_height(this.height - this._internalHeight(this.favBoxWrapper) + this.favoritesBox.get_height() + this.searchBox.get_height());
-         if(this.scrollCategoriesVisible)
-            this.categoriesBox.set_height(-1);
-         else
-            this.categoriesBox.set_height(this.height);
-         if(this.scrollApplicationsVisible)
-            this.applicationsBox.set_height(-1);
-         else
-            this.applicationsBox.set_height(this.height);
+            this.favBoxWrapper.set_height(-1);
+         }
+         if(this.categoriesBox.get_vertical()) {
+            if(this.scrollApplicationsVisible)
+               this.applicationsBox.set_height(-1);
+            else
+               this.applicationsBox.set_height(this.height);
+            if(this.scrollCategoriesVisible)
+               this.categoriesBox.set_height(-1);
+            else
+               this.categoriesBox.set_height(this.height);
+         } else {
+            if(this.scrollApplicationsVisible)
+               this.applicationsBox.set_height(-1);
+            else
+               this.applicationsBox.set_height(this.height - this.categoriesBox.get_height());
+         }
       }
       else {
          this.favBoxWrapper.set_height(-1);
@@ -1493,10 +1647,18 @@ MyApplet.prototype = {
       }
    },
 
+   _updateWidth: function() {
+     /* this.betterPanel.set_width(this.applicationsBox.get_width());
+      if(this.scrollCategoriesVisible)
+         this.categoriesBox.set_width(-1);
+      else*/
+         this.categoriesBox.set_width(this.applicationsBox.get_width());
+    },
+
    _internalHeight: function(pane) {
       let actors = pane.get_children();
       let result = 0;
-      for(var i=0; i<actors.length; i++) {
+      for(var i = 0; i < actors.length; i++) {
          result += actors[i].get_height();
       }
       return result;
@@ -1524,18 +1686,33 @@ MyApplet.prototype = {
       }
    },
 
-   _createVerticalScroll: function() {
-      let scrollBox = new St.ScrollView({ x_fill: true, y_fill: false, y_align: St.Align.START, style_class: 'vfade menu-applications-scrollbox' });
-      scrollBox.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
-      let vscroll = scrollBox.get_vscroll_bar();
-      vscroll.connect('scroll-start',
-                       Lang.bind(this, function() {
+   _createScroll: function(vertical) {
+      let scrollBox;
+      if(vertical) {
+         scrollBox = new St.ScrollView({ x_fill: true, y_fill: false, y_align: St.Align.START, style_class: 'vfade menu-applications-scrollbox' });
+         scrollBox.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+         let vscroll = scrollBox.get_vscroll_bar();
+         vscroll.connect('scroll-start',
+                          Lang.bind(this, function() {
                           this.menu.passEvents = true;
                        }));
-      vscroll.connect('scroll-stop',
-                       Lang.bind(this, function() {
+         vscroll.connect('scroll-stop',
+                          Lang.bind(this, function() {
                           this.menu.passEvents = false;
                        }));
+      } else {
+         scrollBox = new St.ScrollView({ x_fill: false, y_fill: true, x_align: St.Align.START, style_class: 'hfade menu-applications-scrollbox' });
+         scrollBox.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER);
+         let hscroll = scrollBox.get_hscroll_bar();
+         hscroll.connect('scroll-start',
+                          Lang.bind(this, function() {
+                          this.menu.passEvents = true;
+                       }));
+         hscroll.connect('scroll-stop',
+                          Lang.bind(this, function() {
+                          this.menu.passEvents = false;
+                       }));
+      }
       return scrollBox;
    },
 
@@ -1573,6 +1750,8 @@ MyApplet.prototype = {
 
          this._session = new GnomeSession.SessionManager();
          this._screenSaverProxy = new ScreenSaver.ScreenSaverProxy();
+
+         this.mainBox = new St.BoxLayout({ style_class: 'menu-applications-box', vertical:false });
 
          this.rightPane = new St.BoxLayout({ vertical: true });        
 //search
@@ -1632,10 +1811,8 @@ MyApplet.prototype = {
          this.categoriesApplicationsBox = new CinnamonMenu.CategoriesApplicationsBox();
          this.rightPane.add_actor(this.categoriesApplicationsBox.actor);
 
-         this.favoritesScrollBox = this._createVerticalScroll();
-         this.categoriesScrollBox = this._createVerticalScroll();
-         this.applicationsScrollBox = this._createVerticalScroll();
-         this._update_autoscroll();
+         this.favoritesScrollBox = this._createScroll(true);
+         this.applicationsScrollBox = this._createScroll(true);
 
          this.categoriesBox = new St.BoxLayout({ style_class: 'menu-categories-box', vertical: true });
          this.applicationsBox = new St.BoxLayout({ style_class: 'menu-applications-box', vertical:true });
@@ -1649,26 +1826,6 @@ MyApplet.prototype = {
          this.favoritesScrollBox.add_actor(this.favoritesBox);
          this.favBoxWrapper.add_actor(this.favoritesScrollBox);
 
-         this.categoriesScrollBox.add_actor(this.categoriesBox);
-         this.applicationsScrollBox.add_actor(this.applicationsBox);
-
-         this.betterPanel = new St.BoxLayout({ vertical: false });
-
-         //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
-         this.betterPanel.add(this.categoriesScrollBox, { x_fill: false, expand: false });
-         this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, expand: false });
-
-         this.categoriesApplicationsBox.actor.add_actor(this.betterPanel);
-                                                          
-         this.mainBox = new St.BoxLayout({ style_class: 'menu-applications-box', vertical:false });
-
-         this.appBoxIter = new VisibleChildIteratorExtended(this, this.applicationsBox, this.iconViewCount);
-         this.applicationsBox._vis_iter = this.appBoxIter;
-         this.catBoxIter = new VisibleChildIteratorExtended(this, this.categoriesBox, 1);
-         this.categoriesBox._vis_iter = this.catBoxIter;
-
-         this._refreshApps();
-
          this.endBox = new St.BoxLayout({ vertical: false });
          this.selectedAppBox = new St.BoxLayout({ style_class: 'menu-selected-app-box', vertical: true });
          this.selectedAppTitle = new St.Label({ style_class: 'menu-selected-app-title', text: "" });
@@ -1678,25 +1835,49 @@ MyApplet.prototype = {
          
          this.endBox.add(this.selectedAppBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
          this.endBox.set_style("padding-right: 20px;");
-         this.signalKeyPowerID = 0;
+
+         this.betterPanel = new St.BoxLayout({ vertical: false });
 
          switch(this.theme) {
-            case "classic":
+            case "classic" :
                           this.loadClassic(); 
                           break;
             case "stylized":
                           this.loadStylized(); 
+                          break;
+            case "dragon"  :
+                          this.loadDragon(); 
                           break;
             default:
                           this.loadClassic(); 
                           break;
          }
 
+         this.categoriesScrollBox.add_actor(this.categoriesBox);
+         this.applicationsScrollBox.add_actor(this.applicationsBox);
+
+         //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+         this.betterPanel.add(this.categoriesScrollBox, { x_fill: false, expand: false });
+         this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, expand: false });
+
+         this.categoriesApplicationsBox.actor.add_actor(this.betterPanel);
+
+         this.appBoxIter = new VisibleChildIteratorExtended(this, this.applicationsBox, this.iconViewCount);
+         this.applicationsBox._vis_iter = this.appBoxIter;
+         this.catBoxIter = new VisibleChildIteratorExtended(this, this.categoriesBox, 1);
+         this.categoriesBox._vis_iter = this.catBoxIter;
+
+         this._refreshApps();
+
+         this.signalKeyPowerID = 0;
+         this._update_autoscroll();
+
          section.actor.add_actor(this.mainBox);
          section.actor.add_actor(this.endBox);
 
          Mainloop.idle_add(Lang.bind(this, function() {
             this._updateHeight();//Add by me
+            this._updateWidth();
             this._clearAllSelections(true);
          }));
       } catch(e) {
@@ -1705,6 +1886,7 @@ MyApplet.prototype = {
    },
 
    loadClassic: function() {
+      this.categoriesScrollBox = this._createScroll(true);
       this.powerButtons = this._powerButtons(true);
       this.favBoxWrapper.add(this.powerButtons, { y_align: St.Align.END, y_fill: false, expand: false });
       this.mainBox.add(this.favBoxWrapper, { y_align: St.Align.END, y_fill: false, expand: true });
@@ -1712,11 +1894,66 @@ MyApplet.prototype = {
    },
 
    loadStylized: function() {
+      this.categoriesScrollBox = this._createScroll(true);
       this.powerButtons = this._powerButtons(false);
       this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
       this.mainBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
    },
+
+   loadDragon: function() {
+      this.betterPanel.set_vertical(true);
+      this.categoriesBox.set_vertical(false);
+      let heightCat = CATEGORY_ICON_SIZE + 40;
+      this.categoriesBox.set_style('max-height: ' + heightCat + 'px; min-height: ' + heightCat + 'px');
+      this.categoriesScrollBox = this._createScroll(false);
+      this._setHorizontalAutoScroll(this.categoriesScrollBox);
+      this.powerButtons = this._powerButtons(false);
+      this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.mainBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
+   },
+
+   _setHorizontalAutoScroll: function(hScroll) {
+      hScroll.connect('motion-event', Lang.bind(this, this._onMotionEvent));
+   },
+
+   _onMotionEvent: function(actor, event) {
+      this.hScroll = actor;
+      let dMin = 10;
+      let dMax = 50;
+      let [mx, my] = event.get_coords();
+      let [ax, ay] = this.hScroll.get_transformed_position();
+      let [ah, aw] = [this.hScroll.get_height(), this.hScroll.get_width()];
+      if((my < ay + ah)&&(my > ay)&&((mx < ax + dMin)&&(mx > ax - dMax))||
+         ((mx > ax + aw - dMin)&&(mx < ax + aw + dMax)))
+         this._doHorizontalScroll();
+   },
+
+   _doHorizontalScroll: function() {
+      let dMin = 10;
+      let dMax = 50;
+      let speed = 1;
+      let [mx, my, mask] = global.get_pointer();
+      let [ax, ay] = this.hScroll.get_transformed_position();
+      let [ah, aw] = [this.hScroll.get_height(), this.hScroll.get_width()];
+      if((my < ay + ah)&&(my > ay)) {
+         if((mx < ax + dMin)&&(mx > ax - dMax)) {
+            if(ax > mx)
+               speed = 20*speed*(ax - mx)/dMax;
+            let val = this.hScroll.get_hscroll_bar().get_adjustment().get_value();
+            this.hScroll.get_hscroll_bar().get_adjustment().set_value(val - speed);
+            Mainloop.timeout_add(100, Lang.bind(this, this._doHorizontalScroll));
+         }
+         else if((mx > ax + aw - dMin)&&(mx < ax + aw + dMax)) {
+            if(ax + aw < mx)
+               speed = 20*speed*(mx - ax - aw)/dMax;
+            let val = this.hScroll.get_hscroll_bar().get_adjustment().get_value();
+            this.hScroll.get_hscroll_bar().get_adjustment().set_value(val + speed);
+            Mainloop.timeout_add(100, Lang.bind(this, this._doHorizontalScroll));
+         }
+      }
+   }, 
 
    _clearAllSelections: function(hide_apps) {
        for(let i = 0; i < this._applicationsButtons.length; i++) {
@@ -1873,6 +2110,9 @@ MyApplet.prototype = {
             this.applicationsBox.set_width(this._applicationsBoxWidth + 42); // The answer to life...
          }
       }
+      if(!this.categoriesBox.get_vertical()) {
+         this._updateWidth();
+      }
    },
 
    _refreshFavs: function() {
@@ -1918,13 +2158,14 @@ MyApplet.prototype = {
       this.applicationsBox.destroy_all_children();
       this._applicationsButtons = new Array();
       this._transientButtons = new Array();
+      this._categoryButtons = new Array();
       this._applicationsButtonFromApp = new Object(); 
       this._applicationsBoxWidth = 0;
       this._activeContainer = null;
       //Remove all categories
       this.categoriesBox.destroy_all_children();
 
-      this._allAppsCategoryButton = new CinnamonMenu.CategoryButton(null);
+      this._allAppsCategoryButton = new CategoryButtonExtended(null);
       this._addEnterEvent(this._allAppsCategoryButton, Lang.bind(this, function() {
          if(!this.searchActive) {
             this._allAppsCategoryButton.isHovered = true;
@@ -1953,6 +2194,7 @@ MyApplet.prototype = {
          this._allAppsCategoryButton.isHovered = false;
       }));
       this.categoriesBox.add_actor(this._allAppsCategoryButton.actor);
+      this._categoryButtons.push(this._allAppsCategoryButton);
 
       let trees = [appsys.get_tree()];
 
@@ -1968,7 +2210,7 @@ MyApplet.prototype = {
                if(dir.get_is_nodisplay())
                   continue;
                if(this._loadCategory(dir)) {
-                  let categoryButton = new CinnamonMenu.CategoryButton(dir);
+                  let categoryButton = new CategoryButtonExtended(dir);
                   this._addEnterEvent(categoryButton, Lang.bind(this, function() {
                      if(!this.searchActive) {
                         categoryButton.isHovered = true;
@@ -2005,6 +2247,7 @@ MyApplet.prototype = {
                      categoryButton.isHovered = false;
                   }));
                   this.categoriesBox.add_actor(categoryButton.actor);
+                  this._categoryButtons.push(categoryButton);
                }
             }
          } 
@@ -2015,6 +2258,7 @@ MyApplet.prototype = {
          return sr;
       });
 
+      let viewBox;
       if(!this.iconView) {
          for(let i = 0; i < this._applicationsButtons.length; i++) {
             this._applicationsButtons[i].setVertical(this.iconView);
@@ -2024,12 +2268,22 @@ MyApplet.prototype = {
             this.applicationsBox.add_actor(viewBox);
          }
       }
+
       this._refreshPlacesAndRecent();
 
-      this._clearPrevCatSelection(this._allAppsCategoryButton.actor);
-      this._allAppsCategoryButton.actor.style_class = "menu-category-button-selected";
-      this._select_category(null, this._allAppsCategoryButton);
-      this.appBoxIter.setNumberView(this.iconViewCount);
+      Mainloop.idle_add(Lang.bind(this, function() {
+      try {
+         if(!this.categoriesBox.get_vertical()) {
+            for(let i = 0; i < this._categoryButtons.length; i++) {
+               this._categoryButtons[i].setVertical(true);
+            }
+         }
+         this._clearPrevCatSelection(this._allAppsCategoryButton.actor);
+         this._allAppsCategoryButton.actor.style_class = "menu-category-button-selected";
+         this._select_category(null, this._allAppsCategoryButton);
+         this.appBoxIter.setNumberView(this.iconViewCount);
+      } catch(e) {Main.notify("errr", e.message);}
+      }));
    },
 
    _refreshPlacesAndRecent : function() {
@@ -2050,7 +2304,7 @@ MyApplet.prototype = {
 
       // Now generate Places category and places buttons and add to the list
       if(this.showPlaces) {
-         this.placesButton = new CinnamonMenu.PlaceCategoryButton();
+         this.placesButton = new PlaceCategoryButtonExtended();
          this._addEnterEvent(this.placesButton, Lang.bind(this, function() {
             if(!this.searchActive) {
                this.placesButton.isHovered = true;
@@ -2108,7 +2362,7 @@ MyApplet.prototype = {
       }
       // Now generate recent category and recent files buttons and add to the list
       if(this.showRecent) {
-         this.recentButton = new CinnamonMenu.RecentCategoryButton();
+         this.recentButton = new RecentCategoryButtonExtended();
          this._addEnterEvent(this.recentButton, Lang.bind(this, function() {
             if(!this.searchActive) {
                this.recentButton.isHovered = true;
@@ -2248,9 +2502,6 @@ MyApplet.prototype = {
 
    _sysButtonEnterEvent: function(actor, event) {
       this.old_active_item_actor = this._activeActor;
-      /*let item_actor = this.applicationsBox.get_child_at_index(this.applicationsBox.get_children().length -1);
-      this._scrollToButton(item_actor._delegate);*/
-      this.applicationsScrollBox.vscroll.get_adjustment().set_value(this.applicationsScrollBox.vscroll.get_adjustment().upper);
 
       this.applicationsScrollBox.set_auto_scrolling(false);
       this.categoriesScrollBox.set_auto_scrolling(false);

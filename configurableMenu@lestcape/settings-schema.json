@@ -6,7 +6,8 @@
         "tooltip": "Select a theme of paper menu.",
         "options": {
             "Classic": "classic",
-            "Stylized": "stylized"
+            "Stylized": "stylized",
+            "Dragon": "dragon"
         }
     },
    "menu-icon" : {
