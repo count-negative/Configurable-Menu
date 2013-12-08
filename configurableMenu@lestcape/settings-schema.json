@@ -104,6 +104,18 @@
       "description": "Show favorites",
       "tooltip": "Choose whether or not to show favorites in the menu."
    },
+   "favorites-lines" : {
+      "type": "spinbutton",
+      "default" : 1,
+      "min" : 1,
+      "max" : 4,
+      "step" : 1,
+      "units" : "lines",
+      "description" : "Number of favorites lines:",
+      "tooltip" : "Choose the number of favorites lines.",
+      "indent": true,
+      "dependency": "how-favorites"
+   },
    "show-hover-icon" : {
       "type" : "checkbox",
       "default" : false,

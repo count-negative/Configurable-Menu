@@ -1,11 +1,11 @@
-Configurable Menu v0.4-Beta
+Configurable Menu v0.5-Beta
 ==============
 
-Applet: Configurable Menu Version: v0.4-Beta
+Applet: Configurable Menu Version: v0.5-Beta
 
 O.S.: Cinnamon 
 
-Release Date: 03 Dicember 2013
+Release Date: 07 Dicember 2013
 
 Author: Lester Carballo Pérez
 
@@ -35,7 +35,9 @@ Skills including:
 
 6.	Different modes of view menu items.
 
-7.	And more for the future.
+7.	Favorites with multiple lines.
+
+8.	And more for the future.
 
 
 This program is free software:
@@ -63,6 +65,7 @@ Change Log:
 0.5-Beta
    - Added Dragon theme to put the categories horizontally.
    - Implementation of horizontal auto scrolling(do not exist in cinnamon).
+   - Implementation of favorites with multiple lines.
 
 0.4-Beta
    - Fixed bug in list view mode that cause lag when you change categories.
