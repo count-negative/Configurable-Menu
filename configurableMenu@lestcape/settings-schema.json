@@ -7,7 +7,9 @@
         "options": {
             "Classic": "classic",
             "Stylized": "stylized",
-            "Dragon": "dragon"
+            "Dragon": "dragon",
+            "Dragon Inverted": "dragonInverted",
+            "Horizontal": "horizontal"
         }
     },
    "menu-icon" : {
@@ -84,13 +86,11 @@
       "type": "spinbutton",
       "default" : 4,
       "min" : 0,
-      "max" : 10,
+      "max" : 14,
       "step" : 1,
       "units" : "items",
-      "indent": true,
-      "dependency": "view-item",
-      "description" : "Number of columns in icon view:",
-      "tooltip" : "Set the number of columns in icon view."
+      "description" : "Number of columns in view:",
+      "tooltip" : "Set the number of columns in view."
    },
    "activate-on-press" : {
       "type" : "checkbox",
@@ -100,7 +100,7 @@
    },
    "show-favorites" : {
       "type" : "checkbox",
-      "default" : false,
+      "default" : true,
       "description": "Show favorites",
       "tooltip": "Choose whether or not to show favorites in the menu."
    },
@@ -118,7 +118,7 @@
    },
    "show-hover-icon" : {
       "type" : "checkbox",
-      "default" : false,
+      "default" : true,
       "description": "Show hover icon",
       "tooltip": "Choose whether or not to show hover icon in the menu."
    },
@@ -182,8 +182,8 @@
    },
    "height" : {
       "type": "spinbutton",
-      "default" : 0,
-      "min" : 100,
+      "default" : 200,
+      "min" : 200,
       "max" : 1000,
       "step" : 5,
       "units" : "pixels",

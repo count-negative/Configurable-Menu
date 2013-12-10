@@ -471,34 +471,32 @@ HoverIcon.prototype = {
 };
 
 function FavoritesBoxExtended(vertical, numberLines) {
-    this._init(vertical, numberLines);
+   this._init(vertical, numberLines);
 }
 
 FavoritesBoxExtended.prototype = {
-    _init: function(vertical, numberLines) {
-     try {
-        this.actor = new St.BoxLayout();
-        this.actor._delegate = this;
-        this.numberLines = numberLines;
-        let internalLine;
-        for(let i = 0; i < this.numberLines; i++) {
-           internalLine = new St.BoxLayout();
-           this.actor.add_actor(internalLine);
-        }
-        this.setVertical(vertical);
-        this._dragPlaceholder = null;
-        this._dragPlaceholderPos = -1;
-        this._animatingPlaceholdersCount = 0;
-      } catch(e) {
-        Main.notify("ef", e.message);
+   _init: function(vertical, numberLines) {
+      this.actor = new St.BoxLayout();
+      this.actor.set_vertical(!vertical);
+      this.actor._delegate = this;
+      this.numberLines = numberLines;
+      let internalLine;
+      for(let i = 0; i < this.numberLines; i++) {
+         internalLine = new St.BoxLayout();
+         internalLine.set_vertical(vertical);
+         this.actor.add(internalLine, { x_align: St.Align.MIDDLE, y_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
       }
-    },
+      this.setVertical(vertical);
+      this._dragPlaceholder = null;
+      this._dragPlaceholderPos = -1;
+      this._animatingPlaceholdersCount = 0;
+   },
 
-    getNumberLines: function() {
-       return this.numberLines;
-    },
+   getNumberLines: function() {
+      return this.numberLines;
+   },
 
-    setNumberLines: function(numberLines) {
+   setNumberLines: function(numberLines) {
       let childrens = this.actor.get_children();
       let childrensItems;
       let saveItems = new Array();
@@ -515,7 +513,7 @@ FavoritesBoxExtended.prototype = {
       for(let i = this.numberLines; i < numberLines; i++) {
          internalLine = new St.BoxLayout();
          internalLine.set_vertical(this.isVertical);
-         this.actor.add_actor(internalLine);
+         this.actor.add(internalLine, { x_align: St.Align.MIDDLE, y_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
       }
       for(let i = numberLines; i < this.numberLines; i++) {
          this.actor.remove_actor(childrens[i]);
@@ -524,55 +522,67 @@ FavoritesBoxExtended.prototype = {
       for(let i = 0; i < saveItems.length; i++) {
          this.add(saveItems[i]);
       }
-    },
+   },
 
-    setVertical: function(vertical) {
-       this.isVertical = vertical;
-       this.actor.set_vertical(!vertical);
-       let childrens = this.actor.get_children();
-       for(let i = 0; i < childrens.length; i++) {
-          childrens[i].set_vertical(vertical);
-       }
-    },
+   setVertical: function(vertical) {
+      this.isVertical = vertical;
+      this.actor.set_vertical(!vertical);
+      let childrens = this.actor.get_children();
+      for(let i = 0; i < childrens.length; i++) {
+         childrens[i].set_vertical(vertical);
+      }
+   },
 
-    add: function(actor, properties) {
-       let childrens = this.actor.get_children();
-       let currentNumberLines = childrens[0].get_children().length;
-       if(currentNumberLines == 0) {
-          childrens[0].add(actor, properties);
-       }
-       else {
-          for(let i = 1; i < childrens.length; i++) {
-             if(currentNumberLines > childrens[i].get_children().length) {
-                childrens[i].add(actor, properties);
-                currentNumberLines--; 
-                break;
-             }
-          }
-          if(currentNumberLines == childrens[0].get_children().length)
-             childrens[0].add(actor, properties);
-       }
-    },
+   getVertical: function() {
+      return this.isVertical;
+   },
 
-    insert: function(actor, posX, posY) {
-       if((posX > -1)&&(posY > -1)) {
-          let posI, posE;
-             if(this.isVertical) {
-               posI = posX;
-               posE = posY;
-             }
-             else {
-               posI = posY;
-               posE = posX;
-             }
-          let childrens = this.actor.get_children();
-          if((posI < childrens.length)&&(posE <= childrens[posI].get_children().length)) {
-             childrens[posI].insert_actor(actor, posE);
-          }
-       }
-    },
+   getRealSpace: function() {
+      let result = 0;
+      let childrens = this.actor.get_children();
+      for(let i = 0; i < childrens.length; i++)
+         result += childrens[i].get_height();
+      return result;
+   },
 
-    removeAll: function() {
+   add: function(actor, properties) {
+      let childrens = this.actor.get_children();
+      let currentNumberLines = childrens[0].get_children().length;
+      if(currentNumberLines == 0) {
+         childrens[0].add(actor, properties);
+      }
+      else {
+         for(let i = 1; i < childrens.length; i++) {
+            if(currentNumberLines > childrens[i].get_children().length) {
+               childrens[i].add(actor, properties);
+               currentNumberLines--; 
+               break;
+            }
+         }
+         if(currentNumberLines == childrens[0].get_children().length)
+            childrens[0].add(actor, properties);
+      }
+   },
+
+   insert: function(actor, posX, posY) {
+      if((posX > -1)&&(posY > -1)) {
+         let posI, posE;
+         if(this.isVertical) {
+            posI = posX;
+            posE = posY;
+         }
+         else {
+            posI = posY;
+            posE = posX;
+         }
+         let childrens = this.actor.get_children();
+         if((posI < childrens.length)&&(posE <= childrens[posI].get_children().length)) {
+            childrens[posI].insert_actor(actor, posE);
+         }
+      }
+   },
+
+   removeAll: function() {
       //Remove all favorites
       let childrens = this.actor.get_children();
       let childrensItems;
@@ -583,103 +593,99 @@ FavoritesBoxExtended.prototype = {
             childrensItems[j].destroy();
          }
       }
-    },
+   },
 
-    _generateChildrenList: function() {
-       let result = new Array();
-       let childrens = this.actor.get_children();
-       let childrensItems;
-       for(let i = 0; i < childrens.length; i++) {
-          childrensItems = childrens[i].get_children();
-          for(let j = 0; j < childrensItems.length; j++) {
-             result.push(childrensItems[j]);
-          }
-       }
-       return result;
-    },
-
-    _clearDragPlaceholder: function() {
-     try {
-        if (this._dragPlaceholder) {
-            this._dragPlaceholder.animateOutAndDestroy();
-            this._dragPlaceholder = null;
-            this._dragPlaceholderPosX = -1;
-            this._dragPlaceholderPosY = -1;
-        }
-      } catch(e) {
-        Main.notify("ef", e.message);
+   _generateChildrenList: function() {
+      let result = new Array();
+      let childrens = this.actor.get_children();
+      let childrensItems;
+      for(let i = 0; i < childrens.length; i++) {
+         childrensItems = childrens[i].get_children();
+         for(let j = 0; j < childrensItems.length; j++) {
+            result.push(childrensItems[j]);
+         }
       }
-    },
+      return result;
+   },
+
+   _clearDragPlaceholder: function() {
+      if(this._dragPlaceholder) {
+         this._dragPlaceholder.animateOutAndDestroy();
+         this._dragPlaceholder = null;
+         this._dragPlaceholderPosX = -1;
+         this._dragPlaceholderPosY = -1;
+      }
+   },
     
-    handleDragOver : function(source, actor, x, y, time) {
-     try {
-        let app = source.app;
+   handleDragOver : function(source, actor, x, y, time) {
+   try {
+      let app = source.app;
 
-        // Don't allow favoriting of transient apps
-        if (app == null || app.is_window_backed() || (!(source instanceof FavoritesButtonExtended) && app.get_id() in AppFavorites.getAppFavorites().getFavoriteMap()))
-            return DND.DragMotionResult.NO_DROP;
+      // Don't allow favoriting of transient apps
+      if(app == null || app.is_window_backed() || (!(source instanceof FavoritesButtonExtended) && app.get_id() in AppFavorites.getAppFavorites().getFavoriteMap()))
+         return DND.DragMotionResult.NO_DROP;
 
-        let favorites = AppFavorites.getAppFavorites().getFavorites();
-        let numFavorites = favorites.length;
+      let favorites = AppFavorites.getAppFavorites().getFavorites();
+      let numFavorites = favorites.length;
 
-        let favPos = favorites.indexOf(app);
+      let favPos = favorites.indexOf(app);
 
-        let childrenBox = this.actor.get_children();
-        let numChildrenBox = childrenBox.length;
-        let boxHeight = this.actor.height;
-        let boxWidth = this.actor.width;
+      let childrenBox = this.actor.get_children();
+      let numChildrenBox = childrenBox.length;
+      let boxHeight = this.actor.height;
+      let boxWidth = this.actor.width;
 
-        // Keep the placeholder out of the index calculation; assuming that
-        // the remove target has the same size as "normal" items, we don't
-        // need to do the same adjustment there.
-        /*if(this._dragPlaceholder) {
-            if(this.isVertical)
-               boxHeight -= this._dragPlaceholder.actor.height;
-            else
-               boxWidth -= this._dragPlaceholder.actor.width;
-            numChildrenBox--;
-        }*/
+      // Keep the placeholder out of the index calculation; assuming that
+      // the remove target has the same size as "normal" items, we don't
+      // need to do the same adjustment there.
+      /*if(this._dragPlaceholder) {
+          if(this.isVertical)
+             boxHeight -= this._dragPlaceholder.actor.height;
+          else
+             boxWidth -= this._dragPlaceholder.actor.width;
+          numChildrenBox--;
+      }*/
 
-        let posY, posX, itemChild;
-        let itemsInline = 0;
-        if(this.isVertical) {
-           posX = Math.round(x * this.numberLines / boxWidth) - 1;
-           if(posX >= childrenBox.length)
-              posX = childrenBox.length - 1;
-           if(posX < 0)
-              posX = 0;
-           itemChild = childrenBox[posX].get_children();
-           if(itemChild)
-              itemsInline = itemChild.length;
-           posY = Math.round(y * itemsInline / boxHeight);
-           if(posY >= itemsInline - 1)
-              posY = itemsInline - 2;
-           if(posY < 0)
-              posY = 0;
-        }
-        else {
-           posY = Math.round(y * this.numberLines / boxHeight) - 1;
-           if(posY >= childrenBox.length)
-              posY = childrenBox.length - 1;
-           if(posY < 0)
-              posY = 0;
-           itemChild = childrenBox[posY].get_children();
-           if(itemChild)
-              itemsInline = itemChild.length;
-           posX = Math.round(x * itemsInline / boxWidth);
-           if(posX >= itemsInline - 1)
-              posX = itemsInline - 2;
-           if(posX < 0)
-              posX = 0;
-        }
+      let posY, posX, itemChild;
+      let itemsInline = 0;
+      if(this.isVertical) {
+         posX = Math.round(x * this.numberLines / boxWidth) - 1;
+         if(posX >= childrenBox.length)
+            posX = childrenBox.length - 1;
+         if(posX < 0)
+            posX = 0;
+         itemChild = childrenBox[posX].get_children();
+         if(itemChild)
+            itemsInline = itemChild.length;
+         posY = Math.round(y * itemsInline / boxHeight);
+         if(posY >= itemsInline - 1)
+            posY = itemsInline - 2;
+         if(posY < 0)
+            posY = 0;
+      }
+      else {
+         posY = Math.round(y * this.numberLines / boxHeight) - 1;
+         if(posY >= childrenBox.length)
+            posY = childrenBox.length - 1;
+         if(posY < 0)
+            posY = 0;
+         itemChild = childrenBox[posY].get_children();
+         if(itemChild)
+            itemsInline = itemChild.length;
+         posX = Math.round(x * itemsInline / boxWidth);
+         if(posX >= itemsInline - 1)
+            posX = itemsInline - 2;
+         if(posX < 0)
+            posX = 0;
+      }
 
-        if(((posY != this._dragPlaceholderPosY)||(posX != this._dragPlaceholderPosX))) {
-           /* if (this._animatingPlaceholdersCount > 0) {
-                let appChildren = childrenBox.filter(function(actor) {
-                    return (actor._delegate instanceof FavoritesButtonExtended);
-                });
-                this._dragPlaceholderPos = childrenBox[0].indexOf(appChildren[posY]);
-                //this._dragPlaceholderPos = childrenBox[posX].indexOf(appChildren[posY]);
+      if(((posY != this._dragPlaceholderPosY)||(posX != this._dragPlaceholderPosX))) {
+         /* if(this._animatingPlaceholdersCount > 0) {
+              let appChildren = childrenBox.filter(function(actor) {
+                 return (actor._delegate instanceof FavoritesButtonExtended);
+              });
+              this._dragPlaceholderPos = childrenBox[0].indexOf(appChildren[posY]);
+              //this._dragPlaceholderPos = childrenBox[posX].indexOf(appChildren[posY]);
             } else {*/
                 this._dragPlaceholderPosX = posX;
                 this._dragPlaceholderPosY = posY;
@@ -687,14 +693,14 @@ FavoritesBoxExtended.prototype = {
            // }
 
             // Don't allow positioning before or after self
-            if (favPos != -1 && (posY == favPos || posY == favPos + 1)) {
-                if (this._dragPlaceholder) {
-                    this._dragPlaceholder.animateOutAndDestroy();
-                    this._animatingPlaceholdersCount++;
-                    this._dragPlaceholder.actor.connect('destroy',
-                        Lang.bind(this, function() {
-                            this._animatingPlaceholdersCount--;
-                        }));
+         if(favPos != -1 && (posY == favPos || posY == favPos + 1)) {
+            if(this._dragPlaceholder) {
+               this._dragPlaceholder.animateOutAndDestroy();
+               this._animatingPlaceholdersCount++;
+               this._dragPlaceholder.actor.connect('destroy',
+                  Lang.bind(this, function() {
+                     this._animatingPlaceholdersCount--;
+                  }));
                 }
                 this._dragPlaceholder = null;
 
@@ -705,11 +711,11 @@ FavoritesBoxExtended.prototype = {
             // it, but if we are adding it, expand its size in
             // an animation
             let fadeIn;
-            if (this._dragPlaceholder) {
-                this._dragPlaceholder.actor.destroy();
-                fadeIn = false;
+            if(this._dragPlaceholder) {
+               this._dragPlaceholder.actor.destroy();
+               fadeIn = false;
             } else {
-                fadeIn = true;
+               fadeIn = true;
             }
 
             this._dragPlaceholder = new DND.GenericDragPlaceholderItem();
@@ -718,28 +724,28 @@ FavoritesBoxExtended.prototype = {
            // this.actor.insert_actor(this._dragPlaceholder.actor,
            //                        this._dragPlaceholderPos);
             this.insert(this._dragPlaceholder.actor, this._dragPlaceholderPosX, this._dragPlaceholderPosY);
-            if (fadeIn)
-                this._dragPlaceholder.animateIn();
+            if(fadeIn)
+               this._dragPlaceholder.animateIn();
         }
 
         let srcIsFavorite = (favPos != -1);
 
-        if (srcIsFavorite)
-            return DND.DragMotionResult.MOVE_DROP;
+        if(srcIsFavorite)
+           return DND.DragMotionResult.MOVE_DROP;
 
         return DND.DragMotionResult.COPY_DROP;
       } catch(e) {
         Main.notify("efx", e.message);
       }
-    },
+   },
     
-    // Draggable target interface
-    acceptDrop : function(source, actor, x, y, time) {
+   // Draggable target interface
+   acceptDrop: function(source, actor, x, y, time) {
      try {
         let app = source.app;
 
         // Don't allow favoriting of transient apps
-        if (app == null || app.is_window_backed()) {
+        if(app == null || app.is_window_backed()) {
             return false;
         }
 
@@ -759,7 +765,7 @@ FavoritesBoxExtended.prototype = {
            posY = this._dragPlaceholderPosX;
         }
 
-        Main.notify("posX:" + posX + " posY:" + posY);
+       // Main.notify("posX:" + posX + " posY:" + posY);
 
         let favPos = 0;
         let cPosY = 0;
@@ -790,7 +796,7 @@ FavoritesBoxExtended.prototype = {
            cPosY++;
         }
 
-        Main.notify("fav" + favPos);
+        //Main.notify("fav" + favPos);
 
        // childrens[this._dragPlaceholderPosX][this._dragPlaceholderPosY];
  /*       for(let i = 0; i < this._dragPlaceholderPos; i++) {
@@ -821,7 +827,53 @@ FavoritesBoxExtended.prototype = {
       } catch(e) {
         Main.notify("ef", e.message);
       }
-    }
+   },
+
+   navegateFavBox: function(symbol, actor) {
+      let childrens = this.actor.get_children();
+      let childrensItems;
+      let posX, posY;
+      for(let i = 0; i < childrens.length; i++) {
+         childrensItems = childrens[i].get_children();
+         for(let j = 0; j < childrensItems.length; j++) {
+            if(childrensItems[j] == actor)  {
+               posY = i;
+               posX = j;
+               break;
+            }
+         }
+         if(posX)
+            break;
+      }
+      if(this.isVertical) {
+         if(symbol == Clutter.KEY_Up) {
+            if(posX == 0)
+               posX = childrens[posY].get_children().length - 1;
+            else
+               posX--;
+         }
+         else if(symbol == Clutter.KEY_Down) {
+            if(posX == childrens[posY].get_children().length - 1)
+               posX = 0;
+            else
+               posX++;
+         }
+         else if(symbol == Clutter.KEY_Right) {
+            if(posY == childrens.length - 1)
+               posY = 0;
+            else
+               posY++;
+         }
+         else if(symbol == Clutter.KEY_Left) {
+            if(posY == 0)
+               posY = childrens.length - 1;
+            else
+               posY--;
+         }
+      }
+      global.stage.set_key_focus(childrens[posY].get_children()[posX]);
+      return true;
+   }
 };
 
 function TransientButtonExtended(appsMenuButton, pathOrCommand) {
@@ -1504,11 +1556,9 @@ MyApplet.prototype = {
         }   
 
         if(actor._delegate instanceof CinnamonMenu.FavoritesButton) {
-           this._navegateFavBox(symbol, actor);
-           return false;
+           return this._navegateFavBox(symbol, actor);
         } else if(actor == this.powerButtons) {
-           this._navegateSysBox(symbol, actor);
-           return false; 
+           return this._navegateSysBox(symbol, actor);; 
         } else if(actor == this.hover.actor) {
            this._navegateHoverIcon(symbol, actor);
            return false;
@@ -1727,33 +1777,12 @@ MyApplet.prototype = {
 
    _navegateFavBox: function(symbol, actor) {
       this.fav_actor = actor;
-      let childrens = this.favoritesBox.get_children()[0].get_children();
-      if(childrens.length > 0) {
-         if((symbol == Clutter.KEY_Up) || (symbol == Clutter.KEY_Right)) {
-            if(childrens[0] == actor) {
-               this.fav_actor = childrens[childrens.length -1];
-            } else
-               this.fav_actor = childrens[childrens.indexOf(actor) - 1];
-            Mainloop.idle_add(Lang.bind(this, this._putFocus));
-            this._scrollToButtonFav(this.fav_actor._delegate);
-            return false;
-         }
-         else if((symbol == Clutter.KEY_Down) || (symbol == Clutter.KEY_Left)) {
-            if(childrens[childrens.length - 1] == actor) {
-               this.fav_actor = childrens[0];
-            } else
-               this.fav_actor = childrens[childrens.indexOf(actor) + 1];
-            Mainloop.idle_add(Lang.bind(this, this._putFocus));
-            this._scrollToButtonFav(this.fav_actor._delegate);
-            return false;
-         }
-         else if(symbol == Clutter.Tab) {
-            this.fav_actor = this.searchEntry;
-            Mainloop.idle_add(Lang.bind(this, this._putFocus));
-         } else {
-            global.stage.set_key_focus(this.powerButtons);
-         }
-         return false;
+      if(symbol == Clutter.Tab) {
+         this.fav_actor = this.searchEntry;
+         Mainloop.idle_add(Lang.bind(this, this._putFocus));
+         return true;
+      } else {
+         return this.favoritesObj.navegateFavBox(symbol, actor);
       }
    },
 
@@ -1793,6 +1822,7 @@ MyApplet.prototype = {
             this._systemButtons[this.sysButtSelected].executeAction();
          }
       }
+      return true;
    },
 
    _navegateHoverIcon: function(symbol, actor) {
@@ -1844,7 +1874,6 @@ MyApplet.prototype = {
    _updateView: function() {
       try {
       let viewBox;
-      if(this.iconView) {
          let appBox = this.applicationsBox.get_children();
          let appItem;
          for(let i = 0; i < appBox.length; i++) {
@@ -1852,6 +1881,7 @@ MyApplet.prototype = {
             if(appItem) {
                for(let j = 0; j < appItem.length; j++)
                   appBox[i].remove_actor(appItem[j]);
+               appBox[i].destroy();
             }
          }
 //app
@@ -1881,12 +1911,16 @@ MyApplet.prototype = {
             }
          }
 
+      this.applicationsBox.set_vertical(this.iconView);
+      if(this.iconView) {
          let valance = Math.floor(visibleAppButtons.length/this.iconViewCount);
          if(valance * 4 < visibleAppButtons.length)
             valance++;
          let currValue, falseActor;
          for(let i = 0; i < valance; i++) {
-            viewBox = new St.BoxLayout({ vertical: false });
+            viewBox = new St.BoxLayout({ vertical: !this.iconView });
+            if(this.iconView)
+               viewBox.set_width(this._applicationsBoxWidth);
             for(let j = 0; j < this.iconViewCount; j++) {
                currValue = (i*(this.iconViewCount) + j);
                if(currValue < visibleAppButtons.length) {
@@ -1902,6 +1936,32 @@ MyApplet.prototype = {
             }
             this.applicationsBox.add_actor(viewBox);
          }
+      }
+      else  {
+         let valance = Math.floor(visibleAppButtons.length/this.iconViewCount);
+         if(valance * 4 < visibleAppButtons.length)
+            valance++;
+         let currValue, falseActor;
+         for(let i = 0; i < this.iconViewCount; i++) {
+            viewBox = new St.BoxLayout({ vertical: !this.iconView });
+            /*if(this.iconView)
+               viewBox.set_width(this._applicationsBoxWidth);*/
+            for(let j = 0; j < valance; j++) {
+               currValue = (i*(valance) + j);
+               if(currValue < visibleAppButtons.length) {
+                  viewBox.add_actor(visibleAppButtons[currValue].actor);
+                  if(visibleAppButtons[currValue].menu)
+                     viewBox.add_actor(visibleAppButtons[currValue].menu.actor);
+                  else {//Remplace menu actor by a hide false actor.
+                     falseActor = new St.BoxLayout();
+                     falseActor.hide();
+                     viewBox.add_actor(falseActor);
+                  }
+               }
+            }
+            this.applicationsBox.add_actor(viewBox);
+         }
+         this.applicationsBox.set_width(this.iconViewCount*this._applicationsBoxWidth);
       }
       } catch(e) {
         Main.notify("Error", e.message);
@@ -1975,13 +2035,15 @@ MyApplet.prototype = {
    _updateHeight: function() {
       if(this.controlingHeight) {
          this.betterPanel.set_height(this.height);
-         if(this.scrollFavoritesVisible) {
-            this.favBoxWrapper.set_height(this.height +  this.searchBox.get_height());
-            this.favoritesBox.set_height(-1);
-         }
-         else {
-            this.favoritesBox.set_height(this.height - this._internalHeight(this.favBoxWrapper) + this.favoritesBox.get_height() + this.searchBox.get_height());
-            this.favBoxWrapper.set_height(-1);
+         if(this.favoritesObj.getVertical()) {
+            if(this.scrollFavoritesVisible) {
+               this.favBoxWrapper.set_height(this.height +  this.searchBox.get_height());
+               this.favoritesBox.set_height(-1);
+            }
+            else {
+               this.favoritesBox.set_height(this.height - this._internalHeight(this.favBoxWrapper) + this.favoritesBox.get_height() + this.searchBox.get_height());
+               this.favBoxWrapper.set_height(-1);
+            }
          }
          if(this.categoriesBox.get_vertical()) {
             if(this.scrollApplicationsVisible)
@@ -2176,22 +2238,16 @@ MyApplet.prototype = {
          this.categoriesApplicationsBox = new CinnamonMenu.CategoriesApplicationsBox();
          this.rightPane.add_actor(this.categoriesApplicationsBox.actor);
 
-         this.favoritesScrollBox = this._createScroll(true);
          this.applicationsScrollBox = this._createScroll(true);
 
          this.categoriesBox = new St.BoxLayout({ style_class: 'menu-categories-box', vertical: true });
          this.applicationsBox = new St.BoxLayout({ style_class: 'menu-applications-box', vertical:true });
          this.favBoxWrapper = new St.BoxLayout({ vertical: true });
-         this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
          this.favoritesBox = new St.BoxLayout({ style_class: 'menu-favorites-box', vertical: true });
-         this.favoritesBox.add_actor(this.favoritesObj.actor);
 
          this.a11y_settings = new Gio.Settings({ schema: "org.cinnamon.desktop.a11y.applications" });
          this.a11y_settings.connect("changed::screen-magnifier-enabled", Lang.bind(this, this._updateVFade));
          this._updateVFade();
-
-         this.favoritesScrollBox.add_actor(this.favoritesBox);
-         this.favBoxWrapper.add_actor(this.favoritesScrollBox);
 
          this.endBox = new St.BoxLayout({ vertical: false });
          this.selectedAppBox = new St.BoxLayout({ style_class: 'menu-selected-app-box', vertical: true });
@@ -2204,30 +2260,37 @@ MyApplet.prototype = {
          this.endBox.set_style("padding-right: 20px;");
 
          this.betterPanel = new St.BoxLayout({ vertical: false });
+        // this.applicationsBox.set_style('max-height: 200px; min-height: 200px');
+         this.categoriesWrapper = new St.BoxLayout({ vertical: true });
 
          switch(this.theme) {
-            case "classic" :
+            case "classic"        :
                           this.loadClassic(); 
                           break;
-            case "stylized":
+            case "stylized"       :
                           this.loadStylized(); 
                           break;
-            case "dragon"  :
+            case "dragon"         :
                           this.loadDragon(); 
                           break;
-            default:
+            case "dragonInverted":
+                          this.loadDragonInverted(); 
+                          break;
+            case "horizontal"     :
+                          this.loadHorizontal(); 
+                          break;
+            default               :
                           this.loadClassic(); 
                           break;
          }
+         this.favoritesBox.add_actor(this.favoritesObj.actor);
 
-         this.categoriesWrapper = new St.BoxLayout({ vertical: true });
+         this.favoritesScrollBox.add_actor(this.favoritesBox);
+         this.favBoxWrapper.add_actor(this.favoritesScrollBox);
+
          this.categoriesWrapper.add_actor(this.categoriesScrollBox);
          this.categoriesScrollBox.add_actor(this.categoriesBox);
          this.applicationsScrollBox.add_actor(this.applicationsBox);
-
-         //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
-         this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
-         this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, expand: false });
 
          this.categoriesApplicationsBox.actor.add_actor(this.betterPanel);
 
@@ -2255,32 +2318,87 @@ MyApplet.prototype = {
    },
 
    loadClassic: function() {
+      this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
       this.categoriesScrollBox = this._createScroll(true);
+      this.favoritesScrollBox = this._createScroll(true);
       this.powerButtons = this._powerButtons(true);
       this.favBoxWrapper.add(this.powerButtons, { y_align: St.Align.END, y_fill: false, expand: false });
       this.mainBox.add(this.favBoxWrapper, { y_align: St.Align.END, y_fill: false, expand: true });
       this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
+      //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
+      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, expand: false });
    },
 
    loadStylized: function() {
+      this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
       this.categoriesScrollBox = this._createScroll(true);
+      this.favoritesScrollBox = this._createScroll(true);
       this.powerButtons = this._powerButtons(false);
       this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
       this.mainBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
+      //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
+      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, expand: false });
    },
 
    loadDragon: function() {
+      this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
       this.betterPanel.set_vertical(true);
       this.categoriesBox.set_vertical(false);
       let heightCat = CATEGORY_ICON_SIZE + 40;
       this.categoriesBox.set_style('max-height: ' + heightCat + 'px; min-height: ' + heightCat + 'px');
       this.categoriesScrollBox = this._createScroll(false);
+      this.favoritesScrollBox = this._createScroll(true);
       //this.categoriesScrollBox.hscrollbar_visible(false);
       this.powerButtons = this._powerButtons(false);
       this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
       this.mainBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
+      //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
+      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, expand: false });
+   },
+
+   loadDragonInverted: function() {
+      this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
+      this.betterPanel.set_vertical(true);
+      this.categoriesBox.set_vertical(false);
+      let heightCat = CATEGORY_ICON_SIZE + 40;
+      this.categoriesBox.set_style('max-height: ' + heightCat + 'px; min-height: ' + heightCat + 'px');
+      this.categoriesScrollBox = this._createScroll(false);
+      this.favoritesScrollBox = this._createScroll(true);
+      //this.categoriesScrollBox.hscrollbar_visible(false);
+      this.powerButtons = this._powerButtons(false);
+      this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
+      this.mainBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
+      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, expand: false });
+   },
+
+   loadHorizontal: function() {
+      this.favoritesObj = new FavoritesBoxExtended(false, this.favoritesLinesNumber);
+      this.betterPanel.set_vertical(true);
+      this.categoriesBox.set_vertical(false);
+      let heightCat = CATEGORY_ICON_SIZE + 40;
+      this.categoriesBox.set_style('max-height: ' + heightCat + 'px; min-height: ' + heightCat + 'px');
+      this.categoriesScrollBox = this._createScroll(false);
+      this.favoritesScrollBox = this._createScroll(false);
+      //this.categoriesScrollBox.hscrollbar_visible(false);
+      this.powerButtons = this._powerButtons(false);
+      this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
+      //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      //this.favoritesObj.setVertical(false);
+      this.rightPane.add(this.favBoxWrapper, { x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, expand: true });
+      this.betterPanel.add(this.categoriesWrapper, { x_fill: false, y_fill: false, expand: false });
+      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, expand: true });
+      this.favBoxWrapper.set_vertical(false);
+     // let heightFav = this.favoritesObj.getRealSpace(); //MAX_FAV_ICON_SIZE*(this.favoritesLinesNumber+1) + 1;
+     // this.favoritesBox.set_style('max-height: ' + heightFav + 'px; min-height: ' + heightFav + 'px');
    },
 
    _setHorizontalAutoScroll: function(hScroll, setValue) {
@@ -2495,12 +2613,13 @@ MyApplet.prototype = {
             this.applicationsBox.set_width(this._applicationsBoxWidth + 42); // The answer to life...
          }
       }
-      if(this.searchBox.get_width() > this.applicationsBox.get_width())
-         this.applicationsBox.set_width(this.searchBox.get_width());
-      if(this.endBox.get_width() > this.applicationsBox.get_width())
-         this.applicationsBox.set_width(this.searchBox.get_width());
+/*    if(this.searchBox.get_width() > this.applicationsScrollBox.get_width())
+         this.applicationsScrollBox.set_width(this.searchBox.get_width());
+      if(this.endBox.get_width() > this.applicationsScrollBox.get_width())
+         this.applicationsScrollBox.set_width(this.searchBox.get_width());
+      this.categoriesBox.set_width(this.applicationsScrollBox.get_width());*/
       this._updateHeight();
-      this._updateWidth();
+      //this._updateWidth();
    },
 
    _refreshFavs: function() {
@@ -2649,17 +2768,6 @@ MyApplet.prototype = {
          let sr = a.app.get_name().toLowerCase() > b.app.get_name().toLowerCase();
          return sr;
       });
-
-      let viewBox;
-      if(!this.iconView) {
-         for(let i = 0; i < this._applicationsButtons.length; i++) {
-            this._applicationsButtons[i].setVertical(this.iconView);
-            viewBox = new St.BoxLayout({ vertical: true});
-            viewBox.add_actor(this._applicationsButtons[i].actor);
-            viewBox.add_actor(this._applicationsButtons[i].menu.actor);
-            this.applicationsBox.add_actor(viewBox);
-         }
-      }
 
       this._refreshPlacesAndRecent();
 
@@ -2822,21 +2930,6 @@ MyApplet.prototype = {
          }
       }
       this._setCategoriesButtonActive(!this.searchActive);
-
-      if(!this.iconView) {
-         for(let i = 0; i < this._placesButtons.length; i ++) {
-            this._placesButtons[i].setVertical(this.iconView);
-            viewBox = new St.BoxLayout({ vertical: true});
-            viewBox.add_actor(this._placesButtons[i].actor);
-            this.applicationsBox.add_actor(viewBox);
-         }
-         for(let i = 0; i < this._recentButtons.length; i ++) {
-            this._recentButtons[i].setVertical(this.iconView);
-            viewBox = new St.BoxLayout({ vertical: true});
-            viewBox.add_actor(this._recentButtons[i].actor);
-            this.applicationsBox.add_actor(viewBox);
-         }
-      }
    },
 
 //systemButtons
@@ -2897,7 +2990,7 @@ MyApplet.prototype = {
 
       this.applicationsScrollBox.set_auto_scrolling(false);
       this.categoriesScrollBox.set_auto_scrolling(false);
-      this.favoritesScrollBox.set_auto_scrolling(false);
+      //this.favoritesScrollBox.set_auto_scrolling(false);
     
       let index = this._indexOfSysButton(actor);
       this.selectedAppTitle.set_text(this._systemButtons[index].title);
@@ -2909,7 +3002,7 @@ MyApplet.prototype = {
       this._scrollToButton(this.old_active_item_actor._delegate);
       this.applicationsScrollBox.set_auto_scrolling(this.autoscroll_enabled);
       this.categoriesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
-      this.favoritesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
+     // this.favoritesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
       this.selectedAppTitle.set_text("");
       this.selectedAppDescription.set_text("");
       this.hover.refreshFace();

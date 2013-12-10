@@ -5,7 +5,7 @@ Applet: Configurable Menu Version: v0.5-Beta
 
 O.S.: Cinnamon 
 
-Release Date: 07 Dicember 2013
+Release Date: 10 Dicember 2013
 
 Author: Lester Carballo Pérez
 
@@ -19,6 +19,8 @@ This is a frock of Main Cinnamon menu applet with more configurable options.
 
 ![Alt text](/configurableMenu@lestcape/Capture.png)
 
+
+Alert!!!!!: This implementations are unstable and have several bugs... Download this only for test purpose.
 
 Skills including:
 --------------
@@ -64,8 +66,11 @@ Change Log:
 ==============
 0.5-Beta
    - Added Dragon theme to put the categories horizontally.
+   - Added Horizontal theme to put  all horizontally.
+   - Added Dragon Inverted theme to put the favorites in left.
    - Implementation of horizontal auto scrolling(do not exist in cinnamon).
    - Implementation of favorites with multiple lines.
+   - Implementation of items multicolumn horizontal.
 
 0.4-Beta
    - Fixed bug in list view mode that cause lag when you change categories.
