@@ -1,5 +1,5 @@
 // Applet : Configurable Menu      Version      : v0.5-Beta
-// O.S.   : Cinnamon               Release Date : 07 Dicember 2013.
+// O.S.   : Cinnamon               Release Date : 10 Dicember 2013.
 // Author : Lester Carballo Pérez  Email        : lestcape@gmail.com
 //
 // Website : https://github.com/lestcape/Configurable-Menu
@@ -1919,8 +1919,6 @@ MyApplet.prototype = {
          let currValue, falseActor;
          for(let i = 0; i < valance; i++) {
             viewBox = new St.BoxLayout({ vertical: !this.iconView });
-            if(this.iconView)
-               viewBox.set_width(this._applicationsBoxWidth);
             for(let j = 0; j < this.iconViewCount; j++) {
                currValue = (i*(this.iconViewCount) + j);
                if(currValue < visibleAppButtons.length) {
@@ -1944,8 +1942,6 @@ MyApplet.prototype = {
          let currValue, falseActor;
          for(let i = 0; i < this.iconViewCount; i++) {
             viewBox = new St.BoxLayout({ vertical: !this.iconView });
-            /*if(this.iconView)
-               viewBox.set_width(this._applicationsBoxWidth);*/
             for(let j = 0; j < valance; j++) {
                currValue = (i*(valance) + j);
                if(currValue < visibleAppButtons.length) {
@@ -1962,13 +1958,16 @@ MyApplet.prototype = {
             this.applicationsBox.add_actor(viewBox);
          }
       }
-      if(this._applicationsBoxWidth == 0)
-         this._applicationsBoxWidth = 200;
-      this.applicationsBox.set_width(this.iconViewCount*this._applicationsBoxWidth + 42);
-      if(!this.categoriesBox.get_vertical()) {
-         // if(this.categoriesBox.get_width() < this.applicationsBox.get_width())
-         this.categoriesBox.set_width(this.applicationsBox.get_width());
-      }
+      Mainloop.idle_add(Lang.bind(this, function() {
+         if(this._applicationsBoxWidth == 0)
+            this._applicationsBoxWidth = 100;
+         this.applicationsBox.set_width(this.iconViewCount*this._applicationsBoxWidth + 42);
+         if(!this.categoriesBox.get_vertical()) {
+            // if(this.categoriesBox.get_width() < this.applicationsBox.get_width())
+            this.categoriesBox.set_width(this.applicationsBox.get_width());
+         }
+      }));
+      
       } catch(e) {
         Main.notify("Error", e.message);
       }
@@ -2266,7 +2265,6 @@ MyApplet.prototype = {
          this.endBox.set_style("padding-right: 20px;");
 
          this.betterPanel = new St.BoxLayout({ vertical: false });
-        // this.applicationsBox.set_style('max-height: 200px; min-height: 200px');
          this.categoriesWrapper = new St.BoxLayout({ vertical: true });
 
          switch(this.theme) {
@@ -2333,7 +2331,7 @@ MyApplet.prototype = {
       this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
-      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, expand: false });
+      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
    },
 
    loadStylized: function() {
@@ -2346,15 +2344,14 @@ MyApplet.prototype = {
       this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
-      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, expand: false });
+      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
    },
 
    loadDragon: function() {
       this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
       this.betterPanel.set_vertical(true);
       this.categoriesBox.set_vertical(false);
-      let heightCat = CATEGORY_ICON_SIZE + 40;
-      this.categoriesBox.set_style('max-height: ' + heightCat + 'px; min-height: ' + heightCat + 'px');
+      this.categoriesWrapper.set_vertical(false);
       this.categoriesScrollBox = this._createScroll(false);
       this.favoritesScrollBox = this._createScroll(true);
       //this.categoriesScrollBox.hscrollbar_visible(false);
@@ -2364,15 +2361,14 @@ MyApplet.prototype = {
       this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
-      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, expand: false });
+      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
    },
 
    loadDragonInverted: function() {
       this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
       this.betterPanel.set_vertical(true);
       this.categoriesBox.set_vertical(false);
-      let heightCat = CATEGORY_ICON_SIZE + 40;
-      this.categoriesBox.set_style('max-height: ' + heightCat + 'px; min-height: ' + heightCat + 'px');
+      this.categoriesWrapper.set_vertical(false);
       this.categoriesScrollBox = this._createScroll(false);
       this.favoritesScrollBox = this._createScroll(true);
       //this.categoriesScrollBox.hscrollbar_visible(false);
@@ -2382,15 +2378,14 @@ MyApplet.prototype = {
       this.mainBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
-      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, expand: false });
+      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
    },
 
    loadHorizontal: function() {
       this.favoritesObj = new FavoritesBoxExtended(false, this.favoritesLinesNumber);
       this.betterPanel.set_vertical(true);
       this.categoriesBox.set_vertical(false);
-      let heightCat = CATEGORY_ICON_SIZE + 40;
-      this.categoriesBox.set_style('max-height: ' + heightCat + 'px; min-height: ' + heightCat + 'px');
+      this.categoriesWrapper.set_vertical(false);
       this.categoriesScrollBox = this._createScroll(false);
       this.favoritesScrollBox = this._createScroll(false);
       //this.categoriesScrollBox.hscrollbar_visible(false);
@@ -2399,9 +2394,9 @@ MyApplet.prototype = {
       this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       //this.favoritesObj.setVertical(false);
-      this.rightPane.add(this.favBoxWrapper, { x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, expand: true });
-      this.betterPanel.add(this.categoriesWrapper, { x_fill: false, y_fill: false, expand: false });
-      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, expand: true });
+      this.rightPane.add(this.favBoxWrapper, { x_fill: false, expand: true });
+      this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
+      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
       this.favBoxWrapper.set_vertical(false);
      // let heightFav = this.favoritesObj.getRealSpace(); //MAX_FAV_ICON_SIZE*(this.favoritesLinesNumber+1) + 1;
      // this.favoritesBox.set_style('max-height: ' + heightFav + 'px; min-height: ' + heightFav + 'px');
@@ -2609,15 +2604,9 @@ MyApplet.prototype = {
    },
 
    _onApplicationButtonRealized: function(actor) {
-      if(this.iconView) {
+      if(actor.get_width() > this._applicationsBoxWidth) {
          this._applicationsBoxWidth = actor.get_width();
          this.applicationsBox.set_width(this.iconViewCount*this._applicationsBoxWidth + 42); // The answer to life...
-      }
-      else {
-         if(actor.get_width() > this._applicationsBoxWidth) {
-            this._applicationsBoxWidth = actor.get_width();
-            this.applicationsBox.set_width(this._applicationsBoxWidth + 42); // The answer to life...
-         }
       }
 /*    if(this.searchBox.get_width() > this.applicationsScrollBox.get_width())
          this.applicationsScrollBox.set_width(this.searchBox.get_width());
@@ -2625,7 +2614,7 @@ MyApplet.prototype = {
          this.applicationsScrollBox.set_width(this.searchBox.get_width());
       this.categoriesBox.set_width(this.applicationsScrollBox.get_width());*/
       this._updateHeight();
-      //this._updateWidth();
+      this._updateWidth();
    },
 
    _refreshFavs: function() {
@@ -3166,6 +3155,8 @@ MyApplet.prototype = {
             let applicationsBoxHeight = this.applicationsBox.get_allocation_box().y2-this.applicationsBox.get_allocation_box().y1;
             let scrollBoxHeight = (this.favoritesBox.get_allocation_box().y2-this.favoritesBox.get_allocation_box().y1) -
                                   (this.searchBox.get_allocation_box().y2-this.searchBox.get_allocation_box().y1);
+            if(scrollBoxHeight < 200)
+               scrollBoxHeight = 200;
             this.applicationsScrollBox.style = "height: "+scrollBoxHeight+"px;";
          }
          this.initButtonLoad = 30;
