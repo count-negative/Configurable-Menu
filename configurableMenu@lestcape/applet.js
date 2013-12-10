@@ -1882,6 +1882,7 @@ MyApplet.prototype = {
                for(let j = 0; j < appItem.length; j++)
                   appBox[i].remove_actor(appItem[j]);
                appBox[i].destroy();
+               this.applicationsBox.remove_actor(appBox[i]);
             }
          }
 //app
@@ -1910,7 +1911,6 @@ MyApplet.prototype = {
                visibleAppButtons.push(this._transientButtons[i]);
             }
          }
-
       this.applicationsBox.set_vertical(this.iconView);
       if(this.iconView) {
          let valance = Math.floor(visibleAppButtons.length/this.iconViewCount);
@@ -1961,7 +1961,13 @@ MyApplet.prototype = {
             }
             this.applicationsBox.add_actor(viewBox);
          }
-         this.applicationsBox.set_width(this.iconViewCount*this._applicationsBoxWidth);
+      }
+      if(this._applicationsBoxWidth == 0)
+         this._applicationsBoxWidth = 200;
+      this.applicationsBox.set_width(this.iconViewCount*this._applicationsBoxWidth + 42);
+      if(!this.categoriesBox.get_vertical()) {
+         // if(this.categoriesBox.get_width() < this.applicationsBox.get_width())
+         this.categoriesBox.set_width(this.applicationsBox.get_width());
       }
       } catch(e) {
         Main.notify("Error", e.message);
