@@ -1,11 +1,11 @@
-Configurable Menu v0.5-Beta
+Configurable Menu v0.6-Beta
 ==============
 
-Applet: Configurable Menu Version: v0.5-Beta
+Applet: Configurable Menu Version: v0.6-Beta
 
 O.S.: Cinnamon 
 
-Release Date: 10 Dicember 2013
+Release Date: 11 Dicember 2013
 
 Author: Lester Carballo Pérez
 
@@ -64,6 +64,10 @@ Add new languages:
 
 Change Log:
 ==============
+0.6-Beta
+   - Fixed several bugs.
+   - Ability to drag and drop item to Desktop and icon list applet of physic.
+
 0.5-Beta
    - Added Dragon theme to put the categories horizontally.
    - Added Horizontal theme to put  all horizontally.

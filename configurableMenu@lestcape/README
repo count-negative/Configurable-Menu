@@ -1,5 +1,5 @@
-Applet : Configurable Menu      Version      : v0.5-Beta
-O.S.   : Cinnamon               Release Date : 10 Dicember 2013.
+Applet : Configurable Menu      Version      : v0.6-Beta
+O.S.   : Cinnamon               Release Date : 11 Dicember 2013.
 Author : Lester Carballo Pérez  Email        : lestcape@gmail.com
 
 Website : https://github.com/lestcape/Configurable-Menu
@@ -40,9 +40,14 @@ Installation Instructions:
    3- Enable the applet in Cinnamon Settings and use it.
 
 Add new languages:
+
   - Unsupported yet.
 
 Change Log:
+
+0.6-Beta
+   - Fixed several bugs.
+   - Ability to drag and drop item to Desktop and icon list applet of physic.
 
 0.5-Beta
    - Added Dragon theme to put the categories horizontally.
