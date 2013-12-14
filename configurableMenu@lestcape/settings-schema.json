@@ -104,6 +104,12 @@
       "description": "Show favorites",
       "tooltip": "Choose whether or not to show favorites in the menu."
    },
+   "show-power-buttons" : {
+      "type" : "checkbox",
+      "default" : true,
+      "description": "Show power buttons",
+      "tooltip": "Choose whether or not to show power buttons in the menu."
+   },
    "favorites-lines" : {
       "type": "spinbutton",
       "default" : 1,
