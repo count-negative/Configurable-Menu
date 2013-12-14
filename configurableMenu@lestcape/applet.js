@@ -2267,11 +2267,19 @@ MyApplet.prototype = {
                this.categoriesBox.set_height(this.height);
          } else {
             if(this.scrollApplicationsVisible) {
-               this.applicationsScrollBox.set_height(this.height - this.categoriesScrollBox.get_height());
+               if(this.favoritesObj.getVertical())
+                  this.applicationsScrollBox.set_height(this.height - this.categoriesScrollBox.get_height());
+               else
+                  this.applicationsScrollBox.set_height(this.height - this.categoriesScrollBox.get_height() - this.favoritesObj.actor.get_height());
                this.applicationsBox.set_height(-1);
             }
-            else
-               this.applicationsBox.set_height(this.height - this.categoriesScrollBox.get_height());
+            else {
+               if(this.favoritesObj.getVertical())
+                  this.applicationsScrollBox.set_height(this.height - this.categoriesScrollBox.get_height());
+               else
+                  this.applicationsScrollBox.set_height(this.height - this.categoriesScrollBox.get_height() - this.favoritesObj.actor.get_height());
+               this.applicationsBox.set_height(this.applicationsScrollBox.get_height());
+            }
          }
       }
       else {
@@ -2307,7 +2315,6 @@ MyApplet.prototype = {
                currWidth = this.endBox.get_width();
             if(currWidth < this.searchBox.get_width()-10)
                currWidth = this.searchBox.get_width()-10;
-            this.applicationsBox.set_width(currWidth);
          }
          this.categoriesBox.set_width(this.applicationsBox.get_width());
       }
