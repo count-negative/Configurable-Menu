@@ -1,5 +1,5 @@
 Applet : Configurable Menu      Version      : v0.6-Beta
-O.S.   : Cinnamon               Release Date : 11 Dicember 2013.
+O.S.   : Cinnamon               Release Date : 14 Dicember 2013.
 Author : Lester Carballo Pérez  Email        : lestcape@gmail.com
 
 Website : https://github.com/lestcape/Configurable-Menu
@@ -47,7 +47,12 @@ Change Log:
 
 0.6-Beta
    - Fixed several bugs.
-   - Ability to drag and drop item to Desktop and icon list applet of physic.
+   - Ability to drag and drop items to Desktop.
+   - Now the option "add to panel" do not open panel launcher applet if it's closed.
+   - Now the option "add to panel" also add item to icon list applet of physic if it's open.
+   - Fixed the keyboard navegation.
+   - Unified mechanisms for the different items views.
+   - Show and hide power buttons.
 
 0.5-Beta
    - Added Dragon theme to put the categories horizontally.

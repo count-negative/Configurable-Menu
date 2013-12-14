@@ -66,9 +66,11 @@ Change Log:
 ==============
 0.6-Beta
    - Fixed several bugs.
-   - Ability to drag and drop item to Desktop and icon list applet of physic.
-   - Fixed navegation keyboard.
-   - Unify icon view mechanims.
+   - Ability to drag and drop items to Desktop.
+   - Now the option "add to panel" do not open panel launcher applet if it's closed.
+   - Now the option "add to panel" also add item to icon list applet of physic if it's open.
+   - Fixed the keyboard navegation.
+   - Unified mechanisms for the different items views.
    - Show and hide power buttons.
 
 0.5-Beta
