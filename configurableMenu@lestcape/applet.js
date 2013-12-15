@@ -1,5 +1,5 @@
-// Applet : Configurable Menu      Version      : v0.6-Beta
-// O.S.   : Cinnamon               Release Date : 11 Dicember 2013.
+// Applet : Configurable Menu      Version      : v0.7-Beta
+// O.S.   : Cinnamon               Release Date : 15 Dicember 2013.
 // Author : Lester Carballo Pérez  Email        : lestcape@gmail.com
 //
 // Website : https://github.com/lestcape/Configurable-Menu
@@ -78,11 +78,11 @@ let appsys = Cinnamon.AppSystem.get_default();
 
 const USER_DESKTOP_PATH = FileUtils.getUserDesktopDir();
 
-const MAX_FAV_ICON_SIZE = 32;
-const HOVER_ICON_SIZE = 68;
-const APPLICATION_ICON_SIZE = 22;
+//const MAX_FAV_ICON_SIZE = 32;
+//const HOVER_ICON_SIZE = 68;
+//const APPLICATION_ICON_SIZE = 22;
 const MAX_RECENT_FILES = 20;
-const CATEGORY_ICON_SIZE = 22;
+//const CATEGORY_ICON_SIZE = 22;
 /*
 const LIB_PATH = '/usr/share/cinnamon/applets/menu@cinnamon.org';
 imports.searchPath.unshift(LIB_PATH);
@@ -468,20 +468,21 @@ VisibleChildIteratorExtended.prototype = {
    }
 };
 
-function HoverIcon(parent) {
-   this._init(parent);
+function HoverIcon(parent, iconSize) {
+   this._init(parent, iconSize);
 }
 
 HoverIcon.prototype = {
    __proto__: PopupMenu.PopupSubMenuMenuItem.prototype,
     
-   _init: function(parent) {
+   _init: function(parent, iconSize) {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
       try {
          //this.actor._delegate = this;
+         this.iconSize = iconSize;
          this.actor.style = "padding-top: "+(0)+"px;padding-bottom: "+(0)+"px;padding-left: "+(0)+"px;padding-right: "+(0)+"px;margin:auto;";
-         this._userIcon = new St.Icon({ icon_size: HOVER_ICON_SIZE });
-         this.icon = new St.Icon({ icon_size: HOVER_ICON_SIZE, icon_type: St.IconType.FULLCOLOR });
+         this._userIcon = new St.Icon({ icon_size: this.iconSize });
+         this.icon = new St.Icon({ icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR });
          this.parent = parent;
          
          this.menu = new PopupMenu.PopupSubMenu(this.actor);
@@ -520,6 +521,16 @@ HoverIcon.prototype = {
       } catch(e) {
          Main.notifyError("Error:",e.message);
       }
+   },
+
+   setIconSize: function (iconSize) {
+      this.iconSize = iconSize;
+      if(this._userIcon)
+         this._userIcon.set_icon_size(this.iconSize);
+      if(this.icon)
+         this.icon.set_icon_size(this.iconSize);
+      if(this.lastApp)
+         this.lastApp.set_icon_size(this.iconSize);
    },
 
    _onButtonReleaseEvent: function (actor, event) {
@@ -586,19 +597,19 @@ HoverIcon.prototype = {
 
    refreshApp: function (app) {
       this._removeIcon();
-      this.lastApp = app.create_icon_texture(HOVER_ICON_SIZE);
+      this.lastApp = app.create_icon_texture(this.iconSize);
       this.addActor(this.lastApp);
    },
 
    refreshPlace: function (place) {
       this._removeIcon();
-      this.lastApp = place.iconFactory(HOVER_ICON_SIZE);
+      this.lastApp = place.iconFactory(this.iconSize);
       this.addActor(this.lastApp);
    },
 
    refreshFile: function (file) {
       this._removeIcon();
-      this.lastApp = file.createIcon(HOVER_ICON_SIZE);
+      this.lastApp = file.createIcon(this.iconSize);
       this.addActor(this.lastApp);
    },
 
@@ -853,8 +864,11 @@ FavoritesBoxExtended.prototype = {
             }
 
             this._dragPlaceholder = new DND.GenericDragPlaceholderItem();
-            this._dragPlaceholder.child.set_width (source.actor.height);
-            this._dragPlaceholder.child.set_height (source.actor.height);
+            let dragSize = source.actor.height;
+            if((this.actor.get_children().length > 0)&&(this.actor.get_children()[0].get_children().length > 0))
+               dragSize = this.actor.get_children()[0].get_children()[0].height;
+            this._dragPlaceholder.child.set_width(dragSize);
+            this._dragPlaceholder.child.set_height(dragSize);
            // this.actor.insert_actor(this._dragPlaceholder.actor,
            //                        this._dragPlaceholderPos);
             this.insert(this._dragPlaceholder.actor, this._dragPlaceholderPosX, this._dragPlaceholderPosY);
@@ -1020,14 +1034,15 @@ FavoritesBoxExtended.prototype = {
    }
 };
 
-function TransientButtonExtended(appsMenuButton, pathOrCommand) {
-   this._init(appsMenuButton, pathOrCommand);
+function TransientButtonExtended(appsMenuButton, pathOrCommand, iconSize) {
+   this._init(appsMenuButton, pathOrCommand, iconSize);
 }
 
 TransientButtonExtended.prototype = {
    __proto__: CinnamonMenu.TransientButton.prototype,
     
-   _init: function(appsMenuButton, pathOrCommand) {
+   _init: function(appsMenuButton, pathOrCommand, iconSize) {
+      this.iconSize = iconSize;
       let displayPath = pathOrCommand;
       if(pathOrCommand.charAt(0) == '~') {
          pathOrCommand = pathOrCommand.slice(1);
@@ -1057,12 +1072,12 @@ TransientButtonExtended.prototype = {
          let fileInfo = this.file.query_info(Gio.FILE_ATTRIBUTE_STANDARD_TYPE, Gio.FileQueryInfoFlags.NONE, null);
          let contentType = Gio.content_type_guess(this.pathOrCommand, null);
          let themedIcon = Gio.content_type_get_icon(contentType[0]);
-         this.icon = new St.Icon({gicon: themedIcon, icon_size: APPLICATION_ICON_SIZE, icon_type: St.IconType.FULLCOLOR });
+         this.icon = new St.Icon({gicon: themedIcon, icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR });
          this.actor.set_style_class_name('menu-application-button');
       } catch (e) {
          this.handler = null;
          let iconName = this.isPath ? 'gnome-folder' : 'unknown';
-         this.icon = new St.Icon({icon_name: iconName, icon_size: APPLICATION_ICON_SIZE, icon_type: St.IconType.FULLCOLOR });
+         this.icon = new St.Icon({icon_name: iconName, icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR });
          // @todo Would be nice to indicate we don't have a handler for this file.
          this.actor.set_style_class_name('menu-application-button');
       }
@@ -1113,12 +1128,18 @@ TransientButtonExtended.prototype = {
       this.isDraggableApp = false;
    },
 
+   setIconSize: function (iconSize) {
+      this.iconSize = iconSize;
+      if(this.icon)
+         this.icon.set_icon_size(this.iconSize);
+   },
+
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
       this.label.clutter_text.line_wrap = vertical;
       if(vertical) {
-         this.textBox.set_width(4*APPLICATION_ICON_SIZE);
-         this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);
+         this.textBox.set_width(88);
+         this.textBox.set_height(32);
       }
       else {
          this.textBox.set_width(-1);
@@ -1127,14 +1148,16 @@ TransientButtonExtended.prototype = {
    }
 };
 
-function SystemButton(appsMenuButton, icon, nbFavorites, title, description, hoverIcon) {
-   this._init(appsMenuButton, icon, nbFavorites, title, description, hoverIcon);
+function SystemButton(appsMenuButton, icon, nbFavorites, title, description, hoverIcon, iconSize) {
+   this._init(appsMenuButton, icon, nbFavorites, title, description, hoverIcon, iconSize);
 }
 
 SystemButton.prototype = {
 
-   _init: function(appsMenuButton, icon, nbFavorites, title, description, hoverIcon) {
+   _init: function(appsMenuButton, icon, nbFavorites, title, description, hoverIcon, iconSize) {
       this.actor = new St.Button({ reactive: true, style_class: 'menu-favorites-button' });
+      this.iconSize = iconSize;
+      this.nbFavorite = nbFavorites;
       this.icon = icon;
       this.title = title;
       this.description = description;
@@ -1142,14 +1165,25 @@ SystemButton.prototype = {
       this.active = false;
       this.hoverIcon = hoverIcon;
       let monitorHeight = Main.layoutManager.primaryMonitor.height;
-      let real_size = (0.7*monitorHeight) / nbFavorites;
+      let real_size = (0.7*monitorHeight) / this.nbFavorite;
       let icon_size = 0.6*real_size;
-      if (icon_size>MAX_FAV_ICON_SIZE) icon_size = MAX_FAV_ICON_SIZE;
+      if (icon_size > this.iconSize) icon_size = this.iconSize;
       this.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(2)+"px;padding-right: "+(2)+"px;margin:auto;";
-      let iconObj = new St.Icon({icon_name: icon, icon_size: icon_size, icon_type: St.IconType.FULLCOLOR});
-      this.actor.set_child(iconObj);
+      this.iconObj = new St.Icon({icon_name: icon, icon_size: icon_size, icon_type: St.IconType.FULLCOLOR});
+      this.actor.set_child(this.iconObj);
       //this.actor.connect()
-      iconObj.realize()
+      this.iconObj.realize()
+   },
+
+   setIconSize: function (iconSize) {
+      this.iconSize = iconSize;
+      if(this.icon) {
+         let monitorHeight = Main.layoutManager.primaryMonitor.height;
+         let real_size = (0.7*monitorHeight) / this.nbFavorite;
+         let icon_size = 0.6*real_size;
+         if (icon_size > this.iconSize) icon_size = this.iconSize;
+            this.iconObj.set_icon_size(icon_size);
+      }
    },
 
    setAction: function(actionCallBack) {
@@ -1175,18 +1209,20 @@ SystemButton.prototype = {
    }
 };
 
-function ApplicationButtonExtended(appsMenuButton, app, vertical) {
-   this._init(appsMenuButton, app, vertical);
+function ApplicationButtonExtended(appsMenuButton, app, vertical, iconSize, iconSizeDrag) {
+   this._init(appsMenuButton, app, vertical, iconSize, iconSizeDrag);
 }
 
 ApplicationButtonExtended.prototype = {
    __proto__: GenericApplicationButtonExtended.prototype,
     
-   _init: function(appsMenuButton, app, vertical) {
+   _init: function(appsMenuButton, app, vertical, iconSize, iconSizeDrag) {
       GenericApplicationButtonExtended.prototype._init.call(this, appsMenuButton, app, true);
+      this.iconSize = iconSize;
+      this.iconSizeDrag = iconSizeDrag;
       this.category = new Array();
       this.actor.set_style_class_name('menu-application-button');
-      this.icon = this.app.create_icon_texture(APPLICATION_ICON_SIZE);
+      this.icon = this.app.create_icon_texture(this.iconSize);
       this.name = this.app.get_name();
       this.label = new St.Label({ text: this.name , style_class: 'menu-application-button-label' });
       this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
@@ -1227,12 +1263,18 @@ ApplicationButtonExtended.prototype = {
       return false;
    },
 
+   setIconSize: function (iconSize) {
+      this.iconSize = iconSize;
+      if(this.icon)
+         this.icon.set_icon_size(this.iconSize);
+   },
+ 
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
       this.label.clutter_text.line_wrap = vertical;
       if(vertical) {
-         this.textBox.set_width(4*APPLICATION_ICON_SIZE);
-         this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);    
+         this.textBox.set_width(88);
+         this.textBox.set_height(32);    
       }
       else {
          this.textBox.set_width(-1);
@@ -1245,12 +1287,15 @@ ApplicationButtonExtended.prototype = {
    },
     
    getDragActor: function() {
-      let favorites = AppFavorites.getAppFavorites().getFavorites();
+      /*let favorites = AppFavorites.getAppFavorites().getFavorites();
       let nbFavorites = favorites.length;
       let monitorHeight = Main.layoutManager.primaryMonitor.height;
       let real_size = (0.7*monitorHeight) / nbFavorites;
       let icon_size = 0.6*real_size;
-      if(icon_size>MAX_FAV_ICON_SIZE) icon_size = MAX_FAV_ICON_SIZE;
+      if(icon_size > this.iconSizeDrag) icon_size = this.iconSizeDrag;*/
+      let icon_size = this.iconSize;
+      if(this.iconSizeDrag < this.iconSize)
+         icon_size = this.iconSizeDrag;
       return this.app.create_icon_texture(icon_size);
     },
 
@@ -1261,15 +1306,16 @@ ApplicationButtonExtended.prototype = {
     }
 };
 
-function PlaceButtonExtended(appsMenuButton, place, button_name, vertical) {
-   this._init(appsMenuButton, place, button_name, vertical);
+function PlaceButtonExtended(appsMenuButton, place, button_name, vertical, iconSize) {
+   this._init(appsMenuButton, place, button_name, vertical, iconSize);
 }
 
 PlaceButtonExtended.prototype = {
    __proto__: CinnamonMenu.PlaceButton.prototype,
 
-   _init: function(appsMenuButton, place, button_name, vertical) {
+   _init: function(appsMenuButton, place, button_name, vertical, iconSize) {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
+      this.iconSize = iconSize;
       this.appsMenuButton = appsMenuButton;
       this.place = place;
       this.button_name = button_name;
@@ -1284,9 +1330,9 @@ PlaceButtonExtended.prototype = {
       this.setVertical(vertical);
 
       this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-      this.icon = place.iconFactory(APPLICATION_ICON_SIZE);
+      this.icon = place.iconFactory(this.iconSize);
       if(!this.icon)
-         this.icon = new St.Icon({icon_name: "folder", icon_size: APPLICATION_ICON_SIZE, icon_type: St.IconType.FULLCOLOR});
+         this.icon = new St.Icon({icon_name: "folder", icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR});
       if(this.icon)
          this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
@@ -1296,12 +1342,18 @@ PlaceButtonExtended.prototype = {
       this.label.realize();
    },
 
+   setIconSize: function (iconSize) {
+      this.iconSize = iconSize;
+      if(this.icon)
+         this.icon.set_icon_size(this.iconSize);
+   },
+
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
       this.label.clutter_text.line_wrap = vertical;
       if(vertical) {
-         this.textBox.set_width(4*APPLICATION_ICON_SIZE);
-         this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);          
+         this.textBox.set_width(88);
+         this.textBox.set_height(32);          
       }
       else {
          this.textBox.set_width(-1);
@@ -1310,15 +1362,16 @@ PlaceButtonExtended.prototype = {
    }
 };
 
-function RecentButtonExtended(appsMenuButton, file, vertical) {
-   this._init(appsMenuButton, file, vertical);
+function RecentButtonExtended(appsMenuButton, file, vertical, iconSize) {
+   this._init(appsMenuButton, file, vertical, iconSize);
 }
 
 RecentButtonExtended.prototype = {
    __proto__: CinnamonMenu.RecentButton.prototype,
 
-   _init: function(appsMenuButton, file, vertical) {
+   _init: function(appsMenuButton, file, vertical, iconSize) {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
+      this.iconSize = iconSize;
       this.file = file;
       this.appsMenuButton = appsMenuButton;
       this.button_name = this.file.name;
@@ -1334,7 +1387,7 @@ RecentButtonExtended.prototype = {
       this.setVertical(vertical);
 
       this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-      this.icon = file.createIcon(APPLICATION_ICON_SIZE);
+      this.icon = file.createIcon(this.iconSize);
       this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
 
@@ -1343,12 +1396,18 @@ RecentButtonExtended.prototype = {
       this.label.realize();
    },
 
+   setIconSize: function (iconSize) {
+      this.iconSize = iconSize;
+      if(this.icon)
+         this.icon.set_icon_size(this.iconSize);
+   },
+
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
       this.label.clutter_text.line_wrap = vertical;
       if(vertical) {
-         this.textBox.set_width(4*APPLICATION_ICON_SIZE);
-         this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);
+         this.textBox.set_width(88);
+         this.textBox.set_height(32);
       }
       else {
          this.textBox.set_width(-1);
@@ -1357,15 +1416,16 @@ RecentButtonExtended.prototype = {
    }
 };
 
-function RecentClearButtonExtended(appsMenuButton, vertical) {
-   this._init(appsMenuButton, vertical);
+function RecentClearButtonExtended(appsMenuButton, vertical, iconSize) {
+   this._init(appsMenuButton, vertical, iconSize);
 }
 
 RecentClearButtonExtended.prototype = {
    __proto__: CinnamonMenu.RecentClearButton.prototype,
 
-   _init: function(appsMenuButton, vertical) {
+   _init: function(appsMenuButton, vertical, iconSize) {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
+      this.iconSize = iconSize;
       this.appsMenuButton = appsMenuButton;
       this.actor.set_style_class_name('menu-application-button');
       this.button_name = _("Clear list");
@@ -1379,7 +1439,7 @@ RecentClearButtonExtended.prototype = {
       this.setVertical(vertical);
 
       this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-      this.icon = new St.Icon({ icon_name: 'edit-clear', icon_type: St.IconType.SYMBOLIC, icon_size: APPLICATION_ICON_SIZE });
+      this.icon = new St.Icon({ icon_name: 'edit-clear', icon_type: St.IconType.SYMBOLIC, icon_size: this.iconSize });
       this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
 
@@ -1388,12 +1448,18 @@ RecentClearButtonExtended.prototype = {
       this.label.realize();
    },
 
+   setIconSize: function (iconSize) {
+      this.iconSize = iconSize;
+      if(this.icon)
+         this.icon.set_icon_size(this.iconSize);
+   },
+
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
       this.label.clutter_text.line_wrap = vertical;
       if(vertical) {
-         this.textBox.set_width(4*APPLICATION_ICON_SIZE);
-         this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);
+         this.textBox.set_width(88);
+         this.textBox.set_height(32);
       }
       else {
          this.textBox.set_width(-1);
@@ -1402,23 +1468,26 @@ RecentClearButtonExtended.prototype = {
    }
 };
 
-function FavoritesButtonExtended(appsMenuButton, vertical, app, nbFavorites) {
-   this._init(appsMenuButton, vertical, app, nbFavorites);
+function FavoritesButtonExtended(appsMenuButton, vertical, app, nbFavorites, iconSize) {
+   this._init(appsMenuButton, vertical, app, nbFavorites, iconSize);
 }
 
 FavoritesButtonExtended.prototype = {
    __proto__: GenericApplicationButtonExtended.prototype,
     
-   _init: function(appsMenuButton, vertical, app, nbFavorites) {
+   _init: function(appsMenuButton, vertical, app, nbFavorites, iconSize) {
       GenericApplicationButtonExtended.prototype._init.call(this, appsMenuButton, app);
+      this.iconSize = iconSize;
+      this.vertical = vertical;
+      this.nbFavorites = nbFavorites;
       let monitorHeight;
-      if(vertical)
+      if(this.vertical)
          monitorHeight = Main.layoutManager.primaryMonitor.height;
       else
          monitorHeight = Main.layoutManager.primaryMonitor.width;
-      let real_size = (0.7*monitorHeight) / nbFavorites;
+      let real_size = (0.7*monitorHeight) / this.nbFavorites;
       let icon_size = 0.7*real_size;
-      if(icon_size>MAX_FAV_ICON_SIZE) icon_size = MAX_FAV_ICON_SIZE;
+      if(icon_size > this.iconSize) icon_size = this.iconSize;
       this.actor.style = "padding-top: "+2+"px;padding-bottom: "+2+"px;padding-left: "+(2)+"px;padding-right: "+(2)+"px;margin:auto;";
 
       this.actor.add_style_class_name('menu-favorites-button');
@@ -1429,6 +1498,20 @@ FavoritesButtonExtended.prototype = {
       this._draggable = DND.makeDraggable(this.actor);
       this._draggable.connect('drag-end', Lang.bind(this, this._onDragEnd));  
       this.isDraggableApp = true;
+   },
+
+   setIconSize: function (iconSize) {
+      this.iconSize = iconSize;
+      if(this.icon) {
+         if(this.vertical)
+            monitorHeight = Main.layoutManager.primaryMonitor.height;
+         else
+            monitorHeight = Main.layoutManager.primaryMonitor.width;
+         let real_size = (0.7*monitorHeight) / this.nbFavorites;
+         let icon_size = 0.7*real_size;
+         if(icon_size > this.iconSize) icon_size = this.iconSize;
+         this.icon.set_icon_size(this.iconSize);
+      }
    },
 
    _onDragEnd: function(actor, time, acepted) {
@@ -1453,16 +1536,16 @@ FavoritesButtonExtended.prototype = {
    }
 };
 
-function CategoryButtonExtended(app) {
-   this._init(app);
+function CategoryButtonExtended(app, iconSize) {
+   this._init(app, iconSize);
 }
 
 CategoryButtonExtended.prototype = {
    __proto__: CinnamonMenu.CategoryButton.prototype,
 
-   _init: function(category) {
+   _init: function(category, iconSize) {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
-
+      this.iconSize = iconSize;
       this.actor.set_style_class_name('menu-category-button');
       var label;
       let icon = null;
@@ -1487,7 +1570,7 @@ CategoryButtonExtended.prototype = {
 
       this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       if(category && this.icon_name) {
-         this.icon = St.TextureCache.get_default().load_gicon(null, icon, CATEGORY_ICON_SIZE);
+         this.icon = St.TextureCache.get_default().load_gicon(null, icon, this.iconSize);
          this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
          this.icon.realize();
       }
@@ -1497,12 +1580,18 @@ CategoryButtonExtended.prototype = {
       this.label.realize();
    },
 
+   setIconSize: function (iconSize) {
+      this.iconSize = iconSize;
+      if(this.icon)
+         this.icon.set_icon_size(this.iconSize);
+   },
+
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
     /*  this.label.clutter_text.line_wrap = vertical;
       if(vertical) {
-         this.textBox.set_width(4*APPLICATION_ICON_SIZE);
-         this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);    
+         this.textBox.set_width(88);
+         this.textBox.set_height(32);    
       }
       else {
          this.textBox.set_width(-1);
@@ -1511,15 +1600,16 @@ CategoryButtonExtended.prototype = {
    }
 };
 
-function PlaceCategoryButtonExtended(app) {
-    this._init(app);
+function PlaceCategoryButtonExtended(app, iconSize) {
+    this._init(app, iconSize);
 }
 
 PlaceCategoryButtonExtended.prototype = {
    __proto__: CinnamonMenu.PlaceCategoryButton.prototype,
 
-   _init: function(category) {
+   _init: function(category, iconSize) {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
+      this.iconSize = iconSize;
       this.actor.set_style_class_name('menu-category-button');
       this.actor._delegate = this;
       this.label = new St.Label({ text: _("Places"), style_class: 'menu-category-button-label' });
@@ -1531,7 +1621,7 @@ PlaceCategoryButtonExtended.prototype = {
       this.setVertical(false);
 
       this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-      this.icon = new St.Icon({icon_name: "folder", icon_size: CATEGORY_ICON_SIZE, icon_type: St.IconType.FULLCOLOR});
+      this.icon = new St.Icon({icon_name: "folder", icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR});
       this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
 
@@ -1540,12 +1630,18 @@ PlaceCategoryButtonExtended.prototype = {
       this.label.realize();
    },
 
+   setIconSize: function (iconSize) {
+      this.iconSize = iconSize;
+      if(this.icon)
+         this.icon.set_icon_size(this.iconSize);
+   },
+
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
      /* this.label.clutter_text.line_wrap = vertical;
       if(vertical) {
-         this.textBox.set_width(4*APPLICATION_ICON_SIZE);
-         this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);    
+         this.textBox.set_width(88);
+         this.textBox.set_height(32);    
       }
       else {
          this.textBox.set_width(-1);
@@ -1554,15 +1650,16 @@ PlaceCategoryButtonExtended.prototype = {
    }
 };
 
-function RecentCategoryButtonExtended(app) {
-   this._init(app);
+function RecentCategoryButtonExtended(app, iconSize) {
+   this._init(app, iconSize);
 }
 
 RecentCategoryButtonExtended.prototype = {
    __proto__: CinnamonMenu.RecentCategoryButton.prototype,
 
-   _init: function(category) {
+   _init: function(category, iconSize) {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
+      this.iconSize = iconSize;
       this.actor.set_style_class_name('menu-category-button');
       this.actor._delegate = this;
       this.label = new St.Label({ text: _("Recent Files"), style_class: 'menu-category-button-label' });
@@ -1574,7 +1671,7 @@ RecentCategoryButtonExtended.prototype = {
       this.setVertical(false);
 
       this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-      this.icon = new St.Icon({icon_name: "folder-recent", icon_size: CATEGORY_ICON_SIZE, icon_type: St.IconType.FULLCOLOR});
+      this.icon = new St.Icon({icon_name: "folder-recent", icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR});
       this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
 
@@ -1583,12 +1680,18 @@ RecentCategoryButtonExtended.prototype = {
       this.label.realize();
    },
 
+   setIconSize: function (iconSize) {
+      this.iconSize = iconSize;
+      if(this.icon)
+         this.icon.set_icon_size(this.iconSize);
+   },
+
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
      /* this.label.clutter_text.line_wrap = vertical;
       if(vertical) {
-         this.textBox.set_width(4*APPLICATION_ICON_SIZE);
-         this.textBox.set_height(1.4*APPLICATION_ICON_SIZE);    
+         this.textBox.set_width(88);
+         this.textBox.set_height(32);    
       }
       else {
          this.textBox.set_width(-1);
@@ -1607,6 +1710,11 @@ MyApplet.prototype = {
    _init: function(orientation, panel_height, instance_id) {
       Applet.TextIconApplet.prototype._init.call(this, orientation, panel_height, instance_id);
       try {
+         this.iconAppSize = 22;
+         this.iconCatSize = 22;
+         this.iconMaxFavSize = 20;
+         this.iconPowerSize = 20;
+         this.iconHoverSize = 68;
          this.iconView = false;
          this.iconViewCount = 4;
          this.favoritesLinesNumber = 1;
@@ -1667,12 +1775,17 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.IN, "view-icon-count", "iconViewCount", this._refreshApps, null);
 
          this.settings.bindProperty(Settings.BindingDirection.IN, "activate-on-press", "activateOnPress", null, null);
+this.settings.bindProperty(Settings.BindingDirection.IN, "icon-app-size", "iconAppSize", this._refreshApps, null);
+this.settings.bindProperty(Settings.BindingDirection.IN, "icon-cat-size", "iconCatSize", this._refreshApps, null);
+this.settings.bindProperty(Settings.BindingDirection.IN, "icon-max-fav-size", "iconMaxFavSize", this._setIconMaxFavSize, null);
+this.settings.bindProperty(Settings.BindingDirection.IN, "icon-power-size", "iconPowerSize", this._setIconPowerSize, null);
+this.settings.bindProperty(Settings.BindingDirection.IN, "icon-control-size", "iconControlSize", this._setIconControlSize, null);
+this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "iconHoverSize", this._setIconHoverSize, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "show-favorites", "showFavorites", this._setVisibleFavorites, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "show-power-buttons", "showPowerButtons", this._setVisiblePowerButtons, null);
-
          this.settings.bindProperty(Settings.BindingDirection.IN, "favorites-lines", "favoritesLinesNumber", this._refreshFavs, null);
 
          this.settings.bindProperty(Settings.BindingDirection.IN, "show-hover-icon", "showHoverIcon", this._setVisibleHoverIcon, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "show-power-buttons", "showPowerButtons", this._setVisiblePowerButtons, null);
          
          this.settings.bindProperty(Settings.BindingDirection.IN, "show-time", "showTime", this._updateClock, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "time-format", "timeFormat", this._updateClock, null);
@@ -1744,7 +1857,7 @@ MyApplet.prototype = {
         this.menuManager.addMenu(this.menu);
         this._display();
    },
-*/
+*/ 
    _onMenuKeyPress: function(actor, event) {
       try {
         let symbol = event.get_key_symbol();
@@ -1803,25 +1916,21 @@ MyApplet.prototype = {
    },
 
    _changeFocusElement: function(elementActive) {
-      //try {
-         let activeElements = [this.hover.actor, //this.hover.menu.actor, this.hover.notificationsSwitch.actor,
-                            this.powerButtons, this.favoritesObj.getFirstElement(), this.searchEntry];
-         let index = activeElements.indexOf(elementActive);
-         let selected = index + 1;
-         while((selected < activeElements.length)&&((!activeElements[selected])||(!activeElements[selected].visible))) {
-            selected++;
-         }
-         if(selected != activeElements.length)
-            return activeElements[selected];
-         let selected = 0;
-         while((selected < index)&&((!activeElements[selected])||(!activeElements[selected].visible))) {
-            selected++;
-         }
-    //  } 
-    //  catch(e) {
-         /*Main.notify("Err", e.message);*/
-    //  }
-      return activeElements[selected];
+      let activeElements = [this.hover.actor, this.powerButtons, this.favoritesScrollBox, this.searchEntry];
+      let actors = [this.hover.actor, this.powerButtons, this.favoritesObj.getFirstElement(), this.searchEntry];
+      let index = activeElements.indexOf(elementActive);
+      let selected = index + 1;
+      while((selected < activeElements.length)&&((!activeElements[selected])||(!activeElements[selected].visible))) {
+         selected++;
+      }
+      if(selected != activeElements.length) {
+         return actors[selected];
+      }
+      let selected = 0;
+      while((selected < index)&&((!activeElements[selected])||(!activeElements[selected].visible))) {
+         selected++;
+      }
+      return actors[selected];
    },
 
    _searchFileSystem: function(symbol) {
@@ -1993,7 +2102,7 @@ MyApplet.prototype = {
    _navegateFavBox: function(symbol, actor) {
       this.fav_actor = actor;
       if(symbol == Clutter.Tab) {
-         this.fav_actor = this._changeFocusElement(this.favoritesObj.getFirstElement());
+         this.fav_actor = this._changeFocusElement(this.favoritesScrollBox);
          Mainloop.idle_add(Lang.bind(this, this._putFocus));
          return true;
       } else {
@@ -2176,7 +2285,31 @@ MyApplet.prototype = {
       this.categoriesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
       this.favoritesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
       this._setHorizontalAutoScroll(this.categoriesScrollBox, this.autoscroll_enabled);
-   },    
+   },
+
+   _setIconMaxFavSize: function() {
+      this._refreshApps();
+      this._refreshFavs();
+   },
+
+   _setIconControlSize: function() {
+      if((this.bttViewList)&&(this.bttViewList.get_children()[0]))
+         this.bttViewList.get_children()[0].set_icon_size(this.iconControlSize);
+      if((this.bttViewGrid)&&(this.bttViewGrid.get_children()[0]))
+         this.bttViewGrid.get_children()[0].set_icon_size(this.iconControlSize);
+   },
+
+   _setIconPowerSize: function() {
+      if(this._systemButtons) {
+         for(let i = 0; i < this._systemButtons.length; i++)
+            this._systemButtons[i].setIconSize(this.iconPowerSize);
+      }
+   },
+
+   _setIconHoverSize: function() {
+      if(this.hover)
+         this.hover.setIconSize(this.iconHoverSize);
+   },
 
    _setVisibleViewControl: function() {
       this.bttViewGrid.visible = this.showView;
@@ -2185,6 +2318,7 @@ MyApplet.prototype = {
 
    _setVisibleFavorites: function() {
       this.favoritesScrollBox.visible = this.showFavorites;
+     // this.favoritesObj.actor.visible = this.showFavorites;
       this._refreshFavs();
    },
 
@@ -2193,20 +2327,7 @@ MyApplet.prototype = {
    },
 
    _setVisibleHoverIcon: function() {
-      let currentFather;
-      switch(this.theme) {
-         case "classic":
-            currentFather = this.searchBox;
-            break;
-         case "stylized":
-            currentFather = this.searchBox;
-            break;
-      }
-      if(currentFather) {
-         currentFather.remove_actor(this.hover.actor);
-         if(this.showHoverIcon)
-            currentFather.add(this.hover.actor, {x_fill: false, x_align: St.Align.MIDDLE, expand: true });
-      }
+      this.hover.actor.visible = this.showHoverIcon;
    },
 
    _updateClock: function() {
@@ -2223,6 +2344,8 @@ MyApplet.prototype = {
 
    _updateComplete: function() {
       this._updateMenuSection();
+      this._setIconPowerSize();
+      this._setIconHoverSize();
       this._display();
       this._setVisibleViewControl();
       this._setVisibleFavorites();
@@ -2385,7 +2508,7 @@ MyApplet.prototype = {
 
    _createSymbolicButton: function(icon) {
       let bttIcon = new St.Icon({icon_name: icon, icon_type: St.IconType.SYMBOLIC,
-	                         style_class: 'popup-menu-icon', icon_size: MAX_FAV_ICON_SIZE});
+	                         style_class: 'popup-menu-icon', icon_size: this.iconControlSize});
       let btt = new St.Button({ child: bttIcon });
       this.controlView.add(btt, { x_fill: false, expand: false });
    
@@ -2468,7 +2591,7 @@ MyApplet.prototype = {
          this.controlBox.add(this.searchEntry, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
 //search
 
-         this.hover = new HoverIcon(this);
+         this.hover = new HoverIcon(this, this.iconHoverSize);
          this.hover.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
          this.hover.menu.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
 
@@ -2824,7 +2947,7 @@ MyApplet.prototype = {
       if(autocompletes) {
          let viewBox;
          for(let i = 0; i < autocompletes.length; i++) {
-            let button = new TransientButtonExtended(this, autocompletes[i]);
+            let button = new TransientButtonExtended(this, autocompletes[i], this.iconAppSize);
             button.actor.connect('realize', Lang.bind(this, this._onApplicationButtonRealized));
             button.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, button));
             this._addEnterEvent(button, Lang.bind(this, this._appEnterEvent, button));
@@ -2876,7 +2999,7 @@ MyApplet.prototype = {
       for(let i = 0; i < launchers.length; ++i) {
          let app = appSys.lookup_app(launchers[i]);
          if(app) {
-            let button = new FavoritesButtonExtended(this, this.favoritesObj.getVertical(), app, launchers.length/this.favoritesLinesNumber);
+            let button = new FavoritesButtonExtended(this, this.favoritesObj.getVertical(), app, launchers.length/this.favoritesLinesNumber, this.iconMaxFavSize);
             // + 3 because we're adding 3 system buttons at the bottom
             //button.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(4)+"px;padding-right: "+(-5)+"px;margin:auto;";
             this._favoritesButtons[app] = button;
@@ -2911,7 +3034,7 @@ MyApplet.prototype = {
       //Remove all categories
       this.categoriesBox.destroy_all_children();
 
-      this._allAppsCategoryButton = new CategoryButtonExtended(null);
+      this._allAppsCategoryButton = new CategoryButtonExtended(null, this.iconCatSize);
       this._addEnterEvent(this._allAppsCategoryButton, Lang.bind(this, function() {
          if(!this.searchActive) {
             this._allAppsCategoryButton.isHovered = true;
@@ -2956,7 +3079,7 @@ MyApplet.prototype = {
                if(dir.get_is_nodisplay())
                   continue;
                if(this._loadCategory(dir)) {
-                  let categoryButton = new CategoryButtonExtended(dir);
+                  let categoryButton = new CategoryButtonExtended(dir, this.iconCatSize);
                   this._addEnterEvent(categoryButton, Lang.bind(this, function() {
                      if(!this.searchActive) {
                         categoryButton.isHovered = true;
@@ -3039,7 +3162,7 @@ MyApplet.prototype = {
 
       // Now generate Places category and places buttons and add to the list
       if(this.showPlaces) {
-         this.placesButton = new PlaceCategoryButtonExtended();
+         this.placesButton = new PlaceCategoryButtonExtended(null, this.iconCatSize);
          this._addEnterEvent(this.placesButton, Lang.bind(this, function() {
             if(!this.searchActive) {
                this.placesButton.isHovered = true;
@@ -3078,7 +3201,7 @@ MyApplet.prototype = {
          let places = bookmarks.concat(devices);
          for(let i = 0; i < places.length; i++) {
             let place = places[i];
-            let button = new PlaceButtonExtended(this, place, place.name, this.iconView);
+            let button = new PlaceButtonExtended(this, place, place.name, this.iconView, this.iconAppSize);
             this._addEnterEvent(button, Lang.bind(this, function() {
                this._clearPrevAppSelection(button.actor);
                button.actor.style_class = "menu-application-button-selected";
@@ -3097,7 +3220,7 @@ MyApplet.prototype = {
       }
       // Now generate recent category and recent files buttons and add to the list
       if(this.showRecent) {
-         this.recentButton = new RecentCategoryButtonExtended();
+         this.recentButton = new RecentCategoryButtonExtended(null, this.iconCatSize);
          this._addEnterEvent(this.recentButton, Lang.bind(this, function() {
             if(!this.searchActive) {
                this.recentButton.isHovered = true;
@@ -3132,7 +3255,7 @@ MyApplet.prototype = {
          this._categoryButtons.push(this.recentButton);
 
          for(let id = 0; id < MAX_RECENT_FILES && id < this.RecentManager._infosByTimestamp.length; id++) {
-            let button = new RecentButtonExtended(this, this.RecentManager._infosByTimestamp[id], this.iconView);
+            let button = new RecentButtonExtended(this, this.RecentManager._infosByTimestamp[id], this.iconView, this.iconAppSize);
             this._addEnterEvent(button, Lang.bind(this, function() {
                this._clearPrevAppSelection(button.actor);
                button.actor.style_class = "menu-application-button-selected";
@@ -3150,7 +3273,7 @@ MyApplet.prototype = {
             this._recentButtons.push(button);
          }
          if(this.RecentManager._infosByTimestamp.length > 0) {
-            let button = new RecentClearButtonExtended(this, this.iconView);
+            let button = new RecentClearButtonExtended(this, this.iconView, this.iconAppSize);
             this._addEnterEvent(button, Lang.bind(this, function() {
                this._clearPrevAppSelection(button.actor);
                button.actor.style_class = "menu-application-button-selected";
@@ -3192,31 +3315,31 @@ MyApplet.prototype = {
             powerButtons.disconnect(this.signalKeyPowerID);
       }));
       //Lock screen
-      let button = new SystemButton(this, "gnome-lockscreen", 3, _("Lock screen"), _("Lock the screen"), this.hover);
+      let button = new SystemButton(this, "gnome-lockscreen", 3, _("Lock screen"), _("Lock the screen"), this.hover, this.iconPowerSize);
       button.actor.connect('enter-event', Lang.bind(this, this._sysButtonEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._sysButtonLeaveEvent));
       button.setAction(Lang.bind(this, this._onLockScreenAction));     
         
       powerButtons.add_actor(button.actor);
-      this._systemButtons[0] = button;
+      this._systemButtons.push(button);
         
       //Logout button
-      button = new SystemButton(this, "gnome-logout", 3, _("Logout"), _("Leave the session"), this.hover);        
+      button = new SystemButton(this, "gnome-logout", 3, _("Logout"), _("Leave the session"), this.hover, this.iconPowerSize);        
       button.actor.connect('enter-event', Lang.bind(this, this._sysButtonEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._sysButtonLeaveEvent));
       button.setAction(Lang.bind(this, this._onLogoutAction));
 
       powerButtons.add_actor(button.actor, { y_align: St.Align.END, y_fill: false }); 
-      this._systemButtons[1] = button;
+      this._systemButtons.push(button);
 
       //Shutdown button
-      button = new SystemButton(this, "gnome-shutdown", 3, _("Quit"), _("Shutdown the computer"), this.hover);        
+      button = new SystemButton(this, "gnome-shutdown", 3, _("Quit"), _("Shutdown the computer"), this.hover, this.iconPowerSize);        
       button.actor.connect('enter-event', Lang.bind(this, this._sysButtonEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._sysButtonLeaveEvent)); 
       button.setAction(Lang.bind(this, this._onShutdownAction));
         
       powerButtons.add_actor(button.actor, { y_align: St.Align.END, y_fill: false });
-      this._systemButtons[2] = button;
+      this._systemButtons.push(button);
       return powerButtons;
    },
 
@@ -3359,7 +3482,7 @@ MyApplet.prototype = {
                   app.get_description();
                }
                if(!(app_key in this._applicationsButtonFromApp)) {
-                  let applicationButton = new ApplicationButtonExtended(this, app, this.iconView);
+                  let applicationButton = new ApplicationButtonExtended(this, app, this.iconView, this.iconAppSize, this.iconMaxFavSize);
                   this._applicationsButtons.push(applicationButton);
                   applicationButton.actor.connect('realize', Lang.bind(this, this._onApplicationButtonRealized));
                   applicationButton.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, applicationButton));

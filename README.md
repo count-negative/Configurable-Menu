@@ -1,11 +1,11 @@
-Configurable Menu v0.6-Beta
+Configurable Menu v0.7-Beta
 ==============
 
-Applet: Configurable Menu Version: v0.6-Beta
+Applet: Configurable Menu Version: v0.7-Beta
 
 O.S.: Cinnamon 
 
-Release Date: 14 Dicember 2013
+Release Date: 15 Dicember 2013
 
 Author: Lester Carballo Pérez
 
@@ -64,6 +64,10 @@ Add new languages:
 
 Change Log:
 ==============
+0.7-Beta
+   - Fixed a bug in the keyboard navigation, when press tab key when a component was not visible.
+   - Now you can control the size of all icons in the menu.
+
 0.6-Beta
    - Fixed several bugs.
    - Ability to drag and drop items to Desktop.
