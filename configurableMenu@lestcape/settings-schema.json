@@ -1,17 +1,19 @@
 {
    "theme": {
-        "type": "combobox",
-        "description": "Selected theme of menu:",
-        "default": "classic",
-        "tooltip": "Select a theme of paper menu.",
-        "options": {
-            "Classic": "classic",
-            "Stylized": "stylized",
-            "Dragon": "dragon",
-            "Dragon Inverted": "dragonInverted",
-            "Horizontal": "horizontal"
-        }
-    },
+      "type": "combobox",
+      "description": "Selected theme of menu:",
+      "default": "classic",
+      "tooltip": "Select a theme of paper menu.",
+      "options": {
+         "Classic": "classic",
+         "Stylized": "stylized",
+         "Dragon": "dragon",
+         "Dragon Inverted": "dragonInverted",
+         "Horizontal": "horizontal",
+         "Accessible": "accessible",
+         "Accessible Inverted": "accessibleInverted"
+      }
+   },
    "menu-icon" : {
       "type" : "iconfilechooser",
       "default" : "/usr/share/cinnamon/theme/menu.png",

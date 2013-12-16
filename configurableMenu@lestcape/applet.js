@@ -188,6 +188,196 @@ TimeAndDate.prototype = {
    }
 };
 
+function StaticBox(parent, appTitle, appDescription, hoverIcon, vertical, iconSize) {
+   this._init(parent, appTitle, appDescription, hoverIcon, vertical, iconSize);
+}
+
+StaticBox.prototype = {
+   _init: function(parent, appTitle, appDescription, hoverIcon, vertical, iconSize) {
+      this.actor = new St.BoxLayout({ vertical: true });
+      this.parent = parent;
+      this.takingHover = false;
+      this._staticButtons = new Array();
+      this.appTitle = appTitle;
+      this.appDescription = appDescription;
+      this.hover = hoverIcon;
+      this.vertical = vertical;
+      this.iconSize = iconSize;
+      this.initItems();
+      //this.actor._delegate = this;
+   },
+
+   takeHover: function(take) {
+      if((take)&&(!this.hoverBox)) {
+         this.hoverBox = new St.BoxLayout({ vertical: false });
+         this.hoverBox.add(this.hover.actor, { x_fill: false, x_align: St.Align.MIDDLE, expand: true });
+         this.hoverBox.add_actor(this.hover.menu.actor);
+         this.actor.insert_actor(this.hoverBox, 0);
+      }
+      else if((!take)&&(this.hoverBox)) {
+         this.hoverBox.remove_actor(this.hover.actor);
+         this.hoverBox.remove_actor(this.hover.menu.actor);
+         this.actor.remove_actor(this.hoverBox);
+         this.hoverBox = null;
+      }
+   },
+
+   getFirstElement: function() {
+      let childrens = this.actor.get_children();
+      if(childrens.length > 0) {
+         return childrens[0];
+      }
+      return null;
+   },
+
+   initItems: function() {
+      let appSys = Cinnamon.AppSystem.get_default();
+      let item;
+
+      item = this._createSpecialButton("computer", _("Computer"), "computer:///");
+      item.setAction(Lang.bind(this, this._onComputerAction));
+      item = this._createSpecialButton("folder-home", _("Home"), GLib.get_home_dir());
+      item.setAction(Lang.bind(this, this._onHomeAction));
+      item = this._createSpecialButton("desktop", _("Desktop"), USER_DESKTOP_PATH);
+      item.setAction(Lang.bind(this, this._onDesktopAction));
+      //this._createPlace();
+      item = this._createSpecialButton("user-trash", _("Trash"), "trash:///");
+      item.setAction(Lang.bind(this, this._onTrashAction));
+
+      this._createApp(appSys, "synaptic");
+      this._createApp(appSys, "update-manager");
+      this._createApp(appSys, "cinnamon-settings");
+      this._createApp(appSys, "gnome-terminal");
+
+      item = this._createSpecialButton("gnome-lockscreen", _("Lock screen"), _("Lock the screen"));
+      item.setAction(Lang.bind(this, this._onLockScreenAction));
+      item = this._createSpecialButton("gnome-logout", _("Logout"), _("Leave the session"));
+      item.setAction(Lang.bind(this, this._onLogoutAction));
+      item = this._createSpecialButton("gnome-shutdown", _("Quit"), _("Shutdown the computer"));
+      item.setAction(Lang.bind(this, this._onShutdownAction));
+
+//Places: Computer, HomeFolder, Network, Desktop Trash, 
+//system:  Synaptic, control center, terminal, (power buttons)
+
+//Home, Picture, Music, Videos, Documents
+//Computer, Control Center
+// Package Manager, Terminal, Help
+
+   },
+
+   _createApp: function(appSys, appName) {
+      let iconSizeDrag = 32;
+      let app = appSys.lookup_app(appName + ".desktop");
+      if(app) {
+         let item = new ApplicationButtonExtended(this.parent, app, this.vertical, this.iconSize, iconSizeDrag);
+         item.actor.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
+         item.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
+         item.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, item));
+         this.actor.add_actor(item.actor);
+         this._staticButtons.push(item);
+      }
+   },
+
+   _createPlace: function() {
+      let iconSizeDrag = 32;
+      let item;
+      let bookmarks = Main.placesManager.getBookmarks();
+      for(let id = 0; id < bookmarks.length; id++) {
+          //Main.notify("PN:"+placeName.toLowerCase()+":BN:"+bookmarks[id].name.toLowerCase()+":"+bookmarks[id].name.toLowerCase().indexOf(placeName.toLowerCase()));
+          //if(bookmarks[id].name.toLowerCase().indexOf(placeName.toLowerCase()) != -1)
+          //if(bookmarks[id].name.toLowerCase() == placeName)
+             //return bookmarks[id];
+         item = new PlaceButtonExtended(this, bookmarks[id], bookmarks[id].name, this.vertical, this.iconSize);
+         this.actor.add_actor(item.actor);
+         this._staticButtons.push(item);
+      }
+   },
+
+   _createSpecialButton: function(icon, title, description) {
+      let item = new SystemButton(false, icon, title, description, this.hover, this.iconSize, true);
+      item.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(6)+"px;padding-right: "+(2)+"px;margin:auto;";
+      item.actor.connect('enter-event', Lang.bind(this, this._sysButtonEnterEvent));
+      item.actor.connect('leave-event', Lang.bind(this, this._sysButtonLeaveEvent));
+
+      this.actor.add_actor(item.actor);
+      this._staticButtons.push(item);
+      return item;
+   },
+
+   navegateStaticBox: function(symbol, actor) {
+      
+   },
+
+   _appEnterEvent: function(actor, event, applicationButton) {
+      try {
+      this.appTitle.set_text(applicationButton.app.get_name());
+      if(applicationButton.app.get_description())
+         this.appDescription.set_text(applicationButton.app.get_description());
+      else
+         this.appDescription.set_text("");
+      //this._clearPrevAppSelection(applicationButton.actor);
+      applicationButton.actor.style_class = "menu-application-button-selected";
+      this.hover.refreshApp(applicationButton.app);
+      } catch(e) {
+         Main.notify("err:", e.message);
+      }
+   },
+
+   _appLeaveEvent: function(actor, event, applicationButton) {
+      applicationButton.actor.style_class = "menu-application-button";
+      this.appTitle.set_text("");
+      this.appDescription.set_text("");
+      this.hover.refreshFace();;
+   },
+
+   _sysButtonEnterEvent: function(actor, event) {
+      let index = this.actor.get_children().indexOf(actor);
+      if(this.hoverBox)
+         index --;
+      this.appTitle.set_text(this._staticButtons[index].title);
+      this.appDescription.set_text(this._staticButtons[index].description);
+      this.hover.refresh(this._staticButtons[index].icon);
+   },
+
+   _sysButtonLeaveEvent: function(actor, event) {
+      this.appTitle.set_text("");
+      this.appDescription.set_text("");
+      this.hover.refreshFace();
+   },
+
+   _onComputerAction: function() {
+      this.parent.menu.close();
+      Util.spawnCommandLine('xdg-open computer:///');
+   },
+
+   _onHomeAction: function() {
+      this.parent.menu.close();
+      Util.spawnCommandLine('xdg-open ' + GLib.get_home_dir());
+   },
+
+   _onDesktopAction: function() {
+      this.parent.menu.close();
+      Util.spawnCommandLine('xdg-open ' + USER_DESKTOP_PATH);
+   },
+
+   _onTrashAction: function() {
+      this.parent.menu.close();
+      Util.spawnCommandLine('xdg-open trash:///');
+   },
+
+   _onLockScreenAction: function() {
+      this.parent._onLockScreenAction();
+   },
+
+   _onLogoutAction: function() {
+      this.parent._onLogoutAction();
+   },
+
+   _onShutdownAction: function() {
+      this.parent._onShutdownAction();
+   }
+};
+
 function ApplicationContextMenuItemExtended(appButton, label, action) {
    this._init(appButton, label, action);
 }
@@ -324,6 +514,28 @@ function CategoriesApplicationsBoxExtended() {
 }
 
 CategoriesApplicationsBoxExtended.prototype = {
+   _init: function() {
+      this.actor = new St.BoxLayout();
+      this.actor._delegate = this;
+   },
+    
+   acceptDrop : function(source, actor, x, y, time) {
+      if(source instanceof FavoritesButtonExtended) {
+         source.actor.destroy();
+         actor.destroy();
+         AppFavorites.getAppFavorites().removeFavorite(source.app.get_id());
+         return true;
+      }
+      return false;
+   }
+};
+
+
+function SystemBox() {
+   this._init();
+}
+
+SystemBox.prototype = {
    _init: function() {
       this.actor = new St.BoxLayout();
       this.actor._delegate = this;
@@ -496,12 +708,13 @@ HoverIcon.prototype = {
          let menuItem;
          let userBox = new St.BoxLayout({ style_class: 'user-box', vertical: false });
          this.userLabel = new St.Label(({ /*style_class: 'user-label'*/}));
-         userBox.add(this.userLabel, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE }); 
+         userBox.add(this.userLabel, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
          this.menu.addActor(userBox);
 
         // this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
          this.notificationsSwitch = new PopupMenu.PopupSwitchMenuItem(_("Notifications"), this._toggleNotifications);
+         this.notificationsSwitch.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(1)+"px;padding-right: "+(1)+"px;margin:auto;";
          this.menu.addMenuItem(this.notificationsSwitch);
          global.settings.connect('changed::display-notifications', Lang.bind(this, function() {
             this.notificationsSwitch.setToggleState(global.settings.get_boolean("display-notifications"));
@@ -511,6 +724,7 @@ HoverIcon.prototype = {
          }));
 
          this.account = new PopupMenu.PopupMenuItem(_("Account Details"));
+         this.account.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(1)+"px;padding-right: "+(1)+"px;margin:auto;";
          this.menu.addMenuItem(this.account);
          this.account.connect('activate', Lang.bind(this, function() {
             Util.spawnCommandLine("cinnamon-settings user");
@@ -565,7 +779,9 @@ HoverIcon.prototype = {
     
    toggleMenu: function() {
       if(!this.menu.isOpen)
-         this.parent.searchEntry.set_width(200);
+         if(this.actor.get_parent() == this.parent.searchBox)
+            //this.actor.get_parent().set_width(this.actor.get_parent().get_allocation_box().x2 - this.actor.get_parent().get_allocation_box().x1);
+            this.parent.searchEntry.set_width(200);
       this.menu.toggle();
    },
 
@@ -1148,51 +1364,58 @@ TransientButtonExtended.prototype = {
    }
 };
 
-function SystemButton(appsMenuButton, icon, nbFavorites, title, description, hoverIcon, iconSize) {
-   this._init(appsMenuButton, icon, nbFavorites, title, description, hoverIcon, iconSize);
+function SystemButton(appsMenuButton, icon, title, description, hoverIcon, iconSize, haveText) {
+   this._init(appsMenuButton, icon, title, description, hoverIcon, iconSize, haveText);
 }
 
 SystemButton.prototype = {
+   __proto__: GenericApplicationButtonExtended.prototype,
 
-   _init: function(appsMenuButton, icon, nbFavorites, title, description, hoverIcon, iconSize) {
-      this.actor = new St.Button({ reactive: true, style_class: 'menu-favorites-button' });
+   _init: function(appsMenuButton, icon, title, description, hoverIcon, iconSize, haveText) {
+      GenericApplicationButtonExtended.prototype._init.call(this, appsMenuButton);
+      this.actor.set_style_class_name('menu-favorites-button');
+      this.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(2)+"px;padding-right: "+(2)+"px;margin:auto;";
+      this.haveText = haveText;
       this.iconSize = iconSize;
-      this.nbFavorite = nbFavorites;
       this.icon = icon;
       this.title = title;
       this.description = description;
       this.actionCallBack = null;
       this.active = false;
       this.hoverIcon = hoverIcon;
-      let monitorHeight = Main.layoutManager.primaryMonitor.height;
-      let real_size = (0.7*monitorHeight) / this.nbFavorite;
-      let icon_size = 0.6*real_size;
-      if (icon_size > this.iconSize) icon_size = this.iconSize;
-      this.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(2)+"px;padding-right: "+(2)+"px;margin:auto;";
-      this.iconObj = new St.Icon({icon_name: icon, icon_size: icon_size, icon_type: St.IconType.FULLCOLOR});
-      this.actor.set_child(this.iconObj);
-      //this.actor.connect()
-      this.iconObj.realize()
+      
+      this.container = new St.BoxLayout();
+      this.iconObj = new St.Icon({icon_name: icon, icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR});
+      this.container.add(this.iconObj, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+
+      if(this.haveText) {
+         this.label = new St.Label({ text: this.title , style_class: 'menu-application-button-label' });
+         this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+         this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+         this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+         this.textBox = new St.BoxLayout({ vertical: false });
+         this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+         this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      }
+
+      this.addActor(this.container);
+      this.iconObj.realize();
    },
 
    setIconSize: function (iconSize) {
       this.iconSize = iconSize;
       if(this.icon) {
-         let monitorHeight = Main.layoutManager.primaryMonitor.height;
-         let real_size = (0.7*monitorHeight) / this.nbFavorite;
-         let icon_size = 0.6*real_size;
-         if (icon_size > this.iconSize) icon_size = this.iconSize;
-            this.iconObj.set_icon_size(icon_size);
+         this.iconObj.set_icon_size(this.iconSize);
       }
    },
 
    setAction: function(actionCallBack) {
       this.actionCallBack = actionCallBack;
-      this.actor.connect('clicked', actionCallBack);
+      this.actor.connect('button-press-event', Lang.bind(this, this.executeAction));
    },
 
-   executeAction: function() {
-      if(this.actionCallBack)
+   executeAction: function(actor, event) {
+      if((this.actionCallBack)&&((!event)||(event.get_button()==1)))
          this.actionCallBack();
    },
 
@@ -2328,6 +2551,8 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
 
    _setVisibleHoverIcon: function() {
       this.hover.actor.visible = this.showHoverIcon;
+      if(this.hover.menu.actor.visible)
+         this.hover.menu.actor.visible = this.showHoverIcon;
    },
 
    _updateClock: function() {
@@ -2545,7 +2770,7 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
 
          this.rightPane = new St.BoxLayout({ vertical: true });        
 //search
-         this.searchBox = new St.BoxLayout({ vertical: false });//{ style_class: 'menu-search-box' });
+         this.searchBox = new St.BoxLayout({ vertical: false }); //style_class: 'menu-search-box',
          this.controlBox = new St.BoxLayout({ vertical: true });
          this.rightPane.add_actor(this.searchBox);
 
@@ -2615,7 +2840,7 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
          this.endBox = new St.BoxLayout({ vertical: false });
          this.selectedAppBox = new St.BoxLayout({ style_class: 'menu-selected-app-box', vertical: true });
          this.selectedAppTitle = new St.Label({ style_class: 'menu-selected-app-title', text: "" });
-         this.selectedAppBox.add(this.selectedAppTitle);
+         this.selectedAppBox.add_actor(this.selectedAppTitle);
          this.selectedAppDescription = new St.Label({ style_class: 'menu-selected-app-description', text: "" });
          this.selectedAppBox.add_actor(this.selectedAppDescription);
          
@@ -2625,23 +2850,32 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
          this.betterPanel = new St.BoxLayout({ vertical: false });
          this.categoriesWrapper = new St.BoxLayout({ vertical: true });
 
+         this.staticBox = new StaticBox(this, this.selectedAppTitle, this.selectedAppDescription, this.hover, false, 32);
+
          switch(this.theme) {
-            case "classic"        :
+            case "classic"           :
                           this.loadClassic(); 
                           break;
-            case "stylized"       :
+            case "stylized"          :
                           this.loadStylized(); 
                           break;
-            case "dragon"         :
+            case "dragon"            :
                           this.loadDragon(); 
                           break;
-            case "dragonInverted":
+            case "dragonInverted"    :
                           this.loadDragonInverted(); 
                           break;
-            case "horizontal"     :
+            case "horizontal"        :
                           this.loadHorizontal(); 
                           break;
-            default               :
+            case "accessible"        :
+                          this.loadAccessible(); 
+                          break;
+            case "accessibleInverted":
+                          this.loadAccessibleInverted(); 
+                          break;
+
+            default                  :
                           this.loadClassic(); 
                           break;
          }
@@ -2762,6 +2996,42 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
      // let heightFav = this.favoritesObj.getRealSpace(); //MAX_FAV_ICON_SIZE*(this.favoritesLinesNumber+1) + 1;
      // this.favoritesBox.set_style('max-height: ' + heightFav + 'px; min-height: ' + heightFav + 'px');
+   },
+
+   loadAccessible: function() {
+      this.searchBox.remove_actor(this.hover.actor);
+      this.searchBox.remove_actor(this.hover.menu.actor);
+      this.staticBox.takeHover(true);
+      this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
+      this.categoriesScrollBox = this._createScroll(true);
+      this.favoritesScrollBox = this._createScroll(true);
+      this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.powerButtons = this._powerButtons(false);
+      //this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.mainBox.add(this.staticBox.actor, { y_align: St.Align.START, y_fill: false, expand: true });
+      this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
+      this.mainBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
+      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
+   },
+
+   loadAccessibleInverted: function() {
+      this.searchBox.remove_actor(this.hover.actor);
+      this.searchBox.remove_actor(this.hover.menu.actor);
+      this.staticBox.takeHover(true);
+      this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
+      this.categoriesScrollBox = this._createScroll(true);
+      this.favoritesScrollBox = this._createScroll(true);
+      this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.powerButtons = this._powerButtons(false);
+      //this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.mainBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
+      this.mainBox.add(this.staticBox.actor, { y_align: St.Align.START, y_fill: false, expand: true });
+      //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
+      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
    },
 
    _setHorizontalAutoScroll: function(hScroll, setValue) {
@@ -3315,7 +3585,7 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
             powerButtons.disconnect(this.signalKeyPowerID);
       }));
       //Lock screen
-      let button = new SystemButton(this, "gnome-lockscreen", 3, _("Lock screen"), _("Lock the screen"), this.hover, this.iconPowerSize);
+      let button = new SystemButton(this, "gnome-lockscreen", _("Lock screen"), _("Lock the screen"), this.hover, this.iconPowerSize, false);
       button.actor.connect('enter-event', Lang.bind(this, this._sysButtonEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._sysButtonLeaveEvent));
       button.setAction(Lang.bind(this, this._onLockScreenAction));     
@@ -3324,7 +3594,7 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       this._systemButtons.push(button);
         
       //Logout button
-      button = new SystemButton(this, "gnome-logout", 3, _("Logout"), _("Leave the session"), this.hover, this.iconPowerSize);        
+      button = new SystemButton(this, "gnome-logout", _("Logout"), _("Leave the session"), this.hover, this.iconPowerSize, false);        
       button.actor.connect('enter-event', Lang.bind(this, this._sysButtonEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._sysButtonLeaveEvent));
       button.setAction(Lang.bind(this, this._onLogoutAction));
@@ -3333,7 +3603,7 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       this._systemButtons.push(button);
 
       //Shutdown button
-      button = new SystemButton(this, "gnome-shutdown", 3, _("Quit"), _("Shutdown the computer"), this.hover, this.iconPowerSize);        
+      button = new SystemButton(this, "gnome-shutdown", _("Quit"), _("Shutdown the computer"), this.hover, this.iconPowerSize, false);        
       button.actor.connect('enter-event', Lang.bind(this, this._sysButtonEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._sysButtonLeaveEvent)); 
       button.setAction(Lang.bind(this, this._onShutdownAction));
