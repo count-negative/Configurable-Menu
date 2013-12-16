@@ -11,7 +11,8 @@
          "Dragon Inverted": "dragonInverted",
          "Horizontal": "horizontal",
          "Accessible": "accessible",
-         "Accessible Inverted": "accessibleInverted"
+         "Accessible Inverted": "accessibleInverted",
+         "Mint": "mint"
       }
    },
    "menu-icon" : {
@@ -157,8 +158,8 @@
       "max" : 14,
       "step" : 1,
       "units" : "items",
-      "description" : "Number of lines in view:",
-      "tooltip" : "Set the number of lines in view."
+      "description" : "Number of columns in view:",
+      "tooltip" : "Set the number of columns in view."
    },
    "show-favorites" : {
       "type" : "checkbox",
@@ -170,7 +171,7 @@
       "type": "spinbutton",
       "default" : 1,
       "min" : 1,
-      "max" : 6,
+      "max" : 12,
       "step" : 1,
       "units" : "lines",
       "description" : "Number of favorites lines:",

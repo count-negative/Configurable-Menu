@@ -188,6 +188,80 @@ TimeAndDate.prototype = {
    }
 };
 
+function ButtonChangerBox(label, icon, parent) {
+    this._init(label, icon, parent);
+}
+
+ButtonChangerBox.prototype = {
+    __proto__: PopupMenu.PopupSubMenuMenuItem.prototype,
+
+    _init: function (label, icon, parent) {
+        PopupMenu.PopupSubMenuMenuItem.prototype._init.call(this, label);
+
+        this.actor.set_style_class_name('');
+        this.box = new St.BoxLayout({ style_class: 'menu-category-button' });
+        this.parent = parent;
+        this.removeActor(this.label);
+        this.removeActor(this._triangle);
+        this._triangle = new St.Label();
+        this.label = new St.Label({
+            text: " " + label
+        });
+        this.icon = new St.Icon({
+            style_class: 'popup-menu-icon',
+            icon_type: St.IconType.FULLCOLOR,
+            icon_name: icon,
+            icon_size: 20
+        });
+        this.icon.realize();
+        this.label.realize();
+	this.box.add(this.label, {x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE });
+	this.box.add(this.icon, {x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE });
+        this.addActor(this.box);
+    },
+
+    setActive: function (active) {
+        if(active) {
+           global.set_cursor(Cinnamon.Cursor.POINTING_HAND);
+           this.box.set_style_class_name('menu-category-button-selected');
+        }
+        else {
+           global.unset_cursor();
+           this.box.set_style_class_name('menu-category-button');
+        }
+    },
+
+    _onButtonReleaseEvent: function (actor, event) {
+        if (event.get_button() == 1) {
+            this.activate(event);
+        }
+    },
+
+    activate: function (event) {
+       if(this.label.get_text().indexOf(_("All Applications")) != -1) {
+          //this.box.set_width(this.box.get_allocation_box().x2 - this.box.get_allocation_box().x1);
+          this.label.set_text(_("Favorites"));
+          this.parent.categoriesWrapper.visible = true;
+          this.parent.applicationsScrollBox.visible = true;
+          this.parent.favBoxWrapper.visible = false;
+         /* if(this.parent.mainBox.get_children().indexOf(this.parent.rightPane) == -1)
+             this.parent.mainBox.add(this.parent.rightPane, { span: 2, x_fill: false, expand: false });
+          this.parent.mainBox.remove_actor(this.parent.favBoxWrapper);*/
+       }
+       else {
+          this.label.set_text(_("All Applications"));
+          this.parent.favBoxWrapper.visible = true;
+          this.parent.categoriesWrapper.visible = false;
+          this.parent.applicationsScrollBox.visible = false;
+          /*if(this.parent.mainBox.get_children().indexOf(this.parent.favBoxWrapper) == -1)
+             this.parent.mainBox.add(this.parent.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+          this.parent.mainBox.remove_actor(this.parent.rightPane);*/
+       }
+       /* if (this.parent.leftPane.get_child() == this.parent.favsBox) this.parent.switchPanes("apps");
+        else this.parent.switchPanes("favs");*/
+    }
+};
+
 function StaticBox(parent, appTitle, appDescription, hoverIcon, vertical, iconSize) {
    this._init(parent, appTitle, appDescription, hoverIcon, vertical, iconSize);
 }
@@ -1691,32 +1765,52 @@ RecentClearButtonExtended.prototype = {
    }
 };
 
-function FavoritesButtonExtended(appsMenuButton, vertical, app, nbFavorites, iconSize) {
-   this._init(appsMenuButton, vertical, app, nbFavorites, iconSize);
+function FavoritesButtonExtended(appsMenuButton, vertical, app, nbFavorites, iconSize, allowName) {
+   this._init(appsMenuButton, vertical, app, nbFavorites, iconSize, allowName);
 }
 
 FavoritesButtonExtended.prototype = {
    __proto__: GenericApplicationButtonExtended.prototype,
     
-   _init: function(appsMenuButton, vertical, app, nbFavorites, iconSize) {
+   _init: function(appsMenuButton, vertical, app, nbFavorites, iconSize, allowName) {
       GenericApplicationButtonExtended.prototype._init.call(this, appsMenuButton, app);
       this.iconSize = iconSize;
       this.vertical = vertical;
+      this.allowName = allowName;
       this.nbFavorites = nbFavorites;
-      let monitorHeight;
-      if(this.vertical)
-         monitorHeight = Main.layoutManager.primaryMonitor.height;
-      else
-         monitorHeight = Main.layoutManager.primaryMonitor.width;
-      let real_size = (0.7*monitorHeight) / this.nbFavorites;
-      let icon_size = 0.7*real_size;
-      if(icon_size > this.iconSize) icon_size = this.iconSize;
-      this.actor.style = "padding-top: "+2+"px;padding-bottom: "+2+"px;padding-left: "+(2)+"px;padding-right: "+(2)+"px;margin:auto;";
 
+      let icon_size = this.iconSize;
+      if(!allowName) {
+         let monitorHeight;
+         if(this.vertical)
+            monitorHeight = Main.layoutManager.primaryMonitor.height;
+         else
+            monitorHeight = Main.layoutManager.primaryMonitor.width;
+         let real_size = (0.7*monitorHeight) / this.nbFavorites;
+         icon_size = 0.7*real_size;
+         if(icon_size > this.iconSize) icon_size = this.iconSize;
+      }
+      this.actor.style = "padding-top: "+2+"px;padding-bottom: "+2+"px;padding-left: "+(2)+"px;padding-right: "+(2)+"px;margin:auto;";
       this.actor.add_style_class_name('menu-favorites-button');
-      let icon = app.create_icon_texture(icon_size);
-      this.addActor(icon);
-      icon.realize()
+
+      this.container = new St.BoxLayout();
+      this.icon = app.create_icon_texture(icon_size);
+      this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+
+      if(this.allowName) {
+         this.label = new St.Label({ text: this.app.get_name(), style_class: 'menu-application-button-label' });
+         this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+         this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+         this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+
+         this.textBox = new St.BoxLayout({ vertical: false });
+         this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+         this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      }
+
+      this.addActor(this.container);
+
+      this.icon.realize()
 
       this._draggable = DND.makeDraggable(this.actor);
       this._draggable.connect('drag-end', Lang.bind(this, this._onDragEnd));  
@@ -1933,6 +2027,7 @@ MyApplet.prototype = {
    _init: function(orientation, panel_height, instance_id) {
       Applet.TextIconApplet.prototype._init.call(this, orientation, panel_height, instance_id);
       try {
+         this.allowFavName = false;
          this.iconAppSize = 22;
          this.iconCatSize = 22;
          this.iconMaxFavSize = 20;
@@ -2591,14 +2686,21 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
          this.betterPanel.set_height(this.height);
          if(this.favoritesObj.getVertical()) {
             if(this.scrollFavoritesVisible) {
-               this.favBoxWrapper.set_height(this.height +  this.searchBox.get_height());
+               if(this.favBoxWrapper.get_parent() == this.betterPanel)
+                  this.favBoxWrapper.set_height(this.height);
+               else
+                  this.favBoxWrapper.set_height(this.height +  this.searchBox.get_height());
                this.favoritesBox.set_height(-1);
             }
             else {
-               if((this.favBoxWrapper.get_children().indexOf(this.powerButtons))&&(this.powerButtons.visible))
+               if((this.favBoxWrapper.get_children().indexOf(this.powerButtons) != -1)&&(this.powerButtons.visible))
                   this.favoritesBox.set_height(this.height +  this.searchBox.get_height() - this.powerButtons.get_height());
-               else
-                  this.favoritesBox.set_height(this.height +  this.searchBox.get_height());
+               else {
+                  if(this.favBoxWrapper.get_parent() == this.betterPanel)
+                     this.favoritesBox.set_height(this.height);
+                  else
+                     this.favoritesBox.set_height(this.height +  this.searchBox.get_height());
+               }
                this.favBoxWrapper.set_height(-1);
             }
          }
@@ -2631,7 +2733,11 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
          }
       }
       else {
-         let scrollBoxHeight = 0.9*this.favBoxWrapper.get_height();
+         let scrollBoxHeight;
+         if(this.favBoxWrapper.get_parent() != this.betterPanel)
+            scrollBoxHeight = 0.9*this.favBoxWrapper.get_height();
+         else
+            scrollBoxHeight =this.categoriesBox.get_height();
          if(this.categoriesBox.get_vertical()) {
             if(this.categoriesBox.get_height() > scrollBoxHeight)
                scrollBoxHeight = this.categoriesBox.get_height();
@@ -2642,7 +2748,10 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
          if(scrollBoxHeight < 200)
             scrollBoxHeight = 200;
          this.applicationsScrollBox.set_height(scrollBoxHeight);
-         this.favBoxWrapper.set_height(-1);
+         if(this.favBoxWrapper.get_parent() == this.betterPanel)
+            this.favBoxWrapper.set_height(scrollBoxHeight);
+         else
+            this.favBoxWrapper.set_height(-1);
          this.categoriesBox.set_height(-1);
          this.applicationsBox.set_height(-1);
          this.betterPanel.set_height(-1);
@@ -2667,6 +2776,18 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
          this.categoriesBox.set_width(this.applicationsBox.get_width());
       }
       else {
+         if(this.favBoxWrapper.get_parent() == this.betterPanel) {
+            if((this._applicationsBoxWidth)&&(this._applicationsBoxWidth != 0))
+               this.applicationsBox.set_width(this.iconViewCount*this._applicationsBoxWidth + 42); // The answer to life...
+             /*if(this.favoritesScrollBox.get_width() > this.applicationsBox.get_width() + this.categoriesBox.get_width() + 20)
+               this.applicationsBox.set_width(this.favoritesScrollBox.get_width() - this.categoriesBox.get_width() - 20);
+             if(this.favoritesScrollBox.get_width() < this.applicationsBox.get_width() + this.categoriesBox.get_width() + 20)*/
+            //this.favoritesScrollBox.set_width(this.applicationsBox.get_width() + this.categoriesBox.get_width() + 20);
+            //this.favoritesBox.set_width(this.applicationsBox.get_width() + this.categoriesBox.get_width() + 20);
+            if(this.favoritesScrollBox.get_width() > this.applicationsBox.get_width() + this.categoriesBox.get_width() + 20)
+               this.applicationsBox.set_width(this.favoritesScrollBox.get_width() - this.categoriesBox.get_width() - 20);
+            this.favoritesScrollBox.set_width(this.applicationsBox.get_width() + this.categoriesBox.get_width() + 20); 
+         }
       }
    },
 /*
@@ -2754,6 +2875,7 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
 
    _display: function() {
       try {
+         this.allowFavName = false;
          this._activeContainer = null;
          this._activeActor = null;
          this.vectorBox = null;
@@ -2873,6 +2995,9 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
                           break;
             case "accessibleInverted":
                           this.loadAccessibleInverted(); 
+                          break;
+            case "mint":
+                          this.loadMint(); 
                           break;
 
             default                  :
@@ -3029,6 +3154,29 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       this.mainBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       this.mainBox.add(this.staticBox.actor, { y_align: St.Align.START, y_fill: false, expand: true });
+      //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
+      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
+   },
+
+   loadMint: function() {
+      this.allowFavName = true;
+      this.searchBox.remove_actor(this.hover.actor);
+      this.searchBox.remove_actor(this.hover.menu.actor);
+      let btChanger = new ButtonChangerBox(_("All Applications"), "forward", this, false);
+      this.searchBox.add(btChanger.actor, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
+      this.staticBox.takeHover(true);
+      this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
+      this.categoriesScrollBox = this._createScroll(true);
+      this.favoritesScrollBox = this._createScroll(true);
+      this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.powerButtons = this._powerButtons(false);
+      //this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.mainBox.add(this.staticBox.actor, { y_align: St.Align.START, y_fill: false, expand: true });
+      this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
+      this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.categoriesWrapper.visible = false;
+      this.applicationsScrollBox.visible = false;
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
@@ -3257,6 +3405,8 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
 
       let favoritesBox = new CinnamonMenu.FavoritesBox();
       this.favoritesBox.add_actor(favoritesBox.actor);*/
+      this.favoritesScrollBox.set_width(-1)
+      this.favoritesBox.set_width(-1);
       this.favoritesObj.removeAll();
       if(this.favoritesObj.getNumberLines() != this.favoritesLinesNumber)
          this.favoritesObj.setNumberLines(this.favoritesLinesNumber);
@@ -3269,7 +3419,9 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       for(let i = 0; i < launchers.length; ++i) {
          let app = appSys.lookup_app(launchers[i]);
          if(app) {
-            let button = new FavoritesButtonExtended(this, this.favoritesObj.getVertical(), app, launchers.length/this.favoritesLinesNumber, this.iconMaxFavSize);
+            let button = new FavoritesButtonExtended(this, this.favoritesObj.getVertical(), app,
+                                                     launchers.length/this.favoritesLinesNumber,
+                                                     this.iconMaxFavSize, this.allowFavName);
             // + 3 because we're adding 3 system buttons at the bottom
             //button.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(4)+"px;padding-right: "+(-5)+"px;margin:auto;";
             this._favoritesButtons[app] = button;
@@ -3301,6 +3453,7 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       this._applicationsButtonFromApp = new Object(); 
       this._applicationsBoxWidth = 0;
       this._activeContainer = null;
+      this.favoritesScrollBox.set_width(-1);
       //Remove all categories
       this.categoriesBox.destroy_all_children();
 
