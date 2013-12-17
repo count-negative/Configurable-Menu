@@ -3209,7 +3209,7 @@ MyApplet.prototype = {
       this.searchBox.remove_actor(this.hover.actor);
       this.searchBox.remove_actor(this.hover.menu.actor);
       let btChanger = new ButtonChangerBox(_("All Applications"), "forward", this, false);
-      this.searchBox.add(btChanger.actor, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
+      this.searchBox.add(btChanger.actor, {x_fill: false, x_align: St.Align.END, y_align: St.Align.START, expand: true });
       this.staticBox.takeHover(true);
       this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
       this.categoriesScrollBox = this._createScroll(true);
