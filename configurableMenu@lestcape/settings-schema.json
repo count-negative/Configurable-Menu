@@ -139,6 +139,16 @@
       "description" : "Hover icon size:",
       "tooltip" : "Set the hover icon size."
    },
+  "icon-accesible-size" : {
+      "type": "spinbutton",
+      "default" : 22,
+      "min" : 10,
+      "max" : 100,
+      "step" : 1,
+      "units" : "pixels",
+      "description" : "Accesible icon size:",
+      "tooltip" : "Set the accesible icon size."
+   },
    "show-view-item" : {
       "type" : "checkbox",
       "default" : true,

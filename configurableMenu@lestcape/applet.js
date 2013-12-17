@@ -339,6 +339,13 @@ StaticBox.prototype = {
 
    },
 
+   setIconSize: function (iconSize) {
+      this.iconSize = iconSize;
+      for(let i = 0; i < this._staticButtons.length; i++) {
+         this._staticButtons[i].setIconSize(iconSize);
+      }
+   },
+
    _createApp: function(appSys, appName) {
       let iconSizeDrag = 32;
       let app = appSys.lookup_app(appName + ".desktop");
@@ -1562,8 +1569,14 @@ ApplicationButtonExtended.prototype = {
 
    setIconSize: function (iconSize) {
       this.iconSize = iconSize;
-      if(this.icon)
-         this.icon.set_icon_size(this.iconSize);
+      if(this.icon) {
+         let visible = this.icon.visible;
+         this.container.remove_actor(this.icon);
+         this.icon.destroy();
+         this.icon = this.app.create_icon_texture(this.iconSize);
+         this.icon.visible = visible;
+         this.container.insert_actor(this.icon, 0);
+      }
    },
  
    setVertical: function(vertical) {
@@ -2048,6 +2061,7 @@ MyApplet.prototype = {
          this.iconMaxFavSize = 20;
          this.iconPowerSize = 20;
          this.iconHoverSize = 68;
+         this.iconAccessibleSize = 68;
          this.iconView = false;
          this.iconViewCount = 4;
          this.favoritesLinesNumber = 1;
@@ -2114,6 +2128,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.IN, "icon-power-size", "iconPowerSize", this._setIconPowerSize, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "icon-control-size", "iconControlSize", this._setIconControlSize, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "iconHoverSize", this._setIconHoverSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "icon-accesible-size", "iconAccessibleSize", this._setIconAccessibleSize, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "show-favorites", "showFavorites", this._setVisibleFavorites, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "favorites-lines", "favoritesLinesNumber", this._refreshFavs, null);
 
@@ -2643,6 +2658,11 @@ MyApplet.prototype = {
          this.hover.setIconSize(this.iconHoverSize);
    },
 
+   _setIconAccessibleSize: function() {
+      if(this.staticBox)
+        this.staticBox.setIconSize(this.iconAccessibleSize);
+   },
+
    _setVisibleViewControl: function() {
       this.bttViewGrid.visible = this.showView;
       this.bttViewList.visible = this.showView;
@@ -2685,6 +2705,7 @@ MyApplet.prototype = {
       this._updateMenuSection();
       this._setIconPowerSize();
       this._setIconHoverSize();
+      this._setIconAccessibleSize();
       this._display();
       this._setVisibleViewControl();
       this._setVisibleFavorites();
@@ -2995,7 +3016,7 @@ MyApplet.prototype = {
          this.mainBox = new St.BoxLayout({ vertical: false,  style_class: 'menu-applications-box' });
          //this.mainBox.set_style("padding-right: 20px;");
          this.extendedBox = new St.BoxLayout({ vertical: true });
-         this.staticBox = new StaticBox(this, this.selectedAppTitle, this.selectedAppDescription, this.hover, false, 22);
+         this.staticBox = new StaticBox(this, this.selectedAppTitle, this.selectedAppDescription, this.hover, false, this.iconAccessibleSize);
 
          switch(this.theme) {
             case "classic"           :
