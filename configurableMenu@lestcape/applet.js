@@ -244,18 +244,18 @@ ButtonChangerBox.prototype = {
           this.parent.categoriesWrapper.visible = true;
           this.parent.applicationsScrollBox.visible = true;
           this.parent.favBoxWrapper.visible = false;
-         /* if(this.parent.mainBox.get_children().indexOf(this.parent.rightPane) == -1)
-             this.parent.mainBox.add(this.parent.rightPane, { span: 2, x_fill: false, expand: false });
-          this.parent.mainBox.remove_actor(this.parent.favBoxWrapper);*/
+         /* if(this.parent.standardBox.get_children().indexOf(this.parent.rightPane) == -1)
+             this.parent.standardBox.add(this.parent.rightPane, { span: 2, x_fill: false, expand: false });
+          this.parent.standardBox.remove_actor(this.parent.favBoxWrapper);*/
        }
        else {
           this.label.set_text(_("All Applications"));
           this.parent.favBoxWrapper.visible = true;
           this.parent.categoriesWrapper.visible = false;
           this.parent.applicationsScrollBox.visible = false;
-          /*if(this.parent.mainBox.get_children().indexOf(this.parent.favBoxWrapper) == -1)
-             this.parent.mainBox.add(this.parent.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
-          this.parent.mainBox.remove_actor(this.parent.rightPane);*/
+          /*if(this.parent.standardBox.get_children().indexOf(this.parent.favBoxWrapper) == -1)
+             this.parent.standardBox.add(this.parent.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+          this.parent.standardBox.remove_actor(this.parent.rightPane);*/
        }
        /* if (this.parent.leftPane.get_child() == this.parent.favsBox) this.parent.switchPanes("apps");
         else this.parent.switchPanes("favs");*/
@@ -1765,16 +1765,17 @@ RecentClearButtonExtended.prototype = {
    }
 };
 
-function FavoritesButtonExtended(appsMenuButton, vertical, app, nbFavorites, iconSize, allowName) {
-   this._init(appsMenuButton, vertical, app, nbFavorites, iconSize, allowName);
+function FavoritesButtonExtended(appsMenuButton, vertical, displayVertical, app, nbFavorites, iconSize, allowName) {
+   this._init(appsMenuButton, vertical, displayVertical, app, nbFavorites, iconSize, allowName);
 }
 
 FavoritesButtonExtended.prototype = {
    __proto__: GenericApplicationButtonExtended.prototype,
     
-   _init: function(appsMenuButton, vertical, app, nbFavorites, iconSize, allowName) {
+   _init: function(appsMenuButton, vertical, displayVertical, app, nbFavorites, iconSize, allowName) {
       GenericApplicationButtonExtended.prototype._init.call(this, appsMenuButton, app);
       this.iconSize = iconSize;
+      this.displayVertical = displayVertical;
       this.vertical = vertical;
       this.allowName = allowName;
       this.nbFavorites = nbFavorites;
@@ -1782,7 +1783,7 @@ FavoritesButtonExtended.prototype = {
       let icon_size = this.iconSize;
       if(!allowName) {
          let monitorHeight;
-         if(this.vertical)
+         if(this.displayVertical)
             monitorHeight = Main.layoutManager.primaryMonitor.height;
          else
             monitorHeight = Main.layoutManager.primaryMonitor.width;
@@ -1806,6 +1807,7 @@ FavoritesButtonExtended.prototype = {
          this.textBox = new St.BoxLayout({ vertical: false });
          this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
          this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+         this.setVertical(vertical);
       }
 
       this.addActor(this.container);
@@ -1820,7 +1822,7 @@ FavoritesButtonExtended.prototype = {
    setIconSize: function (iconSize) {
       this.iconSize = iconSize;
       if(this.icon) {
-         if(this.vertical)
+         if(this.displayVertical)
             monitorHeight = Main.layoutManager.primaryMonitor.height;
          else
             monitorHeight = Main.layoutManager.primaryMonitor.width;
@@ -1828,6 +1830,19 @@ FavoritesButtonExtended.prototype = {
          let icon_size = 0.7*real_size;
          if(icon_size > this.iconSize) icon_size = this.iconSize;
          this.icon.set_icon_size(this.iconSize);
+      }
+   },
+
+   setVertical: function(vertical) {
+      this.container.set_vertical(vertical);
+      this.label.clutter_text.line_wrap = vertical;
+      if(vertical) {
+         this.textBox.set_width(88);
+         this.textBox.set_height(32);    
+      }
+      else {
+         this.textBox.set_width(-1);
+         this.textBox.set_height(-1);
       }
    },
 
@@ -2089,16 +2104,16 @@ MyApplet.prototype = {
 //My Setting
          this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this._updateComplete, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "show-view-item", "showView", this._setVisibleViewControl, null);
-         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "view-item", "iconView", this._refreshApps, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "view-item", "iconView", this._changeView, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "view-icon-count", "iconViewCount", this._refreshApps, null);
 
          this.settings.bindProperty(Settings.BindingDirection.IN, "activate-on-press", "activateOnPress", null, null);
-this.settings.bindProperty(Settings.BindingDirection.IN, "icon-app-size", "iconAppSize", this._refreshApps, null);
-this.settings.bindProperty(Settings.BindingDirection.IN, "icon-cat-size", "iconCatSize", this._refreshApps, null);
-this.settings.bindProperty(Settings.BindingDirection.IN, "icon-max-fav-size", "iconMaxFavSize", this._setIconMaxFavSize, null);
-this.settings.bindProperty(Settings.BindingDirection.IN, "icon-power-size", "iconPowerSize", this._setIconPowerSize, null);
-this.settings.bindProperty(Settings.BindingDirection.IN, "icon-control-size", "iconControlSize", this._setIconControlSize, null);
-this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "iconHoverSize", this._setIconHoverSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "icon-app-size", "iconAppSize", this._refreshApps, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "icon-cat-size", "iconCatSize", this._refreshApps, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "icon-max-fav-size", "iconMaxFavSize", this._setIconMaxFavSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "icon-power-size", "iconPowerSize", this._setIconPowerSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "icon-control-size", "iconControlSize", this._setIconControlSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "iconHoverSize", this._setIconHoverSize, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "show-favorites", "showFavorites", this._setVisibleFavorites, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "favorites-lines", "favoritesLinesNumber", this._refreshFavs, null);
 
@@ -2113,8 +2128,8 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
          this.settings.bindProperty(Settings.BindingDirection.IN, "date-format", "dateFormat", this._updateDate, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "date-size", "dateSize", this._updateDate, null);
 
-         this.settings.bindProperty(Settings.BindingDirection.IN, "controling-height", "controlingHeight", this._updateComplete, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "height", "height", this._updateComplete, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "controling-height", "controlingHeight", this._updateHeight, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "height", "height", this._updateHeight, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-favorites", "scrollFavoritesVisible", this._updateComplete, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-categories", "scrollCategoriesVisible", this._updateComplete, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-applications", "scrollApplicationsVisible", this._updateComplete, null);
@@ -2126,7 +2141,6 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
                                                 icon_name: 'edit-clear',
                                                 icon_type: St.IconType.SYMBOLIC });
 
-         this._display();
          appsys.connect('installed-changed', Lang.bind(this, this._refreshApps));
          AppFavorites.getAppFavorites().connect('changed', Lang.bind(this, this._refreshFavs));
 
@@ -2634,6 +2648,11 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       this.bttViewList.visible = this.showView;
    },
 
+   _changeView: function() {
+      this._refreshApps();
+      this._refreshFavs();
+   },
+
    _setVisibleFavorites: function() {
       this.favoritesScrollBox.visible = this.showFavorites;
      // this.favoritesObj.actor.visible = this.showFavorites;
@@ -2752,6 +2771,7 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
             this.favBoxWrapper.set_height(scrollBoxHeight);
          else
             this.favBoxWrapper.set_height(-1);
+         this.favoritesBox.set_height(-1);
          this.categoriesBox.set_height(-1);
          this.applicationsBox.set_height(-1);
          this.betterPanel.set_height(-1);
@@ -2888,7 +2908,7 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
          this._session = new GnomeSession.SessionManager();
          this._screenSaverProxy = new ScreenSaver.ScreenSaverProxy();
 
-         this.mainBox = new St.BoxLayout({ style_class: 'menu-applications-box', vertical:false });
+         this.standardBox = new St.BoxLayout({vertical:false });
 
          this.rightPane = new St.BoxLayout({ vertical: true });        
 //search
@@ -2916,7 +2936,7 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
             this.bttViewGrid.set_style('padding: 0px;');
             this.bttViewList.set_style('padding: 0px; border: 1px solid #ffffff;');
             this.iconView = false;
-            this._refreshApps();
+            this._changeView();
          }));
          this.controlView.add(this.bttViewList, { x_fill: false, expand: false });
          this.bttViewGrid = this._createSymbolicButton('view-grid-symbolic');
@@ -2924,7 +2944,7 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
             this.bttViewList.set_style('padding: 0px;');
             this.bttViewGrid.set_style('padding: 0px; border: 1px solid #ffffff;');
             this.iconView = true;
-            this._refreshApps();
+            this._changeView();
          }));
          this.controlView.add(this.bttViewGrid, { x_fill: false, expand: false });
          if(this.iconView)
@@ -2972,7 +2992,10 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
          this.betterPanel = new St.BoxLayout({ vertical: false });
          this.categoriesWrapper = new St.BoxLayout({ vertical: true });
 
-         this.staticBox = new StaticBox(this, this.selectedAppTitle, this.selectedAppDescription, this.hover, false, 32);
+         this.mainBox = new St.BoxLayout({ vertical: false,  style_class: 'menu-applications-box' });
+         //this.mainBox.set_style("padding-right: 20px;");
+         this.extendedBox = new St.BoxLayout({ vertical: true });
+         this.staticBox = new StaticBox(this, this.selectedAppTitle, this.selectedAppDescription, this.hover, false, 22);
 
          switch(this.theme) {
             case "classic"           :
@@ -3022,9 +3045,10 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
 
          this.signalKeyPowerID = 0;
          this._update_autoscroll();
-
+         this.extendedBox.add_actor(this.standardBox);
+         this.extendedBox.add_actor(this.endBox);
+         this.mainBox.add_actor(this.extendedBox);
          section.actor.add_actor(this.mainBox);
-         section.actor.add_actor(this.endBox);
 
          Mainloop.idle_add(Lang.bind(this, function() {
             this._updateHeight();//Add by me
@@ -3043,8 +3067,8 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       this.powerButtons = this._powerButtons(true);
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.favBoxWrapper.add(this.powerButtons, { y_align: St.Align.END, y_fill: false, expand: false });
-      this.mainBox.add(this.favBoxWrapper, { y_align: St.Align.END, y_fill: false, expand: true });
-      this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
+      this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.END, y_fill: false, expand: true });
+      this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
@@ -3057,8 +3081,8 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.powerButtons = this._powerButtons(false);
       this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
-      this.mainBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
-      this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
+      this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
@@ -3075,8 +3099,8 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       //this.categoriesScrollBox.hscrollbar_visible(false);
       this.powerButtons = this._powerButtons(false);
       this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
-      this.mainBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
-      this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
+      this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
@@ -3093,8 +3117,8 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       //this.categoriesScrollBox.hscrollbar_visible(false);
       this.powerButtons = this._powerButtons(false);
       this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
-      this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
-      this.mainBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
+      this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
@@ -3110,7 +3134,7 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       //this.categoriesScrollBox.hscrollbar_visible(false);
       this.powerButtons = this._powerButtons(false);
       this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
-      this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
+      this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       //this.favoritesObj.setVertical(false);
      // this.rightPane.add(this.favBoxWrapper, { x_fill: false, y_fill: false, expand: true });
@@ -3134,8 +3158,8 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       this.powerButtons = this._powerButtons(false);
       //this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
       this.mainBox.add(this.staticBox.actor, { y_align: St.Align.START, y_fill: false, expand: true });
-      this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
-      this.mainBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
+      this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
@@ -3151,9 +3175,9 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.powerButtons = this._powerButtons(false);
       //this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
-      this.mainBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
-      this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
-      this.mainBox.add(this.staticBox.actor, { y_align: St.Align.START, y_fill: false, expand: true });
+      this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
+      this.standardBox.add(this.staticBox.actor, { y_align: St.Align.START, y_fill: false, expand: true });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
@@ -3172,8 +3196,8 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.powerButtons = this._powerButtons(false);
       //this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
-      this.mainBox.add(this.staticBox.actor, { y_align: St.Align.START, y_fill: false, expand: true });
-      this.mainBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
+      this.standardBox.add(this.staticBox.actor, { y_align: St.Align.START, y_fill: false, expand: true });
+      this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.categoriesWrapper.visible = false;
       this.applicationsScrollBox.visible = false;
@@ -3419,7 +3443,7 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       for(let i = 0; i < launchers.length; ++i) {
          let app = appSys.lookup_app(launchers[i]);
          if(app) {
-            let button = new FavoritesButtonExtended(this, this.favoritesObj.getVertical(), app,
+            let button = new FavoritesButtonExtended(this, this.iconView, this.favoritesObj.getVertical(), app,
                                                      launchers.length/this.favoritesLinesNumber,
                                                      this.iconMaxFavSize, this.allowFavName);
             // + 3 because we're adding 3 system buttons at the bottom
@@ -3743,7 +3767,7 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       button.actor.connect('leave-event', Lang.bind(this, this._sysButtonLeaveEvent));
       button.setAction(Lang.bind(this, this._onLockScreenAction));     
         
-      powerButtons.add_actor(button.actor);
+      powerButtons.add(button.actor, { x_fill: false, x_align: St.Align.MIDDLE});
       this._systemButtons.push(button);
         
       //Logout button
@@ -3752,7 +3776,7 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       button.actor.connect('leave-event', Lang.bind(this, this._sysButtonLeaveEvent));
       button.setAction(Lang.bind(this, this._onLogoutAction));
 
-      powerButtons.add_actor(button.actor, { y_align: St.Align.END, y_fill: false }); 
+      powerButtons.add(button.actor, { x_fill: false, x_align: St.Align.MIDDLE}); 
       this._systemButtons.push(button);
 
       //Shutdown button
@@ -3761,7 +3785,7 @@ this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "ico
       button.actor.connect('leave-event', Lang.bind(this, this._sysButtonLeaveEvent)); 
       button.setAction(Lang.bind(this, this._onShutdownAction));
         
-      powerButtons.add_actor(button.actor, { y_align: St.Align.END, y_fill: false });
+      powerButtons.add(button.actor, { x_fill: false, x_align: St.Align.MIDDLE});
       this._systemButtons.push(button);
       return powerButtons;
    },
