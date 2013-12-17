@@ -1,5 +1,5 @@
 // Applet : Configurable Menu      Version      : v0.7-Beta
-// O.S.   : Cinnamon               Release Date : 15 Dicember 2013.
+// O.S.   : Cinnamon               Release Date : 16 Dicember 2013.
 // Author : Lester Carballo Pérez  Email        : lestcape@gmail.com
 //
 // Website : https://github.com/lestcape/Configurable-Menu

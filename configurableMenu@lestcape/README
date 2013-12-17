@@ -51,7 +51,7 @@ Change Log:
    - Added Accessible theme to allow the bar like Mint menu.
    - Added Accessible Inverted theme to allow the bar like Windows menu.
    - Added Mint theme.
-   - The avorites can show the text of applications.
+   - The favorites can show the text of applications.
    - The power buttons was reimplemented, now are better.
    - The internal layout have change to support the new accessible bar.
    - Several minor bugs are fixed(but i know that have some more for example in Mint theme).
