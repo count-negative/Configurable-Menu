@@ -201,57 +201,63 @@
       "description": "Show power buttons",
       "tooltip": "Choose whether or not to show power buttons in the menu."
    },
-   "show-time" : {
+   "show-time-date" : {
       "type" : "checkbox",
       "default" : false,
-      "description": "Show time",
-      "tooltip": "Choose whether or not to show time in the menu."
+      "description": "Show time and date",
+      "tooltip": "Choose whether or not to show time and date in the menu."
    },
    "time-format" : {
       "type" : "entry",
       "default" : "%H:%M",
       "indent": true,
-      "dependency": "show-time",
-      "description": "Time format",
+      "dependency": "show-time-date",
+      "description": "Time format:",
       "tooltip": "Choose the time format to show time in the menu."
-   },
-   "time-size" : {
-      "type": "spinbutton",
-      "default" : 15,
-      "min" : 4,
-      "max" : 20,
-      "step" : 1,
-      "units" : "pixels",
-      "indent": true,
-      "dependency": "show-time",
-      "description" : "Time size:",
-      "tooltip" : "Size of time font."
-   },
-   "show-date" : {
-      "type" : "checkbox",
-      "default" : false,
-      "description": "Show date",
-      "tooltip": "Choose whether or not to show date in the menu."
    },
    "date-format" : {
       "type" : "entry",
       "default" : "%A,%e %B",
       "indent": true,
-      "dependency": "show-date",
-      "description": "Date format",
+      "dependency": "show-time-date",
+      "description": "Date format:",
       "tooltip": "Choose the date format to show time in the menu."
    },
-   "date-size" : {
+   "show-app-title" : {
+      "type" : "checkbox",
+      "default" : true,
+      "description": "Show selected application title",
+      "tooltip": "Choose whether or not to show selected application title in the menu."
+   },
+   "app-title-size" : {
       "type": "spinbutton",
-      "default" : 6,
+      "default" : 10,
       "min" : 4,
       "max" : 20,
       "step" : 1,
-      "units" : "pixels",
+      "units" : "points",
       "indent": true,
-      "dependency": "show-date",
-      "description" : "Date size:",
-      "tooltip" : "Size of date font."
+      "dependency": "show-app-title",
+      "description" : "Size of selected application title:",
+      "tooltip" : "Size of font in selected application title."
+   },
+   "show-app-description" : {
+      "type" : "checkbox",
+      "default" : true,
+      "description": "Show selected application description",
+      "tooltip": "Choose whether or not to show selected application description in the menu."
+   },
+   "app-description-size" : {
+      "type": "spinbutton",
+      "default" : 8,
+      "min" : 4,
+      "max" : 20,
+      "step" : 1,
+      "units" : "points",
+      "indent": true,
+      "dependency": "show-app-description",
+      "description" : "Size of selected application description:",
+      "tooltip" : "Size of font in selected application description."
    },
    "controling-height" : {
       "type" : "checkbox",

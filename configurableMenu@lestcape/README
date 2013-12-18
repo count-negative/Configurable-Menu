@@ -1,5 +1,5 @@
 Applet : Configurable Menu      Version      : v0.7-Beta
-O.S.   : Cinnamon               Release Date : 16 Dicember 2013.
+O.S.   : Cinnamon               Release Date : 17 dicember 2013.
 Author : Lester Carballo Pérez  Email        : lestcape@gmail.com
 
 Website : https://github.com/lestcape/Configurable-Menu
@@ -51,10 +51,16 @@ Change Log:
    - Added Accessible theme to allow the bar like Mint menu.
    - Added Accessible Inverted theme to allow the bar like Windows menu.
    - Added Mint theme.
-   - The favorites can show the text of applications.
+   - A button to swap "all app" by "favorites" was implemented.
+   - The favorites can show the text of applications also in icon and list view mode.
    - The power buttons was reimplemented, now are better.
    - The internal layout have change to support the new accessible bar.
    - Several minor bugs are fixed(but i know that have some more for example in Mint theme).
+   - Added settings button.
+   - Time and date now appear only when you don't have any app selected in the same place of title and description.
+   - Time and date can be set visible or hide.
+   - Now you can select if description and title of selected app appear, also you can change the font size.
+
 
 0.6-Beta
    - Fixed several bugs.
