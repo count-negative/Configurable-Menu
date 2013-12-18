@@ -3939,10 +3939,10 @@ MyApplet.prototype = {
       //this.old_active_item_actor = this._activeActor;
       this.applicationsScrollBox.set_auto_scrolling(false);
       this.categoriesScrollBox.set_auto_scrolling(false);
-      this.favoritesScrollBox.set_auto_scrolling(false);
+      //this.favoritesScrollBox.set_auto_scrolling(false);
       this.applicationsScrollBox.set_auto_scrolling(this.autoscroll_enabled);
       this.categoriesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
-      this.favoritesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
+      //this.favoritesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
       // this._scrollToButton(this.old_active_item_actor._delegate);
 
       let index = this._indexOfSysButton(actor);
