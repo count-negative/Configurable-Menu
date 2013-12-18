@@ -2331,7 +2331,7 @@ MyApplet.prototype = {
             this.menu.close();
             return true;
         }   
-
+//Main.notify("ok" + actor);
         if(actor._delegate instanceof FavoritesButtonExtended) {
            return this._navegateFavBox(symbol, actor);
         } else if(actor == this.powerButtons) {
@@ -2342,6 +2342,11 @@ MyApplet.prototype = {
         } else if(actor == this.hover.menu.actor) {
            this._navegateHoverMenu(symbol, actor);
            return false;
+        } else if (actor == this.searchEntry.clutter_text) {
+           if(this._activeContainer === null)
+              item_actor = this._navegationInit(symbol);
+           if(this.btChanger)
+              this.btChanger.activateSelected(_("Favorites"));
         } else if(this._activeContainer === null) {
            item_actor = this._navegationInit(symbol);
         } else if(this._activeContainer == this.applicationsBox) {
@@ -2350,8 +2355,7 @@ MyApplet.prototype = {
            item_actor = this._navegateCatBox(symbol, this._selectedItemIndex);
         } else if (this.searchFilesystem && (this._fileFolderAccessActive || symbol == Clutter.slash)) {
            return this._searchFileSystem(symbol);
-        }
-        else {
+        }  else {
             return false;
         }
         if(!item_actor || item_actor === this.searchEntry) {
@@ -2385,8 +2389,6 @@ MyApplet.prototype = {
    },
 
    _searchFileSystem: function(symbol) {
-      if(this.btChanger)
-         this.btChanger.activateSelected(_("All Applications"));
       if(symbol == Clutter.Return || symbol == Clutter.KP_Enter) {
          if(this._run(this.searchEntry.get_text())) {
             this.menu.close();
@@ -3100,8 +3102,11 @@ MyApplet.prototype = {
             case "accessibleInverted":
                           this.loadAccessibleInverted(); 
                           break;
-            case "mint":
+            case "mint"              :
                           this.loadMint(); 
+                          break;
+            case "windows"           :
+                          this.loadWindows(); 
                           break;
 
             default                  :
@@ -3931,22 +3936,21 @@ MyApplet.prototype = {
    },
 
    _sysButtonEnterEvent: function(actor, event) {
-      this.old_active_item_actor = this._activeActor;
-
+      //this.old_active_item_actor = this._activeActor;
       this.applicationsScrollBox.set_auto_scrolling(false);
       this.categoriesScrollBox.set_auto_scrolling(false);
-      //this.favoritesScrollBox.set_auto_scrolling(false);
-    
+      this.favoritesScrollBox.set_auto_scrolling(false);
+      this.applicationsScrollBox.set_auto_scrolling(this.autoscroll_enabled);
+      this.categoriesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
+      this.favoritesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
+      // this._scrollToButton(this.old_active_item_actor._delegate);
+
       let index = this._indexOfSysButton(actor);
       this.selectedAppBox.setSelectedText(this._systemButtons[index].title, this._systemButtons[index].description);
       this.hover.refresh(this._systemButtons[index].icon);
    },
 
    _sysButtonLeaveEvent: function(actor, event) {
-      this._scrollToButton(this.old_active_item_actor._delegate);
-      this.applicationsScrollBox.set_auto_scrolling(this.autoscroll_enabled);
-      this.categoriesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
-     // this.favoritesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
       this.selectedAppBox.setSelectedText("", "");
       this.hover.refreshFace();
    },
