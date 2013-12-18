@@ -183,20 +183,22 @@ SelectedAppBox.prototype = {
    }
 };
 
-function ButtonChangerBox(parent, labels, icon, state) {
-    this._init(parent, labels, icon, state);
+function ButtonChangerBox(parent, icon, labels, selected, callBackOnSelectedChange) {
+    this._init(parent, icon, labels, selected, callBackOnSelectedChange);
 }
 
 ButtonChangerBox.prototype = {
     __proto__: PopupMenu.PopupSubMenuMenuItem.prototype,
 
-    _init: function (parent, labels, icon, state) {
-        PopupMenu.PopupSubMenuMenuItem.prototype._init.call(this, labels[0]);
+    _init: function (parent, icon, labels, selected, callBackOnSelectedChange) {
+        PopupMenu.PopupSubMenuMenuItem.prototype._init.call(this, labels[selected]);
 
         this.actor.set_style_class_name('');
         this.box = new St.BoxLayout({ style_class: 'menu-category-button' });
         this.parent = parent;
         this.labels = labels;
+        this.selected = selected;
+        this.callBackOnSelectedChange = callBackOnSelectedChange;
         this.removeActor(this.label);
         this.removeActor(this._triangle);
         this._triangle = new St.Label();
@@ -226,33 +228,33 @@ ButtonChangerBox.prototype = {
     },
 
     _onButtonReleaseEvent: function (actor, event) {
-        if (event.get_button() == 1) {
-            this.activate(event);
+       if(event.get_button() == 1) {
+          this.activateNext();
+          /* if (this.parent.leftPane.get_child() == this.parent.favsBox) this.parent.switchPanes("apps");
+           else this.parent.switchPanes("favs");*/
         }
     },
 
-    activate: function (event) {
-       if(this.label.get_text().indexOf(this.labels[0]) != -1) {
-          //this.box.set_width(this.box.get_allocation_box().x2 - this.box.get_allocation_box().x1);
-          this.label.set_text(this.labels[1]);
-          this.parent.categoriesWrapper.visible = true;
-          this.parent.applicationsScrollBox.visible = true;
-          this.parent.favBoxWrapper.visible = false;
-         /* if(this.parent.standardBox.get_children().indexOf(this.parent.rightPane) == -1)
-             this.parent.standardBox.add(this.parent.rightPane, { span: 2, x_fill: false, expand: false });
-          this.parent.standardBox.remove_actor(this.parent.favBoxWrapper);*/
+    activateNext: function() {
+       if(this.selected >= this.labels.length - 1)
+          this.selected = 0;
+       else
+          this.selected ++;
+       this.activateIndex(this.selected);
+    },
+
+    activateSelected: function(selected) {
+       let index = this.labels.indexOf(selected);
+       if((index != - 1)&&(index != this.selected)) {
+          this.activateIndex(index);
        }
-       else {
-          this.label.set_text(this.labels[0]);
-          this.parent.favBoxWrapper.visible = true;
-          this.parent.categoriesWrapper.visible = false;
-          this.parent.applicationsScrollBox.visible = false;
-          /*if(this.parent.standardBox.get_children().indexOf(this.parent.favBoxWrapper) == -1)
-             this.parent.standardBox.add(this.parent.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
-          this.parent.standardBox.remove_actor(this.parent.rightPane);*/
-       }
-       /* if (this.parent.leftPane.get_child() == this.parent.favsBox) this.parent.switchPanes("apps");
-        else this.parent.switchPanes("favs");*/
+    },
+
+    activateIndex: function(index) {
+       this.selected = index;
+       this.label.set_text(this.labels[this.selected]);
+       if(this.callBackOnSelectedChange)
+          this.callBackOnSelectedChange(this.labels[this.selected]);
     }
 };
 
@@ -2383,6 +2385,8 @@ MyApplet.prototype = {
    },
 
    _searchFileSystem: function(symbol) {
+      if(this.btChanger)
+         this.btChanger.activateSelected(_("All Applications"));
       if(symbol == Clutter.Return || symbol == Clutter.KP_Enter) {
          if(this._run(this.searchEntry.get_text())) {
             this.menu.close();
@@ -3003,7 +3007,9 @@ MyApplet.prototype = {
       try {
          if(this.selectedAppBox)
             this.selectedAppBox.setDateTimeVisible(false);
+
          this.allowFavName = false;
+         this.btChanger = null;
          this._activeContainer = null;
          this._activeActor = null;
          this.vectorBox = null;
@@ -3281,8 +3287,8 @@ MyApplet.prototype = {
    loadMint: function() {
       this.allowFavName = true;
       this.controlBox.add(this.searchEntry, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
-      let btChanger = new ButtonChangerBox(this, [_("All Applications"), _("Favorites")], "forward", false);
-      this.controlSearchBox.add(btChanger.actor, {x_fill: false, x_align: St.Align.END, y_align: St.Align.START, expand: true });
+      this.btChanger = new ButtonChangerBox(this, "forward", [_("All Applications"), _("Favorites")], 0, this._onPanelMintChange);
+      this.controlSearchBox.add(this.btChanger.actor, {x_fill: false, x_align: St.Align.END, y_align: St.Align.START, expand: true });
       this.staticBox.takeHover(true);
       this.staticBox.takeControl(true);
       this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
@@ -3299,6 +3305,49 @@ MyApplet.prototype = {
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
+   },
+
+   loadWindows: function() {
+      this.allowFavName = true;
+      this.controlBox.add(this.searchEntry, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
+      this.btChanger = new ButtonChangerBox(this, "forward", [_("All Applications"), _("Favorites")], 0, this._onPanelWindowsChange);
+      this.controlSearchBox.add(this.btChanger.actor, {x_fill: false, x_align: St.Align.END, y_align: St.Align.START, expand: true });
+      this.staticBox.takeHover(true);
+      this.staticBox.takeControl(true);
+      this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
+      this.categoriesScrollBox = this._createScroll(true);
+      this.favoritesScrollBox = this._createScroll(true);
+      this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.powerButtons = this._powerButtons(false);
+      //this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.standardBox.add(this.staticBox.actor, { y_align: St.Align.START, y_fill: false, expand: true });
+      this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
+      this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.categoriesWrapper.visible = false;
+      this.applicationsScrollBox.visible = false;
+      //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
+      this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
+   },
+
+   _onPanelMintChange: function(selected) {
+      let appBarVisible = false;
+      let titleAppBar = _("All Applications");
+      if(titleAppBar == selected)
+         appBarVisible = true;
+      this.parent.categoriesWrapper.visible = !appBarVisible;
+      this.parent.applicationsScrollBox.visible = !appBarVisible;
+      this.parent.favBoxWrapper.visible = appBarVisible;
+   },
+
+   _onPanelWindowsChange: function(selected) {
+      let appBarVisible = false;
+      let titleAppBar = _("All Applications");
+      if(titleAppBar == selected)
+         appBarVisible = true;
+      this.parent.categoriesWrapper.visible = !appBarVisible;
+      this.parent.applicationsScrollBox.visible = !appBarVisible;
+      this.parent.favBoxWrapper.visible = appBarVisible;
    },
 
    _setHorizontalAutoScroll: function(hScroll, setValue) {
@@ -4072,6 +4121,8 @@ MyApplet.prototype = {
          this.destroyVectorBox();
          this._systemButtons[this.sysButtSelected].setActive(false);
          this.selectedAppBox.setDateTimeVisible(false);
+         if(this.btChanger)
+            this.btChanger.activateSelected(_("All Applications"));
       }
    }
 };
