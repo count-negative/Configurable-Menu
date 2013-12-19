@@ -2330,23 +2330,23 @@ MyApplet.prototype = {
         if (global.display.get_is_overlay_key(keyCode, modifierState) && this.menu.isOpen) {
             this.menu.close();
             return true;
-        }   
+        }
+        if((this.btChanger)&&(symbol != Clutter.Return) && (symbol != Clutter.KP_Enter) &&
+           (symbol != Clutter.KEY_Right) && (symbol != Clutter.KEY_Up) && (symbol != Clutter.KEY_Down) &&
+           (symbol != Clutter.KEY_Left) && (symbol != Clutter.Escape) && (symbol != Clutter.Tab))
+           this.btChanger.activateSelected(_("Favorites"));
+
 //Main.notify("ok" + actor);
         if(actor._delegate instanceof FavoritesButtonExtended) {
            return this._navegateFavBox(symbol, actor);
         } else if(actor == this.powerButtons) {
-           return this._navegateSysBox(symbol, actor);; 
+           return this._navegateSysBox(symbol, actor); 
         } else if(actor == this.hover.actor) {
            this._navegateHoverIcon(symbol, actor);
            return false;
         } else if(actor == this.hover.menu.actor) {
            this._navegateHoverMenu(symbol, actor);
            return false;
-        } else if (actor == this.searchEntry.clutter_text) {
-           if(this._activeContainer === null)
-              item_actor = this._navegationInit(symbol);
-           if(this.btChanger)
-              this.btChanger.activateSelected(_("Favorites"));
         } else if(this._activeContainer === null) {
            item_actor = this._navegationInit(symbol);
         } else if(this._activeContainer == this.applicationsBox) {
