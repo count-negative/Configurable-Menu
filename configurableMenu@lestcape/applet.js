@@ -258,6 +258,165 @@ ButtonChangerBox.prototype = {
     }
 };
 
+function PowerBox(parent, vertical, iconSize, hover, selectedAppBox) {
+   this._init(parent, vertical, iconSize, hover, selectedAppBox);
+}
+
+PowerBox.prototype = {
+   _init: function(parent, vertical, iconSize, hover, selectedAppBox) {
+      this.parent = parent;
+      this.vertical = vertical;
+      this.iconSize = iconSize;
+      this.signalKeyPowerID = 0;
+      this._session = new GnomeSession.SessionManager();
+      this.selectedAppBox = selectedAppBox;
+      this.hover = hover;
+      this.powerSelected = 0;
+      //Separator
+      /*if(launchers.length!=0){
+         let separator = new PopupMenu.PopupSeparatorMenuItem();
+         powerButton.add_actor(separator.actor, { y_align: St.Align.END, y_fill: false });                   
+      }*/
+      this.actor = new St.BoxLayout({ style_class: 'menu-favorites-box', vertical: this.vertical });
+      this._powerButtons = new Array();
+      this.actor.connect('key-focus-in', Lang.bind(this, function(actor, event) {        
+         if(this._powerButtons.length > 0) {
+            if(!this.powerSelected)
+               this.powerSelected = 0;
+            this._powerButtons[this.powerSelected].setActive(true);
+            if(this.signalKeyPowerID == 0)
+               //this.signalKeyPowerID = this.actor.connect('key-press-event', Lang.bind(this, this.parent._onMenuKeyPress));
+               this.signalKeyPowerID = this.actor.connect('key-press-event', Lang.bind(this.parent, this.parent._onMenuKeyPress));
+         }
+      }));
+      this.actor.connect('key-focus-out', Lang.bind(this, function(actor, event) {
+         for(let cSys in this._powerButtons)
+            this._systemButton[cSys].setActive(false);
+         if(this.signalKeyPowerID > 0)
+            this.actor.disconnect(this.signalKeyPowerID);
+      }));
+      //Lock screen
+      let button = new SystemButton(this.parent, "gnome-lockscreen", _("Lock screen"), _("Lock the screen"), this.hover, this.iconSize, false);
+      button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
+      button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent));
+      button.setAction(Lang.bind(this, this._onLockScreenAction));     
+        
+      this.actor.add(button.actor, { x_fill: false, x_align: St.Align.MIDDLE});
+      this._powerButtons.push(button);
+        
+      //Logout button
+      button = new SystemButton(this, "gnome-logout", _("Logout"), _("Leave the session"), this.hover, this.iconSize, false);        
+      button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
+      button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent));
+      button.setAction(Lang.bind(this, this._onLogoutAction));
+
+      this.actor.add(button.actor, { x_fill: false, x_align: St.Align.MIDDLE}); 
+      this._powerButtons.push(button);
+
+      //Shutdown button
+      button = new SystemButton(this, "gnome-shutdown", _("Quit"), _("Shutdown the computer"), this.hover, this.iconSize, false);        
+      button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
+      button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent)); 
+      button.setAction(Lang.bind(this, this._onShutdownAction));
+        
+      this.actor.add(button.actor, { x_fill: false, x_align: St.Align.MIDDLE});
+      this._powerButtons.push(button);
+   },
+
+   indexOf: function(actor) {
+      for(sysB in this._powerButtons)
+         if(this._powerButtons[sysB].actor == actor)
+            return sysB;
+      return -1;
+   },
+
+   setIconSize: function(iconSize) {
+      this.iconSize = iconSize;
+      if(this._powerButtons) {
+         for(let i = 0; i < this._powerButtons.length; i++)
+            this._powerButtons[i].setIconSize(this.iconSize);
+      }
+   },
+
+   _onLockScreenAction: function() {
+      try {
+      this.parent.menu.close();
+      let screensaver_settings = new Gio.Settings({ schema: "org.cinnamon.screensaver" });                        
+      let screensaver_dialog = Gio.file_new_for_path("/usr/bin/cinnamon-screensaver-command");    
+      if(screensaver_dialog.query_exists(null)) {
+         if(screensaver_settings.get_boolean("ask-for-away-message")) {                                    
+            Util.spawnCommandLine("cinnamon-screensaver-lock-dialog");
+         }
+         else {
+            Util.spawnCommandLine("cinnamon-screensaver-command --lock");
+         }
+      }
+      else {                
+         this._screenSaverProxy.LockRemote();
+      }
+      } catch(e) {
+         Main.notify("Error", e.message);
+      }   
+   },
+
+   _onLogoutAction: function() {
+      this.parent.menu.close();
+      this._session.LogoutRemote(0);
+   },
+
+   _onShutdownAction: function() {
+      this.parent.menu.close();
+      this._session.ShutdownRemote();
+   },
+
+   _onEnterEvent: function(actor, event) {
+      this.parent.applicationsScrollBox.set_auto_scrolling(false);
+      this.parent.categoriesScrollBox.set_auto_scrolling(false);
+      //this.parent.favoritesScrollBox.set_auto_scrolling(false);
+      this.parent.applicationsScrollBox.set_auto_scrolling(this.autoscroll_enabled);
+      this.parent.categoriesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
+      //this.parent.favoritesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
+
+      let index = this.indexOf(actor);
+      this.selectedAppBox.setSelectedText(this._powerButtons[index].title, this._powerButtons[index].description);
+      this.hover.refresh(this._powerButtons[index].icon);
+   },
+
+   _onLeaveEvent: function(actor, event) {
+      this.selectedAppBox.setSelectedText("", "");
+      this.hover.refreshFace();
+   },
+
+   disableSelected: function() {
+      this._powerButtons[this.powerSelected].setActive(false);
+      this.powerSelected = 0;
+   },
+
+   navegatePowerBox: function(symbol, actor) {
+      if((symbol == Clutter.KEY_Up) || (symbol == Clutter.KEY_Left)) {
+         this._powerButtons[this.powerSelected].setActive(false);
+         if(this.powerSelected - 1 < 0)
+            this.powerSelected = this._powerButtons.length -1;
+         else
+            this.powerSelected--;
+         this._powerButtons[this.powerSelected].setActive(true);
+      }
+      else if((symbol == Clutter.KEY_Down) || (symbol == Clutter.KEY_Right)) {
+         this._powerButtons[this.powerSelected].setActive(false);
+         if(this.powerSelected + 1 < this._powerButtons.length)
+            this.powerSelected++;
+         else
+            this.powerSelected = 0;
+         this._powerButtons[this.powerSelected].setActive(true);
+      }
+      else if((symbol == Clutter.KEY_Return) || (symbol == Clutter.KP_Enter)) {
+         this._powerButtons[this.powerSelected].setActive(false);
+         this._powerButtons[this.powerSelected].executeAction();
+      }
+      return true;
+   }
+};
+
 function ControlBox(parent, iconView, iconSize) {
    this._init(parent, iconView, iconSize);
 }
@@ -915,6 +1074,23 @@ HoverIcon.prototype = {
       } catch(e) {
          Main.notifyError("Error:",e.message);
       }
+   },
+
+   navegateHoverMenu: function(symbol, actor) {
+      if((symbol == Clutter.KEY_Down)||(symbol == Clutter.KEY_Up)) {
+         if(this.account.active) {
+            this.fav_actor = this.notificationsSwitch.actor;
+            Mainloop.idle_add(Lang.bind(this, this._putFocus));
+         }
+         if(this.notificationsSwitch.active) {
+            this.fav_actor = this.account.actor;
+            Mainloop.idle_add(Lang.bind(this, this._putFocus));
+         }
+      }
+   },
+
+   _putFocus: function() {
+      global.stage.set_key_focus(this.fav_actor);
    },
 
    setIconSize: function (iconSize) {
@@ -2339,14 +2515,12 @@ MyApplet.prototype = {
 //Main.notify("ok" + actor);
         if(actor._delegate instanceof FavoritesButtonExtended) {
            return this._navegateFavBox(symbol, actor);
-        } else if(actor == this.powerButtons) {
-           return this._navegateSysBox(symbol, actor); 
+        } else if(actor == this.powerBox.actor) {
+           return this._navegatePowerBox(symbol, actor); 
         } else if(actor == this.hover.actor) {
-           this._navegateHoverIcon(symbol, actor);
-           return false;
+           return this._navegateHoverIcon(symbol, actor);
         } else if(actor == this.hover.menu.actor) {
-           this._navegateHoverMenu(symbol, actor);
-           return false;
+           return this._navegateHoverMenu(symbol, actor);
         } else if(this._activeContainer === null) {
            item_actor = this._navegationInit(symbol);
         } else if(this._activeContainer == this.applicationsBox) {
@@ -2371,8 +2545,8 @@ MyApplet.prototype = {
    },
 
    _changeFocusElement: function(elementActive) {
-      let activeElements = [this.hover.actor, this.powerButtons, this.favoritesScrollBox, this.searchEntry];
-      let actors = [this.hover.actor, this.powerButtons, this.favoritesObj.getFirstElement(), this.searchEntry];
+      let activeElements = [this.hover.actor, this.powerBox.actor, this.favoritesScrollBox, this.searchEntry];
+      let actors = [this.hover.actor, this.powerBox.actor, this.favoritesObj.getFirstElement(), this.searchEntry];
       let index = activeElements.indexOf(elementActive);
       let selected = index + 1;
       while((selected < activeElements.length)&&((!activeElements[selected])||(!activeElements[selected].visible))) {
@@ -2385,6 +2559,8 @@ MyApplet.prototype = {
       while((selected < index)&&((!activeElements[selected])||(!activeElements[selected].visible))) {
          selected++;
       }
+      this.hover.refreshFace();
+      this.selectedAppBox.setSelectedText("", "");
       return actors[selected];
    },
 
@@ -2441,7 +2617,7 @@ MyApplet.prototype = {
          this._activeContainer = this.applicationsBox;
          item_actor = this.appBoxIter.getFirstVisible();
       }
-      //global.stage.set_key_focus(this.powerButtons);
+      //global.stage.set_key_focus(this.powerBox.actor);
       this._selectedItemIndex = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
       this._selectedRowIndex = this.appBoxIter.getInternalIndexOfChild(item_actor);
       return item_actor;
@@ -2455,10 +2631,10 @@ MyApplet.prototype = {
       }
       else if(symbol == Clutter.KEY_Up) {
          this._previousSelectedActor = this.applicationsBox.get_child_at_index(index).get_child_at_index(2*rowIndex);
-            item_actor = this.appBoxIter.getPrevVisible(this._previousSelectedActor);
-            this._previousVisibleIndex = this.appBoxIter.getVisibleIndex(item_actor);
-            index = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
-            this._scrollToButton(item_actor._delegate);
+         item_actor = this.appBoxIter.getPrevVisible(this._previousSelectedActor);
+         this._previousVisibleIndex = this.appBoxIter.getVisibleIndex(item_actor);
+         index = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
+         this._scrollToButton(item_actor._delegate);
       } 
       else if(symbol == Clutter.KEY_Down) {
          this._previousSelectedActor = this.applicationsBox.get_child_at_index(index).get_child_at_index(2*rowIndex);
@@ -2480,6 +2656,9 @@ MyApplet.prototype = {
             item_actor = (this._previousTreeSelectedActor) ? this._previousTreeSelectedActor : this.catBoxIter.getFirstVisible();
             index = this.catBoxIter.getAbsoluteIndexOfChild(item_actor);
             this._previousTreeSelectedActor = item_actor;
+            this._scrollToButtonCategories(item_actor._delegate);
+            this.hover.refreshFace();
+            this.selectedAppBox.setSelectedText("", "");
          } else {
             this._previousSelectedActor = this.applicationsBox.get_child_at_index(index).get_child_at_index(2*rowIndex);
             item_actor = this.appBoxIter.getLeftVisible(this._previousSelectedActor);
@@ -2561,43 +2740,29 @@ MyApplet.prototype = {
          Mainloop.idle_add(Lang.bind(this, this._putFocus));
          return true;
       } else {
-         this._scrollToButtonFav(this.favoritesObj.navegateFavBox(symbol, actor)._delegate);
+         this.fav_actor = this.favoritesObj.navegateFavBox(symbol, actor);
+         let fav_obj = this._searchFavActor(this.fav_actor);
+         if(fav_obj) {
+            this.hover.refreshApp(fav_obj.app);
+            if(fav_obj.app.get_description())
+               this.selectedAppBox.setSelectedText(fav_obj.app.get_name(), fav_obj.app.get_description().split("\n")[0]);
+            else
+               this.selectedAppBox.setSelectedText(fav_obj.app.get_name(), "");
+         }
+         this._scrollToButtonFav(this.fav_actor._delegate);
          return true;
       }
    },
 
-   _navegateSysBox: function(symbol, actor) {
+   _navegatePowerBox: function(symbol, actor) {
       if(symbol == Clutter.Tab) {
-         this._systemButtons[this.sysButtSelected].setActive(false);
-         this.fav_actor = this._changeFocusElement(this.powerButtons);
+         this.powerBox.disableSelected();
+         this.fav_actor = this._changeFocusElement(this.powerBox.actor);
          //global.stage.set_key_focus(this.fav_actor);
          Mainloop.idle_add(Lang.bind(this, this._putFocus));
       }
-      else if((symbol == Clutter.KEY_Up) || (symbol == Clutter.KEY_Left)) {
-         this._systemButtons[this.sysButtSelected].setActive(false);
-         if(this.sysButtSelected - 1 < 0)
-            this.sysButtSelected = this._systemButtons.length -1;
-         else
-            this.sysButtSelected--;
-         this._systemButtons[this.sysButtSelected].setActive(true);
-         this.fav_actor = this.powerButtons;
-         Mainloop.idle_add(Lang.bind(this, this._putFocus));
-      }
-      else if((symbol == Clutter.KEY_Down) || (symbol == Clutter.KEY_Right)) {
-         this._systemButtons[this.sysButtSelected].setActive(false);
-         if(this.sysButtSelected + 1 < this._systemButtons.length)
-            this.sysButtSelected++;
-         else
-            this.sysButtSelected = 0;
-         this._systemButtons[this.sysButtSelected].setActive(true);
-         this.fav_actor = this.powerButtons;
-         Mainloop.idle_add(Lang.bind(this, this._putFocus));
-      }
-      else if((symbol == Clutter.KEY_Return) || (symbol == Clutter.KP_Enter)) {
-         if(this.sysButtSelected) {
-            this._systemButtons[this.sysButtSelected].setActive(false);
-            this._systemButtons[this.sysButtSelected].executeAction();
-         }
+      else {
+         this.powerBox.navegatePowerBox(symbol, actor);
       }
       return true;
    },
@@ -2607,17 +2772,29 @@ MyApplet.prototype = {
          this.fav_actor = this._changeFocusElement(this.hover.actor);
          Mainloop.idle_add(Lang.bind(this, this._putFocus));
       }
+      return true;
    },
 
    _navegateHoverMenu: function(symbol, actor) {
-      if((this.hover.account.active)&&(symbol == Clutter.KEY_Down)) {
-         this.fav_actor = this.hover.notificationsSwitch.actor;
+      if(symbol == Clutter.Tab) {
+         this.fav_actor = this._changeFocusElement(this.hover.actor);
          Mainloop.idle_add(Lang.bind(this, this._putFocus));
+      } else {
+         this.hover.navegateHoverMenu(symbol, actor);
       }
+      return true;
    },
 
    _putFocus: function() {
       global.stage.set_key_focus(this.fav_actor);
+   },
+
+   _searchFavActor: function(actor) {
+      for(let key in this._favoritesButtons) {
+         if(this._favoritesButtons[key].actor == actor)
+           return this._favoritesButtons[key];
+      }
+      return null;
    },
 
    _scrollToButton: function(button) {
@@ -2752,10 +2929,8 @@ MyApplet.prototype = {
    },
 
    _setIconPowerSize: function() {
-      if(this._systemButtons) {
-         for(let i = 0; i < this._systemButtons.length; i++)
-            this._systemButtons[i].setIconSize(this.iconPowerSize);
-      }
+      if(this.powerBox)
+         this.powerBox.setIconSize(this.iconPowerSize);
    },
 
    _setIconHoverSize: function() {
@@ -2786,7 +2961,7 @@ MyApplet.prototype = {
    },
 
    _setVisiblePowerButtons: function() {
-      this.powerButtons.visible = this.showPowerButtons;
+      this.powerBox.actor.visible = this.showPowerButtons;
    },
 
    _setVisibleHoverIcon: function() {
@@ -2845,8 +3020,8 @@ MyApplet.prototype = {
                this.favoritesBox.set_height(-1);
             }
             else {
-               if((this.favBoxWrapper.get_children().indexOf(this.powerButtons) != -1)&&(this.powerButtons.visible))
-                  this.favoritesBox.set_height(this.height +  this.controlSearchBox.get_height() - this.powerButtons.get_height());
+               if((this.favBoxWrapper.get_children().indexOf(this.powerBox.actor) != -1)&&(this.powerBox.actor.visible))
+                  this.favoritesBox.set_height(this.height +  this.controlSearchBox.get_height() - this.powerBox.actor.get_height());
                else {
                   if(this.favBoxWrapper.get_parent() == this.betterPanel)
                      this.favoritesBox.set_height(this.height);
@@ -3154,9 +3329,9 @@ MyApplet.prototype = {
       this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
       this.categoriesScrollBox = this._createScroll(true);
       this.favoritesScrollBox = this._createScroll(true);
-      this.powerButtons = this._powerButtons(true);
+      this.powerBox = new PowerBox(this, true, this.iconPowerSize, this.hover, this.selectedAppBox);
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
-      this.favBoxWrapper.add(this.powerButtons, { y_align: St.Align.END, y_fill: false, expand: false });
+      this.favBoxWrapper.add(this.powerBox.actor, { y_align: St.Align.END, y_fill: false, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.END, y_fill: false, expand: true });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
@@ -3173,8 +3348,8 @@ MyApplet.prototype = {
       this.categoriesScrollBox = this._createScroll(true);
       this.favoritesScrollBox = this._createScroll(true);
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
-      this.powerButtons = this._powerButtons(false);
-      this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.powerBox = new PowerBox(this, false, this.iconPowerSize, this.hover, this.selectedAppBox);
+      this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
@@ -3195,8 +3370,8 @@ MyApplet.prototype = {
       this.favoritesScrollBox = this._createScroll(true);
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       //this.categoriesScrollBox.hscrollbar_visible(false);
-      this.powerButtons = this._powerButtons(false);
-      this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.powerBox = new PowerBox(this, false, this.iconPowerSize, this.hover, this.selectedAppBox);
+      this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
@@ -3217,8 +3392,8 @@ MyApplet.prototype = {
       this.favoritesScrollBox = this._createScroll(true);
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       //this.categoriesScrollBox.hscrollbar_visible(false);
-      this.powerButtons = this._powerButtons(false);
-      this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.powerBox = new PowerBox(this, false, this.iconPowerSize, this.hover, this.selectedAppBox);
+      this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
@@ -3238,8 +3413,8 @@ MyApplet.prototype = {
       this.categoriesScrollBox = this._createScroll(false);
       this.favoritesScrollBox = this._createScroll(true);
       //this.categoriesScrollBox.hscrollbar_visible(false);
-      this.powerButtons = this._powerButtons(false);
-      this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.powerBox = new PowerBox(this, false, this.iconPowerSize, this.hover, this.selectedAppBox);
+      this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       //this.favoritesObj.setVertical(false);
@@ -3261,8 +3436,8 @@ MyApplet.prototype = {
       this.categoriesScrollBox = this._createScroll(true);
       this.favoritesScrollBox = this._createScroll(true);
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
-      this.powerButtons = this._powerButtons(false);
-      //this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.powerBox = new PowerBox(this, false, this.iconPowerSize, this.hover, this.selectedAppBox);
+      //this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.mainBox.add(this.staticBox.actor, { y_align: St.Align.START, y_fill: false, expand: true });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
@@ -3279,8 +3454,8 @@ MyApplet.prototype = {
       this.categoriesScrollBox = this._createScroll(true);
       this.favoritesScrollBox = this._createScroll(true);
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
-      this.powerButtons = this._powerButtons(false);
-      //this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.powerBox = new PowerBox(this, false, this.iconPowerSize, this.hover, this.selectedAppBox);
+      //this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       this.standardBox.add(this.staticBox.actor, { y_align: St.Align.START, y_fill: false, expand: true });
@@ -3300,8 +3475,8 @@ MyApplet.prototype = {
       this.categoriesScrollBox = this._createScroll(true);
       this.favoritesScrollBox = this._createScroll(true);
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
-      this.powerButtons = this._powerButtons(false);
-      //this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.powerBox = new PowerBox(this, false, this.iconPowerSize, this.hover, this.selectedAppBox);
+      //this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.staticBox.actor, { y_align: St.Align.START, y_fill: false, expand: true });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
@@ -3323,8 +3498,8 @@ MyApplet.prototype = {
       this.categoriesScrollBox = this._createScroll(true);
       this.favoritesScrollBox = this._createScroll(true);
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
-      this.powerButtons = this._powerButtons(false);
-      //this.endBox.add(this.powerButtons, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.powerBox = new PowerBox(this, false, this.iconPowerSize, this.hover, this.selectedAppBox);
+      //this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.staticBox.actor, { y_align: St.Align.START, y_fill: false, expand: true });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
@@ -3882,114 +4057,6 @@ MyApplet.prototype = {
       this._setCategoriesButtonActive(!this.searchActive);
    },
 
-//systemButtons
-   _powerButtons: function(verticalPane) {        
-      //Separator
-      /*if(launchers.length!=0){
-         let separator = new PopupMenu.PopupSeparatorMenuItem();
-         powerButton.add_actor(separator.actor, { y_align: St.Align.END, y_fill: false });                   
-      }*/
-      let powerButtons = new St.BoxLayout({ style_class: 'menu-favorites-box', vertical: verticalPane });
-      this._systemButtons = new Array();
-      powerButtons.connect('key-focus-in', Lang.bind(this, function(actor, event) {        
-         if(this._systemButtons.length > 0) {
-            if(!this.sysButtSelected)
-               this.sysButtSelected = 0;
-            this._systemButtons[this.sysButtSelected].setActive(true);
-            if(this.signalKeyPowerID == 0)
-               this.signalKeyPowerID = powerButtons.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
-         }
-      }));
-      powerButtons.connect('key-focus-out', Lang.bind(this, function(actor, event) {
-         for(let cSys in this._systemButtons)
-            this._systemButton[cSys].setActive(false);
-         if(this.signalKeyPowerID > 0)
-            powerButtons.disconnect(this.signalKeyPowerID);
-      }));
-      //Lock screen
-      let button = new SystemButton(this, "gnome-lockscreen", _("Lock screen"), _("Lock the screen"), this.hover, this.iconPowerSize, false);
-      button.actor.connect('enter-event', Lang.bind(this, this._sysButtonEnterEvent));
-      button.actor.connect('leave-event', Lang.bind(this, this._sysButtonLeaveEvent));
-      button.setAction(Lang.bind(this, this._onLockScreenAction));     
-        
-      powerButtons.add(button.actor, { x_fill: false, x_align: St.Align.MIDDLE});
-      this._systemButtons.push(button);
-        
-      //Logout button
-      button = new SystemButton(this, "gnome-logout", _("Logout"), _("Leave the session"), this.hover, this.iconPowerSize, false);        
-      button.actor.connect('enter-event', Lang.bind(this, this._sysButtonEnterEvent));
-      button.actor.connect('leave-event', Lang.bind(this, this._sysButtonLeaveEvent));
-      button.setAction(Lang.bind(this, this._onLogoutAction));
-
-      powerButtons.add(button.actor, { x_fill: false, x_align: St.Align.MIDDLE}); 
-      this._systemButtons.push(button);
-
-      //Shutdown button
-      button = new SystemButton(this, "gnome-shutdown", _("Quit"), _("Shutdown the computer"), this.hover, this.iconPowerSize, false);        
-      button.actor.connect('enter-event', Lang.bind(this, this._sysButtonEnterEvent));
-      button.actor.connect('leave-event', Lang.bind(this, this._sysButtonLeaveEvent)); 
-      button.setAction(Lang.bind(this, this._onShutdownAction));
-        
-      powerButtons.add(button.actor, { x_fill: false, x_align: St.Align.MIDDLE});
-      this._systemButtons.push(button);
-      return powerButtons;
-   },
-
-   _sysButtonEnterEvent: function(actor, event) {
-      //this.old_active_item_actor = this._activeActor;
-      this.applicationsScrollBox.set_auto_scrolling(false);
-      this.categoriesScrollBox.set_auto_scrolling(false);
-      //this.favoritesScrollBox.set_auto_scrolling(false);
-      this.applicationsScrollBox.set_auto_scrolling(this.autoscroll_enabled);
-      this.categoriesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
-      //this.favoritesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
-      // this._scrollToButton(this.old_active_item_actor._delegate);
-
-      let index = this._indexOfSysButton(actor);
-      this.selectedAppBox.setSelectedText(this._systemButtons[index].title, this._systemButtons[index].description);
-      this.hover.refresh(this._systemButtons[index].icon);
-   },
-
-   _sysButtonLeaveEvent: function(actor, event) {
-      this.selectedAppBox.setSelectedText("", "");
-      this.hover.refreshFace();
-   },
-
-   _indexOfSysButton: function(actor) {
-      for(sysB in this._systemButtons)
-         if(this._systemButtons[sysB].actor == actor)
-            return sysB;
-      return -1;
-   },
-
-   _onLockScreenAction: function() {
-      this.menu.close();
-            
-      let screensaver_settings = new Gio.Settings({ schema: "org.cinnamon.screensaver" });                        
-      let screensaver_dialog = Gio.file_new_for_path("/usr/bin/cinnamon-screensaver-command");    
-      if(screensaver_dialog.query_exists(null)) {
-         if(screensaver_settings.get_boolean("ask-for-away-message")) {                                    
-            Util.spawnCommandLine("cinnamon-screensaver-lock-dialog");
-         }
-         else {
-            Util.spawnCommandLine("cinnamon-screensaver-command --lock");
-         }
-      }
-      else {                
-         this._screenSaverProxy.LockRemote();
-      }     
-   },
-
-   _onLogoutAction: function() {
-      this.menu.close();
-      this._session.LogoutRemote(0);
-   },
-
-   _onShutdownAction: function() {
-      this.menu.close();
-      this._session.ShutdownRemote();
-   },
-//systemButtons
    _appLeaveEvent: function(a, b, applicationButton) {
       this._previousSelectedActor = applicationButton.actor;
       applicationButton.actor.style_class = "menu-application-button";
@@ -4099,7 +4166,6 @@ MyApplet.prototype = {
          this._selectedItemIndex = null;
          this._activeContainer = null;
          this._activeActor = null;
-         this.sysButtSelected = 0;
          this.initButtonLoad = 30;
          let n = Math.min(this._applicationsButtons.length, this.initButtonLoad)
          for(let i = 0; i < n; i++) {
@@ -4123,7 +4189,7 @@ MyApplet.prototype = {
          this._clearAllSelections(false);
          this._refreshFavs();
          this.destroyVectorBox();
-         this._systemButtons[this.sysButtSelected].setActive(false);
+         this.powerBox.disableSelected();
          this.selectedAppBox.setDateTimeVisible(false);
          if(this.btChanger)
             this.btChanger.activateSelected(_("All Applications"));
