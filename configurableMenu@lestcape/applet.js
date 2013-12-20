@@ -373,8 +373,8 @@ PowerBox.prototype = {
       this.parent.applicationsScrollBox.set_auto_scrolling(false);
       this.parent.categoriesScrollBox.set_auto_scrolling(false);
       //this.parent.favoritesScrollBox.set_auto_scrolling(false);
-      this.parent.applicationsScrollBox.set_auto_scrolling(this.autoscroll_enabled);
-      this.parent.categoriesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
+      this.parent.applicationsScrollBox.set_auto_scrolling(this.parent.autoscroll_enabled);
+      this.parent.categoriesScrollBox.set_auto_scrolling(this.parent.autoscroll_enabled);
       //this.parent.favoritesScrollBox.set_auto_scrolling(this.autoscroll_enabled);
 
       let index = this.indexOf(actor);
