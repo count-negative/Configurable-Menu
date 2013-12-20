@@ -89,6 +89,302 @@ imports.searchPath.unshift(LIB_PATH);
 const CinnamonMenu = imports.applet;
 */
 
+function ScrollItemsBox(panelToScroll) {
+   this._init(panelToScroll);
+}
+
+ScrollItemsBox.prototype = {
+   _init: function(panelToScroll) {
+      this.panelToScroll = panelToScroll;
+      this.actor = new St.BoxLayout({ style_class: 'menu-favorites-box', vertical: this.panelToScroll.get_vertical() });
+      this.panelResize = new St.BoxLayout({ vertical: this.panelToScroll.get_vertical() });
+      this.scroll = this._createScroll(this.panelToScroll.get_vertical());
+      this.scroll.add_actor(this.panelToScroll);
+
+      this.actor.add_actor(this.panelResize);
+      this.panelResize.add_actor(this.panelToScroll);
+      this.panelResize.add_actor(this.scroll);
+
+      this.panelResize.connect('allocation_changed', Lang.bind(this, this._onAllocationChanged));
+      this.actor.connect('allocation_changed', Lang.bind(this, this._onAllocationParentChanged));
+
+
+   },
+
+   _createScroll: function(vertical) {
+      let scrollBox;
+      if(vertical) {
+         scrollBox = new St.ScrollView({ x_fill: true, y_fill: false, y_align: St.Align.START, style_class: 'vfade menu-applications-scrollbox' });
+         scrollBox.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+         let vscroll = scrollBox.get_vscroll_bar();
+         vscroll.connect('scroll-start',
+                          Lang.bind(this, function() {
+                          this.menu.passEvents = true;
+                       }));
+         vscroll.connect('scroll-stop',
+                          Lang.bind(this, function() {
+                          this.menu.passEvents = false;
+                       }));
+      } else {
+         scrollBox = new St.ScrollView({ x_fill: false, y_fill: true, x_align: St.Align.START, style_class: 'hfade menu-applications-scrollbox' });
+         scrollBox.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER);
+         let hscroll = scrollBox.get_hscroll_bar();
+         hscroll.connect('scroll-start',
+                          Lang.bind(this, function() {
+                          this.menu.passEvents = true;
+                       }));
+         hscroll.connect('scroll-stop',
+                          Lang.bind(this, function() {
+                          this.menu.passEvents = false;
+                       }));
+      }
+      return scrollBox;
+   },
+
+   _onAllocationParentChanged: function(actor, event) {
+      this.panelToScroll.set_height(-1);
+      //Main.notify("listo");
+   },
+
+   _onAllocationChanged: function(actor, event) {
+      if(this.visible) {
+         if(this.panelToScroll.get_vertical()) {
+            this.panelToScroll.set_height(-1);
+         }
+      } else {
+         if(this.panelToScroll.get_vertical()) {
+            this.panelToScroll.set_height(actor.get_height());// 4 pixels allow
+         }
+      }
+   },
+
+   setAutoScrolling: function(autoScroll) {
+      this.scroll.set_auto_scrolling(autoScroll);
+   },
+
+   setScrollVisible: function(visible) {
+      this.visible = visible;
+   },
+
+   scrollToActor: function(actor) {
+      if(this.panelToScroll.get_vertical()) {
+         var current_scroll_value = this.scroll.get_vscroll_bar().get_adjustment().get_value();
+         var box_height = this.get_allocation_box().y2-this.get_allocation_box().y1;
+         var new_scroll_value = current_scroll_value;
+         if (current_scroll_value > actor.get_allocation_box().y1-10) new_scroll_value = actor.get_allocation_box().y1-10;
+         if (box_height+current_scroll_value < actor.get_allocation_box().y2+10) new_scroll_value = actor.get_allocation_box().y2-box_height+10;
+         if (new_scroll_value!=current_scroll_value) this.scroll.get_vscroll_bar().get_adjustment().set_value(new_scroll_value);
+      } else {
+         var current_scroll_value = this.scroll.get_hscroll_bar().get_adjustment().get_value();
+         var box_width = this.get_allocation_box().x2-this.get_allocation_box().x1;
+         var new_scroll_value = current_scroll_value;
+         if (current_scroll_value > actor.get_allocation_box().x1-10) new_scroll_value = actor.get_allocation_box().x1-10;
+         if (box_width+current_scroll_value < actor.get_allocation_box().x2+10) new_scroll_value = actor.get_allocation_box().x2-box_width+10;
+         if (new_scroll_value!=current_scroll_value) this.scroll.get_hscroll_bar().get_adjustment().set_value(new_scroll_value);
+      }
+   }
+};
+
+function StaticBox(parent, hoverIcon, selectedAppBox, controlBox, powerBox, vertical, iconSize) {
+   this._init(parent, hoverIcon, selectedAppBox, controlBox, powerBox, vertical, iconSize);
+}
+
+StaticBox.prototype = {
+   _init: function(parent, hoverIcon, selectedAppBox, controlBox, powerBox, vertical, iconSize) {
+      this.actor = new St.BoxLayout({ vertical: true });
+      this.hoverBox = new St.BoxLayout({ vertical: false });
+      this.actor.add_actor(this.hoverBox);
+      this.controlBox = new St.BoxLayout({ vertical: false });
+      this.actor.add_actor(this.controlBox);
+      this.itemsBox = new St.BoxLayout({ vertical: true });
+      this.scrollActor = new ScrollItemsBox(this.itemsBox);
+      this.actor.add(this.scrollActor.actor, {y_fill: true, expand: true});
+      this.scrollActor.setAutoScrolling(true);
+      this.scrollActor.setScrollVisible(false);
+      //this.actor = new St.BoxLayout({ style_class: 'menu-favorites-box', vertical: true });
+      this.parent = parent;
+      this.hover = hoverIcon;
+      this.selectedAppBox = selectedAppBox;
+      this.control = controlBox;
+      this.powerBox = powerBox;
+      this.vertical = vertical;
+      this.iconSize = iconSize;
+      this.takingHover = false;
+      this._staticButtons = new Array();
+      this.takeHover(true);
+      this.takeControl(true);
+      this.initItems();
+      this.takePower(true);
+      //this.actor._delegate = this;
+   },
+
+   takeHover: function(take) {
+      if(take) {
+         this.hoverBox.add(this.hover.actor, { x_fill: false, x_align: St.Align.MIDDLE, expand: true });
+         this.hoverBox.add_actor(this.hover.menu.actor);
+      }
+      else {
+         this.hoverBox.remove_actor(this.hover.actor);
+         this.hoverBox.remove_actor(this.hover.menu.actor);
+      }
+   },
+
+   takeControl: function(take) {
+      if(take) {
+         this.controlBox.add(this.control.actor, { x_fill: false, x_align: St.Align.MIDDLE, expand: true });
+      }
+      else {
+         this.controlBox.remove_actor(this.control.actor);
+      }
+   },
+
+   takePower: function(take) {
+      if(take) {
+         if(this.actor.get_children().indexOf(this.powerBox.actor) == -1)
+            this.actor.add(this.powerBox.actor, { x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.END, expand: true });
+      }
+      else {
+         this.actor.remove_actor(this.powerBox.actor);
+      }
+   },
+
+   getFirstElement: function() {
+      let childrens = this.actor.get_children();
+      if(childrens.length > 0) {
+         return childrens[0];
+      }
+      return null;
+   },
+
+   initItems: function() {
+      let appSys = Cinnamon.AppSystem.get_default();
+      let item;
+
+      item = this._createSpecialButton("computer", _("Computer"), "computer:///");
+      item.setAction(Lang.bind(this, this._onComputerAction));
+      item = this._createSpecialButton("folder-home", _("Home"), GLib.get_home_dir());
+      item.setAction(Lang.bind(this, this._onHomeAction));
+      item = this._createSpecialButton("desktop", _("Desktop"), USER_DESKTOP_PATH);
+      item.setAction(Lang.bind(this, this._onDesktopAction));
+      //this._createPlace();
+      item = this._createSpecialButton("user-trash", _("Trash"), "trash:///");
+      item.setAction(Lang.bind(this, this._onTrashAction));
+
+      this._createApp(appSys, "synaptic");
+      this._createApp(appSys, "update-manager");
+      this._createApp(appSys, "cinnamon-settings");
+      this._createApp(appSys, "gnome-terminal");
+
+//Places: Computer, HomeFolder, Network, Desktop Trash, 
+//system:  Synaptic, control center, terminal, (power buttons)
+
+//Home, Picture, Music, Videos, Documents
+//Computer, Control Center
+// Package Manager, Terminal, Help
+
+   },
+
+   setIconSize: function (iconSize) {
+      this.iconSize = iconSize;
+      for(let i = 0; i < this._staticButtons.length; i++) {
+         this._staticButtons[i].setIconSize(iconSize);
+      }
+   },
+
+   _createApp: function(appSys, appName) {
+      let iconSizeDrag = 32;
+      let app = appSys.lookup_app(appName + ".desktop");
+      if(app) {
+         let item = new ApplicationButtonExtended(this.parent, app, this.vertical, this.iconSize, iconSizeDrag);
+         item.actor.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
+         item.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
+         item.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, item));
+         this.itemsBox.add_actor(item.actor);
+         this._staticButtons.push(item);
+      }
+   },
+
+   _createPlace: function() {
+      let iconSizeDrag = 32;
+      let item;
+      let bookmarks = Main.placesManager.getBookmarks();
+      for(let id = 0; id < bookmarks.length; id++) {
+          //Main.notify("PN:"+placeName.toLowerCase()+":BN:"+bookmarks[id].name.toLowerCase()+":"+bookmarks[id].name.toLowerCase().indexOf(placeName.toLowerCase()));
+          //if(bookmarks[id].name.toLowerCase().indexOf(placeName.toLowerCase()) != -1)
+          //if(bookmarks[id].name.toLowerCase() == placeName)
+             //return bookmarks[id];
+         item = new PlaceButtonExtended(this, bookmarks[id], bookmarks[id].name, this.vertical, this.iconSize);
+         this.itemsBox.add_actor(item.actor);
+         this._staticButtons.push(item);
+      }
+   },
+
+   _createSpecialButton: function(icon, title, description) {
+      let item = new SystemButton(false, icon, title, description, this.hover, this.iconSize, true);
+      item.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(6)+"px;padding-right: "+(2)+"px;margin:auto;";
+      item.actor.connect('enter-event', Lang.bind(this, this._sysButtonEnterEvent));
+      item.actor.connect('leave-event', Lang.bind(this, this._sysButtonLeaveEvent));
+
+      this.itemsBox.add_actor(item.actor);
+      this._staticButtons.push(item);
+      return item;
+   },
+
+   navegateStaticBox: function(symbol, actor) {
+      
+   },
+
+   _appEnterEvent: function(actor, event, applicationButton) {
+      try {
+      if(applicationButton.app.get_description())
+         this.selectedAppBox.setSelectedText(applicationButton.app.get_name(), applicationButton.app.get_description().split("\n")[0]);
+      else
+         this.selectedAppBox.setSelectedText(applicationButton.app.get_name(), "");
+      applicationButton.actor.style_class = "menu-application-button-selected";
+      this.hover.refreshApp(applicationButton.app);
+      } catch(e) {
+         Main.notify("err:", e.message);
+      }
+   },
+
+   _appLeaveEvent: function(actor, event, applicationButton) {
+      applicationButton.actor.style_class = "menu-application-button";
+      this.selectedAppBox.setSelectedText("", "");
+      this.hover.refreshFace();;
+   },
+
+   _sysButtonEnterEvent: function(actor, event) {
+      let index = this.itemsBox.get_children().indexOf(actor);
+      this.selectedAppBox.setSelectedText(this._staticButtons[index].title, this._staticButtons[index].description);
+      this.hover.refresh(this._staticButtons[index].icon);
+   },
+
+   _sysButtonLeaveEvent: function(actor, event) {
+      this.selectedAppBox.setSelectedText("", "");
+      this.hover.refreshFace();
+   },
+
+   _onComputerAction: function() {
+      this.parent.menu.close();
+      Util.spawnCommandLine('xdg-open computer:///');
+   },
+
+   _onHomeAction: function() {
+      this.parent.menu.close();
+      Util.spawnCommandLine('xdg-open ' + GLib.get_home_dir());
+   },
+
+   _onDesktopAction: function() {
+      this.parent.menu.close();
+      Util.spawnCommandLine('xdg-open ' + USER_DESKTOP_PATH);
+   },
+
+   _onTrashAction: function() {
+      this.parent.menu.close();
+      Util.spawnCommandLine('xdg-open trash:///');
+   }
+};
+
 function SelectedAppBox(parent, activeDateTime) {
    this._init(parent, activeDateTime);
 }
@@ -506,212 +802,6 @@ ControlBox.prototype = {
          })
       });
    }*/
-};
-
-function StaticBox(parent, hoverIcon, selectedAppBox, controlBox, powerBox, vertical, iconSize) {
-   this._init(parent, hoverIcon, selectedAppBox, controlBox, powerBox, vertical, iconSize);
-}
-
-StaticBox.prototype = {
-   _init: function(parent, hoverIcon, selectedAppBox, controlBox, powerBox, vertical, iconSize) {
-      this.actor = new St.BoxLayout({ vertical: true });
-      //this.actor = new St.BoxLayout({ style_class: 'menu-favorites-box', vertical: true });
-      this.parent = parent;
-      this.hover = hoverIcon;
-      this.selectedAppBox = selectedAppBox;
-      this.control = controlBox;
-      this.powerBox = powerBox;
-      this.vertical = vertical;
-      this.iconSize = iconSize;
-      this.takingHover = false;
-      this._staticButtons = new Array();
-      this.takeHover(true);
-      this.takeControl(true);
-      this.initItems();
-      this.takePower(true);
-      //this.actor._delegate = this;
-   },
-
-   takeHover: function(take) {
-      if((take)&&(!this.hoverBox)) {
-         this.hoverBox = new St.BoxLayout({ vertical: false });
-         this.hoverBox.add(this.hover.actor, { x_fill: false, x_align: St.Align.MIDDLE, expand: true });
-         this.hoverBox.add_actor(this.hover.menu.actor);
-         this.actor.insert_actor(this.hoverBox, 0);
-      }
-      else if((!take)&&(this.hoverBox)) {
-         this.hoverBox.remove_actor(this.hover.actor);
-         this.hoverBox.remove_actor(this.hover.menu.actor);
-         this.actor.remove_actor(this.hoverBox);
-         this.hoverBox = null;
-      }
-   },
-
-   takeControl: function(take) {
-      if((take)&&(!this.controlBox)) {
-         this.controlBox = new St.BoxLayout({ vertical: false });
-         this.controlBox.add(this.control.actor, { x_fill: false, x_align: St.Align.MIDDLE, expand: true });
-         if(this.hoverBox)
-            this.actor.insert_actor(this.controlBox, 1);
-         else
-            this.actor.insert_actor(this.controlBox, 0);
-      }
-      else if((!take)&&(this.controlBox)) {
-         this.controlBox.remove_actor(this.control.actor);
-         this.actor.remove_actor(this.controlBox);
-         this.controlBox = null;
-      }
-   },
-
-   takePower: function(take) {
-      if(take) {
-         if(this.actor.get_children().indexOf(this.powerBox.actor) == -1)
-            this.actor.add(this.powerBox.actor, { x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.END, expand: true });
-      }
-      else {
-         this.actor.remove_actor(this.powerBox.actor);
-      }
-   },
-
-   getFirstElement: function() {
-      let childrens = this.actor.get_children();
-      if(childrens.length > 0) {
-         return childrens[0];
-      }
-      return null;
-   },
-
-   initItems: function() {
-      let appSys = Cinnamon.AppSystem.get_default();
-      let item;
-
-      item = this._createSpecialButton("computer", _("Computer"), "computer:///");
-      item.setAction(Lang.bind(this, this._onComputerAction));
-      item = this._createSpecialButton("folder-home", _("Home"), GLib.get_home_dir());
-      item.setAction(Lang.bind(this, this._onHomeAction));
-      item = this._createSpecialButton("desktop", _("Desktop"), USER_DESKTOP_PATH);
-      item.setAction(Lang.bind(this, this._onDesktopAction));
-      //this._createPlace();
-      item = this._createSpecialButton("user-trash", _("Trash"), "trash:///");
-      item.setAction(Lang.bind(this, this._onTrashAction));
-
-      this._createApp(appSys, "synaptic");
-      this._createApp(appSys, "update-manager");
-      this._createApp(appSys, "cinnamon-settings");
-      this._createApp(appSys, "gnome-terminal");
-
-//Places: Computer, HomeFolder, Network, Desktop Trash, 
-//system:  Synaptic, control center, terminal, (power buttons)
-
-//Home, Picture, Music, Videos, Documents
-//Computer, Control Center
-// Package Manager, Terminal, Help
-
-   },
-
-   setIconSize: function (iconSize) {
-      this.iconSize = iconSize;
-      for(let i = 0; i < this._staticButtons.length; i++) {
-         this._staticButtons[i].setIconSize(iconSize);
-      }
-   },
-
-   _createApp: function(appSys, appName) {
-      let iconSizeDrag = 32;
-      let app = appSys.lookup_app(appName + ".desktop");
-      if(app) {
-         let item = new ApplicationButtonExtended(this.parent, app, this.vertical, this.iconSize, iconSizeDrag);
-         item.actor.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
-         item.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
-         item.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, item));
-         this.actor.add_actor(item.actor);
-         this._staticButtons.push(item);
-      }
-   },
-
-   _createPlace: function() {
-      let iconSizeDrag = 32;
-      let item;
-      let bookmarks = Main.placesManager.getBookmarks();
-      for(let id = 0; id < bookmarks.length; id++) {
-          //Main.notify("PN:"+placeName.toLowerCase()+":BN:"+bookmarks[id].name.toLowerCase()+":"+bookmarks[id].name.toLowerCase().indexOf(placeName.toLowerCase()));
-          //if(bookmarks[id].name.toLowerCase().indexOf(placeName.toLowerCase()) != -1)
-          //if(bookmarks[id].name.toLowerCase() == placeName)
-             //return bookmarks[id];
-         item = new PlaceButtonExtended(this, bookmarks[id], bookmarks[id].name, this.vertical, this.iconSize);
-         this.actor.add_actor(item.actor);
-         this._staticButtons.push(item);
-      }
-   },
-
-   _createSpecialButton: function(icon, title, description) {
-      let item = new SystemButton(false, icon, title, description, this.hover, this.iconSize, true);
-      item.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(6)+"px;padding-right: "+(2)+"px;margin:auto;";
-      item.actor.connect('enter-event', Lang.bind(this, this._sysButtonEnterEvent));
-      item.actor.connect('leave-event', Lang.bind(this, this._sysButtonLeaveEvent));
-
-      this.actor.add_actor(item.actor);
-      this._staticButtons.push(item);
-      return item;
-   },
-
-   navegateStaticBox: function(symbol, actor) {
-      
-   },
-
-   _appEnterEvent: function(actor, event, applicationButton) {
-      try {
-      if(applicationButton.app.get_description())
-         this.selectedAppBox.setSelectedText(applicationButton.app.get_name(), applicationButton.app.get_description().split("\n")[0]);
-      else
-         this.selectedAppBox.setSelectedText(applicationButton.app.get_name(), "");
-      applicationButton.actor.style_class = "menu-application-button-selected";
-      this.hover.refreshApp(applicationButton.app);
-      } catch(e) {
-         Main.notify("err:", e.message);
-      }
-   },
-
-   _appLeaveEvent: function(actor, event, applicationButton) {
-      applicationButton.actor.style_class = "menu-application-button";
-      this.selectedAppBox.setSelectedText("", "");
-      this.hover.refreshFace();;
-   },
-
-   _sysButtonEnterEvent: function(actor, event) {
-      let index = this.actor.get_children().indexOf(actor);
-      if(this.hoverBox)
-         index --;
-      if(this.controlBox)
-         index --;
-      this.selectedAppBox.setSelectedText(this._staticButtons[index].title, this._staticButtons[index].description);
-      this.hover.refresh(this._staticButtons[index].icon);
-   },
-
-   _sysButtonLeaveEvent: function(actor, event) {
-      this.selectedAppBox.setSelectedText("", "");
-      this.hover.refreshFace();
-   },
-
-   _onComputerAction: function() {
-      this.parent.menu.close();
-      Util.spawnCommandLine('xdg-open computer:///');
-   },
-
-   _onHomeAction: function() {
-      this.parent.menu.close();
-      Util.spawnCommandLine('xdg-open ' + GLib.get_home_dir());
-   },
-
-   _onDesktopAction: function() {
-      this.parent.menu.close();
-      Util.spawnCommandLine('xdg-open ' + USER_DESKTOP_PATH);
-   },
-
-   _onTrashAction: function() {
-      this.parent.menu.close();
-      Util.spawnCommandLine('xdg-open trash:///');
-   }
 };
 
 function ApplicationContextMenuItemExtended(appButton, label, action) {
@@ -3006,6 +3096,7 @@ MyApplet.prototype = {
 
    _updateHeight: function() {
       if(this.controlingHeight) {
+        this.staticBox.actor.set_height(this.height);
         this.applicationsScrollBox.set_height(-1);
          this.betterPanel.set_height(this.height);
          if(this.favoritesObj.getVertical()) {
@@ -3228,12 +3319,14 @@ MyApplet.prototype = {
          this.categoriesApplicationsBox = new CategoriesApplicationsBoxExtended();
          this.rightPane.add_actor(this.categoriesApplicationsBox.actor);
 
-         this.applicationsScrollBox = this._createScroll(true);
-
          this.categoriesBox = new St.BoxLayout({ style_class: 'menu-categories-box', vertical: true });
          this.applicationsBox = new St.BoxLayout({ style_class: 'menu-applications-box', vertical:true });
          this.favBoxWrapper = new St.BoxLayout({ vertical: true });
          this.favoritesBox = new St.BoxLayout({ style_class: 'menu-favorites-box', vertical: true });
+
+         //this.applicationsScrollBox = new ScrollItemsBox(this.applicationsBox));
+         this.applicationsScrollBox = this._createScroll(true);
+         this.applicationsScrollBox.add_actor(this.applicationsBox);
 
          this.a11y_settings = new Gio.Settings({ schema: "org.cinnamon.desktop.a11y.applications" });
          this.a11y_settings.connect("changed::screen-magnifier-enabled", Lang.bind(this, this._updateVFade));
@@ -3289,7 +3382,6 @@ MyApplet.prototype = {
 
          this.categoriesWrapper.add_actor(this.categoriesScrollBox);
          this.categoriesScrollBox.add_actor(this.categoriesBox);
-         this.applicationsScrollBox.add_actor(this.applicationsBox);
 
          this.categoriesApplicationsBox.actor.add_actor(this.betterPanel);
 
@@ -3333,6 +3425,7 @@ MyApplet.prototype = {
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
+      //this.betterPanel.add(this.applicationsScrollBox.actor, {y_fill: true, y_align: St.Align.START, expand: true});
    },
 
    loadStylized: function() {
@@ -3351,6 +3444,7 @@ MyApplet.prototype = {
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
+      //this.betterPanel.add(this.applicationsScrollBox.actor, {y_fill: true, y_align: St.Align.START, expand: true});
    },
 
    loadDragon: function() {
@@ -3373,6 +3467,7 @@ MyApplet.prototype = {
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
+      //this.betterPanel.add(this.applicationsScrollBox.actor, {y_fill: true, y_align: St.Align.START, expand: true});
    },
 
    loadDragonInverted: function() {
@@ -3395,6 +3490,7 @@ MyApplet.prototype = {
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
+      //this.betterPanel.add(this.applicationsScrollBox.actor, {y_fill: true, y_align: St.Align.START, expand: true});;
    },
 
    loadHorizontal: function() {
@@ -3417,6 +3513,7 @@ MyApplet.prototype = {
      // this.rightPane.add(this.favBoxWrapper, { x_fill: false, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
+      //this.betterPanel.add(this.applicationsScrollBox.actor, {y_fill: true, y_align: St.Align.START, expand: true});
       this.betterPanel.add(this.favBoxWrapper, { x_fill: false, y_fill: false, expand: true });
       this.favBoxWrapper.set_vertical(false);
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
@@ -3441,6 +3538,7 @@ MyApplet.prototype = {
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
+      //this.betterPanel.add(this.applicationsScrollBox.actor, {y_fill: true, y_align: St.Align.START, expand: true});
    },
 
    loadAccessibleInverted: function() {
@@ -3460,6 +3558,7 @@ MyApplet.prototype = {
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
+      //this.betterPanel.add(this.applicationsScrollBox.actor, {y_fill: true, y_align: St.Align.START, expand: true});
    },
 
    loadMint: function() {
@@ -3484,6 +3583,7 @@ MyApplet.prototype = {
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
+      //this.betterPanel.add(this.applicationsScrollBox.actor, {y_fill: true, y_align: St.Align.START, expand: true});
    },
 
    loadWindows: function() {
@@ -3508,6 +3608,7 @@ MyApplet.prototype = {
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.categoriesWrapper, { x_fill: false, expand: false });
       this.betterPanel.add(this.applicationsScrollBox, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: true });
+      //this.betterPanel.add(this.applicationsScrollBox.actor, {y_fill: true, y_align: St.Align.START, expand: true});
    },
 
    _onPanelMintChange: function(selected) {
