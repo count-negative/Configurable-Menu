@@ -258,15 +258,16 @@ ButtonChangerBox.prototype = {
     }
 };
 
-function PowerBox(parent, vertical, iconSize, hover, selectedAppBox) {
-   this._init(parent, vertical, iconSize, hover, selectedAppBox);
+function PowerBox(parent, vertical, iconSize, haveText, hover, selectedAppBox) {
+   this._init(parent, vertical, iconSize, haveText, hover, selectedAppBox);
 }
 
 PowerBox.prototype = {
-   _init: function(parent, vertical, iconSize, hover, selectedAppBox) {
+   _init: function(parent, vertical, iconSize, haveText, hover, selectedAppBox) {
       this.parent = parent;
       this.vertical = vertical;
       this.iconSize = iconSize;
+      this.haveText = haveText;
       this.signalKeyPowerID = 0;
       this._session = new GnomeSession.SessionManager();
       this.selectedAppBox = selectedAppBox;
@@ -507,22 +508,27 @@ ControlBox.prototype = {
    }*/
 };
 
-function StaticBox(parent, selectedAppBox, hoverIcon, controlBox, vertical, iconSize) {
-   this._init(parent, selectedAppBox, hoverIcon, controlBox, vertical, iconSize);
+function StaticBox(parent, hoverIcon, selectedAppBox, controlBox, powerBox, vertical, iconSize) {
+   this._init(parent, hoverIcon, selectedAppBox, controlBox, powerBox, vertical, iconSize);
 }
 
 StaticBox.prototype = {
-   _init: function(parent, selectedAppBox, hoverIcon, controlBox, vertical, iconSize) {
+   _init: function(parent, hoverIcon, selectedAppBox, controlBox, powerBox, vertical, iconSize) {
       this.actor = new St.BoxLayout({ vertical: true });
+      //this.actor = new St.BoxLayout({ style_class: 'menu-favorites-box', vertical: true });
       this.parent = parent;
-      this.takingHover = false;
-      this._staticButtons = new Array();
-      this.selectedAppBox = selectedAppBox;
       this.hover = hoverIcon;
+      this.selectedAppBox = selectedAppBox;
       this.control = controlBox;
+      this.powerBox = powerBox;
       this.vertical = vertical;
       this.iconSize = iconSize;
+      this.takingHover = false;
+      this._staticButtons = new Array();
+      this.takeHover(true);
+      this.takeControl(true);
       this.initItems();
+      this.takePower(true);
       //this.actor._delegate = this;
    },
 
@@ -557,6 +563,16 @@ StaticBox.prototype = {
       }
    },
 
+   takePower: function(take) {
+      if(take) {
+         if(this.actor.get_children().indexOf(this.powerBox.actor) == -1)
+            this.actor.add(this.powerBox.actor, { x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.END, expand: true });
+      }
+      else {
+         this.actor.remove_actor(this.powerBox.actor);
+      }
+   },
+
    getFirstElement: function() {
       let childrens = this.actor.get_children();
       if(childrens.length > 0) {
@@ -583,13 +599,6 @@ StaticBox.prototype = {
       this._createApp(appSys, "update-manager");
       this._createApp(appSys, "cinnamon-settings");
       this._createApp(appSys, "gnome-terminal");
-
-      item = this._createSpecialButton("gnome-lockscreen", _("Lock screen"), _("Lock the screen"));
-      item.setAction(Lang.bind(this, this._onLockScreenAction));
-      item = this._createSpecialButton("gnome-logout", _("Logout"), _("Leave the session"));
-      item.setAction(Lang.bind(this, this._onLogoutAction));
-      item = this._createSpecialButton("gnome-shutdown", _("Quit"), _("Shutdown the computer"));
-      item.setAction(Lang.bind(this, this._onShutdownAction));
 
 //Places: Computer, HomeFolder, Network, Desktop Trash, 
 //system:  Synaptic, control center, terminal, (power buttons)
@@ -702,18 +711,6 @@ StaticBox.prototype = {
    _onTrashAction: function() {
       this.parent.menu.close();
       Util.spawnCommandLine('xdg-open trash:///');
-   },
-
-   _onLockScreenAction: function() {
-      this.parent._onLockScreenAction();
-   },
-
-   _onLogoutAction: function() {
-      this.parent._onLogoutAction();
-   },
-
-   _onShutdownAction: function() {
-      this.parent._onShutdownAction();
    }
 };
 
@@ -2940,7 +2937,7 @@ MyApplet.prototype = {
 
    _setIconAccessibleSize: function() {
       if(this.staticBox)
-        this.staticBox.setIconSize(this.iconAccessibleSize);
+         this.staticBox.setIconSize(this.iconAccessibleSize);
    },
 
    _setVisibleViewControl: function() {
@@ -3253,7 +3250,6 @@ MyApplet.prototype = {
          this.mainBox = new St.BoxLayout({ vertical: false,  style_class: 'menu-applications-box' });
          //this.mainBox.set_style("padding-right: 20px;");
          this.extendedBox = new St.BoxLayout({ vertical: true });
-         this.staticBox = new StaticBox(this, this.selectedAppBox, this.hover, this.controlView, false, this.iconAccessibleSize);
 
          switch(this.theme) {
             case "classic"           :
@@ -3329,7 +3325,7 @@ MyApplet.prototype = {
       this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
       this.categoriesScrollBox = this._createScroll(true);
       this.favoritesScrollBox = this._createScroll(true);
-      this.powerBox = new PowerBox(this, true, this.iconPowerSize, this.hover, this.selectedAppBox);
+      this.powerBox = new PowerBox(this, true, this.iconPowerSize, false, this.hover, this.selectedAppBox);
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.favBoxWrapper.add(this.powerBox.actor, { y_align: St.Align.END, y_fill: false, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.END, y_fill: false, expand: true });
@@ -3348,7 +3344,7 @@ MyApplet.prototype = {
       this.categoriesScrollBox = this._createScroll(true);
       this.favoritesScrollBox = this._createScroll(true);
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
-      this.powerBox = new PowerBox(this, false, this.iconPowerSize, this.hover, this.selectedAppBox);
+      this.powerBox = new PowerBox(this, false, this.iconPowerSize, false, this.hover, this.selectedAppBox);
       this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
@@ -3370,7 +3366,7 @@ MyApplet.prototype = {
       this.favoritesScrollBox = this._createScroll(true);
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       //this.categoriesScrollBox.hscrollbar_visible(false);
-      this.powerBox = new PowerBox(this, false, this.iconPowerSize, this.hover, this.selectedAppBox);
+      this.powerBox = new PowerBox(this, false, this.iconPowerSize, false, this.hover, this.selectedAppBox);
       this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
@@ -3392,7 +3388,7 @@ MyApplet.prototype = {
       this.favoritesScrollBox = this._createScroll(true);
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       //this.categoriesScrollBox.hscrollbar_visible(false);
-      this.powerBox = new PowerBox(this, false, this.iconPowerSize, this.hover, this.selectedAppBox);
+      this.powerBox = new PowerBox(this, false, this.iconPowerSize, false, this.hover, this.selectedAppBox);
       this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
@@ -3413,7 +3409,7 @@ MyApplet.prototype = {
       this.categoriesScrollBox = this._createScroll(false);
       this.favoritesScrollBox = this._createScroll(true);
       //this.categoriesScrollBox.hscrollbar_visible(false);
-      this.powerBox = new PowerBox(this, false, this.iconPowerSize, this.hover, this.selectedAppBox);
+      this.powerBox = new PowerBox(this, false, this.iconPowerSize, false, this.hover, this.selectedAppBox);
       this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
@@ -3430,15 +3426,16 @@ MyApplet.prototype = {
 
    loadAccessible: function() {
       this.controlBox.add(this.searchEntry, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
-      this.staticBox.takeHover(true);
-      this.staticBox.takeControl(true);
       this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
       this.categoriesScrollBox = this._createScroll(true);
       this.favoritesScrollBox = this._createScroll(true);
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
-      this.powerBox = new PowerBox(this, false, this.iconPowerSize, this.hover, this.selectedAppBox);
+      this.powerBox = new PowerBox(this, false, this.iconPowerSize, true, this.hover, this.selectedAppBox);
+      this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
+      //this.staticBox.takeHover(true);
+      //this.staticBox.takeControl(true);
       //this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
-      this.mainBox.add(this.staticBox.actor, { y_align: St.Align.START, y_fill: false, expand: true });
+      this.mainBox.add(this.staticBox.actor, { y_fill: true });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       //this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
@@ -3448,13 +3445,14 @@ MyApplet.prototype = {
 
    loadAccessibleInverted: function() {
       this.controlBox.add(this.searchEntry, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
-      this.staticBox.takeHover(true);
-      this.staticBox.takeControl(true);
       this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
       this.categoriesScrollBox = this._createScroll(true);
       this.favoritesScrollBox = this._createScroll(true);
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
-      this.powerBox = new PowerBox(this, false, this.iconPowerSize, this.hover, this.selectedAppBox);
+      this.powerBox = new PowerBox(this, false, this.iconPowerSize, true, this.hover, this.selectedAppBox);
+      this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
+      //this.staticBox.takeHover(true);
+      //this.staticBox.takeControl(true);
       //this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
@@ -3469,13 +3467,14 @@ MyApplet.prototype = {
       this.controlBox.add(this.searchEntry, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.btChanger = new ButtonChangerBox(this, "forward", [_("All Applications"), _("Favorites")], 0, this._onPanelMintChange);
       this.controlSearchBox.add(this.btChanger.actor, {x_fill: false, x_align: St.Align.END, y_align: St.Align.START, expand: true });
-      this.staticBox.takeHover(true);
-      this.staticBox.takeControl(true);
       this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
       this.categoriesScrollBox = this._createScroll(true);
       this.favoritesScrollBox = this._createScroll(true);
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
-      this.powerBox = new PowerBox(this, false, this.iconPowerSize, this.hover, this.selectedAppBox);
+      this.powerBox = new PowerBox(this, false, this.iconPowerSize, true, this.hover, this.selectedAppBox);
+      this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
+      //this.staticBox.takeHover(true);
+      //this.staticBox.takeControl(true);
       //this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.staticBox.actor, { y_align: St.Align.START, y_fill: false, expand: true });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
@@ -3492,13 +3491,14 @@ MyApplet.prototype = {
       this.controlBox.add(this.searchEntry, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.btChanger = new ButtonChangerBox(this, "forward", [_("All Applications"), _("Favorites")], 0, this._onPanelWindowsChange);
       this.controlSearchBox.add(this.btChanger.actor, {x_fill: false, x_align: St.Align.END, y_align: St.Align.START, expand: true });
-      this.staticBox.takeHover(true);
-      this.staticBox.takeControl(true);
       this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
       this.categoriesScrollBox = this._createScroll(true);
       this.favoritesScrollBox = this._createScroll(true);
       this.favBoxWrapper.add(this.favoritesScrollBox, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
-      this.powerBox = new PowerBox(this, false, this.iconPowerSize, this.hover, this.selectedAppBox);
+      this.powerBox = new PowerBox(this, false, this.iconPowerSize, true, this.hover, this.selectedAppBox);
+      this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
+      //this.staticBox.takeHover(true);
+      //this.staticBox.takeControl(true);
       //this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.staticBox.actor, { y_align: St.Align.START, y_fill: false, expand: true });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
