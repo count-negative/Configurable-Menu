@@ -267,8 +267,8 @@
    },
    "height" : {
       "type": "spinbutton",
-      "default" : 200,
-      "min" : 200,
+      "default" : 300,
+      "min" : 300,
       "max" : 1000,
       "step" : 5,
       "units" : "pixels",
