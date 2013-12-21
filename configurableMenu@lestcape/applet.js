@@ -104,8 +104,8 @@ ScrollItemsBox.prototype = {
       this.scroll = this._createScroll(this.vertical);
       this.scroll.add_actor(this.panelToScroll);
 
-      this.actor.add_actor(this.panelResize);
-      this.panelResize.add_actor(this.scroll);
+      this.actor.add(this.panelResize, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.panelResize.add(this.scroll, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
 
       this.signalAllocationID = 0;
       this.signalParentAllocationID = 0;
@@ -2694,7 +2694,10 @@ MyApplet.prototype = {
         }  else {
             return false;
         }
-        if(!item_actor || item_actor === this.searchEntry) {
+        if(item_actor == this.searchEntry) {
+            return true;
+        }
+        else if(!item_actor) {
             return false;
         }
         if(item_actor._delegate)
@@ -2775,13 +2778,15 @@ MyApplet.prototype = {
       if(symbol == Clutter.Tab) {
          this.fav_actor = this._changeFocusElement(this.searchEntry);
          Mainloop.idle_add(Lang.bind(this, this._putFocus));
+         item_actor = this.searchEntry;
       } else if((symbol == Clutter.KEY_Right)||(symbol == Clutter.KEY_Up)||(symbol == Clutter.KEY_Down)) {
          this._activeContainer = this.applicationsBox;
          item_actor = this.appBoxIter.getFirstVisible();
+         this._selectedItemIndex = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
+         this._selectedRowIndex = this.appBoxIter.getInternalIndexOfChild(item_actor);
       }
       //global.stage.set_key_focus(this.powerBox.actor);
-      this._selectedItemIndex = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
-      this._selectedRowIndex = this.appBoxIter.getInternalIndexOfChild(item_actor);
+      
       return item_actor;
    },
 
@@ -2790,6 +2795,7 @@ MyApplet.prototype = {
       if(symbol == Clutter.Tab) {
          this.fav_actor = this._changeFocusElement(this.searchEntry);
          Mainloop.idle_add(Lang.bind(this, this._putFocus));
+         item_actor = this.searchEntry;
       }
       else if(symbol == Clutter.KEY_Up) {
          this._previousSelectedActor = this.applicationsBox.get_child_at_index(index).get_child_at_index(2*rowIndex);
@@ -2841,6 +2847,7 @@ MyApplet.prototype = {
       if(symbol == Clutter.Tab) {
          this.fav_actor = this._changeFocusElement(this.searchEntry);
          Mainloop.idle_add(Lang.bind(this, this._putFocus));
+         item_actor = this.searchEntry;
       }
       else if(this.categoriesBox.get_vertical()) {
          if(symbol == Clutter.KEY_Up) {
@@ -3150,10 +3157,10 @@ MyApplet.prototype = {
       else {
          let scrollBoxHeight = 0;
          if(this.favBoxWrapper.get_parent() != this.betterPanel)
-            scrollBoxHeight = this.favoritesBox.get_height() + this.endBox.get_height() + 10;
-         if(this.categoriesBox.get_height() + this.controlSearchBox.get_height()+ this.endBox.get_height() + 10 > scrollBoxHeight)
-            scrollBoxHeight = this.categoriesBox.get_height() + this.controlSearchBox.get_height() + this.endBox.get_height() + 10;
-//         this.selectedAppBox.get_height() + this.endBox.get_height()
+            scrollBoxHeight = this.favoritesBox.get_height() + this.endHorizontalBox.get_height() + 10;
+         if(this.categoriesBox.get_height() + this.controlSearchBox.get_height()+ this.endHorizontalBox.get_height() + 10 > scrollBoxHeight)
+            scrollBoxHeight = this.categoriesBox.get_height() + this.controlSearchBox.get_height() + this.endHorizontalBox.get_height() + 10;
+//         this.selectedAppBox.get_height() + this.endHorizontalBox.get_height()
          if(scrollBoxHeight < 300)
             scrollBoxHeight = 300;
          this.mainBox.set_height(scrollBoxHeight);
@@ -3179,8 +3186,8 @@ MyApplet.prototype = {
             /*this.categoriesBox.set_width(80);
             this.applicationsBox.set_width(-1);*/
             let currWidth = this.applicationsBox.get_width();
-            if(currWidth < this.endBox.get_width())
-               currWidth = this.endBox.get_width();
+            if(currWidth < this.endHorizontalBox.get_width())
+               currWidth = this.endHorizontalBox.get_width();
             if(currWidth < this.controlSearchBox.get_width()-10)
                currWidth = this.controlSearchBox.get_width()-10;
          }
@@ -3253,7 +3260,7 @@ MyApplet.prototype = {
          this._session = new GnomeSession.SessionManager();
          this._screenSaverProxy = new ScreenSaver.ScreenSaverProxy();
 
-         this.standardBox = new St.BoxLayout({vertical:false });
+         this.standardBox = new St.BoxLayout({ vertical:false });
 
          this.rightPane = new St.BoxLayout({ vertical: true });        
 //search
@@ -3283,7 +3290,7 @@ MyApplet.prototype = {
          this.hover.menu.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
 
          this.categoriesApplicationsBox = new CategoriesApplicationsBoxExtended();
-         this.rightPane.add_actor(this.categoriesApplicationsBox.actor);
+         this.rightPane.add(this.categoriesApplicationsBox.actor, {y_fill: true, y_align: St.Align.START, expand: true});
 
          this.categoriesBox = new St.BoxLayout({ style_class: 'menu-categories-box', vertical: true });
          this.applicationsBox = new St.BoxLayout({ style_class: 'menu-applications-box', vertical:true });
@@ -3296,10 +3303,12 @@ MyApplet.prototype = {
          this.a11y_settings.connect("changed::screen-magnifier-enabled", Lang.bind(this, this._updateVFade));
          this._updateVFade();
 
-         this.endBox = new St.BoxLayout({ vertical: false });
+         this.endBox = new St.BoxLayout({ vertical: true });
+         this.endHorizontalBox = new St.BoxLayout({ vertical: false });
+
          this.selectedAppBox = new SelectedAppBox(this, this.showTimeDate);
-         this.endBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
-         this.endBox.set_style("padding-right: 20px;");
+         this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+         this.endHorizontalBox.set_style("padding-right: 20px;");
 
          this.betterPanel = new St.BoxLayout({ vertical: false });
          this.operativePanel = new St.BoxLayout({ vertical: false });
@@ -3348,19 +3357,22 @@ MyApplet.prototype = {
 
          this.categoriesWrapper.add_actor(this.categoriesScrollBox.actor, {y_fill: true, y_align: St.Align.START, expand: true});
 
-         this.categoriesApplicationsBox.actor.add_actor(this.betterPanel);
+         this.categoriesApplicationsBox.actor.add(this.betterPanel, {y_fill: true, y_align: St.Align.START, expand: true});
 
          this.appBoxIter = new VisibleChildIteratorExtended(this, this.applicationsBox, this.iconViewCount);
          this.applicationsBox._vis_iter = this.appBoxIter;
          this.catBoxIter = new VisibleChildIteratorExtended(this, this.categoriesBox, 1);
          this.categoriesBox._vis_iter = this.catBoxIter;
 
+         this.endBox.add_actor(this.endHorizontalBox);
+         this.extendedBox.add(this.standardBox, { x_fill: false, y_fill: true, y_align: St.Align.START, expand: true});
+         this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+
          this._refreshApps();
 
          this.signalKeyPowerID = 0;
          this._update_autoscroll();
-         this.extendedBox.add_actor(this.standardBox);
-         this.extendedBox.add_actor(this.endBox);
+
          section.actor.add_actor(this.mainBox);
 
          Mainloop.idle_add(Lang.bind(this, function() {
@@ -3400,7 +3412,7 @@ MyApplet.prototype = {
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: true, y_align: St.Align.START, expand: true });
       this.powerBox = new PowerBox(this, false, this.iconPowerSize, false, this.hover, this.selectedAppBox);
-      this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
@@ -3421,7 +3433,7 @@ MyApplet.prototype = {
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: true, y_align: St.Align.START, expand: true });
       //this.categoriesScrollBox.hscrollbar_visible(false);
       this.powerBox = new PowerBox(this, false, this.iconPowerSize, false, this.hover, this.selectedAppBox);
-      this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
@@ -3442,7 +3454,7 @@ MyApplet.prototype = {
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: true, y_align: St.Align.START, expand: true });
       //this.categoriesScrollBox.hscrollbar_visible(false);
       this.powerBox = new PowerBox(this, false, this.iconPowerSize, false, this.hover, this.selectedAppBox);
-      this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
@@ -3465,10 +3477,10 @@ MyApplet.prototype = {
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: true, y_align: St.Align.START, expand: true });
       //this.categoriesScrollBox.hscrollbar_visible(false);
       this.powerBox = new PowerBox(this, false, this.iconPowerSize, false, this.hover, this.selectedAppBox);
-      this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
+      this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
-      this.betterPanel.add(this.favBoxWrapper, { x_fill: false, y_fill: false, expand: true });
+      this.endBox.add(this.favBoxWrapper, { x_fill: false, y_fill: false, expand: true });
       this.mainBox.add_actor(this.extendedBox);
      // let heightFav = this.favoritesObj.getRealSpace(); //MAX_FAV_ICON_SIZE*(this.favoritesLinesNumber+1) + 1;
      // this.favoritesBox.set_style('max-height: ' + heightFav + 'px; min-height: ' + heightFav + 'px');
@@ -3484,7 +3496,7 @@ MyApplet.prototype = {
       this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
       //this.staticBox.takeHover(true);
       //this.staticBox.takeControl(true);
-      //this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
+      //this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
@@ -3502,7 +3514,7 @@ MyApplet.prototype = {
       this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
       //this.staticBox.takeHover(true);
       //this.staticBox.takeControl(true);
-      //this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
+      //this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
@@ -3523,9 +3535,9 @@ MyApplet.prototype = {
       this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
       //this.staticBox.takeHover(true);
       //this.staticBox.takeControl(true);
-      //this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
+      //this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
-      this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: true });
       this.operativePanel.visible = false;
       this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.staticBox.actor, { y_fill: true });
@@ -3545,7 +3557,7 @@ MyApplet.prototype = {
       this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
       //this.staticBox.takeHover(true);
       //this.staticBox.takeControl(true);
-      //this.endBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
+      //this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: false, expand: false });
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.operativePanel.visible = false;
@@ -3723,7 +3735,7 @@ MyApplet.prototype = {
       }
 /*    if(this.controlSearchBox.get_width() > this.applicationsScrollBox.get_width())
          this.applicationsScrollBox.set_width(this.controlSearchBox.get_width());
-      if(this.endBox.get_width() > this.applicationsScrollBox.get_width())
+      if(this.endHorizontalBox.get_width() > this.applicationsScrollBox.get_width())
          this.applicationsScrollBox.set_width(this.controlSearchBox.get_width());
       this.categoriesBox.set_width(this.applicationsScrollBox.get_width());*/
       this._updateHeight();
