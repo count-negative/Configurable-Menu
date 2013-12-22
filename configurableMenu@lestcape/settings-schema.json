@@ -161,16 +161,6 @@
       "description": "View item of the menu in icon view",
       "tooltip": "Enable view item of the menu in icon view and disable view item of the menu in list view."
    },
-   "view-icon-count" : {
-      "type": "spinbutton",
-      "default" : 4,
-      "min" : 1,
-      "max" : 14,
-      "step" : 1,
-      "units" : "items",
-      "description" : "Number of columns in view:",
-      "tooltip" : "Set the number of columns in view."
-   },
    "show-favorites" : {
       "type" : "checkbox",
       "default" : true,
@@ -258,6 +248,24 @@
       "dependency": "show-app-description",
       "description" : "Size of selected application description:",
       "tooltip" : "Size of font in selected application description."
+   },
+   "controling-width" : {
+      "type" : "checkbox",
+      "default" : true,
+      "description": "Controling the width",
+      "tooltip": "Choose whether or not to controling the width of the menu."
+   },
+   "width" : {
+      "type": "spinbutton",
+      "default" : 300,
+      "min" : 300,
+      "max" : 2000,
+      "step" : 5,
+      "units" : "pixels",
+      "description" : "Width:",
+      "tooltip" : "Width of menu.",
+      "indent": true,
+      "dependency": "controling-width"
    },
    "controling-height" : {
       "type" : "checkbox",
