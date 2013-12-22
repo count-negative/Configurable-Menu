@@ -12,7 +12,8 @@
          "Horizontal": "horizontal",
          "Accessible": "accessible",
          "Accessible Inverted": "accessibleInverted",
-         "Mint": "mint"
+         "Mint": "mint",
+         "Windows 7": "windows7"
       }
    },
    "menu-icon" : {

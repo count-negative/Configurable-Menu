@@ -81,6 +81,8 @@ Change Log:
    - Now you can select if description and title of selected app appear, also you can change the font size.
    - Implementation of power buttons box to be modular.
    - Implementation of scroll buttons class to be modular, also now allow to handle the height so much better.
+   - Changed the mode of controlling the numbers of columns of the items view.
+   - Added Windows 7 theme.
 
 0.6-Beta
    - Fixed several bugs.

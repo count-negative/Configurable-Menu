@@ -273,7 +273,7 @@ StaticBox.prototype = {
       this.controlBox = new St.BoxLayout({ vertical: false });
       this.actor.add_actor(this.controlBox);
       this.itemsBox = new St.BoxLayout({ vertical: true });
-
+      this.itemsBox.set_style("padding-left: 10px;");
       this.scrollActor = new ScrollItemsBox(parent, this.itemsBox, true);
       this.actor.add(this.scrollActor.actor, {y_fill: true, expand: true});
      /* this.scrollActor.setAutoScrolling(true);
@@ -401,7 +401,6 @@ StaticBox.prototype = {
       item.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(6)+"px;padding-right: "+(2)+"px;margin:auto;";
       item.actor.connect('enter-event', Lang.bind(this, this._sysButtonEnterEvent));
       item.actor.connect('leave-event', Lang.bind(this, this._sysButtonLeaveEvent));
-
       this.itemsBox.add_actor(item.actor);
       this._staticButtons.push(item);
       return item;
@@ -3348,7 +3347,7 @@ this.aviableWidth = 0;
             case "mint"              :
                           this.loadMint(); 
                           break;
-            case "windows"           :
+            case "windows7"           :
                           this.loadWindows(); 
                           break;
             default                  :
@@ -3366,7 +3365,6 @@ this.aviableWidth = 0;
          this.catBoxIter = new VisibleChildIteratorExtended(this, this.categoriesBox, 1);
          this.categoriesBox._vis_iter = this.catBoxIter;
 
-         this.endBox.add_actor(this.endHorizontalBox);
          this.extendedBox.add(this.standardBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
          this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
 
@@ -3402,6 +3400,7 @@ this.aviableWidth = 0;
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.endBox.add_actor(this.endHorizontalBox);
    },
 
    loadStylized: function() {
@@ -3419,6 +3418,7 @@ this.aviableWidth = 0;
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.endBox.add_actor(this.endHorizontalBox);
    },
 
    loadDragon: function() {
@@ -3440,6 +3440,7 @@ this.aviableWidth = 0;
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.endBox.add_actor(this.endHorizontalBox);
    },
 
    loadDragonInverted: function() {
@@ -3461,6 +3462,7 @@ this.aviableWidth = 0;
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: false });
       this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.endBox.add_actor(this.endHorizontalBox);
    },
 
    loadHorizontal: function() {
@@ -3484,8 +3486,7 @@ this.aviableWidth = 0;
       this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
       this.endBox.add(this.favBoxWrapper, { x_fill: false, y_fill: false, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-     // let heightFav = this.favoritesObj.getRealSpace(); //MAX_FAV_ICON_SIZE*(this.favoritesLinesNumber+1) + 1;
-     // this.favoritesBox.set_style('max-height: ' + heightFav + 'px; min-height: ' + heightFav + 'px');
+      this.endBox.add_actor(this.endHorizontalBox);
    },
 
    loadAccessible: function() {
@@ -3504,6 +3505,7 @@ this.aviableWidth = 0;
       this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.staticBox.actor, { y_fill: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.endBox.add_actor(this.endHorizontalBox);
    },
 
    loadAccessibleInverted: function() {
@@ -3522,6 +3524,7 @@ this.aviableWidth = 0;
       this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.staticBox.actor, { y_fill: true });
+      this.endBox.add_actor(this.endHorizontalBox);
    },
 
    loadMint: function() {
@@ -3542,14 +3545,13 @@ this.aviableWidth = 0;
       this.operativePanel.visible = false;
       this.mainBox.add(this.staticBox.actor, { y_fill: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.operativePanel.style_class = 'menu-favorites-box'; 
+      this.operativePanel.style_class = 'menu-favorites-box';
+      this.endBox.add_actor(this.endHorizontalBox);
    },
 
    loadWindows: function() {
       this.allowFavName = true;
-      this.controlBox.add(this.searchEntry, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.btChanger = new ButtonChangerBox(this, "forward", [_("All Applications"), _("Favorites")], 0, Lang.bind(this, this._onPanelWindowsChange));
-      this.controlSearchBox.add(this.btChanger.actor, {x_fill: false, x_align: St.Align.END, y_align: St.Align.START, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
@@ -3560,10 +3562,16 @@ this.aviableWidth = 0;
       this.betterPanel.set_vertical(true);
       this.betterPanel.add(this.favBoxWrapper, { x_fill: true, y_fill: true, y_align: St.Align.MIDDLE, expand: true });
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.betterPanel.add(this.btChanger.actor, { x_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: false });
+      this.betterPanel.add(this.searchEntry, { x_fill: false, x_align: St.Align.START, y_align: St.Align.END, y_fill: false, expand: false });
+      this.betterPanel.add_actor(this.endHorizontalBox);
       this.operativePanel.visible = false;
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.staticBox.actor, { y_fill: true });
-      this.operativePanel.style_class = 'menu-favorites-box'; 
+      this.favoritesBox.style_class = '';
+      this.betterPanel.style_class = 'menu-favorites-box';
+      this.btChanger.actor.set_style("padding-top: 6px;");
+      this.endHorizontalBox.set_style("padding-right: 2px;");
    },
 
    _onPanelMintChange: function(selected) {
@@ -3578,14 +3586,19 @@ this.aviableWidth = 0;
    },
 
    _onPanelWindowsChange: function(selected) {
+     try {
       let operPanelVisible = false;
       let titleAppBar = _("All Applications");
       if(titleAppBar == selected)
          operPanelVisible = true;
       this._clearView();
+      this.staticBox.actor.visible = operPanelVisible;
       this.operativePanel.visible = !operPanelVisible;
       this.favBoxWrapper.visible = operPanelVisible;
       this._updateView();
+     } catch(e) {
+        Main.notify("Error", e.message);
+     }
    },
 
    _clearAllSelections: function(hide_apps) {
