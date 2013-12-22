@@ -249,11 +249,11 @@
       "description" : "Size of selected application description:",
       "tooltip" : "Size of font in selected application description."
    },
-   "controling-width" : {
+   "controling-size" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "Controling the width",
-      "tooltip": "Choose whether or not to controling the width of the menu."
+      "description": "Controling the size",
+      "tooltip": "Choose whether or not to controling the size of the menu."
    },
    "width" : {
       "type": "spinbutton",
@@ -265,13 +265,7 @@
       "description" : "Width:",
       "tooltip" : "Width of menu.",
       "indent": true,
-      "dependency": "controling-width"
-   },
-   "controling-height" : {
-      "type" : "checkbox",
-      "default" : false,
-      "description": "Controling the height",
-      "tooltip": "Choose whether or not to controling the height of the menu."
+      "dependency": "controling-size"
    },
    "height" : {
       "type": "spinbutton",
@@ -283,7 +277,7 @@
       "description" : "Height:",
       "tooltip" : "Height of menu.",
       "indent": true,
-      "dependency": "controling-height"
+      "dependency": "controling-size"
    },
    "scroll-favorites" : {
       "type" : "checkbox",
@@ -291,7 +285,7 @@
       "description": "Scroll of favorites visible",
       "tooltip": "Choose whether or not to make the scroll of favorites visible.",
       "indent": true,
-      "dependency": "controling-height"
+      "dependency": "controling-size"
    },
    "scroll-categories" : {
       "type" : "checkbox",
@@ -299,7 +293,7 @@
       "description": "Scroll of categories visible",
       "tooltip": "Choose whether or not to make the scroll of categories visible.",
       "indent": true,
-      "dependency": "controling-height"
+      "dependency": "controling-size"
    },
    "scroll-applications" : {
       "type" : "checkbox",
@@ -307,6 +301,6 @@
       "description": "Scroll of applications visible",
       "tooltip": "Choose whether or not to make the scroll of applications visible.",
       "indent": true,
-      "dependency": "controling-height"
+      "dependency": "controling-size"
    }
 }

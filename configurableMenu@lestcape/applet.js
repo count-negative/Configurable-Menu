@@ -2586,11 +2586,10 @@ this.aviableWidth = 0;
          this.settings.bindProperty(Settings.BindingDirection.IN, "show-app-description", "showAppDescription", this._updateAppSelectedText, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "app-description-size", "appDescriptionSize", this._updateAppSelectedText, null);
 
-         this.settings.bindProperty(Settings.BindingDirection.IN, "controling-width", "controlingWidth", this._updateWidth, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "controling-size", "controlingSize", this._updateSize, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "width", "width", this._updateWidth, null);
-
-         this.settings.bindProperty(Settings.BindingDirection.IN, "controling-height", "controlingHeight", this._updateHeight, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "height", "height", this._updateHeight, null);
+
          this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-favorites", "scrollFavoritesVisible", this._setVisibleScrollFav, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-categories", "scrollCategoriesVisible", this._setVisibleScrollCat, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-applications", "scrollApplicationsVisible", this._setVisibleScrollApp, null);
@@ -3164,81 +3163,66 @@ this.aviableWidth = 0;
       this._update_hover_delay();
    },
 
+   _updateSize: function() {
+      this.mainBox.set_height(0);
+      this.mainBox.set_width(0);
+      this._updateHeight();
+      this._updateWidth();
+   },
+
    _updateHeight: function() {
-      if(this.controlingHeight) {
+      if(this.controlingSize) {
         this.mainBox.set_height(this.height);
       }
       else {
          let scrollBoxHeight = 0;
          if(this.favBoxWrapper.get_parent() != this.betterPanel)
-            scrollBoxHeight = this.favoritesBox.get_height() + this.endHorizontalBox.get_height() + 10;
+            scrollBoxHeight = this.favBoxWrapper.get_height() + this.endHorizontalBox.get_height() + 10;
          if(this.categoriesBox.get_height() + this.controlSearchBox.get_height()+ this.endHorizontalBox.get_height() + 10 > scrollBoxHeight)
             scrollBoxHeight = this.categoriesBox.get_height() + this.controlSearchBox.get_height() + this.endHorizontalBox.get_height() + 10;
-//         this.selectedAppBox.get_height() + this.endHorizontalBox.get_height()
          if(scrollBoxHeight < 300)
             scrollBoxHeight = 300;
          this.mainBox.set_height(scrollBoxHeight);
-         //this.applicationsScrollBox.set_height(scrollBoxHeight);
-         /*if(this.favBoxWrapper.get_parent() == this.betterPanel)
-            this.favBoxWrapper.set_height(scrollBoxHeight);
-         else
-         this.favBoxWrapper.set_height(-1);
-         this.favoritesBox.set_height(-1);
-         this.categoriesBox.set_height(-1);
-         this.applicationsBox.set_height(-1);
-         this.betterPanel.set_height(-1);*/
       }
    },
 
    _updateWidth: function() {
-      if(this.controlingHeight) {
-         let oldWidth = this.mainBox.get_width();
-         this.mainBox.set_width(this.width);
-         this._updateView();
-      } else {
-         if(!this.categoriesBox.get_vertical()) {
-            if(!this.favoritesObj.getVertical()) {
-               if(this.applicationsBox.get_width() < this.favBoxWrapper.get_width())
-                  this.applicationsBox.set_width(this.favBoxWrapper.get_width());
-            }
-            else {
-               /*this.categoriesBox.set_width(80);
-               this.applicationsBox.set_width(-1);*/
-               let currWidth = this.applicationsBox.get_width();
-               if(currWidth < this.endHorizontalBox.get_width())
-                  currWidth = this.endHorizontalBox.get_width();
-               if(currWidth < this.controlSearchBox.get_width()-10)
-                  currWidth = this.controlSearchBox.get_width()-10;
-            }
-            this.categoriesBox.set_width(this.applicationsBox.get_width());
+      let oldWidth = this.mainBox.get_width();
+      let minWidth = this._minimalWidth();
+      if(this.controlingSize) {
+         if(minWidth > this.width) {
+            this.mainBox.set_width(minWidth);
+            Mainloop.idle_add(Lang.bind(this, function() {
+               this._updateView();
+            }));
          }
          else {
-            if(this.favBoxWrapper.get_parent() == this.betterPanel) {
-               if((this._applicationsBoxWidth)&&(this._applicationsBoxWidth != 0))
-                  this.applicationsBox.set_width(this.iconViewCount*this._applicationsBoxWidth + 42); // The answer to life...
-                /*if(this.favoritesScrollBox.get_width() > this.applicationsBox.get_width() + this.categoriesBox.get_width() + 20)
-                  this.applicationsBox.set_width(this.favoritesScrollBox.get_width() - this.categoriesBox.get_width() - 20);
-                if(this.favoritesScrollBox.get_width() < this.applicationsBox.get_width() + this.categoriesBox.get_width() + 20)*/
-               //this.favoritesScrollBox.set_width(this.applicationsBox.get_width() + this.categoriesBox.get_width() + 20);
-               //this.favoritesBox.set_width(this.applicationsBox.get_width() + this.categoriesBox.get_width() + 20);
-
-               /* if(this.favoritesScrollBox.get_width() > this.applicationsBox.get_width() + this.categoriesBox.get_width() + 20)
-               this.applicationsBox.set_width(this.favoritesScrollBox.get_width() - this.categoriesBox.get_width() - 20);
-               this.favoritesScrollBox.set_width(this.applicationsBox.get_width() + this.categoriesBox.get_width() + 20); */
-            }
+            this.mainBox.set_width(this.width);
+            this._updateView();
          }
+         
+      } else {
+         if(minWidth > oldWidth) {
+            this.mainBox.set_width(minWidth);
+         }
+         Mainloop.idle_add(Lang.bind(this, function() {
+            this._updateView();
+         }));
       }
    },
-/*
-   _internalHeight: function(pane) {
-      let actors = pane.get_children();
-      let result = 0;
-      for(var i = 0; i < actors.length; i++) {
-         result += actors[i].get_height(); 
-      }
-      return result;
+
+   _minimalWidth: function(pane) {
+      let width = 0;
+      if((this.staticBox)&&(this.staticBox.actor.visible))
+         width += this.staticBox.actor.get_width();
+      if(this.favBoxWrapper.get_parent() == this.standardBox)
+         width += this.favBoxWrapper.get_width();
+      if(this.categoriesBox.get_vertical())
+         width += this.categoriesWrapper.get_width();
+      width += this._applicationsBoxWidth + 122;
+      return width;
    },
-*/
+
    _onButtonReleaseEvent: function(actor, event) {
       if(!this.activateOnPress)
          CinnamonMenu.MyApplet.prototype._onButtonReleaseEvent.call(this, actor, event);
@@ -3265,7 +3249,6 @@ this.aviableWidth = 0;
       try {
          if(this.selectedAppBox)
             this.selectedAppBox.setDateTimeVisible(false);
-
          this.allowFavName = false;
          this.btChanger = null;
          this._activeContainer = null;
@@ -3331,7 +3314,7 @@ this.aviableWidth = 0;
          this.endHorizontalBox.set_style("padding-right: 20px;");
 
          this.betterPanel = new St.BoxLayout({ vertical: false });
-         this.operativePanel = new St.BoxLayout({ style_class: 'menu-favorites-box', vertical: false });
+         this.operativePanel = new St.BoxLayout({ vertical: false });
          this.categoriesWrapper = new St.BoxLayout({ vertical: true });
          this.operativePanel.add(this.categoriesWrapper, { x_fill: true, expand: false });
          this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
@@ -3368,7 +3351,6 @@ this.aviableWidth = 0;
             case "windows"           :
                           this.loadWindows(); 
                           break;
-
             default                  :
                           this.loadClassic(); 
                           break;
@@ -3560,6 +3542,7 @@ this.aviableWidth = 0;
       this.operativePanel.visible = false;
       this.mainBox.add(this.staticBox.actor, { y_fill: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.operativePanel.style_class = 'menu-favorites-box'; 
    },
 
    loadWindows: function() {
@@ -3580,6 +3563,7 @@ this.aviableWidth = 0;
       this.operativePanel.visible = false;
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.staticBox.actor, { y_fill: true });
+      this.operativePanel.style_class = 'menu-favorites-box'; 
    },
 
    _onPanelMintChange: function(selected) {
