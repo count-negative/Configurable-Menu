@@ -3509,6 +3509,11 @@ MyApplet.prototype = {
             }*/
          }));
 
+         this.menu.actor.connect('leave-event', Lang.bind(this, function(actor) {
+            this.actorResize = null;
+            global.unset_cursor();
+         }));
+
          this.menu.actor.connect('button-release-event', Lang.bind(this, function(actor) {
            this.actorResize = null;
             global.unset_cursor();
