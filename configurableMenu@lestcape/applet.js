@@ -3229,11 +3229,16 @@ MyApplet.prototype = {
    },
 
    _updateHeight: function() {
-      this.mainBox.set_height(-1);
       if(this.controlingSize) {
+         let monitorHeight = Main.layoutManager.primaryMonitor.height;
+         if(this.height > monitorHeight)
+            this.height = monitorHeight;
+         if(this.height < 300)
+            this.height = 300;
          this.mainBox.set_height(this.height);
       }
       else {
+         this.mainBox.set_height(-1);
          this._clearView();
          if(this.btChanger) {
             let operPanelVisible = this.operativePanel.visible;
@@ -3258,16 +3263,14 @@ MyApplet.prototype = {
             if(this.width > monitorWidth) {
                this.width = monitorWidth;
                this.mainBox.set_width(this.width);
-               this._updateView();
             }
             else if(this.width < minWidth) {
                this.width = minWidth + 20;
                this.mainBox.set_width(-1);
-               this._updateView();
             }
+            this._updateView();
          }));
       }
-      this._updateView();
    },
 
    allocationWidth: function(actor) {
@@ -3538,8 +3541,8 @@ MyApplet.prototype = {
          let [ax, ay] = this.actorResize.get_transformed_position();
          posRight = ax + this.actorResize.get_width();
          posTop = ay + this.actorResize.get_height();
-         this.mainBox.set_width(this.mainBox.get_width() + mx - posRight);
-         this.mainBox.set_height(this.mainBox.get_height() +  ay - my);
+         this.mainBox.set_width(this.mainBox.get_width() + mx - posRight + 4);
+         this.mainBox.set_height(this.mainBox.get_height() +  ay - my + 4);
          this.width = this.mainBox.get_width();
          this.height = this.mainBox.get_height();
          this._updateSize();
