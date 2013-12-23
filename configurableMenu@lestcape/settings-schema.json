@@ -284,24 +284,24 @@
       "type" : "checkbox",
       "default" : false,
       "description": "Scroll of favorites visible",
-      "tooltip": "Choose whether or not to make the scroll of favorites visible.",
-      "indent": true,
-      "dependency": "controling-size"
+      "tooltip": "Choose whether or not to make the scroll of favorites visible."
    },
    "scroll-categories" : {
       "type" : "checkbox",
       "default" : true,
       "description": "Scroll of categories visible",
-      "tooltip": "Choose whether or not to make the scroll of categories visible.",
-      "indent": true,
-      "dependency": "controling-size"
+      "tooltip": "Choose whether or not to make the scroll of categories visible."
    },
    "scroll-applications" : {
       "type" : "checkbox",
       "default" : true,
       "description": "Scroll of applications visible",
-      "tooltip": "Choose whether or not to make the scroll of applications visible.",
-      "indent": true,
-      "dependency": "controling-size"
+      "tooltip": "Choose whether or not to make the scroll of applications visible."
+   },
+   "scroll-accessible" : {
+      "type" : "checkbox",
+      "default" : true,
+      "description": "Scroll of accessible box visible",
+      "tooltip": "Choose whether or not to make the scroll of accessible box visible."
    }
 }

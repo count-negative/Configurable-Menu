@@ -276,8 +276,6 @@ StaticBox.prototype = {
       this.itemsBox.set_style("padding-left: 10px;");
       this.scrollActor = new ScrollItemsBox(parent, this.itemsBox, true);
       this.actor.add(this.scrollActor.actor, {y_fill: true, expand: true});
-     /* this.scrollActor.setAutoScrolling(true);
-      this.scrollActor.setScrollVisible(false);*/
 
       this.parent = parent;
       this.hover = hoverIcon;
@@ -323,6 +321,14 @@ StaticBox.prototype = {
       else {
          this.actor.remove_actor(this.powerBox.actor);
       }
+   },
+
+   setAutoScrolling: function(autoScroll) {
+      this.scrollActor.setAutoScrolling(autoScroll);
+   },
+
+   setScrollVisible: function(visible) {
+      this.scrollActor.setScrollVisible(visible);
    },
 
    getFirstElement: function() {
@@ -1007,7 +1013,10 @@ GenericApplicationButtonExtended.prototype = {
    },
     
    _subMenuOpenStateChanged: function() {
-      if(this.menu.isOpen) this.appsMenuButton._scrollToButton(this.menu);
+      if(this.menu.isOpen) {
+         this.appsMenuButton._scrollToButton(this.menu);
+         this.parent._updateWidth();
+      }
    }
 };
 
@@ -1278,10 +1287,11 @@ HoverIcon.prototype = {
 
    _subMenuOpenStateChanged: function() {
        //if (this.menu.isOpen) this.appsMenuButton._scrollToButton(this.menu);
-       if(!this.menu.isOpen) {
+       if(!this.menu.isOpen)
           this.parent.searchEntry.set_width(-1);
+       else
+          this.parent._updateWidth();
           //this.menu.actor.can_focus = false;
-       }
        /*else
           this.menu.actor.can_focus = true;*/
    },
@@ -2493,7 +2503,7 @@ MyApplet.prototype = {
    _init: function(metadata, orientation, panel_height, instance_id) {
       Applet.TextIconApplet.prototype._init.call(this, orientation, panel_height, instance_id);
       try {
-this.aviableWidth = 0;
+         this.aviableWidth = 0;
          this.uuid = metadata["uuid"];
          this.allowFavName = false;
          this.iconAppSize = 22;
@@ -2585,13 +2595,14 @@ this.aviableWidth = 0;
          this.settings.bindProperty(Settings.BindingDirection.IN, "show-app-description", "showAppDescription", this._updateAppSelectedText, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "app-description-size", "appDescriptionSize", this._updateAppSelectedText, null);
 
-         this.settings.bindProperty(Settings.BindingDirection.IN, "controling-size", "controlingSize", this._updateSize, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "width", "width", this._updateWidth, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "height", "height", this._updateHeight, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "controling-size", "controlingSize", this._updateSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "width", "width", this._updateWidth, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "height", "height", this._updateHeight, null);
 
          this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-favorites", "scrollFavoritesVisible", this._setVisibleScrollFav, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-categories", "scrollCategoriesVisible", this._setVisibleScrollCat, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-applications", "scrollApplicationsVisible", this._setVisibleScrollApp, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-accessible", "scrollAccessibleVisible", this._setVisibleScrollAccess, null);
 
          this._searchInactiveIcon = new St.Icon({ style_class: 'menu-search-entry-icon',
                                                   icon_name: 'edit-find',
@@ -2969,6 +2980,7 @@ this.aviableWidth = 0;
    },
 
    _updateView: function() {
+      this._clearView();
       let visibleAppButtons = new Array();
       for(let i = 0; i < this._applicationsButtons.length; i++) {
          if(this._applicationsButtons[i].actor.visible) {
@@ -2994,8 +3006,6 @@ this.aviableWidth = 0;
             visibleAppButtons.push(this._transientButtons[i]);
          }
       }
-     
-      this._clearView();
 // + 42
       this.aviableWidth = this.applicationsScrollBox.actor.get_allocation_box().x2-this.applicationsScrollBox.actor.get_allocation_box().x1 - 42;
       if((this.aviableWidth > 0)&&(this._applicationsBoxWidth > 0)) {
@@ -3005,6 +3015,7 @@ this.aviableWidth = 0;
          if(this.iconViewCount < 1)
             this.iconViewCount = 1; 
       }
+      this.appBoxIter.setNumberView(this.iconViewCount);
 
       let viewBox, currValue, falseActor;
       for(let i = 0; i < this.iconViewCount; i++) {
@@ -3016,7 +3027,7 @@ this.aviableWidth = 0;
          for(let i = 0; i < visibleAppButtons.length; i += this.iconViewCount) {
             for(let j = 0; j < this.iconViewCount; j++) {
                currValue = i + j;
-               if(currValue < visibleAppButtons.length) {
+               if((currValue < visibleAppButtons.length)&&(viewBox[j])) {
                   viewBox[j].add_actor(visibleAppButtons[currValue].actor);   
                   if(visibleAppButtons[currValue].menu)
                      viewBox[j].add_actor(visibleAppButtons[currValue].menu.actor);
@@ -3029,7 +3040,7 @@ this.aviableWidth = 0;
             }
          }
       } catch(e) {
-        //Main.notify("Error10", e.message);
+       // Main.notify("Error10", e.message);
       }
    },
 
@@ -3051,6 +3062,8 @@ this.aviableWidth = 0;
       this.applicationsScrollBox.setAutoScrolling(this.autoscroll_enabled);
       this.categoriesScrollBox.setAutoScrolling(this.autoscroll_enabled);
       this.favoritesScrollBox.setAutoScrolling(this.autoscroll_enabled);
+      if(this.staticBox)
+         this.staticBox.setAutoScrolling(this.autoscroll_enabled);
    },
 
    _setIconMaxFavSize: function() {
@@ -3127,6 +3140,12 @@ this.aviableWidth = 0;
       }
    },
 
+   _setVisibleScrollAccess: function() {
+      if(this.staticBox) {
+         this.staticBox.setScrollVisible(this.scrollAccessibleVisible);
+      }
+   },
+
    _updateAppSelectedText: function() {
       this.selectedAppBox.setTitleVisible(this.showAppTitle);
       this.selectedAppBox.setDescriptionVisible(this.showAppDescription);
@@ -3153,6 +3172,7 @@ this.aviableWidth = 0;
       this._setVisibleScrollFav();
       this._setVisibleScrollCat();
       this._setVisibleScrollApp();
+      this._setVisibleScrollAccess();
       this._updateAppSelectedText();
       this._updateTimeDateFormat();
       this._update_autoscroll();
@@ -3160,13 +3180,21 @@ this.aviableWidth = 0;
       this._updateActivateOnHover();
       this._updateIconAndLabel();
       this._update_hover_delay();
+      this._updateSize();
    },
 
    _updateSize: function() {
-      this.mainBox.set_height(0);
-      this.mainBox.set_width(0);
-      this._updateHeight();
-      this._updateWidth();
+      this.mainBox.set_height(-1);
+      this.mainBox.set_width(-1);
+      if(this.controlingSize) {
+         this._updateHeight();
+         this._updateWidth();
+      } else {
+         Mainloop.idle_add(Lang.bind(this, function() {
+            this._updateHeight();
+            this._updateWidth();
+         }));
+      }
    },
 
    _updateHeight: function() {
@@ -3174,51 +3202,82 @@ this.aviableWidth = 0;
         this.mainBox.set_height(this.height);
       }
       else {
-         let scrollBoxHeight = 0;
-         if(this.favBoxWrapper.get_parent() != this.betterPanel)
-            scrollBoxHeight = this.favBoxWrapper.get_height() + this.endHorizontalBox.get_height() + 10;
-         if(this.categoriesBox.get_height() + this.controlSearchBox.get_height()+ this.endHorizontalBox.get_height() + 10 > scrollBoxHeight)
-            scrollBoxHeight = this.categoriesBox.get_height() + this.controlSearchBox.get_height() + this.endHorizontalBox.get_height() + 10;
-         if(scrollBoxHeight < 300)
-            scrollBoxHeight = 300;
+         let scrollBoxHeight = this._minimalHeight();
          this.mainBox.set_height(scrollBoxHeight);
       }
    },
 
    _updateWidth: function() {
-      let oldWidth = this.mainBox.get_width();
+     // let oldWidth = this.mainBox.get_width();
       let minWidth = this._minimalWidth();
       if(this.controlingSize) {
-         if(minWidth > this.width) {
-            this.mainBox.set_width(minWidth);
-            Mainloop.idle_add(Lang.bind(this, function() {
-               this._updateView();
-            }));
-         }
-         else {
-            this.mainBox.set_width(this.width);
-            this._updateView();
-         }
-         
+         this.mainBox.set_width(this.width);
+         this._updateView();
       } else {
-         if(minWidth > oldWidth) {
-            this.mainBox.set_width(minWidth);
-         }
-         Mainloop.idle_add(Lang.bind(this, function() {
-            this._updateView();
-         }));
+         this.mainBox.set_width(minWidth);
+         this._updateView();
       }
    },
 
-   _minimalWidth: function(pane) {
+   allocationWidth: function(actor) {
+      return actor.get_allocation_box().x2-actor.get_allocation_box().x1;
+   },
+
+   allocationHeight: function(actor) {
+      return actor.get_allocation_box().y2-actor.get_allocation_box().y1;
+   },
+
+   _minimalHeight: function() {
+      let scrollBoxHeight = this.categoriesBox.get_height() + this.controlSearchBox.get_height() + this.endHorizontalBox.get_height() + 10;
+      if(this.favBoxWrapper.get_parent() == this.betterPanel) {
+         if((this.endBox.get_parent() == this.betterPanel) && (this.categoriesBox.get_height() + this.endBox.get_height() +
+            this.controlSearchBox.get_height() + 18 > scrollBoxHeight))
+            scrollBoxHeight = this.categoriesBox.get_height() + this.endBox.get_height() + this.controlSearchBox.get_height() + 18;
+         else if(this.categoriesBox.get_height() + 18 + this.controlSearchBox.get_height() + this.endHorizontalBox.get_height() > scrollBoxHeight)
+            scrollBoxHeight = this.categoriesBox.get_height() + 18 + this.controlSearchBox.get_height() + this.endHorizontalBox.get_height();
+      } else if(this.favBoxWrapper.get_height() + this.endHorizontalBox.get_height() + 10 > scrollBoxHeight)
+         scrollBoxHeight = this.favBoxWrapper.get_height() + this.endHorizontalBox.get_height() + 10;
+      if(!this.favBoxWrapper.get_vertical()) {
+         scrollBoxHeight = this.favoritesBox.get_height() + this.categoriesBox.get_height() + this.controlSearchBox.get_height() +
+                           this.endHorizontalBox.get_height() + 100;
+      }
+      if(scrollBoxHeight < 300)
+         scrollBoxHeight = 300;
+      let monitorHeight = Main.layoutManager.primaryMonitor.height;
+      if(monitorHeight < scrollBoxHeight)
+         scrollBoxHeight = monitorHeight - 20;
+      return scrollBoxHeight;
+   },
+
+   _minimalWidth: function() {
       let width = 0;
-      if((this.staticBox)&&(this.staticBox.actor.visible))
-         width += this.staticBox.actor.get_width();
-      if(this.favBoxWrapper.get_parent() == this.standardBox)
-         width += this.favBoxWrapper.get_width();
-      if(this.categoriesBox.get_vertical())
-         width += this.categoriesWrapper.get_width();
-      width += this._applicationsBoxWidth + 122;
+      if(this.favBoxWrapper.get_parent() == this.betterPanel) {
+         if(this.endBox.get_parent() != this.betterPanel) {
+            if(this.staticBox.actor.get_width() + this.controlSearchBox.get_width() + 18 > width)
+               width = this.staticBox.actor.get_width() + this.controlSearchBox.get_width() + 20;
+         }
+         else {
+            //this.staticBox.actor.get_width() + this.searchEntry.get_width();
+            width = this.staticBox.actor.get_width() + this.operativePanel.get_width() //- 120;
+         }
+      } else {
+         if((this.staticBox)&&(this.staticBox.actor.visible))
+            width += this.staticBox.actor.get_width();
+         if(this.favBoxWrapper.get_parent() == this.standardBox)
+            width += this.favBoxWrapper.get_width();
+         if(this.categoriesBox.get_vertical())
+            width += this.categoriesBox.get_width();
+         width += this._applicationsBoxWidth + 122;
+         if(this.favBoxWrapper.get_parent() == this.standardBox) {
+            if(this.controlSearchBox.get_width() + this.favBoxWrapper.get_width() > width)
+               width = this.controlSearchBox.get_width() + this.favBoxWrapper.get_width() + 20;
+         } else if(this.favBoxWrapper.get_parent() == this.endBox) {
+            width = this.controlSearchBox.get_width() + 20;
+         }
+      }
+      let monitorWidth = Main.layoutManager.primaryMonitor.width;
+      if(monitorWidth < width)
+         width = monitorWidth - 20;
       return width;
    },
 
@@ -3321,6 +3380,7 @@ this.aviableWidth = 0;
          this.mainBox = new St.BoxLayout({ vertical: false,  style_class: 'menu-applications-box' });
          //this.mainBox.set_style("padding-right: 20px;");
          this.extendedBox = new St.BoxLayout({ vertical: true });
+         this.extendedBox.add(this.standardBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
 
          switch(this.theme) {
             case "classic"           :
@@ -3365,9 +3425,6 @@ this.aviableWidth = 0;
          this.catBoxIter = new VisibleChildIteratorExtended(this, this.categoriesBox, 1);
          this.categoriesBox._vis_iter = this.catBoxIter;
 
-         this.extendedBox.add(this.standardBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
-         this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
-
          this._refreshApps();
 
          this.signalKeyPowerID = 0;
@@ -3376,8 +3433,8 @@ this.aviableWidth = 0;
          section.actor.add_actor(this.mainBox);
 
          Mainloop.idle_add(Lang.bind(this, function() {
-            this._updateHeight();//Add by me
-            this._updateWidth();
+            //this._updateHeight();//Add by me
+            //this._updateWidth();
             this._clearAllSelections(true);
          }));
       } catch(e) {
@@ -3396,10 +3453,11 @@ this.aviableWidth = 0;
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: true, y_align: St.Align.START, expand: true });
       this.powerBox = new PowerBox(this, true, this.iconPowerSize, false, this.hover, this.selectedAppBox);
       this.favBoxWrapper.add(this.powerBox.actor, { y_align: St.Align.END, y_fill: false, expand: false });
-      this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.END, expand: false });
+      this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.END, y_fill: false, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
-      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endBox.add_actor(this.endHorizontalBox);
    },
 
@@ -3411,13 +3469,14 @@ this.aviableWidth = 0;
       this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
-      this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: true, y_align: St.Align.START, expand: false });
+      this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.START, expand: true });
       this.powerBox = new PowerBox(this, false, this.iconPowerSize, false, this.hover, this.selectedAppBox);
       this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
-      this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
+      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endBox.add_actor(this.endHorizontalBox);
    },
 
@@ -3438,8 +3497,9 @@ this.aviableWidth = 0;
       this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
-      this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
+      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endBox.add_actor(this.endHorizontalBox);
    },
 
@@ -3460,8 +3520,9 @@ this.aviableWidth = 0;
       this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: false });
-      this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
+      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endBox.add_actor(this.endHorizontalBox);
    },
 
@@ -3483,9 +3544,10 @@ this.aviableWidth = 0;
       this.powerBox = new PowerBox(this, false, this.iconPowerSize, false, this.hover, this.selectedAppBox);
       this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
-      this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
+      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.endBox.add(this.favBoxWrapper, { x_fill: false, y_fill: false, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endBox.add_actor(this.endHorizontalBox);
    },
 
@@ -3494,7 +3556,7 @@ this.aviableWidth = 0;
       this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
-      this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: true, y_align: St.Align.START, expand: false });
+      this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.START, expand: true });
       this.powerBox = new PowerBox(this, false, this.iconPowerSize, true, this.hover, this.selectedAppBox);
       this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
       //this.staticBox.takeHover(true);
@@ -3502,9 +3564,10 @@ this.aviableWidth = 0;
       //this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: false });
-      this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
+      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.staticBox.actor, { y_fill: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endBox.add_actor(this.endHorizontalBox);
    },
 
@@ -3521,9 +3584,10 @@ this.aviableWidth = 0;
       //this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: false, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
-      this.betterPanel.add(this.operativePanel, { y_fill: true, y_align: St.Align.START, expand: true });
+      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.staticBox.actor, { y_fill: true });
+      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endBox.add_actor(this.endHorizontalBox);
    },
 
@@ -3546,6 +3610,7 @@ this.aviableWidth = 0;
       this.mainBox.add(this.staticBox.actor, { y_fill: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.operativePanel.style_class = 'menu-favorites-box';
+      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endBox.add_actor(this.endHorizontalBox);
    },
 
@@ -3562,9 +3627,11 @@ this.aviableWidth = 0;
       this.betterPanel.set_vertical(true);
       this.betterPanel.add(this.favBoxWrapper, { x_fill: true, y_fill: true, y_align: St.Align.MIDDLE, expand: true });
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.betterPanel.add(this.btChanger.actor, { x_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: false });
-      this.betterPanel.add(this.searchEntry, { x_fill: false, x_align: St.Align.START, y_align: St.Align.END, y_fill: false, expand: false });
-      this.betterPanel.add_actor(this.endHorizontalBox);
+      this.endBox.add(this.btChanger.actor, { x_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: false });
+      this.endBox.add(this.searchEntry, { x_fill: false, x_align: St.Align.START, y_align: St.Align.END, y_fill: false, expand: false });
+//      this.endBox.add(this.endHorizontalBox, { x_fill: false, x_align: St.Align.START, y_align: St.Align.END, y_fill: false, expand: false });
+      this.endBox.add_actor(this.endHorizontalBox);
+      this.betterPanel.add(this.endBox, { x_fill: true, y_align: St.Align.START, y_align: St.Align.END, expand: false });
       this.operativePanel.visible = false;
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.staticBox.actor, { y_fill: true });
@@ -3812,6 +3879,8 @@ this.aviableWidth = 0;
       this._activeContainer = null;
       //this.favoritesScrollBox.set_width(-1);
       //Remove all categories
+      this._clearView();
+      this.iconViewCount = 1;
       this.categoriesBox.destroy_all_children();
 
       this._allAppsCategoryButton = new CategoryButtonExtended(null, this.iconCatSize);
@@ -3909,7 +3978,7 @@ this.aviableWidth = 0;
 
       this._refreshPlacesAndRecent();
 
-      Mainloop.idle_add(Lang.bind(this, function() {
+      //Mainloop.idle_add(Lang.bind(this, function() {
       try {
          if(!this.categoriesBox.get_vertical()) {
             for(let i = 0; i < this._categoryButtons.length; i++) {
@@ -3919,9 +3988,8 @@ this.aviableWidth = 0;
          this._clearPrevCatSelection(this._allAppsCategoryButton.actor);
          this._allAppsCategoryButton.actor.style_class = "menu-category-button-selected";
          this._select_category(null, this._allAppsCategoryButton);
-         this.appBoxIter.setNumberView(this.iconViewCount);
       } catch(e) {Main.notify("errr", e.message);}
-      }));
+     // }));
    },
 
    _refreshPlacesAndRecent : function() {
@@ -4176,16 +4244,18 @@ this.aviableWidth = 0;
          this._activeContainer = null;
          this._activeActor = null;
          this.initButtonLoad = 30;
-         let n = Math.min(this._applicationsButtons.length, this.initButtonLoad)
-         for(let i = 0; i < n; i++) {
+         /*let n = Math.min(this._applicationsButtons.length, this.initButtonLoad)
+         for(let i = 0; i < this._applicationsButtons.length; i++) {
             if(!this._applicationsButtons[i].actor.visible) {
                 this._applicationsButtons[i].actor.show();
             }
-         }
+         }*/
+         this._displayButtons(this._listApplications(null));
          this._allAppsCategoryButton.actor.style_class = "menu-category-button-selected";
          Mainloop.idle_add(Lang.bind(this, this._initial_cat_selection));
          this._updateView();
-      } else {
+      }
+      else {
          this.actor.remove_style_pseudo_class('active');
          if(this.searchActive) {
             this.resetSearch();
