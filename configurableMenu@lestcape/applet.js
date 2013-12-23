@@ -3465,6 +3465,52 @@ MyApplet.prototype = {
          this.signalKeyPowerID = 0;
          this._update_autoscroll();
 
+         this.menu.actor.connect('motion-event', Lang.bind(this, function(actor, event) {
+            if(!this.actorResize) {
+               let dMin = 50;
+               let [mx, my] = event.get_coords();
+               let [ax, ay] = actor.get_transformed_position();
+
+               posRight = ax + actor.get_width();
+               posTop = ay + actor.get_height();
+               if(((mx > ax)&&(mx < posRight))&&((my > ay)&&(my < posTop))) {
+                  if((mx > posRight - dMin)&&(my < ay + dMin)) {
+                     global.set_cursor(Cinnamon.Cursor.DND_MOVE);
+                  } else
+                     global.unset_cursor();
+               } else
+                  global.unset_cursor();
+            }   
+         }));
+
+         this.menu.actor.get_parent().set_style("padding-top: 0px;");
+         this.menu.actor.set_style("padding-top: 0px;");
+         this.menu.actor.connect('button-press-event', Lang.bind(this, function(actor, event) {
+            this.actorResize = actor;
+            global.set_cursor(Cinnamon.Cursor.DND_MOVE);
+            let dMin = 50;
+            let [mx, my] = event.get_coords();
+            let [ax, ay] = actor.get_transformed_position();
+
+            posRight = ax + actor.get_width();
+            posTop = ay + actor.get_height();
+            if(((mx > ax)&&(mx < posRight))&&((my > ay)&&(my < posTop))) {
+               if((mx > posRight - dMin)&&(my < ay + dMin)) {
+                  this._doResize();
+               }
+            }
+            /*if(((mx > ax)&&(mx < posRight))&&((my > ay)&&(my < posTop))) {
+               if((mx > posRight - dMin)&&(my > posTop - dMin)) {
+                  Main.notify("tamos");
+               }
+            }*/
+         }));
+
+         this.menu.actor.connect('button-release-event', Lang.bind(this, function(actor) {
+           this.actorResize = null;
+            global.unset_cursor();
+         }));
+         
          section.actor.add_actor(this.mainBox);
 
          Mainloop.idle_add(Lang.bind(this, function() {
@@ -3484,6 +3530,22 @@ MyApplet.prototype = {
          Main.notify("Error:", e.message);
       }
    },
+
+   _doResize: function(actor) {
+      if(this.actorResize) {
+         let dMin = 10;
+         let [mx, my, mask] = global.get_pointer();
+         let [ax, ay] = this.actorResize.get_transformed_position();
+         posRight = ax + this.actorResize.get_width();
+         posTop = ay + this.actorResize.get_height();
+         this.mainBox.set_width(this.mainBox.get_width() + mx - posRight);
+         this.mainBox.set_height(this.mainBox.get_height() +  ay - my);
+         this.width = this.mainBox.get_width();
+         this.height = this.mainBox.get_height();
+         this._updateSize();
+         Mainloop.timeout_add(300, Lang.bind(this, this._doResize));
+      }
+   }, 
 
    loadClassic: function() {
       this.controlSearchBox.add(this.hover.actor, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
@@ -3649,7 +3711,7 @@ MyApplet.prototype = {
       this.betterPanel.set_vertical(true);
       this.betterPanel.add(this.favBoxWrapper, { x_fill: true, y_fill: true, y_align: St.Align.MIDDLE, expand: true });
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      //this.operativePanel.visible = false;
+      this.operativePanel.visible = false;
       this.mainBox.add(this.staticBox.actor, { y_fill: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.operativePanel.style_class = 'menu-favorites-box';
@@ -4343,6 +4405,8 @@ MyApplet.prototype = {
          this._updateSize();
       }
       else {
+         this.actorResize = null;
+         global.unset_cursor();
          this.actor.remove_style_pseudo_class('active');
          if(this.searchActive) {
             this.resetSearch();
