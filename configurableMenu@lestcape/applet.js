@@ -3261,7 +3261,8 @@ MyApplet.prototype = {
                this._updateView();
             }
             else if(this.width < minWidth) {
-               this.mainBox.set_width(minWidth);
+               this.width = minWidth + 20;
+               this.mainBox.set_width(-1);
                this._updateView();
             }
          }));
@@ -3471,6 +3472,13 @@ MyApplet.prototype = {
             //this._updateWidth();
             //this._updateSize();
             this._clearAllSelections(true);
+//this works here.
+        /* let maxV = 0;   
+         for(let i = 0; i < this._applicationsButtons.length; i++) {
+            if(this._applicationsButtons[i].actor.get_width() > maxV) {
+                maxV = this._applicationsButtons[i].actor.get_width();
+            }
+         }*/
          }));
       } catch(e) {
          Main.notify("Error:", e.message);
