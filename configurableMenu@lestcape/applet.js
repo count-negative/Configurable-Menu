@@ -3879,13 +3879,11 @@ MyApplet.prototype = {
             //this._updateWidth();
             //this._updateSize();
             this._clearAllSelections(true);
-//this works here.
-        /* let maxV = 0;   
-         for(let i = 0; i < this._applicationsButtons.length; i++) {
-            if(this._applicationsButtons[i].actor.get_width() > maxV) {
-                maxV = this._applicationsButtons[i].actor.get_width();
+            this._applicationsBoxWidth = 0;   
+            for(let i = 0; i < this._applicationsButtons.length; i++) {
+               if(this._applicationsButtons[i].actor.get_width() > this._applicationsBoxWidth)
+                  this._applicationsBoxWidth = this._applicationsButtons[i].actor.get_width();
             }
-         }*/
          }));
       } catch(e) {
          Main.notify("Error:", e.message);
@@ -4736,14 +4734,15 @@ MyApplet.prototype = {
          this._activeContainer = null;
          this._activeActor = null;
          this.initButtonLoad = 30;
-         /*let n = Math.min(this._applicationsButtons.length, this.initButtonLoad)
-         for(let i = 0; i < this._applicationsButtons.length; i++) {
-            if(!this._applicationsButtons[i].actor.visible) {
-                this._applicationsButtons[i].actor.show();
+         let n = Math.min(this._applicationsButtons.length, this.initButtonLoad)
+         if(!this.displayed) {
+            for(let i = 0; i < this._applicationsButtons.length; i++) {
+               if(!this._applicationsButtons[i].actor.visible)
+                  this._applicationsButtons[i].actor.show();
             }
-         }*/
-         if(!this.displayed)
-           this._displayButtons(this._listApplications(null));
+         }
+        /* if(!this.displayed)
+           this._displayButtons(this._listApplications(null));*/
          this.displayed = true;
          this._allAppsCategoryButton.actor.style_class = "menu-category-button-selected";
          Mainloop.idle_add(Lang.bind(this, this._initial_cat_selection));
