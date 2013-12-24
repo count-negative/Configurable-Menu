@@ -8,28 +8,15 @@ This is a frock of Main Cinnamon menu applet with more configurable options.
 
 Skills including:
 
-1.	Can be active OnButtonPress action instead of OnButtonRelease.
-
-2.	You can control the menu width and height using the mouse and settings.
-
-3.	Support the theme change with several differents layouts.
-
-4.	You have a hover icon like in windows menu.
-
-5.	Enable and disable favorites, hover icon, power buttons...
-
-6.	Separate power buttons of favorites.
-
-7.	Different modes of view menu items.
-
-8.	Favorites with multiple lines.
-
-8.	You can Drag and Drop items to the desktop, physics windows app icon list...
-
-9.	Auto-Scroll also horizontal.
-
-10.	And more for the future.
-
+   1. Can be active OnButtonPress action instead of OnButtonRelease.
+   2. You can control the menu width and height using the mouse and settings.
+   3. Support the theme change with several differents layouts.
+   4. You have a hover icon like in windows menu.
+   5. Enable and disable favorites.
+   6. Separate power buttons of favorites.
+   7. Different modes of view menu items.
+   8. Favorites with multiple lines.
+   9. And more for the future.
 
 This program is free software:
 

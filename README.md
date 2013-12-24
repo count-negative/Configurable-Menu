@@ -5,7 +5,7 @@ Applet: Configurable Menu Version: v0.7-Beta
 
 O.S.: Cinnamon 
 
-Release Date: 17 dicember 2013
+Release Date: 24 dicember 2013
 
 Author: Lester Carballo Pérez
 
@@ -27,19 +27,25 @@ Skills including:
 
 1.	Can be active OnButtonPress action instead of OnButtonRelease.
 
-2.	You can control the menu with scrolling the height.
+2.	You can control the menu width and height using the mouse and settings.
 
-3.	Support for theme change.
+3.	Support the theme change with several differents layouts.
 
-4.	Enable and disable favorites.
+4.	You have a hover icon like in windows menu.
 
-5.	Separate power button of favorites.
+5.	Enable and disable favorites, hover icon, power buttons...
 
-6.	Different modes of view menu items.
+6.	Separate power buttons of favorites.
 
-7.	Favorites with multiple lines.
+7.	Different modes of view menu items.
 
-8.	And more for the future.
+8.	Favorites with multiple lines.
+
+8.	You can Drag and Drop items to the desktop, physics windows app icon list...
+
+9.	Auto-Scroll also horizontal.
+
+10.	And more for the future.
 
 
 This program is free software:
@@ -83,6 +89,7 @@ Change Log:
    - Implementation of scroll buttons class to be modular, also now allow to handle the height so much better.
    - Changed the mode of controlling the numbers of columns of the items view.
    - Added Windows 7 theme.
+   - Added option to resize the menu with the mouse.
 
 0.6-Beta
    - Fixed several bugs.
