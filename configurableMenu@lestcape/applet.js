@@ -73,6 +73,7 @@ const AccountsService = imports.gi.AccountsService;
 const FileUtils = imports.misc.fileUtils;
 const AppletPath = imports.ui.appletManager.applets['configurableMenu@lestcape'];
 const CinnamonMenu = AppletPath.cinnamonMenu;
+const BoxPointer = imports.ui.boxpointer;
 
 let appsys = Cinnamon.AppSystem.get_default();
 
@@ -2499,6 +2500,279 @@ RecentCategoryButtonExtended.prototype = {
    }
 };
 
+function ConfigurablePointer(arrowSide, binProperties) {
+   this._init(arrowSide, binProperties);
+}
+
+ConfigurablePointer.prototype = {
+   __proto__: BoxPointer.BoxPointer.prototype,
+
+   _init: function(arrowSide, binProperties) {
+      BoxPointer.BoxPointer.prototype._init.call (this, arrowSide, binProperties);
+      this.riseArrow = true;
+      this.fixToCorner = false;
+   },
+
+   setArrow: function(arrow) {
+      this.riseArrow = arrow;
+      this.setArrowOrigin(this._arrowOrigin);
+   },
+
+   fixToCornerMenu: function(fixToCorner) {
+      this.fixToCorner = fixToCorner;
+   },
+
+   _reposition: function(sourceActor, alignment) {
+        // Position correctly relative to the sourceActor
+        let sourceNode = sourceActor.get_theme_node();
+        let sourceContentBox = sourceNode.get_content_box(sourceActor.get_allocation_box());
+        let sourceAllocation = Cinnamon.util_get_transformed_allocation(sourceActor);
+        let sourceCenterX = sourceAllocation.x1 + sourceContentBox.x1 + (sourceContentBox.x2 - sourceContentBox.x1) * this._sourceAlignment;
+        let sourceCenterY = sourceAllocation.y1 + sourceContentBox.y1 + (sourceContentBox.y2 - sourceContentBox.y1) * this._sourceAlignment;
+        let [minWidth, minHeight, natWidth, natHeight] = this.actor.get_preferred_size();
+
+        // We also want to keep it onscreen, and separated from the
+        // edge by the same distance as the main part of the box is
+        // separated from its sourceActor
+        let monitor = Main.layoutManager.findMonitorForActor(sourceActor);
+        let themeNode = this.actor.get_theme_node();
+        let borderWidth = themeNode.get_length('-arrow-border-width');
+        let arrowBase = themeNode.get_length('-arrow-base');
+        let borderRadius = themeNode.get_length('-arrow-border-radius');
+        let margin = (4 * borderRadius + borderWidth + arrowBase);
+        let halfMargin = margin / 2;
+
+        let themeNode = this.actor.get_theme_node();
+        let gap = themeNode.get_length('-boxpointer-gap');
+
+        let resX, resY;
+
+        switch (this._arrowSide) {
+        case St.Side.TOP:
+            resY = sourceAllocation.y2 + gap;
+            break;
+        case St.Side.BOTTOM:
+            resY = sourceAllocation.y1 - natHeight - gap;
+            break;
+        case St.Side.LEFT:
+            resX = sourceAllocation.x2 + gap;
+            break;
+        case St.Side.RIGHT:
+            resX = sourceAllocation.x1 - natWidth - gap;
+            break;
+        }
+
+        // Now align and position the pointing axis, making sure
+        // it fits on screen
+        switch (this._arrowSide) {
+        case St.Side.TOP:
+        case St.Side.BOTTOM:
+            resX = sourceCenterX - (halfMargin + (natWidth - margin) * alignment);
+
+            resX = Math.max(resX, monitor.x + 10);
+            resX = Math.min(resX, monitor.x + monitor.width - (10 + natWidth));
+            this.setArrowOrigin(sourceCenterX - resX);
+            break;
+
+        case St.Side.LEFT:
+        case St.Side.RIGHT:
+            resY = sourceCenterY - (halfMargin + (natHeight - margin) * alignment);
+
+            resY = Math.max(resY, monitor.y + 10);
+            resY = Math.min(resY, monitor.y + monitor.height - (10 + natHeight));
+
+            this.setArrowOrigin(sourceCenterY - resY);
+            break;
+        }
+
+        let parent = this.actor.get_parent();
+        let success, x, y;
+        while (!success) {
+            [success, x, y] = parent.transform_stage_point(resX, resY);
+            parent = parent.get_parent();
+        }
+        
+        if(this.fixToCorner) {
+           if(sourceAllocation.x1 < 10)
+              x = 0;
+           if(Math.abs(sourceAllocation.x1 - Main.layoutManager.primaryMonitor.width) < 10)
+              x = Main.layoutManager.primaryMonitor.width;
+           if(sourceAllocation.y1 < 10)
+              y = 0;
+           if(Math.abs(sourceAllocation.y1 - Main.layoutManager.primaryMonitor.height) < 10)
+              y = Main.layoutManager.primaryMonitor.height;
+        }
+
+        this._xPosition = Math.floor(x);
+        this._yPosition = Math.floor(y);
+        this._shiftActor();
+   },
+
+   _drawBorder: function(area) {
+        let themeNode = this.actor.get_theme_node();
+
+        let borderWidth = themeNode.get_length('-arrow-border-width');
+        let base = themeNode.get_length('-arrow-base');
+        let rise = 0;
+        if(this.riseArrow)
+           rise = themeNode.get_length('-arrow-rise');
+
+        let borderRadius = themeNode.get_length('-arrow-border-radius');
+
+        let halfBorder = borderWidth / 2;
+        let halfBase = Math.floor(base/2);
+
+        let borderColor = themeNode.get_color('-arrow-border-color');
+        let backgroundColor = themeNode.get_color('-arrow-background-color');
+
+        let [width, height] = area.get_surface_size();
+        let [boxWidth, boxHeight] = [width, height];
+        if (this._arrowSide == St.Side.TOP || this._arrowSide == St.Side.BOTTOM) {
+            boxHeight -= rise;
+        } else {
+            boxWidth -= rise;
+        }
+        let cr = area.get_context();
+        Clutter.cairo_set_source_color(cr, borderColor);
+
+        // Translate so that box goes from 0,0 to boxWidth,boxHeight,
+        // with the arrow poking out of that
+        if (this._arrowSide == St.Side.TOP) {
+            cr.translate(0, rise);
+        } else if (this._arrowSide == St.Side.LEFT) {
+            cr.translate(rise, 0);
+        }
+
+        let [x1, y1] = [halfBorder, halfBorder];
+        let [x2, y2] = [boxWidth - halfBorder, boxHeight - halfBorder];
+
+        cr.moveTo(x1 + borderRadius, y1);
+        if (this._arrowSide == St.Side.TOP) {
+            if (this._arrowOrigin < (x1 + (borderRadius + halfBase))) {
+                cr.lineTo(this._arrowOrigin, y1 - rise);
+                cr.lineTo(Math.max(x1 + borderRadius, this._arrowOrigin) + halfBase, y1);
+            } else if (this._arrowOrigin > (x2 - (borderRadius + halfBase))) {
+                cr.lineTo(Math.min(x2 - borderRadius, this._arrowOrigin) - halfBase, y1);
+                cr.lineTo(this._arrowOrigin, y1 - rise);
+            } else {
+                cr.lineTo(this._arrowOrigin - halfBase, y1);
+                cr.lineTo(this._arrowOrigin, y1 - rise);
+                cr.lineTo(this._arrowOrigin + halfBase, y1);
+            }
+        }
+
+        cr.lineTo(x2 - borderRadius, y1);
+
+        // top-right corner
+        cr.arc(x2 - borderRadius, y1 + borderRadius, borderRadius,
+               3*Math.PI/2, Math.PI*2);
+
+        if (this._arrowSide == St.Side.RIGHT) {
+            if (this._arrowOrigin < (y1 + (borderRadius + halfBase))) {
+                cr.lineTo(x2 + rise, this._arrowOrigin);
+                cr.lineTo(x2, Math.max(y1 + borderRadius, this._arrowOrigin) + halfBase);
+            } else if (this._arrowOrigin > (y2 - (borderRadius + halfBase))) {
+                cr.lineTo(x2, Math.min(y2 - borderRadius, this._arrowOrigin) - halfBase);
+                cr.lineTo(x2 + rise, this._arrowOrigin);
+            } else {
+                cr.lineTo(x2, this._arrowOrigin - halfBase);
+                cr.lineTo(x2 + rise, this._arrowOrigin);
+                cr.lineTo(x2, this._arrowOrigin + halfBase);
+            }
+        }
+
+        cr.lineTo(x2, y2 - borderRadius);
+
+        // bottom-right corner
+        cr.arc(x2 - borderRadius, y2 - borderRadius, borderRadius,
+               0, Math.PI/2);
+
+        if (this._arrowSide == St.Side.BOTTOM) {
+            if (this._arrowOrigin < (x1 + (borderRadius + halfBase))) {
+                cr.lineTo(Math.max(x1 + borderRadius, this._arrowOrigin) + halfBase, y2);
+                cr.lineTo(this._arrowOrigin, y2 + rise);
+            } else if (this._arrowOrigin > (x2 - (borderRadius + halfBase))) {
+                cr.lineTo(this._arrowOrigin, y2 + rise);
+                cr.lineTo(Math.min(x2 - borderRadius, this._arrowOrigin) - halfBase, y2);
+            } else {
+                cr.lineTo(this._arrowOrigin + halfBase, y2);
+                cr.lineTo(this._arrowOrigin, y2 + rise);
+                cr.lineTo(this._arrowOrigin - halfBase, y2);
+            }
+        }
+
+        cr.lineTo(x1 + borderRadius, y2);
+
+        // bottom-left corner
+        cr.arc(x1 + borderRadius, y2 - borderRadius, borderRadius,
+               Math.PI/2, Math.PI);
+
+        if (this._arrowSide == St.Side.LEFT) {
+            if (this._arrowOrigin < (y1 + (borderRadius + halfBase))) {
+                cr.lineTo(x1, Math.max(y1 + borderRadius, this._arrowOrigin) + halfBase);
+                cr.lineTo(x1 - rise, this._arrowOrigin);
+            } else if (this._arrowOrigin > (y2 - (borderRadius + halfBase))) {
+                cr.lineTo(x1 - rise, this._arrowOrigin);
+                cr.lineTo(x1, Math.min(y2 - borderRadius, this._arrowOrigin) - halfBase);
+            } else {
+                cr.lineTo(x1, this._arrowOrigin + halfBase);
+                cr.lineTo(x1 - rise, this._arrowOrigin);
+                cr.lineTo(x1, this._arrowOrigin - halfBase);
+            }
+        }
+
+        cr.lineTo(x1, y1 + borderRadius);
+
+        // top-left corner
+        cr.arc(x1 + borderRadius, y1 + borderRadius, borderRadius,
+               Math.PI, 3*Math.PI/2);
+
+        Clutter.cairo_set_source_color(cr, backgroundColor);
+        cr.fillPreserve();
+        Clutter.cairo_set_source_color(cr, borderColor);
+        cr.setLineWidth(borderWidth);
+        cr.stroke();
+    }
+};
+
+function ConfigurableMenu(launcher, orientation) {
+   this._init(launcher, orientation);
+}
+
+ConfigurableMenu.prototype = {
+   __proto__: Applet.AppletPopupMenu.prototype,
+
+   _init: function(launcher, orientation) {
+      PopupMenu.PopupMenuBase.prototype._init.call (this, launcher.actor, 'popup-menu-content');
+
+      this._arrowAlignment = 0.0;
+      this._arrowSide = orientation;
+
+      this._boxPointer = new ConfigurablePointer(orientation,
+                                                   { x_fill: true,
+                                                     y_fill: true,
+                                                     x_align: St.Align.START });
+      this.actor = this._boxPointer.actor;
+      this.actor._delegate = this;
+      this.actor.style_class = 'popup-menu-boxpointer';
+      this.actor.connect('key-press-event', Lang.bind(this, this._onKeyPressEvent));
+
+      this._boxWrapper = new Cinnamon.GenericContainer();
+      this._boxWrapper.connect('get-preferred-width', Lang.bind(this, this._boxGetPreferredWidth));
+      this._boxWrapper.connect('get-preferred-height', Lang.bind(this, this._boxGetPreferredHeight));
+      this._boxWrapper.connect('allocate', Lang.bind(this, this._boxAllocate));
+      this._boxPointer.bin.set_child(this._boxWrapper);
+      this._boxWrapper.add_actor(this.box);
+      this.actor.add_style_class_name('popup-menu');
+
+      global.focus_manager.add_group(this.actor);
+      this.actor.reactive = true;
+
+      Main.uiGroup.add_actor(this.actor);
+      this.actor.hide();     
+   }
+};
+
 function MyApplet(metadata, orientation, panel_height, instance_id) {
    this._init(metadata, orientation, panel_height, instance_id);
 }
@@ -2509,6 +2783,7 @@ MyApplet.prototype = {
    _init: function(metadata, orientation, panel_height, instance_id) {
       Applet.TextIconApplet.prototype._init.call(this, orientation, panel_height, instance_id);
       try {
+         this.deltaMinResize = 50;
          this.aviableWidth = 0;
          this.uuid = metadata["uuid"];
          this.allowFavName = false;
@@ -2550,9 +2825,15 @@ MyApplet.prototype = {
          this.showAppDescription = true;
 
          this.RecentManager = new DocInfo.DocManager();
-         this.menu = new Applet.AppletPopupMenu(this, orientation);
-         this.menu.actor.add_style_class_name('menu-background');
+
+         this.menu = new ConfigurableMenu(this, orientation);
+         this.menu.actor.connect('motion-event', Lang.bind(this, this._onResizeMotionEvent));
+         this.menu.actor.connect('button-press-event', Lang.bind(this, this._onBeginResize));
+         this.menu.actor.connect('leave-event', Lang.bind(this, this._disableOverResizeIcon));
+         this.menu.actor.connect('button-release-event', Lang.bind(this, this._disableResize));
          this.menu.connect('open-state-changed', Lang.bind(this, this._onOpenStateChanged));
+         this.menu.actor.add_style_class_name('menu-background');
+
 
          this.menuManager = new PopupMenu.PopupMenuManager(this);
          this.menuManager.addMenu(this.menu);   
@@ -3331,12 +3612,135 @@ MyApplet.prototype = {
       if(this.menu) {
          this.menu.close();
          this.menu.destroy();
-         this.menu = new Applet.AppletPopupMenu(this, this.orientation);
-         this.menuManager.addMenu(this.menu);
-        
-         this.menu.actor.add_style_class_name('menu-background');
+         this.menu = new ConfigurableMenu(this, this.orientation);
+         this.menu.actor.connect('motion-event', Lang.bind(this, this._onResizeMotionEvent));
+         this.menu.actor.connect('button-press-event', Lang.bind(this, this._onBeginResize));
+         this.menu.actor.connect('leave-event', Lang.bind(this, this._disableOverResizeIcon));
+         this.menu.actor.connect('button-release-event', Lang.bind(this, this._disableResize));
          this.menu.connect('open-state-changed', Lang.bind(this, this._onOpenStateChanged));
+         this.menu.actor.add_style_class_name('menu-background');
+         this.menuManager.addMenu(this.menu);
       }
+   },
+
+   _onResizeMotionEvent: function(actor, event) {
+      if(!this.actorResize) {
+         let [mx, my] = event.get_coords();
+         let [ax, ay] = actor.get_transformed_position();
+         ar = ax + actor.get_width();
+         at = ay + actor.get_height();
+         if(this._isInsideMenu(mx, my, ax, ay, ar, at)) {
+            if(this._correctPlaceResize(mx, my, ax, ay, ar, at)) {
+               global.set_cursor(Cinnamon.Cursor.DND_MOVE);
+            } else
+               global.unset_cursor();
+         } else
+            global.unset_cursor();
+      }
+   },
+
+   _onBeginResize: function(actor, event) {
+      this.actorResize = actor;
+      let [mx, my] = event.get_coords();
+      let [ax, ay] = actor.get_transformed_position();
+      aw = actor.get_width();
+      ah = actor.get_height();
+      if(this._isInsideMenu(mx, my, ax, ay, aw, ah)) {
+         if(this._correctPlaceResize(mx, my, ax, ay, aw, ah)) {
+            global.set_cursor(Cinnamon.Cursor.DND_MOVE);
+            this._doResize();
+         }
+      }
+   },
+
+   _disableResize: function() {
+      this.actorResize = null;
+      global.unset_cursor();
+   },
+
+   _disableOverResizeIcon: function() {
+      if(!this.actorResize) {
+         this._disableResize();
+      }
+   },
+
+   _isInsideMenu: function(mx, my, ax, ay, aw, ah) {
+      return ((this.controlingSize)&&(mx > ax)&&(mx < ax + aw)&&(my > ay)&&(my < ay + ah));
+   },
+
+   _correctPlaceResize: function(mx, my, ax, ay, aw, ah) {
+      let middelScreen = Main.layoutManager.primaryMonitor.width/2;
+      let [cx, cy] = this.actor.get_transformed_position();
+      switch (this.orientation) {
+         case St.Side.TOP:
+            if(my > ay + ah - this.deltaMinResize) {
+               if(cx > middelScreen)
+                  return (mx < ax + this.deltaMinResize);
+               return (mx > ax + aw - this.deltaMinResize);
+            }
+            return false;
+         case St.Side.BOTTOM:
+            if(my < ay + this.deltaMinResize) {
+               if(cx < middelScreen)
+                  return (mx > ax + aw - this.deltaMinResize);
+               return  (mx < ax + this.deltaMinResize);
+            }
+            return false;
+      }
+      return false;
+   },
+
+   _doResize: function(actor) {
+      if(this.actorResize) {
+         let [mx, my, mask] = global.get_pointer();
+         let [ax, ay] = this.actorResize.get_transformed_position();
+         aw = this.actorResize.get_width();
+         ah = this.actorResize.get_height();
+         let middelScreen = Main.layoutManager.primaryMonitor.width/2;
+         let [cx, cy] = this.actor.get_transformed_position();
+         switch (this.orientation) {
+            case St.Side.TOP:
+               this.height = this.mainBox.get_height() + my - this._processPanelSize(false) - ah + 4;
+               if(cx < middelScreen)
+                  this.width = mx - ax;
+               else
+                  this.width = this.mainBox.get_width() + ax - mx;
+               break;
+            case St.Side.BOTTOM:
+               this.height = this.mainBox.get_height() + ay - my + 4;
+               if(cx < middelScreen)
+                  this.width = mx - ax;
+               else
+                  this.width = this.mainBox.get_width() + ax - mx;
+               break;
+         }
+
+         this.mainBox.set_height(this.height);
+         this.mainBox.set_width(this.width);
+         this._updateSize();
+         Mainloop.timeout_add(300, Lang.bind(this, this._doResize));
+      }
+   },
+
+   _processPanelSize: function(bottomPosition) {
+      let panelHeight;
+      let panelResizable = global.settings.get_boolean("panel-resizable");
+      if(panelResizable) {
+         if(bottomPosition) {
+            panelHeight = global.settings.get_int("panel-bottom-height");
+         }
+         else {
+            panelHeight = global.settings.get_int("panel-top-height");
+         }
+      }
+      else {
+         let themeNode = this.actor.get_theme_node();
+         panelHeight = themeNode.get_length("height");
+         if(!panelHeight || panelHeight == 0) {
+            panelHeight = 25;
+         }
+      }
+      return panelHeight;
    },
 
    _display: function() {
@@ -3467,59 +3871,6 @@ MyApplet.prototype = {
 
          this.signalKeyPowerID = 0;
          this._update_autoscroll();
-
-         this.menu.actor.connect('motion-event', Lang.bind(this, function(actor, event) {
-            if(!this.actorResize) {
-               let dMin = 50;
-               let [mx, my] = event.get_coords();
-               let [ax, ay] = actor.get_transformed_position();
-
-               posRight = ax + actor.get_width();
-               posTop = ay + actor.get_height();
-               if(((mx > ax)&&(mx < posRight))&&((my > ay)&&(my < posTop))) {
-                  if((mx > posRight - dMin)&&(my < ay + dMin)) {
-                     global.set_cursor(Cinnamon.Cursor.DND_MOVE);
-                  } else
-                     global.unset_cursor();
-               } else
-                  global.unset_cursor();
-            }   
-         }));
-
-         this.menu.actor.get_parent().set_style("padding-top: 0px;");
-         this.menu.actor.set_style("padding-top: 0px;");
-         this.menu.actor.connect('button-press-event', Lang.bind(this, function(actor, event) {
-            this.actorResize = actor;
-            global.set_cursor(Cinnamon.Cursor.DND_MOVE);
-            let dMin = 50;
-            let [mx, my] = event.get_coords();
-            let [ax, ay] = actor.get_transformed_position();
-
-            posRight = ax + actor.get_width();
-            posTop = ay + actor.get_height();
-            if(((mx > ax)&&(mx < posRight))&&((my > ay)&&(my < posTop))) {
-               if((mx > posRight - dMin)&&(my < ay + dMin)) {
-                  this._doResize();
-               }
-            }
-            /*if(((mx > ax)&&(mx < posRight))&&((my > ay)&&(my < posTop))) {
-               if((mx > posRight - dMin)&&(my > posTop - dMin)) {
-                  Main.notify("tamos");
-               }
-            }*/
-         }));
-
-         this.menu.actor.connect('leave-event', Lang.bind(this, function(actor) {
-            if(!this.actorResize) {
-               this.actorResize = null;
-               global.unset_cursor();
-            }
-         }));
-
-         this.menu.actor.connect('button-release-event', Lang.bind(this, function(actor) {
-            this.actorResize = null;
-            global.unset_cursor();
-         }));
          
          section.actor.add_actor(this.mainBox);
 
@@ -3540,22 +3891,6 @@ MyApplet.prototype = {
          Main.notify("Error:", e.message);
       }
    },
-
-   _doResize: function(actor) {
-      if(this.actorResize) {
-         let dMin = 10;
-         let [mx, my, mask] = global.get_pointer();
-         let [ax, ay] = this.actorResize.get_transformed_position();
-         posRight = ax + this.actorResize.get_width();
-         posTop = ay + this.actorResize.get_height();
-         this.mainBox.set_width(this.mainBox.get_width() + mx - posRight + 4);
-         this.mainBox.set_height(this.mainBox.get_height() +  ay - my + 4);
-         this.width = this.mainBox.get_width();
-         this.height = this.mainBox.get_height();
-         this._updateSize();
-         Mainloop.timeout_add(300, Lang.bind(this, this._doResize));
-      }
-   }, 
 
    loadClassic: function() {
       this.controlSearchBox.add(this.hover.actor, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
@@ -4415,8 +4750,7 @@ MyApplet.prototype = {
          this._updateSize();
       }
       else {
-         this.actorResize = null;
-         global.unset_cursor();
+         this._disableResize();
          this.actor.remove_style_pseudo_class('active');
          if(this.searchActive) {
             this.resetSearch();
