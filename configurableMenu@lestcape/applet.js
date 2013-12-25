@@ -275,7 +275,15 @@ StaticBox.prototype = {
       this.actor.add_actor(this.controlBox);
       this.itemsBox = new St.BoxLayout({ vertical: true });
       this.itemsBox.set_style("padding-left: 10px;");
+      this.itemsPlaces = new St.BoxLayout({ vertical: true });
+      this.itemsSystem = new St.BoxLayout({ vertical: true });
+      this.itemsBox.add_actor(this.itemsPlaces);
+      this.spacerMiddle = new St.BoxLayout({ vertical: false, height: 20 });
+      this.itemsBox.add_actor(this.spacerMiddle);
+      this.itemsBox.add_actor(this.itemsSystem);
       this.scrollActor = new ScrollItemsBox(parent, this.itemsBox, true);
+      this.spacerTop = new St.BoxLayout({ vertical: false, height: 20 });
+      this.actor.add_actor(this.spacerTop);
       this.actor.add(this.scrollActor.actor, {y_fill: true, expand: true});
 
       this.parent = parent;
@@ -289,9 +297,16 @@ StaticBox.prototype = {
       this._staticButtons = new Array();
       this.takeHover(true);
       this.takeControl(true);
-      this.initItems();
+      this.initItemsPlaces();
+      this.initItemsSystem();
       this.takePower(true);
       //this.actor._delegate = this;
+      this.actor.connect('key-focus-in', Lang.bind(this, function(actor, event) {
+         if((this._staticButtons.length > 0)&&(!this._staticSelected)) {
+            this._staticSelected = 0;
+            this.activeSelected();
+         }
+      }));
    },
 
    takeHover: function(take) {
@@ -340,32 +355,25 @@ StaticBox.prototype = {
       return null;
    },
 
-   initItems: function() {
-      let appSys = Cinnamon.AppSystem.get_default();
+   initItemsPlaces: function() {
       let item;
-
       item = this._createSpecialButton("computer", _("Computer"), "computer:///");
       item.setAction(Lang.bind(this, this._onComputerAction));
       item = this._createSpecialButton("folder-home", _("Home"), GLib.get_home_dir());
       item.setAction(Lang.bind(this, this._onHomeAction));
       item = this._createSpecialButton("desktop", _("Desktop"), USER_DESKTOP_PATH);
       item.setAction(Lang.bind(this, this._onDesktopAction));
-      //this._createPlace();
+      //this._createNormalPlaces();
       item = this._createSpecialButton("user-trash", _("Trash"), "trash:///");
       item.setAction(Lang.bind(this, this._onTrashAction));
+   },
 
+   initItemsSystem: function() {
+      let appSys = Cinnamon.AppSystem.get_default();
       this._createApp(appSys, "synaptic");
       this._createApp(appSys, "update-manager");
       this._createApp(appSys, "cinnamon-settings");
       this._createApp(appSys, "gnome-terminal");
-
-//Places: Computer, HomeFolder, Network, Desktop Trash, 
-//system:  Synaptic, control center, terminal, (power buttons)
-
-//Home, Picture, Music, Videos, Documents
-//Computer, Control Center
-// Package Manager, Terminal, Help
-
    },
 
    setIconSize: function (iconSize) {
@@ -383,12 +391,12 @@ StaticBox.prototype = {
          item.actor.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
          item.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
          item.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, item));
-         this.itemsBox.add_actor(item.actor);
+         this.itemsSystem.add_actor(item.actor);
          this._staticButtons.push(item);
       }
    },
 
-   _createPlace: function() {
+   _createNormalPlaces: function() {
       let iconSizeDrag = 32;
       let item;
       let bookmarks = Main.placesManager.getBookmarks();
@@ -398,7 +406,7 @@ StaticBox.prototype = {
           //if(bookmarks[id].name.toLowerCase() == placeName)
              //return bookmarks[id];
          item = new PlaceButtonExtended(this, bookmarks[id], bookmarks[id].name, this.vertical, this.iconSize);
-         this.itemsBox.add_actor(item.actor);
+         this.itemsPlaces.add_actor(item.actor);
          this._staticButtons.push(item);
       }
    },
@@ -406,43 +414,83 @@ StaticBox.prototype = {
    _createSpecialButton: function(icon, title, description) {
       let item = new SystemButton(false, icon, title, description, this.hover, this.iconSize, true);
       item.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(6)+"px;padding-right: "+(2)+"px;margin:auto;";
-      item.actor.connect('enter-event', Lang.bind(this, this._sysButtonEnterEvent));
-      item.actor.connect('leave-event', Lang.bind(this, this._sysButtonLeaveEvent));
-      this.itemsBox.add_actor(item.actor);
+      item.actor.connect('enter-event', Lang.bind(this, this._sysButtonEnterEvent, item));
+      item.actor.connect('leave-event', Lang.bind(this, this._sysButtonLeaveEvent, item));
+      this.itemsPlaces.add_actor(item.actor);
       this._staticButtons.push(item);
       return item;
    },
 
+   disableSelected: function() {
+      if((this._staticSelected)&&(this._staticSelected < this._staticButtons.length)) {
+         let actorItem = this._staticButtons[this._staticSelected];
+         if(this.itemsSystem.get_children().indexOf(actorItem.actor) != -1)
+            actorItem.actor.style_class = "menu-application-button";
+         else
+            actorItem.setActive(false);
+      }
+      this._staticSelected = null;
+   },
+
+   activeSelected: function() {
+      if((this._staticSelected)&&(this._staticSelected < this._staticButtons.length)) {
+         let actorItem = this._staticButtons[this._staticSelected];
+         if(this.itemsSystem.get_children().indexOf(actorItem.actor) != -1)
+            actorItem.actor.style_class = "menu-application-button-selected";
+         else
+            actorItem.setActive(true);
+      }
+   },
+   
+
    navegateStaticBox: function(symbol, actor) {
-      
+      let changerPos = this._staticSelected;
+      this.disableSelected();
+      if((symbol == Clutter.KEY_Up) || (symbol == Clutter.KEY_Left)) {
+         if(changerPos - 1 < 0)
+            this._staticSelected = this._staticButtons.length -1;
+         else
+            this._staticSelected--;
+      }
+      else if((symbol == Clutter.KEY_Down) || (symbol == Clutter.KEY_Right)) {
+         if(changerPos + 1 < this._staticButtons.length)
+            this._staticSelected++;
+         else
+            this._staticSelected = 0;
+      }
+      this.activeSelected();
    },
 
    _appEnterEvent: function(actor, event, applicationButton) {
-      try {
+      this.disableSelected();
+      this._staticSelected = this._staticButtons.indexOf(applicationButton);
+      this.activeSelected();
       if(applicationButton.app.get_description())
          this.selectedAppBox.setSelectedText(applicationButton.app.get_name(), applicationButton.app.get_description().split("\n")[0]);
       else
          this.selectedAppBox.setSelectedText(applicationButton.app.get_name(), "");
-      applicationButton.actor.style_class = "menu-application-button-selected";
       this.hover.refreshApp(applicationButton.app);
-      } catch(e) {
-         Main.notify("err:", e.message);
-      }
    },
 
    _appLeaveEvent: function(actor, event, applicationButton) {
-      applicationButton.actor.style_class = "menu-application-button";
+      this.disableSelected();
       this.selectedAppBox.setSelectedText("", "");
-      this.hover.refreshFace();;
+      this.hover.refreshFace();
    },
 
-   _sysButtonEnterEvent: function(actor, event) {
-      let index = this.itemsBox.get_children().indexOf(actor);
+   _sysButtonEnterEvent: function(actor, event, sysButton) {
+      this.disableSelected();
+      this._staticSelected = this._staticButtons.indexOf(sysButton);
+      this.activeSelected();
+      let index = this.itemsPlaces.get_children().indexOf(actor);
+      if(index == -1)
+         index = this.itemsSystem.get_children().indexOf(actor) + this.itemsPlaces.get_children().length;
       this.selectedAppBox.setSelectedText(this._staticButtons[index].title, this._staticButtons[index].description);
       this.hover.refresh(this._staticButtons[index].icon);
    },
 
-   _sysButtonLeaveEvent: function(actor, event) {
+   _sysButtonLeaveEvent: function(actor, event, sysButton) {
+      this.disableSelected();
       this.selectedAppBox.setSelectedText("", "");
       this.hover.refreshFace();
    },
@@ -572,6 +620,7 @@ ButtonChangerBox.prototype = {
     _init: function (parent, icon, labels, selected, callBackOnSelectedChange) {
         PopupMenu.PopupSubMenuMenuItem.prototype._init.call(this, labels[selected]);
 
+        this.visible = true;
         this.actor.set_style_class_name('');
         this.actor.reactive = true;
         this.box = new St.BoxLayout({ style_class: 'menu-category-button', reactive: true, track_hover: true });
@@ -2970,7 +3019,9 @@ MyApplet.prototype = {
            return this._navegateFavBox(symbol, actor);
         } else if(actor == this.powerBox.actor) {
            return this._navegatePowerBox(symbol, actor); 
-        } else if(actor == this.bttChanger.actor) {
+        } else if((this.staticBox)&&(actor == this.staticBox.actor)) {
+           return this._navegateStaticBox(symbol, actor); 
+        } else if((this.bttChanger)&&(actor == this.bttChanger.actor)) {
            return this._navegateBttChanger(symbol);
         } else if(actor == this.hover.actor) {
            return this._navegateHoverIcon(symbol, actor);
@@ -3005,8 +3056,10 @@ MyApplet.prototype = {
    },
 
    _changeFocusElement: function(elementActive) {
-      let activeElements = [this.hover.actor, this.powerBox.actor, this.searchEntry, this.bttChanger.actor, this.favoritesScrollBox.actor];
-      let actors = [this.hover.actor, this.powerBox.actor, this.searchEntry, this.bttChanger.actor, this.favoritesObj.getFirstElement()];
+      let tbttChanger = null;
+      if(this.bttChanger) tbttChanger = this.bttChanger.actor;
+      let activeElements = [this.hover.actor, this.staticBox.actor, this.powerBox.actor, this.searchEntry, tbttChanger, this.favoritesScrollBox.actor];
+      let actors = [this.hover.actor, this.staticBox.actor, this.powerBox.actor, this.searchEntry, tbttChanger, this.favoritesObj.getFirstElement()];
       let index = actors.indexOf(elementActive);
       let selected = index + 1;
       while((selected < activeElements.length)&&((!activeElements[selected])||(!activeElements[selected].visible))) {
@@ -3246,6 +3299,20 @@ MyApplet.prototype = {
          this.powerBox.navegatePowerBox(symbol, actor);
       }
       return true;
+   },
+
+   _navegateStaticBox: function(symbol, actor) {
+      if(symbol == Clutter.Tab) {
+         this.staticBox.disableSelected();
+         this.fav_actor = this._changeFocusElement(this.staticBox.actor);
+         //global.stage.set_key_focus(this.fav_actor);
+         Mainloop.idle_add(Lang.bind(this, this._putFocus));
+      }
+      else {
+         this.staticBox.navegateStaticBox(symbol, actor);
+      }
+      return true;
+      
    },
 
    _navegateBttChanger: function(symbol) {
@@ -3564,7 +3631,7 @@ MyApplet.prototype = {
 
    _updateWidth: function() {
       if(this.controlingSize) {
-         if(this.width >= this.mainBox.get_width()) {
+         if(this.width > this.mainBox.get_width()) {
             let monitorWidth = Main.layoutManager.primaryMonitor.width;
             if(this.width > monitorWidth)
                this.width = monitorWidth;
@@ -4034,6 +4101,7 @@ MyApplet.prototype = {
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.MIDDLE, expand: true });
       this.powerBox = new PowerBox(this, false, this.iconPowerSize, true, this.hover, this.selectedAppBox);
       this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
+      this.staticBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       //this.staticBox.takeHover(true);
       //this.staticBox.takeControl(true);
       //this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
@@ -4054,6 +4122,7 @@ MyApplet.prototype = {
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.MIDDLE, expand: true });
       this.powerBox = new PowerBox(this, false, this.iconPowerSize, true, this.hover, this.selectedAppBox);
       this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
+      this.staticBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       //this.staticBox.takeHover(true);
       //this.staticBox.takeControl(true);
       //this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
@@ -4078,6 +4147,7 @@ MyApplet.prototype = {
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.powerBox = new PowerBox(this, false, this.iconPowerSize, true, this.hover, this.selectedAppBox);
       this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
+      this.staticBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.betterPanel.set_vertical(true);
       this.betterPanel.add(this.favBoxWrapper, { x_fill: true, y_fill: true, y_align: St.Align.MIDDLE, expand: true });
@@ -4100,6 +4170,7 @@ MyApplet.prototype = {
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.powerBox = new PowerBox(this, false, this.iconPowerSize, true, this.hover, this.selectedAppBox);
       this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
+      this.staticBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.betterPanel.set_vertical(true);
       this.betterPanel.add(this.favBoxWrapper, { x_fill: true, y_fill: true, y_align: St.Align.MIDDLE, expand: true });
@@ -4491,13 +4562,12 @@ MyApplet.prototype = {
          return sr;
       });
       try {
-      this._refreshPlacesAndRecent();
-
       //Mainloop.idle_add(Lang.bind(this, function() {
 
          let catVertical = !this.categoriesBox.get_vertical();
-         let viewBox = new St.BoxLayout({ vertical: !catVertical });
-         this.categoriesBox.add_actor(viewBox);
+         if(this.categoriesBox.get_children().length == 0)
+            this.categoriesBox.add_actor(new St.BoxLayout({ vertical: this.categoriesBox.get_vertical() }));
+         let viewBox = this.categoriesBox.get_children()[0];
          for(let i = 0; i < this._categoryButtons.length; i++) {
             this._categoryButtons[i].setVertical(catVertical);
             viewBox.add_actor(this._categoryButtons[i].actor);
@@ -4509,21 +4579,32 @@ MyApplet.prototype = {
          this._select_category(null, this._allAppsCategoryButton);
       } catch(e) {Main.notify("errr", e.message);}
      // }));
+      this._refreshPlacesAndRecent();
    },
 
    _refreshPlacesAndRecent : function() {
-     /* for(let i = 0; i < this._placesButtons.length; i ++) {
+      let newCatSelection = new Array();
+      for(let i = 0; i < this._placesButtons.length; i ++) {
          this._placesButtons[i].actor.destroy();
       }
       for(let i = 0; i < this._recentButtons.length; i ++) {
          this._recentButtons[i].actor.destroy();
-      }*/
-      /*for(let i = 0; i < this._categoryButtons.length; i++) {
-         if(this._categoryButtons[i] instanceof CinnamonMenu.PlaceCategoryButton ||
-            this._categoryButtons[i] instanceof CinnamonMenu.RecentCategoryButton) {
+      }
+      if(this.categoriesBox.get_children().length == 0)
+         this.categoriesBox.add_actor(new St.BoxLayout({ vertical: this.categoriesBox.get_vertical() }));
+      let tempCat;
+      for(let i = 0; i < this._categoryButtons.length; i++) {
+         tempCat = this._categoryButtons[i]
+         if(!(tempCat instanceof CinnamonMenu.PlaceCategoryButton) && 
+            !(tempCat instanceof CinnamonMenu.RecentCategoryButton)) {
+            newCatSelection.push(this._categoryButtons[i]);
+         } else {
+            this.categoriesBox.get_children()[0].remove_actor(this._categoryButtons[i].actor);
             this._categoryButtons[i].actor.destroy();
          }
-      }*/
+      }
+      this._categoryButtons = newCatSelection;
+      //Main.notify("puedo" + this.showPlaces);
       this._placesButtons = new Array();
       this._recentButtons = new Array();
 
@@ -4567,7 +4648,8 @@ MyApplet.prototype = {
             this.placesButton.isHovered = false;
          }));
          this._categoryButtons.push(this.placesButton);
-         //this.categoriesBox.add_actor(this.placesButton.actor);
+         this.placesButton.setVertical(!this.categoriesBox.get_vertical());
+         this.categoriesBox.get_children()[0].add_actor(this.placesButton.actor);
 
          let bookmarks = this._listBookmarks();
          let devices = this._listDevices();
@@ -4628,7 +4710,8 @@ MyApplet.prototype = {
             this.recentButton.isHovered = false;
          }));
 
-        // this.categoriesBox.add_actor(this.recentButton.actor);
+         this.categoriesBox.get_children()[0].add_actor(this.recentButton.actor);
+         this.recentButton.setVertical(!this.categoriesBox.get_vertical());
          this._categoryButtons.push(this.recentButton);
 
          for(let id = 0; id < MAX_RECENT_FILES && id < this.RecentManager._infosByTimestamp.length; id++) {
