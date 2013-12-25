@@ -4270,7 +4270,7 @@ MyApplet.prototype = {
       this._clearView();
       this.operativePanel.visible = !operPanelVisible;
       this.favoritesScrollBox.actor.visible = operPanelVisible;
-      this._updateView();
+      this._updateSize();
    },
 
    _onPanelWindowsChange: function(selected) {
@@ -4287,7 +4287,7 @@ MyApplet.prototype = {
       this.favoritesScrollBox.actor.visible = operPanelVisible;
       if((this.showAppTitle)||(this.showAppDescription))
          this.endHorizontalBox.visible = !operPanelVisible;
-      this._updateView();
+      this._updateSize();
      } catch(e) {
         Main.notify("Error", e.message);
      }
