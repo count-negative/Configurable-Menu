@@ -13,6 +13,8 @@ Email: lestcape@gmail.com
 
 Website: https://github.com/lestcape/Configurable-Menu
 
+Thanks for all contribution to: Garibaldo: https://github.com/Garibaldo
+
 --------------
 
 This is a frock of Main Cinnamon menu applet with more configurable options.
