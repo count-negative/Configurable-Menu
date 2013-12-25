@@ -286,6 +286,7 @@ StaticBox.prototype = {
       this.actor.add_actor(this.spacerTop);
       this.actor.add(this.scrollActor.actor, {y_fill: true, expand: true});
 
+      this._staticSelected = -1;
       this.parent = parent;
       this.hover = hoverIcon;
       this.selectedAppBox = selectedAppBox;
@@ -302,10 +303,12 @@ StaticBox.prototype = {
       this.takePower(true);
       //this.actor._delegate = this;
       this.actor.connect('key-focus-in', Lang.bind(this, function(actor, event) {
-         if((this._staticButtons.length > 0)&&(!this._staticSelected)) {
+         if((this._staticButtons.length > 0)&&(this._staticSelected == -1))
             this._staticSelected = 0;
-            this.activeSelected();
-         }
+         this.activeSelected();
+      }));
+      this.actor.connect('key-focus-out', Lang.bind(this, function(actor, event) {
+         this.disableSelected();
       }));
    },
 
@@ -314,7 +317,7 @@ StaticBox.prototype = {
          this.hoverBox.add(this.hover.actor, { x_fill: false, x_align: St.Align.MIDDLE, expand: true });
          this.hoverBox.add_actor(this.hover.menu.actor);
       }
-      else {
+      else if(this.hover.actor.get_parent() == this.hoverBox) {
          this.hoverBox.remove_actor(this.hover.actor);
          this.hoverBox.remove_actor(this.hover.menu.actor);
       }
@@ -324,7 +327,7 @@ StaticBox.prototype = {
       if(take) {
          this.controlBox.add(this.control.actor, { x_fill: false, x_align: St.Align.MIDDLE, expand: true });
       }
-      else {
+      else if(this.control.actor.get_parent() == this.controlBox) {
          this.controlBox.remove_actor(this.control.actor);
       }
    },
@@ -334,7 +337,7 @@ StaticBox.prototype = {
          if(this.actor.get_children().indexOf(this.powerBox.actor) == -1)
             this.actor.add(this.powerBox.actor, { x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.END, expand: true });
       }
-      else {
+      else if(this.powerBox.actor.get_parent() == this.actor) {
          this.actor.remove_actor(this.powerBox.actor);
       }
    },
@@ -422,43 +425,57 @@ StaticBox.prototype = {
    },
 
    disableSelected: function() {
-      if((this._staticSelected)&&(this._staticSelected < this._staticButtons.length)) {
+      if((this._staticSelected != -1)&&(this._staticSelected < this._staticButtons.length)) {
          let actorItem = this._staticButtons[this._staticSelected];
          if(this.itemsSystem.get_children().indexOf(actorItem.actor) != -1)
             actorItem.actor.style_class = "menu-application-button";
          else
             actorItem.setActive(false);
       }
-      this._staticSelected = null;
+      this._staticSelected = -1;
    },
 
    activeSelected: function() {
-      if((this._staticSelected)&&(this._staticSelected < this._staticButtons.length)) {
+      if((this._staticSelected != -1)&&(this._staticSelected < this._staticButtons.length)) {
          let actorItem = this._staticButtons[this._staticSelected];
          if(this.itemsSystem.get_children().indexOf(actorItem.actor) != -1)
             actorItem.actor.style_class = "menu-application-button-selected";
          else
             actorItem.setActive(true);
+      } else 
+         this._staticSelected = -1;
+   },
+
+   executeButtonAction: function(buttonIndex) {
+      if((buttonIndex != -1)&&(buttonIndex < this._staticButtons.length)) {
+         let actorItem = this._staticButtons[buttonIndex];
+         if(this.itemsSystem.get_children().indexOf(actorItem.actor) != -1)
+            actorItem.actor._delegate.activate();
+         else
+            actorItem.executeAction();
       }
    },
-   
 
    navegateStaticBox: function(symbol, actor) {
-      let changerPos = this._staticSelected;
-      this.disableSelected();
-      if((symbol == Clutter.KEY_Up) || (symbol == Clutter.KEY_Left)) {
-         if(changerPos - 1 < 0)
-            this._staticSelected = this._staticButtons.length -1;
-         else
-            this._staticSelected--;
+      if((this._staticSelected != -1)&&(this._staticSelected < this._staticButtons.length)) {
+         let changerPos = this._staticSelected;
+         this.disableSelected();
+         if((symbol == Clutter.KEY_Up) || (symbol == Clutter.KEY_Left)) {
+            if(changerPos - 1 < 0)
+               this._staticSelected = this._staticButtons.length -1;
+            else
+               this._staticSelected = changerPos - 1;
+         }
+         else if((symbol == Clutter.KEY_Down) || (symbol == Clutter.KEY_Right)) {
+            if(changerPos + 1 < this._staticButtons.length)
+               this._staticSelected = changerPos + 1;
+            else
+               this._staticSelected = 0;
+         } else if((symbol == Clutter.KEY_Return) || (symbol == Clutter.KP_Enter)) {
+            this.executeButtonAction(changerPos);
+         }
+         this.activeSelected();
       }
-      else if((symbol == Clutter.KEY_Down) || (symbol == Clutter.KEY_Right)) {
-         if(changerPos + 1 < this._staticButtons.length)
-            this._staticSelected++;
-         else
-            this._staticSelected = 0;
-      }
-      this.activeSelected();
    },
 
    _appEnterEvent: function(actor, event, applicationButton) {
@@ -1684,6 +1701,7 @@ FavoritesBoxExtended.prototype = {
       } catch(e) {
         Main.notify("efx", e.message);
       }
+      return null;
    },
     
    // Draggable target interface
@@ -1758,6 +1776,7 @@ FavoritesBoxExtended.prototype = {
       } catch(e) {
         Main.notify("ef", e.message);
       }
+      return false;
    },
 
    navegateFavBox: function(symbol, actor) {
@@ -2004,8 +2023,10 @@ SystemButton.prototype = {
    },
 
    executeAction: function(actor, event) {
-      if((this.actionCallBack)&&((!event)||(event.get_button()==1)))
+      if((this.actionCallBack)&&((!event)||(event.get_button()==1))) {
+         this.setActive(false);
          this.actionCallBack();
+      }
    },
 
    setActive: function(active) {
@@ -2907,7 +2928,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.IN, "enable-autoscroll", "autoscroll_enabled", this._update_autoscroll, null);
 
 //My Setting
-         this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this._updateComplete, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this._onThemeChange, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "show-view-item", "showView", this._setVisibleViewControl, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "view-item", "iconView", this._changeView, null);
          //this.settings.bindProperty(Settings.BindingDirection.IN, "view-icon-count", "iconViewCount", this._refreshApps, null);
@@ -3007,9 +3028,9 @@ MyApplet.prototype = {
             return true;
         }
         if((this.bttChanger)&&(this.bttChanger.getSelected() == _("All Applications"))&&(actor == this.searchEntryText)) {
-           if((symbol != Clutter.Return) && (symbol != Clutter.KP_Enter) &&
-           (symbol != Clutter.KEY_Right) && (symbol != Clutter.KEY_Up) && (symbol != Clutter.KEY_Down) &&
-           (symbol != Clutter.KEY_Left) && (symbol != Clutter.Escape) && (symbol != Clutter.Tab))
+           if((symbol != Clutter.Return) && (symbol != Clutter.KEY_Return) && (symbol != Clutter.KP_Enter) &&
+              (symbol != Clutter.KEY_Right) && (symbol != Clutter.KEY_Up) && (symbol != Clutter.KEY_Down) &&
+              (symbol != Clutter.KEY_Left) && (symbol != Clutter.Escape) && (symbol != Clutter.Tab))
               if(this.searchEntry.text == "")
                  this.bttChanger.activateNext();
         }
@@ -3053,6 +3074,7 @@ MyApplet.prototype = {
       catch(e) {
         Main.notify("Error", e.message);
       }
+      return false;
    },
 
    _changeFocusElement: function(elementActive) {
@@ -3065,7 +3087,7 @@ MyApplet.prototype = {
       while((selected < activeElements.length)&&((!activeElements[selected])||(!activeElements[selected].visible))) {
          selected++;
       }
-      if(selected != activeElements.length) {
+      if(selected < activeElements.length) {
          return actors[selected];
       }
       let selected = 0;
@@ -3319,12 +3341,14 @@ MyApplet.prototype = {
       if(symbol == Clutter.Tab) {
          this.fav_actor = this._changeFocusElement(this.bttChanger.actor);
          Mainloop.idle_add(Lang.bind(this, this._putFocus));
-      } else if((symbol == Clutter.KEY_Return) || (symbol == Clutter.KP_Enter)) {
-          this.bttChanger.activateNext();
-          if(this.bttChanger.getSelected() == _("All Applications"))
+      } else if((symbol == Clutter.Return) || (symbol == Clutter.KEY_Return) || (symbol == Clutter.KP_Enter)) {
+         /* if(this.bttChanger.getSelected() == _("All Applications"))
              this.fav_actor = this.searchEntry;
           else
-             this.fav_actor = this.favoritesScrollBox.actor;
+             this.fav_actor = this.favoritesScrollBox.actor;*/
+          this.bttChanger.activateNext();
+          this.fav_actor = this._changeFocusElement(this.bttChanger.actor);
+         // Mainloop.idle_add(Lang.bind(this, this._putFocus));
           Mainloop.idle_add(Lang.bind(this, this._putFocus));
       }
       return true;
@@ -3552,6 +3576,14 @@ MyApplet.prototype = {
       this.selectedAppBox.setTimeFormat(this.timeFormat);
    },
 
+   _onThemeChange: function() {
+      this.updateTheme = true;
+      this._updateComplete();
+      this.menu.open();
+      /*if(this.controlingSize)
+         Mainloop.idle_add(Lang.bind(this, this._updateSize()));*/
+   },
+
    _updateComplete: function() {
       if(this.staticBox) {
          this.staticBox.actor.get_parent().remove_actor(this.staticBox.actor);
@@ -3612,6 +3644,7 @@ MyApplet.prototype = {
          if(this.height < 300)
             this.height = 300;
          this.mainBox.set_height(this.height);
+         this._updateView();
       }
       else {
          this.mainBox.set_height(-1);
@@ -3619,14 +3652,17 @@ MyApplet.prototype = {
          if(this.bttChanger) {
             let operPanelVisible = this.operativePanel.visible;
             this.operativePanel.visible = true;
-            this.favBoxWrapper.visible = false;
-            this.mainBox.set_height(this.mainBox.get_height());
+            this.favoritesScrollBox.actor.visible = false;
+            this.height = this.mainBox.get_height();
+            this.mainBox.set_height(this.height);
             this.operativePanel.visible = operPanelVisible;
-            this.favBoxWrapper.visible = !operPanelVisible;
-         } else
-            this.mainBox.set_height(this.mainBox.get_height());
+            this.favoritesScrollBox.actor.visible = !operPanelVisible;
+         } else {
+            this.height = this.mainBox.get_height();
+            this.mainBox.set_height(this.height);
+         }
+         this._updateView();
       }
-      this._updateView();
    },
 
    _updateWidth: function() {
@@ -3651,6 +3687,9 @@ MyApplet.prototype = {
       } else {
          this.mainBox.set_width(-1);
          this._updateView();
+         this.width = this.mainBox.get_width();
+         this.mainBox.set_width(this.width);
+
       }
    },
 
@@ -3734,7 +3773,7 @@ MyApplet.prototype = {
                global.set_cursor(Cinnamon.Cursor.DND_MOVE);
             } else
                global.unset_cursor();
-         } else
+         } else if(global.cursor == Cinnamon.Cursor.DND_MOVE)
             global.unset_cursor();
       }
    },
@@ -4178,10 +4217,10 @@ MyApplet.prototype = {
       this.endBox.add_actor(this.endHorizontalBox);
      // this.endBox.add(this.endHorizontalBox, { x_fill: false, x_align: St.Align.START, y_align: St.Align.END, y_fill: false, expand: false });
       this.endBox.add(this.bttChanger.actor, { x_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: false });
-      this.endBox.add(this.searchEntry, { x_fill: false, x_align: St.Align.START, y_align: St.Align.END, y_fill: false, expand: false });
-      this.betterPanel.add(this.endBox, { x_fill: true, y_align: St.Align.START, y_align: St.Align.END, expand: false });
+      this.endBox.add(this.searchEntry, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.END, expand: false });
+      this.betterPanel.add(this.endBox, { x_fill: true, y_align: St.Align.END, expand: false });
       this.operativePanel.visible = false;
-      //this.favBoxWrapper.visible = true;
+      //this.favoritesScrollBox.actor.visible = true;
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.staticBox.actor, { y_fill: true });
       this.favoritesBox.style_class = '';
@@ -4198,7 +4237,7 @@ MyApplet.prototype = {
          operPanelVisible = true;
       this._clearView();
       this.operativePanel.visible = !operPanelVisible;
-      this.favBoxWrapper.visible = operPanelVisible;
+      this.favoritesScrollBox.actor.visible = operPanelVisible;
       this._updateView();
    },
 
@@ -4211,7 +4250,7 @@ MyApplet.prototype = {
       this._clearView();
       this.staticBox.actor.visible = operPanelVisible;
       this.operativePanel.visible = !operPanelVisible;
-      this.favBoxWrapper.visible = operPanelVisible;
+      this.favoritesScrollBox.actor.visible = operPanelVisible;
       if((this.showAppTitle)||(this.showAppDescription))
          this.endHorizontalBox.visible = !operPanelVisible;
       this._updateView();
@@ -4849,6 +4888,23 @@ MyApplet.prototype = {
       return has_entries;
    },
 
+   _initialDisplay: function() {
+      if(!this.displayed) {
+         for(let i = 0; i < this._applicationsButtons.length; i++) {
+               if(!this._applicationsButtons[i].actor.visible)
+                  this._applicationsButtons[i].actor.show();
+         }
+         Mainloop.idle_add(Lang.bind(this, this._initial_cat_selection));
+         this.displayed = true;
+         this.mainBox.set_width(this.width);
+         this.mainBox.set_height(this.height);
+         if(this.updateTheme) {
+            this.updateTheme = false;
+            Mainloop.idle_add(Lang.bind(this, this._updateSize()));
+         }
+      }
+   },
+
    _onOpenStateChanged: function(menu, open) {
       if(open) {
          this.menuIsOpening = true;
@@ -4859,16 +4915,8 @@ MyApplet.prototype = {
          this._activeActor = null;
          this.initButtonLoad = 30;
          let n = Math.min(this._applicationsButtons.length, this.initButtonLoad)
-         if(!this.displayed) {
-            for(let i = 0; i < this._applicationsButtons.length; i++) {
-               if(!this._applicationsButtons[i].actor.visible)
-                  this._applicationsButtons[i].actor.show();
-            }
-         }
-         this.displayed = true;
+         this._initialDisplay();
          this._allAppsCategoryButton.actor.style_class = "menu-category-button-selected";
-         //Mainloop.idle_add(Lang.bind(this, this._initial_cat_selection));
-         Mainloop.idle_add(Lang.bind(this, this._updateSize()));
          this.selectedAppBox.setDateTimeVisible(this.showTimeDate);
       }
       else {
@@ -4890,6 +4938,7 @@ MyApplet.prototype = {
          this.selectedAppBox.setDateTimeVisible(false);
          if(this.bttChanger) 
             this.bttChanger.activateSelected(_("All Applications"));
+         this._clearView();
       }
    }
 };

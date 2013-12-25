@@ -258,27 +258,23 @@
    },
    "width" : {
       "type": "spinbutton",
-      "default" : 300,
+      "default" : 700,
+      "min" : 300,
+      "max" : 3000,
+      "step" : 5,
+      "units" : "pixels",
+      "description" : "Width:",
+      "tooltip" : "Width of menu."
+   },
+   "height" : {
+      "type": "spinbutton",
+      "default" : 500,
       "min" : 300,
       "max" : 2000,
       "step" : 5,
       "units" : "pixels",
-      "description" : "Width:",
-      "tooltip" : "Width of menu.",
-      "indent": true,
-      "dependency": "controling-size"
-   },
-   "height" : {
-      "type": "spinbutton",
-      "default" : 300,
-      "min" : 300,
-      "max" : 1000,
-      "step" : 5,
-      "units" : "pixels",
       "description" : "Height:",
-      "tooltip" : "Height of menu.",
-      "indent": true,
-      "dependency": "controling-size"
+      "tooltip" : "Height of menu."
    },
    "scroll-favorites" : {
       "type" : "checkbox",
