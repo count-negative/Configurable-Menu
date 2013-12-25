@@ -1115,7 +1115,7 @@ GenericApplicationButtonExtended.prototype = {
    _subMenuOpenStateChanged: function() {
       if(this.menu.isOpen) {
          this.appsMenuButton._scrollToButton(this.menu);
-         this.parent._updateWidth();
+         this.parent._updateSize();
       }
    }
 };
@@ -1390,7 +1390,7 @@ HoverIcon.prototype = {
        if(!this.menu.isOpen)
           this.parent.searchEntry.set_width(-1);
        else
-          this.parent._updateWidth();
+          this.parent._updateSize();
           //this.menu.actor.can_focus = false;
        /*else
           this.menu.actor.can_focus = true;*/
@@ -2985,8 +2985,8 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.IN, "app-description-size", "appDescriptionSize", this._updateAppSelectedText, null);
 
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "controling-size", "controlingSize", this._setControlSize, null);
-         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "width", "width", this._updateWidth, null);
-         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "height", "height", this._updateHeight, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "width", "width", this._updateSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "height", "height", this._updateSize, null);
 
          this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-favorites", "scrollFavoritesVisible", this._setVisibleScrollFav, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-categories", "scrollCategoriesVisible", this._setVisibleScrollCat, null);
@@ -3527,8 +3527,10 @@ MyApplet.prototype = {
    },
 
    _setVisibleViewControl: function() {
-      if(this.controlView)
+      if(this.controlView) {
          this.controlView.actor.visible = this.showView;
+         this._updateSize();
+      }
    },
 
    _changeView: function() {
@@ -3601,8 +3603,6 @@ MyApplet.prototype = {
       this.updateTheme = true;
       this._updateComplete();
       this.menu.open();
-      /*if(this.controlingSize)
-         Mainloop.idle_add(Lang.bind(this, this._updateSize()));*/
    },
 
    _updateComplete: function() {
@@ -3647,76 +3647,60 @@ MyApplet.prototype = {
          this.powerBox.actor.visible = this.showPowerButtons;
       }
       this._refreshFavs();
-      //this._refreshPlacesAndRecent();
-      //this._updateSize();
    },
 
    _setControlSize: function() {
-      this._updateSize();
       this.controlView.changeResizeActive(this.controlingSize);
+      this._updateSize();
    },
 
    _updateSize: function() {
       if((this.mainBox)&&(this.displayed)) {
-         this._updateWidth();
-         this._updateHeight();
-      }
-   },
-
-   _updateHeight: function() {
-      if(this.controlingSize) {
-         let monitorHeight = Main.layoutManager.primaryMonitor.height;
-         if(this.height > monitorHeight)
-            this.height = monitorHeight;
-         if(this.height < 300)
-            this.height = 300;
-         this.mainBox.set_height(this.height);
-         this._updateView();
-      }
-      else {
-         this.mainBox.set_height(-1);
-         this._clearView();
-         if(this.bttChanger) {
-            let operPanelVisible = this.operativePanel.visible;
-            this.operativePanel.visible = true;
-            this.favoritesScrollBox.actor.visible = false;
-            this.height = this.mainBox.get_height();
+         if(this.controlingSize) {
+            if(this.width > this.mainBox.get_width()) {
+               let monitorWidth = Main.layoutManager.primaryMonitor.width;
+               if(this.width > monitorWidth)
+                  this.width = monitorWidth;
+               this.mainBox.set_width(this.width);
+            } else {
+               this.mainBox.set_width(this.width);
+               this._clearView();
+               Mainloop.idle_add(Lang.bind(this, function() {//checking correct width and revert if it's needed.
+                  let minWidth = this._minimalWidth();
+                  if(this.width < minWidth) {
+                     this.width = minWidth;
+                     this.mainBox.set_width(this.width);
+                     this._updateView();
+                  }
+               }));
+            }
+            let monitorHeight = Main.layoutManager.primaryMonitor.height;
+            if(this.height > monitorHeight)
+               this.height = monitorHeight;
+            if(this.height < 300)
+               this.height = 300;
             this.mainBox.set_height(this.height);
-            this.operativePanel.visible = operPanelVisible;
-            this.favoritesScrollBox.actor.visible = !operPanelVisible;
-         } else {
-            this.height = this.mainBox.get_height();
-            this.mainBox.set_height(this.height);
-         }
-         this._updateView();
-      }
-   },
-
-   _updateWidth: function() {
-      if(this.controlingSize) {
-         if(this.width > this.mainBox.get_width()) {
-            let monitorWidth = Main.layoutManager.primaryMonitor.width;
-            if(this.width > monitorWidth)
-               this.width = monitorWidth;
-            this.mainBox.set_width(this.width);
             this._updateView();
          } else {
+            this.mainBox.set_width(-1);
+            this.mainBox.set_height(-1);
             this._clearView();
+            if(this.bttChanger) {
+               let operPanelVisible = this.operativePanel.visible;
+               this.operativePanel.visible = true;
+               this.favoritesScrollBox.actor.visible = false;
+               this.height = this.mainBox.get_height();
+               this.mainBox.set_height(this.height);
+               this.operativePanel.visible = operPanelVisible;
+               this.favoritesScrollBox.actor.visible = !operPanelVisible;
+            } else {
+               this.height = this.mainBox.get_height();
+               this.mainBox.set_height(this.height);
+            }
+            this._updateView();
+            this.width = this.mainBox.get_width();
             this.mainBox.set_width(this.width);
-            Mainloop.idle_add(Lang.bind(this, function() {//checking correct width and revert if it's needed.
-               let minWidth = this._minimalWidth();
-               if(this.width < minWidth)
-                  this.width = minWidth;
-               this.mainBox.set_width(this.width);
-               this._updateView();
-            }));
          }
-      } else {
-         this.mainBox.set_width(-1);
-         this._updateView();
-         this.width = this.mainBox.get_width();
-         this.mainBox.set_width(this.width);
-
       }
    },
 
@@ -4473,7 +4457,6 @@ MyApplet.prototype = {
       if(actor.get_width() > this._applicationsBoxWidth) {
          this._applicationsBoxWidth = actor.get_width(); // The answer to life...
          //this.applicationsBox.set_width(this.iconViewCount*this._applicationsBoxWidth + 42); 
-         this._updateSize();
       }
    },
 
@@ -4523,7 +4506,6 @@ MyApplet.prototype = {
             ++j;
          }
       }
-      this._updateSize();
    },
 
    _refreshApps: function() {
@@ -4819,7 +4801,6 @@ MyApplet.prototype = {
          }
       }
       this._setCategoriesButtonActive(!this.searchActive);
-      //this._updateSize();
    },
 
    _appLeaveEvent: function(a, b, applicationButton) {
@@ -4972,9 +4953,6 @@ MyApplet.prototype = {
          this.destroyVectorBox();
          this.powerBox.disableSelected();
          this.selectedAppBox.setDateTimeVisible(false);
-         if(this.updateTheme) {
-            Mainloop.idle_add(Lang.bind(this, this._updateSize()));
-         }
       }
    }
 };
