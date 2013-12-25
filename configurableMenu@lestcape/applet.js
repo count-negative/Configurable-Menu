@@ -3405,34 +3405,7 @@ MyApplet.prototype = {
       return null;
    },
 
-   _updateView: function() {
-      this._clearView();
-      let visibleAppButtons = new Array();
-      for(let i = 0; i < this._applicationsButtons.length; i++) {
-         if(this._applicationsButtons[i].actor.visible) {
-            this._applicationsButtons[i].setVertical(this.iconView);
-            visibleAppButtons.push(this._applicationsButtons[i]);
-         }
-      }
-      for(let i = 0; i < this._placesButtons.length; i++) {
-         if(this._placesButtons[i].actor.visible) {
-            this._placesButtons[i].setVertical(this.iconView);
-            visibleAppButtons.push(this._placesButtons[i]);
-         }
-      }
-      for(let i = 0; i < this._recentButtons.length; i++) {
-         if(this._recentButtons[i].actor.visible) {
-            this._recentButtons[i].setVertical(this.iconView);
-            visibleAppButtons.push(this._recentButtons[i]);
-         }
-      }
-      for(let i = 0; i < this._transientButtons.length; i++) {
-         if(this._transientButtons[i].actor.visible) {
-            this._transientButtons[i].setVertical(this.iconView);
-            visibleAppButtons.push(this._transientButtons[i]);
-         }
-      }
-// + 42
+   _createGridView: function(visibleAppButtons) {
       this.aviableWidth = this.applicationsScrollBox.actor.get_allocation_box().x2-this.applicationsScrollBox.actor.get_allocation_box().x1 - 42;
       if((this.aviableWidth > 0)&&(this._applicationsBoxWidth > 0)) {
          this.iconViewCount = Math.floor(this.aviableWidth/this._applicationsBoxWidth);
@@ -3469,6 +3442,51 @@ MyApplet.prototype = {
       } catch(e) {
         Main.notify("Error10", e.message);
       }
+   },
+
+   _updateView: function() {
+      this._clearView();
+      let visibleButtons = this._prepareUpdateView();
+      this._findMaxWidth();
+      this._createGridView(visibleButtons);
+   },
+
+   _findMaxWidth: function() {
+      this._applicationsBoxWidth = 0;   
+      for(let i = 0; i < this._applicationsButtons.length; i++) {
+          if(this._applicationsButtons[i].actor.get_width() > this._applicationsBoxWidth) {
+              this._applicationsBoxWidth = this._applicationsButtons[i].actor.get_width();
+          }
+      }
+   },
+
+   _prepareUpdateView: function() {
+      let visibleAppButtons = new Array();
+      for(let i = 0; i < this._applicationsButtons.length; i++) {
+         if(this._applicationsButtons[i].actor.visible) {
+            this._applicationsButtons[i].setVertical(this.iconView);
+            visibleAppButtons.push(this._applicationsButtons[i]);
+         }
+      }
+      for(let i = 0; i < this._placesButtons.length; i++) {
+         if(this._placesButtons[i].actor.visible) {
+            this._placesButtons[i].setVertical(this.iconView);
+            visibleAppButtons.push(this._placesButtons[i]);
+         }
+      }
+      for(let i = 0; i < this._recentButtons.length; i++) {
+         if(this._recentButtons[i].actor.visible) {
+            this._recentButtons[i].setVertical(this.iconView);
+            visibleAppButtons.push(this._recentButtons[i]);
+         }
+      }
+      for(let i = 0; i < this._transientButtons.length; i++) {
+         if(this._transientButtons[i].actor.visible) {
+            this._transientButtons[i].setVertical(this.iconView);
+            visibleAppButtons.push(this._transientButtons[i]);
+         }
+      }
+      return visibleAppButtons;
    },
 
    _clearView: function() {
@@ -3535,9 +3553,14 @@ MyApplet.prototype = {
 
    _changeView: function() {
       this.controlView.changeViewSelected(this.iconView);
-      this._refreshApps();
+      this._updateView();
+     /* this._prepareUpdateView();
+      this._findMaxWidth();*/
+      this._clearPrevCatSelection(this._allAppsCategoryButton.actor);
+      this._allAppsCategoryButton.actor.style_class = "menu-category-button-selected";
+      this._select_category(null, this._allAppsCategoryButton);
+      this._updateSize();
       this._refreshFavs();
-      this.updateSize();
    },
 
    _setVisibleFavorites: function() {
@@ -4028,11 +4051,7 @@ MyApplet.prototype = {
 
          Mainloop.idle_add(Lang.bind(this, function() {
             this._clearAllSelections(true);
-            this._applicationsBoxWidth = 0;   
-            for(let i = 0; i < this._applicationsButtons.length; i++) {
-               if(this._applicationsButtons[i].actor.get_width() > this._applicationsBoxWidth)
-                  this._applicationsBoxWidth = this._applicationsButtons[i].actor.get_width();
-            }
+            //this._findMaxWidth();
          }));
       } catch(e) {
          Main.notify("Error:", e.message);
@@ -4436,7 +4455,7 @@ MyApplet.prototype = {
          let viewBox;
          for(let i = 0; i < autocompletes.length; i++) {
             let button = new TransientButtonExtended(this, autocompletes[i], this.iconAppSize);
-            //button.actor.connect('realize', Lang.bind(this, this._onApplicationButtonRealized));
+            button.actor.connect('realize', Lang.bind(this, this._onApplicationButtonRealized));
             button.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, button));
             this._addEnterEvent(button, Lang.bind(this, this._appEnterEvent, button));
             this._transientButtons.push(button);
@@ -4455,7 +4474,7 @@ MyApplet.prototype = {
 
    _onApplicationButtonRealized: function(actor) {
       if(actor.get_width() > this._applicationsBoxWidth) {
-         this._applicationsBoxWidth = actor.get_width(); // The answer to life...
+         //this._applicationsBoxWidth = actor.get_width(); // The answer to life...
          //this.applicationsBox.set_width(this.iconViewCount*this._applicationsBoxWidth + 42); 
       }
    },
@@ -4884,7 +4903,7 @@ MyApplet.prototype = {
                if(!(app_key in this._applicationsButtonFromApp)) {
                   let applicationButton = new ApplicationButtonExtended(this, app, this.iconView, this.iconAppSize, this.iconMaxFavSize);
                   this._applicationsButtons.push(applicationButton);
-                  //applicationButton.actor.connect('realize', Lang.bind(this, this._onApplicationButtonRealized));
+                  applicationButton.actor.connect('realize', Lang.bind(this, this._onApplicationButtonRealized));
                   applicationButton.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, applicationButton));
                   this._addEnterEvent(applicationButton, Lang.bind(this, this._appEnterEvent, applicationButton));
                   applicationButton.category.push(top_dir.get_menu_id());
