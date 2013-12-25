@@ -3447,6 +3447,12 @@ MyApplet.prototype = {
    _updateView: function() {
       this._clearView();
       let visibleButtons = this._prepareUpdateView();
+      this._createGridView(visibleButtons);
+   },
+
+   _updateViewFirstTime: function() {
+      this._clearView();
+      let visibleButtons = this._prepareUpdateView();
       this._findMaxWidth();
       this._createGridView(visibleButtons);
    },
@@ -3456,7 +3462,8 @@ MyApplet.prototype = {
       for(let i = 0; i < this._applicationsButtons.length; i++) {
           if(this._applicationsButtons[i].actor.get_width() > this._applicationsBoxWidth) {
               this._applicationsBoxWidth = this._applicationsButtons[i].actor.get_width();
-          }
+          } else if(this._applicationsButtons[i].actor.get_width() == 0)
+              Mainloop.timeout_add(10, Lang.bind(this, this._findMaxWidth));
       }
    },
 
@@ -3553,9 +3560,9 @@ MyApplet.prototype = {
 
    _changeView: function() {
       this.controlView.changeViewSelected(this.iconView);
-      this._updateView();
-     /* this._prepareUpdateView();
-      this._findMaxWidth();*/
+      //this._updateView();
+      this._prepareUpdateView();
+      this._findMaxWidth();
       this._clearPrevCatSelection(this._allAppsCategoryButton.actor);
       this._allAppsCategoryButton.actor.style_class = "menu-category-button-selected";
       this._select_category(null, this._allAppsCategoryButton);
@@ -4051,7 +4058,6 @@ MyApplet.prototype = {
 
          Mainloop.idle_add(Lang.bind(this, function() {
             this._clearAllSelections(true);
-            //this._findMaxWidth();
          }));
       } catch(e) {
          Main.notify("Error:", e.message);
@@ -4469,7 +4475,7 @@ MyApplet.prototype = {
             }
          }
       }
-      this._updateView();
+      this._updateViewFirstTime();
    },
 
    _onApplicationButtonRealized: function(actor) {
