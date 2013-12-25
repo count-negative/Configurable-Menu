@@ -1,5 +1,5 @@
 // Applet : Configurable Menu      Version      : v0.7-Beta
-// O.S.   : Cinnamon               Release Date : 17 dicember 2013.
+// O.S.   : Cinnamon               Release Date : 25 dicember 2013.
 // Author : Lester Carballo Pérez  Email        : lestcape@gmail.com
 //
 // Website : https://github.com/lestcape/Configurable-Menu
@@ -310,6 +310,17 @@ StaticBox.prototype = {
       this.actor.connect('key-focus-out', Lang.bind(this, function(actor, event) {
          this.disableSelected();
       }));
+      this.actor._delegate = this;
+   },
+
+   acceptDrop : function(source, actor, x, y, time) {
+      if(source instanceof FavoritesButtonExtended) {
+         source.actor.destroy();
+         actor.destroy();
+         AppFavorites.getAppFavorites().removeFavorite(source.app.get_id());
+         return true;
+      }
+      return false;
    },
 
    takeHover: function(take) {
@@ -867,12 +878,12 @@ PowerBox.prototype = {
    }
 };
 
-function ControlBox(parent, iconView, iconSize) {
-   this._init(parent, iconView, iconSize);
+function ControlBox(parent, iconSize) {
+   this._init(parent, iconSize);
 }
 
 ControlBox.prototype = {
-   _init: function(parent, iconView, iconSize) {
+   _init: function(parent, iconSize) {
       this.parent = parent;
       this.iconSize = iconSize;
       this.actor = new St.BoxLayout({ vertical: false });
@@ -881,12 +892,12 @@ ControlBox.prototype = {
       //this.actor.add(this.bttViewList, { x_fill: false, expand: false });
       this.bttViewGrid = this._createSymbolicButton('view-grid-symbolic', { x_fill: false, expand: false });
       this.bttViewGrid.connect('clicked', Lang.bind(this, this._onClickedChangeView));
+      this.bttResize = this._createSymbolicButton('view-fullscreen', { x_fill: false, expand: false });
+      this.bttResize.connect('clicked', Lang.bind(this, this._onClickedChangeResize));
       this.bttSettings = this._createSymbolicButton('preferences-system', {x_fill: false, x_align: St.Align.END, expand: true});
       this.bttSettings.connect('clicked', Lang.bind(this, this._onSettings));
-      this.bttSettings.get_children()[0].set_icon_size(this.iconSize - 10);
-      this.bttSettings.get_children()[0].set_style("padding-left: "+(8)+"px;padding-right: "+(8)+"px;margin:auto;");
-      //this.actor.add(this.bttViewGrid, { x_fill: false, expand: false });
-      this.changeViewSelected(iconView);
+      this.changeViewSelected(this.parent.iconView);
+      this.changeResizeActive(this.parent.controlingSize);
    },
 
    _onClickedChangeView: function(actor, event) {
@@ -894,10 +905,23 @@ ControlBox.prototype = {
       this.parent._changeView();
    },
 
+   _onClickedChangeResize: function(actor, event) {
+      this.changeResizeActive(!this.parent.controlingSize);
+      this.parent._setControlSize();
+   },
+
    _onSettings: function(actor, event) {
       //this._effectIcon(actor, 0.2);
       this.parent.menu.close();
       Util.spawn(['cinnamon-settings', 'applets', this.parent.uuid]);
+   },
+
+   changeResizeActive: function(resizeActive) {
+      this.parent.controlingSize = resizeActive;
+      if(resizeActive)
+         this.bttResize.get_children()[0].set_icon_name('view-fullscreen');  
+      else
+         this.bttResize.get_children()[0].set_icon_name('zoom-out');
    },
 
    changeViewSelected: function(iconView) {
@@ -913,11 +937,10 @@ ControlBox.prototype = {
    },
 
    setIconSize: function(iconSize) {
-      this.iconSize = iconSize;
-      if((this.bttViewList)&&(this.bttViewList.get_children()[0]))
-         this.bttViewList.get_children()[0].set_icon_size(this.iconSize);
-      if((this.bttViewGrid)&&(this.bttViewGrid.get_children()[0]))
-         this.bttViewGrid.get_children()[0].set_icon_size(this.iconSize);
+      let childBtt = this.actor.get_children();
+      for(let i = 0; i < childBtt.length; i++) {
+         childBtt[i].get_children()[0].set_icon_size(iconSize);
+      }
    },
 
    _createSymbolicButton: function(icon, properties) {
@@ -939,7 +962,10 @@ ControlBox.prototype = {
       btt.set_style_class_name('menu-category-button');
       btt.set_style('padding: 0px;');
       return btt;
-   }
+   },
+
+   navegateControlBox: function(symbol, actor) {
+   },
 /*
    _effectIcon: function(effectIcon, time) {
       Tweener.addTween(effectIcon,
@@ -2931,7 +2957,6 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this._onThemeChange, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "show-view-item", "showView", this._setVisibleViewControl, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "view-item", "iconView", this._changeView, null);
-         //this.settings.bindProperty(Settings.BindingDirection.IN, "view-icon-count", "iconViewCount", this._refreshApps, null);
 
          this.settings.bindProperty(Settings.BindingDirection.IN, "activate-on-press", "activateOnPress", null, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "icon-app-size", "iconAppSize", this._refreshApps, null);
@@ -2956,7 +2981,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.IN, "show-app-description", "showAppDescription", this._updateAppSelectedText, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "app-description-size", "appDescriptionSize", this._updateAppSelectedText, null);
 
-         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "controling-size", "controlingSize", this._updateSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "controling-size", "controlingSize", this._setControlSize, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "width", "width", this._updateWidth, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "height", "height", this._updateHeight, null);
 
@@ -3080,8 +3105,8 @@ MyApplet.prototype = {
    _changeFocusElement: function(elementActive) {
       let tbttChanger = null;
       if(this.bttChanger) tbttChanger = this.bttChanger.actor;
-      let activeElements = [this.hover.actor, this.staticBox.actor, this.powerBox.actor, this.searchEntry, tbttChanger, this.favoritesScrollBox.actor];
-      let actors = [this.hover.actor, this.staticBox.actor, this.powerBox.actor, this.searchEntry, tbttChanger, this.favoritesObj.getFirstElement()];
+      let activeElements = [this.hover.actor, this.staticBox.actor, this.powerBox.actor, tbttChanger, this.searchEntry, this.favoritesScrollBox.actor];
+      let actors = [this.hover.actor, this.staticBox.actor, this.powerBox.actor, tbttChanger, this.searchEntry, this.favoritesObj.getFirstElement()];
       let index = actors.indexOf(elementActive);
       let selected = index + 1;
       while((selected < activeElements.length)&&((!activeElements[selected])||(!activeElements[selected].visible))) {
@@ -3342,14 +3367,7 @@ MyApplet.prototype = {
          this.fav_actor = this._changeFocusElement(this.bttChanger.actor);
          Mainloop.idle_add(Lang.bind(this, this._putFocus));
       } else if((symbol == Clutter.Return) || (symbol == Clutter.KEY_Return) || (symbol == Clutter.KP_Enter)) {
-         /* if(this.bttChanger.getSelected() == _("All Applications"))
-             this.fav_actor = this.searchEntry;
-          else
-             this.fav_actor = this.favoritesScrollBox.actor;*/
-          this.bttChanger.activateNext();
-          this.fav_actor = this._changeFocusElement(this.bttChanger.actor);
-         // Mainloop.idle_add(Lang.bind(this, this._putFocus));
-          Mainloop.idle_add(Lang.bind(this, this._putFocus));
+         this.bttChanger.activateNext();
       }
       return true;
    },
@@ -3618,8 +3636,9 @@ MyApplet.prototype = {
       }
       if(this.staticBox)
          this.staticBox.setIconSize(this.iconAccessibleSize);
-      if(this.controlView)
+      if(this.controlView) {
          this.controlView.setIconSize(this.iconControlSize);
+      }
       if(this.powerBox) {
          this.powerBox.setIconSize(this.iconPowerSize);
          this.powerBox.actor.visible = this.showPowerButtons;
@@ -3627,6 +3646,11 @@ MyApplet.prototype = {
       this._refreshFavs();
       //this._refreshPlacesAndRecent();
       //this._updateSize();
+   },
+
+   _setControlSize: function() {
+      this._updateSize();
+      this.controlView.changeResizeActive(this.controlingSize);
    },
 
    _updateSize: function() {
@@ -3770,11 +3794,16 @@ MyApplet.prototype = {
          at = ay + actor.get_height();
          if(this._isInsideMenu(mx, my, ax, ay, ar, at)) {
             if(this._correctPlaceResize(mx, my, ax, ay, ar, at)) {
+               this._cursorChanged = true;
                global.set_cursor(Cinnamon.Cursor.DND_MOVE);
-            } else
+            } else if(this._cursorChanged) {
+               this._cursorChanged = false;
                global.unset_cursor();
-         } else if(global.cursor == Cinnamon.Cursor.DND_MOVE)
+            }
+         } else if(this._cursorChanged) {
+            this._cursorChanged = false;
             global.unset_cursor();
+         }
       }
    },
 
@@ -3919,7 +3948,7 @@ MyApplet.prototype = {
          this.searchEntryText.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
          this._previousSearchPattern = "";
 
-         this.controlView = new ControlBox(this, this.iconView, this.iconControlSize);
+         this.controlView = new ControlBox(this, this.iconControlSize);
 
 //search
 
@@ -4190,7 +4219,7 @@ MyApplet.prototype = {
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.betterPanel.set_vertical(true);
       this.betterPanel.add(this.favBoxWrapper, { x_fill: true, y_fill: true, y_align: St.Align.MIDDLE, expand: true });
-      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.favBoxWrapper.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.operativePanel.visible = false;
       this.mainBox.add(this.staticBox.actor, { y_fill: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
@@ -4206,19 +4235,19 @@ MyApplet.prototype = {
       this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
-      this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: true, y_align: St.Align.MIDDLE, expand: true });
       this.powerBox = new PowerBox(this, false, this.iconPowerSize, true, this.hover, this.selectedAppBox);
       this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
       this.staticBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.betterPanel.set_vertical(true);
       this.betterPanel.add(this.favBoxWrapper, { x_fill: true, y_fill: true, y_align: St.Align.MIDDLE, expand: true });
-      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.favBoxWrapper.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.endBox.add_actor(this.endHorizontalBox);
      // this.endBox.add(this.endHorizontalBox, { x_fill: false, x_align: St.Align.START, y_align: St.Align.END, y_fill: false, expand: false });
       this.endBox.add(this.bttChanger.actor, { x_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: false });
       this.endBox.add(this.searchEntry, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.END, expand: false });
-      this.betterPanel.add(this.endBox, { x_fill: true, y_align: St.Align.END, expand: false });
+      this.betterPanel.add(this.endBox, { x_fill: true, y_fill: true, y_align: St.Align.END, expand: false });
       this.operativePanel.visible = false;
       //this.favoritesScrollBox.actor.visible = true;
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
@@ -4248,6 +4277,8 @@ MyApplet.prototype = {
       if(titleAppBar == selected)
          operPanelVisible = true;
       this._clearView();
+       this.powerBox.actor.visible = operPanelVisible;
+      this.hover.actor.visible = operPanelVisible;
       this.staticBox.actor.visible = operPanelVisible;
       this.operativePanel.visible = !operPanelVisible;
       this.favoritesScrollBox.actor.visible = operPanelVisible;
@@ -4492,7 +4523,7 @@ MyApplet.prototype = {
       this._updateSize();
    },
 
-   _refreshApps : function() {
+   _refreshApps: function() {
       for(let i = 0; i < this._categoryButtons.length; i++)
          this._categoryButtons[i].actor.destroy();
       this.applicationsBox.destroy_all_children();
@@ -4920,6 +4951,8 @@ MyApplet.prototype = {
          this.selectedAppBox.setDateTimeVisible(this.showTimeDate);
       }
       else {
+         if(this.bttChanger) 
+            this.bttChanger.activateSelected(_("All Applications"));
          this._disableResize();
          this.actor.remove_style_pseudo_class('active');
          if(this.searchActive) {
@@ -4936,9 +4969,9 @@ MyApplet.prototype = {
          this.destroyVectorBox();
          this.powerBox.disableSelected();
          this.selectedAppBox.setDateTimeVisible(false);
-         if(this.bttChanger) 
-            this.bttChanger.activateSelected(_("All Applications"));
-         this._clearView();
+         if(this.updateTheme) {
+            Mainloop.idle_add(Lang.bind(this, this._updateSize()));
+         }
       }
    }
 };

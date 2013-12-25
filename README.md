@@ -5,7 +5,7 @@ Applet: Configurable Menu Version: v0.7-Beta
 
 O.S.: Cinnamon 
 
-Release Date: 24 dicember 2013
+Release Date: 25 dicember 2013
 
 Author: Lester Carballo Pérez
 
@@ -71,11 +71,12 @@ Add new languages:
 Change Log:
 ==============
 0.7-Beta
-   - Fixed a bug in the keyboard navigation, when press tab key when a component was not visible.
+   - Fixed a bug in the keyboard navigation, and add for more componets.
    - Now you can control the size of all icons in the menu.
    - Added Accessible theme to allow the bar like Mint menu.
    - Added Accessible Inverted theme to allow the bar like Windows menu.
    - Added Mint theme.
+   - Added Windows 7 theme.
    - A button to swap "all app" by "favorites" was implemented.
    - The favorites can show the text of applications also in icon and list view mode.
    - The power buttons was reimplemented, now are better.
@@ -88,8 +89,8 @@ Change Log:
    - Implementation of power buttons box to be modular.
    - Implementation of scroll buttons class to be modular, also now allow to handle the height so much better.
    - Changed the mode of controlling the numbers of columns of the items view.
-   - Added Windows 7 theme.
    - Added option to resize the menu with the mouse.
+   - Added button to the control box to allow or not the resize of menu.
 
 0.6-Beta
    - Fixed several bugs.
