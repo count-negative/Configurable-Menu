@@ -3467,7 +3467,7 @@ MyApplet.prototype = {
             }
          }
       } catch(e) {
-       // Main.notify("Error10", e.message);
+        Main.notify("Error10", e.message);
       }
    },
 
@@ -4436,7 +4436,7 @@ MyApplet.prototype = {
          let viewBox;
          for(let i = 0; i < autocompletes.length; i++) {
             let button = new TransientButtonExtended(this, autocompletes[i], this.iconAppSize);
-            button.actor.connect('realize', Lang.bind(this, this._onApplicationButtonRealized));
+            //button.actor.connect('realize', Lang.bind(this, this._onApplicationButtonRealized));
             button.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, button));
             this._addEnterEvent(button, Lang.bind(this, this._appEnterEvent, button));
             this._transientButtons.push(button);
@@ -4884,7 +4884,7 @@ MyApplet.prototype = {
                if(!(app_key in this._applicationsButtonFromApp)) {
                   let applicationButton = new ApplicationButtonExtended(this, app, this.iconView, this.iconAppSize, this.iconMaxFavSize);
                   this._applicationsButtons.push(applicationButton);
-                  applicationButton.actor.connect('realize', Lang.bind(this, this._onApplicationButtonRealized));
+                  //applicationButton.actor.connect('realize', Lang.bind(this, this._onApplicationButtonRealized));
                   applicationButton.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, applicationButton));
                   this._addEnterEvent(applicationButton, Lang.bind(this, this._appEnterEvent, applicationButton));
                   applicationButton.category.push(top_dir.get_menu_id());
