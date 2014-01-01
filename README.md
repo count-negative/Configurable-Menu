@@ -1,11 +1,11 @@
-Configurable Menu v0.7-Beta
+Configurable Menu v0.8-Beta
 ==============
 
-Applet: Configurable Menu Version: v0.7-Beta
+Applet: Configurable Menu Version: v0.8-Beta
 
 O.S.: Cinnamon 
 
-Release Date: 25 dicember 2013
+Release Date: 01 january 2014
 
 Author: Lester Carballo Pérez
 
@@ -72,6 +72,13 @@ Add new languages:
 
 Change Log:
 ==============
+0.8-Beta
+   - Accessible bar it's now configurable and have two drag and drop areas(Places and Apps(systems)).
+   - Implemented new place buttons(PC, Desktop, Home and Trash).
+   - You can add item to accessible bar with submenu and drag and drop option, also places.
+   - Favorites Buttons have submenu now.
+   - Reduce the width of search in windows 7 theme to be the same size or less of Favorites Buttons area.
+
 0.7-Beta
    - Fixed a bug in the keyboard navigation, and add for more componets.
    - Now you can control the size of all icons in the menu.

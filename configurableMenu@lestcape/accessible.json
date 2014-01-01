@@ -1,0 +1,4 @@
+{
+    "list-places": "bookmark:file://computer:///,bookmark:file://trash:///",
+    "list-apps": "synaptic.desktop,update-manager.desktop,gnome-terminal.desktop,yelp.desktop"
+}
