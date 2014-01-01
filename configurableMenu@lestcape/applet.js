@@ -3262,22 +3262,41 @@ SpecialBookmarks.prototype = {
 };
 
 
-function AccessibleMetaData(config_path, onChangeCallBack) {
-   this._init(config_path, onChangeCallBack);
+function AccessibleMetaData(uuid, onChangeCallBack) {
+   this._init(uuid, onChangeCallBack);
 }
 
 AccessibleMetaData.prototype = {
 
-   _init: function(config_path, onChangeCallBack) {
-      this.config_path = config_path;
-      this.onChangeCallBack = onChangeCallBack;
+   _init: function(uuid, onChangeCallBack) {
+      let config_source = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + uuid + "/accessible.json";
+      let sourceFile = Gio.File.new_for_path(config_source);
+      let config_path = GLib.get_home_dir() + "/.config/" + uuid + "/accessible.json";
       this.metaDataFile = Gio.File.new_for_path(config_path);
       if(!this.metaDataFile.query_exists(null)) {
-         throw this.logError('File not found: ' + this.metaDataFile.get_path());
-      }
+         this._makeDirectoy(this.metaDataFile.get_parent());
+         sourceFile.copy(this.metaDataFile, Gio.FileCopyFlags.OVERWRITE, null, null);
+      }      
+      this.onChangeCallBack = onChangeCallBack;
       this._loadMetaData();
    },
 
+   _isDirectory: function(fDir) {
+      try {
+         let info = fDir.query_filesystem_info("standard::type", null);
+         if((info)&&(info.get_file_type() != Gio.FileType.DIRECTORY))
+            return true;
+      } catch(e) {
+      }
+      return false;
+   },
+
+   _makeDirectoy: function(fDir) {
+      if(!this._isDirectory(fDir))
+         this._makeDirectoy(fDir.get_parent());
+      if(!this._isDirectory(fDir))
+         fDir.make_directory(null);
+   },
 
    _loadMetaData: function() {
       try {
@@ -3429,7 +3448,6 @@ MyApplet.prototype = {
 
          this.menuManager = new PopupMenu.PopupMenuManager(this);
          this.menuManager.addMenu(this.menu);   
-//this.on_orientation_changed(orientation);
          this.actor.connect('key-press-event', Lang.bind(this, this._onSourceKeyPress));
          this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPressEvent));
          //this._keyFocusNotifyIDSignal = global.stage.connect('notify::key-focus', Lang.bind(this, this._onKeyFocusChanged));
@@ -3504,8 +3522,7 @@ MyApplet.prototype = {
          this.RecentManager.connect('changed', Lang.bind(this, this._refreshPlacesAndRecent));
 
          this._fileFolderAccessActive = false;
-         let config_accessible_file = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + this.uuid + "/accessible.json";
-         this.accessibleMetaData = new AccessibleMetaData(config_accessible_file, Lang.bind(this, this._onChangeAccessible));
+         this.accessibleMetaData = new AccessibleMetaData(this.uuid, Lang.bind(this, this._onChangeAccessible));
          this._pathCompleter = new Gio.FilenameCompleter();
          this._pathCompleter.set_dirs_only(false);
          this.lastAcResults = new Array();
