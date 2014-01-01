@@ -2661,9 +2661,23 @@ RecentClearButtonExtended.prototype = {
       this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
 
-      this.addActor(this.container);
+      this.addActor(this.container);      
       this.icon.realize();
       this.label.realize();
+   },
+
+   _onButtonReleaseEvent: function (actor, event) {
+      if(event.get_button() == 1) {
+         this.parent.menu.close();
+         let GtkRecent = new Gtk.RecentManager();
+         GtkRecent.purge_items();
+      }
+   },
+
+   activate: function(event) {
+      this.parent.menu.close();
+      let GtkRecent = new Gtk.RecentManager();
+      GtkRecent.purge_items();
    },
 
    setIconSize: function (iconSize) {
