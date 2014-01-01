@@ -3262,16 +3262,17 @@ SpecialBookmarks.prototype = {
 };
 
 
-function AccessibleMetaData(uuid, onChangeCallBack) {
-   this._init(uuid, onChangeCallBack);
+function AccessibleMetaData(parent, onChangeCallBack) {
+   this._init(parent, onChangeCallBack);
 }
 
 AccessibleMetaData.prototype = {
 
-   _init: function(uuid, onChangeCallBack) {
-      let config_source = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + uuid + "/accessible.json";
+   _init: function(parent, onChangeCallBack) {
+      this.parent = parent;
+      let config_source = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + parent.uuid + "/accessible.json";
       let sourceFile = Gio.File.new_for_path(config_source);
-      let config_path = GLib.get_home_dir() + "/.config/" + uuid + "/accessible.json";
+      let config_path = GLib.get_home_dir() + "/.config/" + parent.uuid + "/accessible.json";
       this.metaDataFile = Gio.File.new_for_path(config_path);
       if(!this.metaDataFile.query_exists(null)) {
          this._makeDirectoy(this.metaDataFile.get_parent());
@@ -3296,6 +3297,15 @@ AccessibleMetaData.prototype = {
          this._makeDirectoy(fDir.get_parent());
       if(!this._isDirectory(fDir))
          fDir.make_directory(null);
+   },
+
+   _isBookmarks: function(bookmark) {
+      let listBookmarks = this.parent._listBookmarks();
+      for(let i = 0; i < listBookmarks.length; i++) {
+         if(listBookmarks[i].id == bookmark)
+            return true;
+      }
+      return false;
    },
 
    _loadMetaData: function() {
@@ -3330,7 +3340,7 @@ AccessibleMetaData.prototype = {
       let listPlaces = placesString.split(",");
       let pos = 0;
       while(pos < listPlaces.length) {
-         if(listPlaces[pos] == "")
+         if((listPlaces[pos] == "")||(!this._isBookmarks(listPlaces[pos])))
             listPlaces.splice(pos, 1);
          else
             pos++;
@@ -3356,10 +3366,11 @@ AccessibleMetaData.prototype = {
 
    getAppsList: function() {
       let appsString = this.meta["list-apps"];
-      return listApps = appsString.split(",");
+      let listApps = appsString.split(",");
+      let appSys = Cinnamon.AppSystem.get_default();
       let pos = 0;
       while(pos < listApps.length) {
-         if(listApps[pos] == "")
+         if((listApps[pos] == "")||(!appSys.lookup_app(listApps[pos])))
             listApps.splice(pos, 1);
          else
             pos++;
@@ -3522,7 +3533,7 @@ MyApplet.prototype = {
          this.RecentManager.connect('changed', Lang.bind(this, this._refreshPlacesAndRecent));
 
          this._fileFolderAccessActive = false;
-         this.accessibleMetaData = new AccessibleMetaData(this.uuid, Lang.bind(this, this._onChangeAccessible));
+         this.accessibleMetaData = new AccessibleMetaData(this, Lang.bind(this, this._onChangeAccessible));
          this._pathCompleter = new Gio.FilenameCompleter();
          this._pathCompleter.set_dirs_only(false);
          this.lastAcResults = new Array();
