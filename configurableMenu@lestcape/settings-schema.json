@@ -341,5 +341,11 @@
       "default" : true,
       "description": "Scroll of accessible box visible",
       "tooltip": "Choose whether or not to make the scroll of accessible box visible."
+   },
+   "show-box-pointer" : {
+      "type" : "checkbox",
+      "default" : true,
+      "description": "Box Pointer in the menu",
+      "tooltip": "Choose whether or not to make the box pointer of menu visible."
    }
 }

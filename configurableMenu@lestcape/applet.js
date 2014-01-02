@@ -1,5 +1,5 @@
 // Applet : Configurable Menu      Version      : v0.8-Beta
-// O.S.   : Cinnamon               Release Date : 01 january 2014.
+// O.S.   : Cinnamon               Release Date : 02 january 2014.
 // Author : Lester Carballo Pérez  Email        : lestcape@gmail.com
 //
 // Website : https://github.com/lestcape/Configurable-Menu
@@ -1390,6 +1390,19 @@ GenericApplicationButtonExtended.prototype = {
          this.parentScroll.scrollToActor(this.menu.actor);
          this.parent._updateSize();
       }
+   },
+
+   _onKeyPressEvent: function(actor, event) {
+      let symbol = event.get_key_symbol();
+/*
+      if(symbol == Clutter.KEY_space) {
+         if((this.withMenu) && (!this.menu.isOpen)) {
+            this.parent.closeApplicationsContextMenus(this.app, true);
+         }
+         this.toggleMenu();
+         return true;
+      }*/
+      return PopupBaseMenuItem.prototype._onKeyPressEvent.call(this, actor, event);
    }
 };
 
@@ -3283,7 +3296,7 @@ ConfigurablePointer.prototype = {
 
    setArrow: function(arrow) {
       this.riseArrow = arrow;
-      this.setArrowOrigin(this._arrowOrigin);
+      this._border.queue_repaint();
    },
 
    fixToCornerMenu: function(fixToCorner) {
@@ -3819,6 +3832,9 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-categories", "scrollCategoriesVisible", this._setVisibleScrollCat, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-applications", "scrollApplicationsVisible", this._setVisibleScrollApp, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-accessible", "scrollAccessibleVisible", this._setVisibleScrollAccess, null);
+
+         this.settings.bindProperty(Settings.BindingDirection.IN, "show-box-pointer", "showBoxPointer", this._setVisibleBoxPointer, null);
+
 
          this._searchInactiveIcon = new St.Icon({ style_class: 'menu-search-entry-icon',
                                                   icon_name: 'edit-find',
@@ -4445,6 +4461,10 @@ MyApplet.prototype = {
       }
    },
 
+   _setVisibleBoxPointer: function() {
+      this.menu._boxPointer.setArrow(this.showBoxPointer);
+   },
+
    _setCategoriesIconsVisible: function() {
       for(let i = 0; i < this._categoryButtons.length; i++)
          this._categoryButtons[i].setIconVisible(this.showCategoriesIcons);
@@ -4484,6 +4504,7 @@ MyApplet.prototype = {
       if(this.bttChanger)
          this.bttChanger.actor.destroy();
       this._updateMenuSection();
+      this._setVisibleBoxPointer();
       this._display();
       this._setVisibleViewControl();
       this._setVisibleTimeDate();

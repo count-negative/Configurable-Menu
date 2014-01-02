@@ -5,7 +5,7 @@ Applet: Configurable Menu Version: v0.8-Beta
 
 O.S.: Cinnamon 
 
-Release Date: 01 january 2014
+Release Date: 02 january 2014
 
 Author: Lester Carballo Pérez
 
@@ -81,6 +81,7 @@ Change Log:
    - Power Buttons have now several theme to can be selected.
    - Accessible Panel can have icons or not now.
    - Categories can have icons or not now.
+   - You can remove the Box Pointer of Menu if you want.
 
 0.7-Beta
    - Fixed a bug in the keyboard navigation, and add for more componets.
