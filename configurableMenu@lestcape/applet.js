@@ -3707,7 +3707,7 @@ MyApplet.prototype = {
    _init: function(metadata, orientation, panel_height, instance_id) {
       Applet.TextIconApplet.prototype._init.call(this, orientation, panel_height, instance_id);
       try {
-         this.deltaMinResize = 50;
+         this.deltaMinResize = 20;
          this.aviableWidth = 0;
          this.uuid = metadata["uuid"];
          this.allowFavName = false;
@@ -4704,16 +4704,16 @@ MyApplet.prototype = {
       let [cx, cy] = this.actor.get_transformed_position();
       switch (this.orientation) {
          case St.Side.TOP:
-            if(my > ay + ah - this.deltaMinResize) {
+            if(my > ah - this.deltaMinResize) {
                if(cx > middelScreen)
                   return (mx < ax + this.deltaMinResize);
-               return (mx > ax + aw - this.deltaMinResize);
+               return (mx > aw - this.deltaMinResize);
             }
             return false;
          case St.Side.BOTTOM:
             if(my < ay + this.deltaMinResize) {
                if(cx < middelScreen)
-                  return (mx > ax + aw - this.deltaMinResize);
+                  return (mx > aw - this.deltaMinResize);
                return  (mx < ax + this.deltaMinResize);
             }
             return false;
