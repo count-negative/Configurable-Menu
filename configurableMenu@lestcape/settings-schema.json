@@ -16,6 +16,24 @@
          "Windows 7": "windows7"
       }
    },
+   "power-theme": {
+      "type": "combobox",
+      "description": "Selected theme of power buttons:",
+      "default": "vertical",
+      "tooltip": "Select a theme of power buttons.",
+      "options": {
+         "Vertical": "vertical",
+         "Vertical List": "vertical-list",
+         "Vertical Icon": "vertical-icon",
+         "Vertical Text": "vertical-text",
+         "Horizontal": "horizontal",
+         "Horizontal List": "horizontal-list",
+         "Horizontal Icon": "horizontal-icon",
+         "Horizontal Text": "horizontal-text",
+         "Retractable": "retractable",
+         "Retractable Text": "retractable-text"
+      }
+   },
    "menu-icon" : {
       "type" : "iconfilechooser",
       "default" : "/usr/share/cinnamon/theme/menu.png",
@@ -79,6 +97,30 @@
       "default" : false,
       "description": "Open the menu when I press my mouse over it",
       "tooltip": "Enable opening the menu when the mouse press over the applet."
+   },
+   "power-box" : {
+      "type" : "checkbox",
+      "default" : true,
+      "description": "Power Buttons have box",
+      "tooltip": "Choose whether or not to have a box in Power Buttons."
+   },
+   "accessible-box" : {
+      "type" : "checkbox",
+      "default" : false,
+      "description": "Accessible Panel have box",
+      "tooltip": "Choose whether or not to have a box in Accessible Panel."
+   },
+   "accessible-icons" : {
+      "type" : "checkbox",
+      "default" : true,
+      "description": "Accessible Panel have icons",
+      "tooltip": "Choose whether or not to have icons in Accessible Panel."
+   },
+   "categories-icons" : {
+      "type" : "checkbox",
+      "default" : true,
+      "description": "Categories have icons",
+      "tooltip": "Choose whether or not to have icons in Categories."
    },
    "icon-app-size" : {
       "type": "spinbutton",

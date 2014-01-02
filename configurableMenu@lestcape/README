@@ -67,6 +67,9 @@ Change Log:
    - You can add item to accessible bar with submenu and drag and drop option, also places.
    - Favorites Buttons have submenu now.
    - Reduce the width of search in windows 7 theme to be the same size or less of Favorites Buttons area.
+   - Power Buttons have now several theme to can be selected.
+   - Accessible Panel can have icons or not now.
+   - Categories can have icons or not now.
 
 0.7-Beta
    - Fixed a bug in the keyboard navigation, and add for more componets.
