@@ -4037,6 +4037,8 @@ MyApplet.prototype = {
             return item_actor;
          }
          this._activeContainer = this.applicationsBox;
+         this._previousSelectedActor = this.applicationsBox.get_child_at_index(0).get_child_at_index(0);
+         this._previousTreeSelectedActor._delegate.emit('enter-event');
          item_actor = this.appBoxIter.getFirstVisible();
          this._selectedItemIndex = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
          this._selectedRowIndex = this.appBoxIter.getInternalIndexOfChild(item_actor);
@@ -4073,6 +4075,8 @@ MyApplet.prototype = {
          this.applicationsScrollBox.scrollToActor(item_actor._delegate.actor);
       }
       else if(symbol == Clutter.KEY_Right) {
+         if(this._previousTreeSelectedActor)
+            this._previousTreeSelectedActor._delegate.emit('enter-event');
          this._previousSelectedActor = this.applicationsBox.get_child_at_index(index).get_child_at_index(2*rowIndex);
          item_actor = this.appBoxIter.getRightVisible(this._previousSelectedActor);
          this._previousVisibleIndex = this.appBoxIter.getVisibleIndex(item_actor);
@@ -4080,6 +4084,8 @@ MyApplet.prototype = {
          this.applicationsScrollBox.scrollToActor(item_actor._delegate.actor);
       }
       else if(symbol == Clutter.KEY_Left) {//&& !this.searchActive
+         if(this._previousTreeSelectedActor)
+            this._previousTreeSelectedActor._delegate.emit('enter-event');
          if(index == 0) {
             this._previousSelectedActor = this.applicationsBox.get_child_at_index(index).get_child_at_index(0);
             item_actor = (this._previousTreeSelectedActor) ? this._previousTreeSelectedActor : this.catBoxIter.getFirstVisible();
