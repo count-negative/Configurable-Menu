@@ -741,7 +741,7 @@ PowerBox.prototype = {
       this.powerSelected = 0;
 
       this.actor = new St.BoxLayout({ style_class: 'menu-favorites-box' });
-      this.actor.style = "padding-left: "+(10)+"px;padding-rigth: "+(10)+"px;margin:auto;";
+      this.actor.style = "padding-left: "+(10)+"px;padding-right: "+(10)+"px;margin:auto;";
       this._powerButtons = new Array();
       this.actor.connect('key-focus-in', Lang.bind(this, function(actor, event) {        
          if(this._powerButtons.length > 0) {
@@ -888,7 +888,10 @@ PowerBox.prototype = {
 
    _insertNormalButtons: function(aling) {
       for(let i = 0; i < this._powerButtons.length; i++) {
-         this.actor.add(this._powerButtons[i].actor, { x_fill: false, x_align: aling, expand: true });
+         if((this.theme == "horizontal")||(this.theme == "vertical")||(this.theme == "vertical-icon"))
+            this.actor.add(this._powerButtons[i].actor, { x_fill: false, x_align: aling, expand: true });
+         else
+            this.actor.add(this._powerButtons[i].actor, { x_fill: true, x_align: aling, expand: true });
       }
    },
 
@@ -898,11 +901,11 @@ PowerBox.prototype = {
       this.spacer.style = "padding-left: "+(this.iconSize)+"px;margin:auto;";
       this.bttChanger = new ButtonChangerBox(this, "forward", [_("Show Down"), _("Show Down")], 0, Lang.bind(this, this._onPowerChange));
       this.bttChanger.setTextVisible(false);
-      this.activeBar.add(this._powerButtons[2].actor, { x_fill: false, x_align: aling });
-      this.activeBar.add(this.bttChanger.actor, { x_fill: false, x_align: aling, expand: true });
+      this.activeBar.add(this._powerButtons[2].actor, { x_fill: true, x_align: aling });
+      this.activeBar.add(this.bttChanger.actor, { x_fill: false, x_align: aling });
       this.actor.add(this.activeBar, { x_fill: false, y_fill: false, x_align: aling, y_align: aling, expand: true });
-      this.spacer.add(this._powerButtons[0].actor, { x_fill: false, x_align: aling, y_align: aling });
-      this.spacer.add(this._powerButtons[1].actor, { x_fill: false, x_align: aling, y_align: aling });
+      this.spacer.add(this._powerButtons[0].actor, { x_fill: true, x_align: aling, y_align: aling });
+      this.spacer.add(this._powerButtons[1].actor, { x_fill: true, x_align: aling, y_align: aling });
       this.actor.add(this.spacer, { x_fill: false, x_align: aling, y_align: aling, expand: true });
       this._powerButtons[0].actor.visible = false;
       this._powerButtons[1].actor.visible = false;
@@ -1921,12 +1924,13 @@ AccessibleDropBox.prototype = {
    }
 };
 
-function FavoritesBoxExtended(vertical, numberLines) {
-   this._init(vertical, numberLines);
+function FavoritesBoxExtended(parent, vertical, numberLines) {
+   this._init(parent, vertical, numberLines);
 }
 
 FavoritesBoxExtended.prototype = {
-   _init: function(vertical, numberLines) {
+   _init: function(parent, vertical, numberLines) {
+      this.parent = parent;
       this.actor = new St.BoxLayout();
       this.actor.set_vertical(!vertical);
       this.actor._delegate = this;
@@ -2064,7 +2068,10 @@ FavoritesBoxExtended.prototype = {
             childrens[i].remove_actor(childrensItems[j]);
             childrensItems[j].destroy();
          }
+         this.actor.remove_actor(childrens[i]);
+         childrens[i].destroy();
       }
+      this.numberLines = 0;
    },
 
    _generateChildrenList: function() {
@@ -2092,7 +2099,6 @@ FavoritesBoxExtended.prototype = {
    handleDragOver: function(source, actor, x, y, time) {
    try {
       let app = source.app;
-
       // Don't allow favoriting of transient apps
       if(app == null || app.is_window_backed() || (!(source instanceof FavoritesButtonExtended) && app.get_id() in AppFavorites.getAppFavorites().getFavoriteMap()))
          return DND.DragMotionResult.NO_DROP;
@@ -2194,6 +2200,7 @@ FavoritesBoxExtended.prototype = {
    // Draggable target interface
    acceptDrop: function(source, actor, x, y, time) {
      try {
+//this.parent._refreshFavs();
         let app = source.app;
         // Don't allow favoriting of transient apps
         if(app == null || app.is_window_backed()) {
@@ -2258,7 +2265,6 @@ FavoritesBoxExtended.prototype = {
                 }
                 return false;
             }));
-
         return true;
       } catch(e) {
         Main.notify("ef", e.message);
@@ -2285,27 +2291,27 @@ FavoritesBoxExtended.prototype = {
       if(this.isVertical) {
          if(symbol == Clutter.KEY_Up) {
             if(posX == 0)
-               posX = childrens[posY].get_children().length - 1;
+               posX = childrens[posY].get_children().length - 2;
             else
-               posX--;
+               posX -= 2;
          }
          else if(symbol == Clutter.KEY_Down) {
-            if(posX == childrens[posY].get_children().length - 1)
+            if(posX == childrens[posY].get_children().length - 2)
                posX = 0;
             else
-               posX++;
+               posX += 2;
          }
          else if(symbol == Clutter.KEY_Right) {
             if(posY == childrens.length - 1)
                posY = 0;
             else
-               posY++;
+               posY += 1;
          }
          else if(symbol == Clutter.KEY_Left) {
             if(posY == 0)
                posY = childrens.length - 1;
             else
-               posY--;
+               posY -= 1;
          }
       }
       else {
@@ -2313,25 +2319,25 @@ FavoritesBoxExtended.prototype = {
             if(posY == 0)
                posY = childrens.length - 1;
             else
-               posY--;
+               posY -= 1;
          }
          else if(symbol == Clutter.KEY_Down) {
             if(posY == childrens.length - 1)
                posY = 0;
             else
-               posY++;
+               posY += 1;
          }
          else if(symbol == Clutter.KEY_Right) {
-            if(posX == childrens[posY].get_children().length - 1)
+            if(posX == childrens[posY].get_children().length - 2)
                posX = 0;
             else
-               posX++;
+               posX += 2;
          }
          else if(symbol == Clutter.KEY_Left) {
             if(posX == 0)
-               posX = childrens[posY].get_children().length - 1;
+               posX = childrens[posY].get_children().length - 2;
             else
-               posX--;
+               posX -= 2;
          }
       }
       let nextItem = null;
@@ -2614,6 +2620,8 @@ ApplicationButtonExtended.prototype = {
             global.log(e);
          }
       }
+      this.parent._refreshFavs();
+      this.parent._onChangeAccessible();
       return false;
    },
 
@@ -2755,6 +2763,8 @@ PlaceButtonAccessibleExtended.prototype = {
             global.log(e);
          }
       }
+      this.parent._refreshFavs();
+      this.parent._onChangeAccessible();
       return false;
    },
 
@@ -3070,6 +3080,8 @@ FavoritesButtonExtended.prototype = {
      /* } catch(e) {
            Main.notify("err", e.message);
       }*/
+      this.parent._refreshFavs();
+      this.parent._onChangeAccessible();
       return false;
    }
 };
@@ -3855,6 +3867,7 @@ MyApplet.prototype = {
 
    _onMenuKeyPress: function(actor, event) {
       try {
+//Main.notify("ok" + actor);
         let symbol = event.get_key_symbol();
         let item_actor;
         this.appBoxIter.reloadVisible();
@@ -3883,7 +3896,6 @@ MyApplet.prototype = {
                  this.bttChanger.activateNext();
         }
 
-//Main.notify("ok" + actor);
         if(actor._delegate instanceof FavoritesButtonExtended) {
            return this._navegateFavBox(symbol, actor);
         } else if(actor == this.powerBox.actor) {
@@ -3928,9 +3940,11 @@ MyApplet.prototype = {
    _changeFocusElement: function(elementActive) {
       let tbttChanger = null;
       let staticB = null;
+      let favElem = null;
       if(this.bttChanger) tbttChanger = this.bttChanger.actor;
       if(this.staticBox) staticB = this.staticBox.actor;
-      let activeElements = [this.hover.actor, staticB, this.powerBox.actor, tbttChanger, this.searchEntry, this.favoritesScrollBox.actor];
+      if(this.favoritesObj.getFirstElement()) favElem = this.favoritesScrollBox.actor;
+      let activeElements = [this.hover.actor, staticB, this.powerBox.actor, tbttChanger, this.searchEntry, favElem];
       let actors = [this.hover.actor, staticB, this.powerBox.actor, tbttChanger, this.searchEntry, this.favoritesObj.getFirstElement()];
       let index = actors.indexOf(elementActive);
       let selected = index + 1;
@@ -4914,7 +4928,7 @@ MyApplet.prototype = {
       this.controlSearchBox.add(this.hover.menu.actor, {x_fill: false, x_align: St.Align.MIDDLE, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
-      this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
+      this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.END, expand: true });
@@ -4933,7 +4947,7 @@ MyApplet.prototype = {
       this.controlSearchBox.add(this.hover.menu.actor, {x_fill: false, x_align: St.Align.MIDDLE, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
-      this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
+      this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.MIDDLE, expand: true });
@@ -4952,7 +4966,7 @@ MyApplet.prototype = {
       this.controlSearchBox.add(this.hover.menu.actor, {x_fill: false, x_align: St.Align.MIDDLE, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
-      this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
+      this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.operativePanel.set_vertical(true);
       this.categoriesBox.set_vertical(false);
       this.categoriesWrapper.set_vertical(false);
@@ -4975,7 +4989,7 @@ MyApplet.prototype = {
       this.controlSearchBox.add(this.hover.menu.actor, {x_fill: false, x_align: St.Align.MIDDLE, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
-      this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
+      this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.operativePanel.set_vertical(true);
       this.categoriesBox.set_vertical(false);
       this.categoriesWrapper.set_vertical(false);
@@ -4998,7 +5012,7 @@ MyApplet.prototype = {
       this.controlSearchBox.add(this.hover.menu.actor, {x_fill: false, x_align: St.Align.MIDDLE, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
-      this.favoritesObj = new FavoritesBoxExtended(false, this.favoritesLinesNumber);
+      this.favoritesObj = new FavoritesBoxExtended(this, false, this.favoritesLinesNumber);
       this.betterPanel.set_vertical(true);
       this.operativePanel.set_vertical(true);
       this.categoriesBox.set_vertical(false);
@@ -5020,7 +5034,7 @@ MyApplet.prototype = {
 
    loadAccessible: function() {
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
-      this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
+      this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.MIDDLE, expand: true });
@@ -5041,7 +5055,7 @@ MyApplet.prototype = {
 
    loadAccessibleInverted: function() {
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
-      this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
+      this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.MIDDLE, expand: true });
@@ -5066,7 +5080,7 @@ MyApplet.prototype = {
       this.bttChanger = new ButtonChangerBox(this, "forward", [_("All Applications"), _("Favorites")], 0, Lang.bind(this, this._onPanelMintChange));
       this.bttChanger.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.controlSearchBox.add(this.bttChanger.actor, {x_fill: false, x_align: St.Align.END, y_align: St.Align.START, expand: true });
-      this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
+      this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
@@ -5089,7 +5103,7 @@ MyApplet.prototype = {
       this.allowFavName = true;
       this.bttChanger = new ButtonChangerBox(this, "forward", [_("All Applications"), _("Favorites")], 0, Lang.bind(this, this._onPanelWindowsChange));
       this.bttChanger.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
-      this.favoritesObj = new FavoritesBoxExtended(true, this.favoritesLinesNumber);
+      this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: true, y_align: St.Align.MIDDLE, expand: true });
@@ -5131,7 +5145,7 @@ MyApplet.prototype = {
       if(titleAppBar == selected)
          operPanelVisible = true;
       this._clearView();
-       this.powerBox.actor.visible = operPanelVisible;
+      this.powerBox.actor.visible = operPanelVisible;
       this.hover.actor.visible = operPanelVisible;
       this.staticBox.actor.visible = operPanelVisible;
       this.operativePanel.visible = !operPanelVisible;
