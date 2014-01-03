@@ -247,12 +247,14 @@ ScrollItemsBox.prototype = {
    },
 
    scrollToActor: function(actor) {
+    try {
       if(this.vertical) {
          var current_scroll_value = this.scroll.get_vscroll_bar().get_adjustment().get_value();
          var box_height = this.actor.get_allocation_box().y2-this.actor.get_allocation_box().y1;
          var new_scroll_value = current_scroll_value;
-         if (current_scroll_value > actor.get_allocation_box().y1-10) new_scroll_value = actor.get_allocation_box().y1-10;
-         if (box_height+current_scroll_value < actor.get_allocation_box().y2+10) new_scroll_value = actor.get_allocation_box().y2-box_height+10;
+         let hActor = this._getAllocationActor(actor, 0);
+         if (current_scroll_value > hActor-10) new_scroll_value = hActor-10;
+         if (box_height+current_scroll_value < hActor + actor.get_height()+10) new_scroll_value = hActor + actor.get_height()-box_height+10;
          if (new_scroll_value!=current_scroll_value) this.scroll.get_vscroll_bar().get_adjustment().set_value(new_scroll_value);
       } else {
          var current_scroll_value = this.scroll.get_hscroll_bar().get_adjustment().get_value();
@@ -262,6 +264,21 @@ ScrollItemsBox.prototype = {
          if (box_width+current_scroll_value < actor.get_allocation_box().x2+10) new_scroll_value = actor.get_allocation_box().x2-box_width+10;
          if (new_scroll_value!=current_scroll_value) this.scroll.get_hscroll_bar().get_adjustment().set_value(new_scroll_value);
       }
+     } catch(e) {
+        Main.notify("ScrollError", e.message);
+     }
+   },
+
+   _getAllocationActor: function(actor, currHeight) {
+      let actorParent = actor.get_parent();
+      if((actorParent != null)&&(actorParent != this.parent)) {
+         if(actorParent != this.panelToScroll) {
+            return this._getAllocationActor(actorParent, currHeight + actor.get_allocation_box().y1);
+         } else {
+            return currHeight + actor.get_allocation_box().y1;
+         }
+      }
+      return 0;//Some error
    }
 };
 
@@ -360,6 +377,17 @@ StaticBox.prototype = {
          return true;
       }
       return false;
+   },
+
+   closeContextMenus: function(excludeApp, animate) {
+      for(var app in this._staticButtons) {
+         if((app!=excludeApp)&&(this._staticButtons[app].menu)&&(this._staticButtons[app].menu.isOpen)) {
+            if(animate)
+               this._staticButtons[app].toggleMenu();
+            else
+               this._staticButtons[app].closeMenu();
+         }
+      }
    },
 
    takeHover: function(take) {
@@ -555,7 +583,9 @@ StaticBox.prototype = {
       } else if(this._staticButtons.length > 0) {
          this._staticSelected = 0;
       }
+      this.scrollActor.scrollToActor(this._staticButtons[this._staticSelected].actor);
       this.activeSelected();
+      return true;
    },
 
    _appEnterEvent: function(actor, event, applicationButton) {
@@ -1375,6 +1405,7 @@ ApplicationContextMenuItemExtended.prototype = {
             break;
          case "add_to_favorites":
             AppFavorites.getAppFavorites().addFavorite(this._appButton.app.get_id());
+            this._appButton.parent._updateSize();
             break;
          case "remove_from_favorites":
             AppFavorites.getAppFavorites().removeFavorite(this._appButton.app.get_id());
@@ -1991,7 +2022,7 @@ AccessibleDropBox.prototype = {
 
       return DND.DragMotionResult.COPY_DROP;
      } catch(e) {
-        Main.notify("mal", e.message);
+        Main.notify("Drag and Drop problem:", e.message);
      }
    },
     
@@ -4425,7 +4456,7 @@ MyApplet.prototype = {
          Mainloop.idle_add(Lang.bind(this, this._putFocus));
       }
       else {
-         this.staticBox.navegateStaticBox(symbol, actor);
+         return this.staticBox.navegateStaticBox(symbol, actor);
       }
       return true;
    },
@@ -5588,6 +5619,8 @@ MyApplet.prototype = {
                this._placesButtons[app].closeMenu();
          }
       }
+      if(this.staticBox)
+         this.staticBox.closeContextMenus(excludeApp, animate);
    },
 
    _displayButtons: function(appCategory, places, recent, apps, autocompletes) {
