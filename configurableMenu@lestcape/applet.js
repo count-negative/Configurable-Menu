@@ -330,7 +330,7 @@ StaticBox.prototype = {
 
    setSeparatorLine: function(haveLine) {
       this.spacerMiddle.setLineVisible(haveLine);
-      this.spacerTop.setLineVisible(haveLine);;
+      this.spacerTop.setLineVisible(haveLine);
    },
 
    setNamesVisible: function(visible) {
@@ -814,6 +814,7 @@ PowerBox.prototype = {
          this.powerSelected = -1;
          this.bttChanger.setActive(false);
       }));
+      this.spacerPower = new SeparatorBox(false, 0);
       //Lock screen
       let button = new SystemButton(this.parent, null, "gnome-lockscreen", _("Lock screen"), _("Lock the screen"), this.hover, this.iconSize, false);
       button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
@@ -838,6 +839,14 @@ PowerBox.prototype = {
 
       this._powerButtons.push(button);
       this.setTheme(theme);
+   },
+
+   setSeparatorSpace: function(space) {
+      this.spacerPower.setSpace(space);
+   },
+
+   setSeparatorLine: function(haveLine) {
+      this.spacerPower.setLineVisible(haveLine);
    },
 
    setTheme: function(theme) {
@@ -926,7 +935,9 @@ PowerBox.prototype = {
    },
 
    _removeButtons: function() {
-      let parentBtt;
+      let parentBtt = this.spacerPower.actor.get_parent();
+      if(parentBtt)
+         parentBtt.remove_actor(this.spacerPower.actor);
       for(let i = 0; i < this._powerButtons.length; i++) {
          parentBtt = this._powerButtons[i].actor.get_parent();
          if(parentBtt)
@@ -939,6 +950,7 @@ PowerBox.prototype = {
    },
 
    _insertNormalButtons: function(aling) {
+      this.actor.add_actor(this.spacerPower.actor);
       for(let i = 0; i < this._powerButtons.length; i++) {
          if((this.theme == "horizontal")||(this.theme == "vertical")||(this.theme == "vertical-icon"))
             this.actor.add(this._powerButtons[i].actor, { x_fill: false, x_align: aling, expand: true });
@@ -948,6 +960,7 @@ PowerBox.prototype = {
    },
 
   _insertRetractableButtons: function(aling) {
+      this.actor.add_actor(this.spacerPower.actor);
       this.activeBar = new St.BoxLayout({ vertical: false });
       this.spacer = new St.BoxLayout({ vertical: true });
       this.spacer.style = "padding-left: "+(this.iconSize)+"px;margin:auto;";
@@ -4669,6 +4682,7 @@ MyApplet.prototype = {
    },
 
    _setVisibleSpacerLine: function() {
+      this.powerBox.setSeparatorLine(this.showSpacerLine);
       if(this.staticBox)
          this.staticBox.setSeparatorLine(this.showSpacerLine);
       if(this.spacerApp)
@@ -4678,6 +4692,7 @@ MyApplet.prototype = {
    },
 
    _updateSpacerSize: function() {
+      this.powerBox.setSeparatorSpace(this.spacerSize);
       if(this.staticBox)
          this.staticBox.setSeparatorSpace(this.spacerSize);
       if(this.spacerApp)
@@ -5110,7 +5125,6 @@ MyApplet.prototype = {
          this.hover.menu.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
 
          this.categoriesApplicationsBox = new CategoriesApplicationsBoxExtended();
-         this.rightPane.add(this.categoriesApplicationsBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
 
          this.categoriesBox = new St.BoxLayout({ style_class: 'menu-categories-box', vertical: true });
          this.applicationsBox = new St.BoxLayout({ style_class: 'menu-applications-box', vertical: false });
@@ -5141,6 +5155,8 @@ MyApplet.prototype = {
          this.mainBox.set_style('max-width: ' + (monitor.width) + 'px; max-height: ' + (monitor.height) + 'px;');
          this.extendedBox = new St.BoxLayout({ vertical: true });
          this.extendedBox.add(this.standardBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
+         this.spacerWindows = new SeparatorBox(this.showSpacerLine, this.spacerSize);
+         this.spacerApp = new SeparatorBox(this.showSpacerLine, this.spacerSize);
 
          switch(this.theme) {
             case "classic"           :
@@ -5174,6 +5190,8 @@ MyApplet.prototype = {
                           this.loadClassic(); 
                           break;
          }
+
+         this.rightPane.add(this.categoriesApplicationsBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
 
          this.favoritesBox.add(this.favoritesObj.actor, { x_fill: true, y_fill: true, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: false });
 
@@ -5222,9 +5240,11 @@ MyApplet.prototype = {
       this.favBoxWrapper.add(this.powerBox.actor, { y_align: St.Align.END, y_fill: false, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.END, y_fill: true, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
+      this.rightPane.add_actor(this.spacerWindows.actor);
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.endBox.add_actor(this.spacerApp.actor);
       this.endBox.add_actor(this.endHorizontalBox);
    },
 
@@ -5241,9 +5261,11 @@ MyApplet.prototype = {
       this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
+      this.rightPane.add_actor(this.spacerWindows.actor);
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.endBox.add_actor(this.spacerApp.actor);
       this.endBox.add_actor(this.endHorizontalBox);
    },
 
@@ -5264,9 +5286,11 @@ MyApplet.prototype = {
       this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
+      this.rightPane.add_actor(this.spacerWindows.actor);
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.endBox.add_actor(this.spacerApp.actor);
       this.endBox.add_actor(this.endHorizontalBox);
    },
 
@@ -5287,9 +5311,11 @@ MyApplet.prototype = {
       this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
+      this.rightPane.add_actor(this.spacerWindows.actor);
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.endBox.add_actor(this.spacerApp.actor);
       this.endBox.add_actor(this.endHorizontalBox);
    },
 
@@ -5311,6 +5337,7 @@ MyApplet.prototype = {
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
+      this.rightPane.add_actor(this.spacerWindows.actor);
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.endBox.add(this.favBoxWrapper, { x_fill: true, y_fill: true, y_align: St.Align.END, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
@@ -5332,10 +5359,12 @@ MyApplet.prototype = {
       //this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
+      this.rightPane.add_actor(this.spacerWindows.actor);
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.staticBox.actor, { y_fill: true, expand: false });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.endBox.add_actor(this.spacerApp.actor);
       this.endBox.add_actor(this.endHorizontalBox);
    },
 
@@ -5353,10 +5382,12 @@ MyApplet.prototype = {
       //this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
+      this.rightPane.add_actor(this.spacerWindows.actor);
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.staticBox.actor, { y_fill: true });
       this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.endBox.add_actor(this.spacerApp.actor);
       this.endBox.add_actor(this.endHorizontalBox);
    },
 
@@ -5374,7 +5405,6 @@ MyApplet.prototype = {
       this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
       this.staticBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
-      this.spacerApp = new SeparatorBox(this.showSpacerLine, this.spacerSize);
       this.favoritesBox.style_class = '';
       this.betterPanel.style_class = 'menu-favorites-box';
       this.betterPanel.set_vertical(true);
@@ -5404,8 +5434,6 @@ MyApplet.prototype = {
       this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
       this.staticBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
-      this.spacerApp = new SeparatorBox(this.showSpacerLine, this.spacerSize);
-      this.spacerWindows = new SeparatorBox(this.showSpacerLine, this.spacerSize);
       this.betterPanel.set_vertical(true);
       this.betterPanel.add_actor(this.endHorizontalBox);
       this.betterPanel.add_actor(this.spacerApp.actor);
