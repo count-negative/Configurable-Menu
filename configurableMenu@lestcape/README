@@ -71,6 +71,7 @@ Change Log:
    - Accessible Panel can have icons or not now.
    - Categories can have icons or not now.
    - You can remove the Box Pointer of Menu if you want.
+   - Implementation of Separator with configurable options.
 
 0.7-Beta
    - Fixed a bug in the keyboard navigation, and add for more componets.

@@ -342,6 +342,22 @@
       "description": "Scroll of accessible box visible",
       "tooltip": "Choose whether or not to make the scroll of accessible box visible."
    },
+   "spacer-line" : {
+      "type" : "checkbox",
+      "default" : true,
+      "description": "The Separator have line",
+      "tooltip": "Choose whether or not to show a line in the Separator."
+   },
+   "spacer-size" : {
+      "type": "spinbutton",
+      "default" : 20,
+      "min" : 0,
+      "max" : 50,
+      "step" : 1,
+      "units" : "pixels",
+      "description" : "The Separator size:",
+      "tooltip" : "Size of the Separator."
+   },
    "show-box-pointer" : {
       "type" : "checkbox",
       "default" : true,
