@@ -72,6 +72,7 @@ Change Log:
    - Categories can have icons or not now.
    - You can remove the Box Pointer of Menu if you want.
    - Implementation of Separator with configurable options.
+   - Hover Icon can have configurable border now.
 
 0.7-Beta
    - Fixed a bug in the keyboard navigation, and add for more componets.

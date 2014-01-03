@@ -1640,7 +1640,7 @@ HoverIcon.prototype = {
       try {
          //this.actor._delegate = this;
          this.iconSize = iconSize;
-         this.actor.style = "padding-top: "+(0)+"px;padding-bottom: "+(0)+"px;padding-left: "+(0)+"px;padding-right: "+(0)+"px;margin:auto;";
+         this.setBorderSize(0);
          this._userIcon = new St.Icon({ icon_size: this.iconSize });
          this.icon = new St.Icon({ icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR });
          this.parent = parent;
@@ -1681,6 +1681,12 @@ HoverIcon.prototype = {
       } catch(e) {
          Main.notifyError("ErrorHover:",e.message);
       }
+   },
+
+   setBorderSize: function(borderSize) {
+      this.borderSize = borderSize;
+      this.actor.style = "padding-top: "+(0)+"px;padding-bottom: "+(0)+"px;padding-left: "+(0)+"px;padding-right: "+(0)+
+                         "px;margin:auto;border: "+ borderSize + "px solid #ffffff; border-radius: 12px;";
    },
 
    navegateHoverMenu: function(symbol, actor) {
@@ -3862,6 +3868,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.IN, "favorites-lines", "favoritesLinesNumber", this._refreshFavs, null);
 
          this.settings.bindProperty(Settings.BindingDirection.IN, "show-hover-icon", "showHoverIcon", this._setVisibleHoverIcon, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "hover-icon-border", "hoverBorderSize", this._updateBorderHoverSize, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "show-power-buttons", "showPowerButtons", this._setVisiblePowerButtons, null);
          
          this.settings.bindProperty(Settings.BindingDirection.IN, "show-time-date", "showTimeDate", this._setVisibleTimeDate, null);
@@ -4489,6 +4496,10 @@ MyApplet.prototype = {
       this._updateSize();
    },
 
+   _updateBorderHoverSize: function() {
+      this.hover.setBorderSize(this.hoverBorderSize);
+   },
+
    _setVisibleTimeDate: function() {
       if(this.selectedAppBox)
          this.selectedAppBox.setDateTimeVisible(this.showTimeDate);
@@ -4589,6 +4600,7 @@ MyApplet.prototype = {
       this._setVisibleScrollAccess();
       this._setVisibleSpacerLine();
       this._updateSpacerSize();
+      this._updateBorderHoverSize();
       this.favoritesScrollBox.actor.visible = this.showFavorites;
       this.selectedAppBox.setTitleVisible(this.showAppTitle);
       this.selectedAppBox.setDescriptionVisible(this.showAppDescription);

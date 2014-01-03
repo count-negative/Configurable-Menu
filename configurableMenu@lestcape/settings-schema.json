@@ -228,6 +228,18 @@
       "description": "Show hover icon",
       "tooltip": "Choose whether or not to show hover icon in the menu."
    },
+   "hover-icon-border" : {
+      "type": "spinbutton",
+      "default" : 0,
+      "min" : 0,
+      "max" : 4,
+      "step" : 1,
+      "units" : "pixels",
+      "indent": true,
+      "dependency": "show-hover-icon",
+      "description" : "Border size of Hover Icon:",
+      "tooltip" : "Size of the Hover Icon border."
+   },
    "show-power-buttons" : {
       "type" : "checkbox",
       "default" : true,
