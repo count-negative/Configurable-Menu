@@ -1,5 +1,5 @@
 // Applet : Configurable Menu      Version      : v0.8-Beta
-// O.S.   : Cinnamon               Release Date : 02 january 2014.
+// O.S.   : Cinnamon               Release Date : 03 january 2014.
 // Author : Lester Carballo Pérez  Email        : lestcape@gmail.com
 //
 // Website : https://github.com/lestcape/Configurable-Menu
@@ -279,6 +279,7 @@ StaticBox.prototype = {
       this.hoverBox = new St.BoxLayout({ vertical: false });
       this.actor.add_actor(this.hoverBox);
       this.controlBox = new St.BoxLayout({ vertical: false });
+      this.controlBox.set_style("padding-left: 30px;padding-right: 30px;");
       this.actor.add_actor(this.controlBox);
       this.itemsBox = new St.BoxLayout({ vertical: true });
       this.itemsBox.set_style("padding-left: 10px;");
@@ -374,7 +375,7 @@ StaticBox.prototype = {
 
    takeControl: function(take) {
       if(take) {
-         this.controlBox.add(this.control.actor, { x_fill: false, x_align: St.Align.MIDDLE, expand: true });
+         this.controlBox.add(this.control.actor, { x_fill: true, x_align: St.Align.MIDDLE, expand: true });
       }
       else if(this.control.actor.get_parent() == this.controlBox) {
          this.controlBox.remove_actor(this.control.actor);
@@ -1170,9 +1171,12 @@ ControlBox.prototype = {
       //this.actor.add(this.bttViewList, { x_fill: false, expand: false });
       this.bttViewGrid = this._createSymbolicButton('view-grid-symbolic', { x_fill: false, expand: false });
       this.bttViewGrid.connect('clicked', Lang.bind(this, this._onClickedChangeView));
-      this.bttResize = this._createSymbolicButton('view-fullscreen', { x_fill: false, expand: false });
+      
+      this.bttFullScreen = this._createSymbolicButton('window-maximize', {x_fill: false, x_align: St.Align.END, expand: true});
+      this.bttFullScreen.connect('clicked', Lang.bind(this, this._onClickedChangeFullScreen));
+      this.bttResize = this._createSymbolicButton('changes-prevent', {x_fill: false, x_align: St.Align.END, expand: false});
       this.bttResize.connect('clicked', Lang.bind(this, this._onClickedChangeResize));
-      this.bttSettings = this._createSymbolicButton('preferences-system', {x_fill: false, x_align: St.Align.END, expand: true});
+      this.bttSettings = this._createSymbolicButton('preferences-system', {x_fill: false, x_align: St.Align.END, expand: false});
       this.bttSettings.connect('clicked', Lang.bind(this, this._onSettings));
       this.changeViewSelected(this.parent.iconView);
       this.changeResizeActive(this.parent.controlingSize);
@@ -1184,8 +1188,17 @@ ControlBox.prototype = {
    },
 
    _onClickedChangeResize: function(actor, event) {
+      this.parent.fullScreen = false;
+      this.parent.automaticSize = false;
+      this.parent._setFullScreen();
       this.changeResizeActive(!this.parent.controlingSize);
-      this.parent._setControlSize();
+      this.parent._updateSize();
+   },
+
+   _onClickedChangeFullScreen: function(actor, event) {
+      this.parent.fullScreen = !this.parent.fullScreen;
+      this.parent._setFullScreen();
+      this.changeFullScreen(this.parent.fullScreen);
    },
 
    _onSettings: function(actor, event) {
@@ -1197,11 +1210,12 @@ ControlBox.prototype = {
    changeResizeActive: function(resizeActive) {
       this.parent.controlingSize = resizeActive;
       if(resizeActive) {
-         this.bttResize.get_children()[0].set_icon_name('view-fullscreen');  
+         this.bttResize.get_children()[0].set_icon_name('changes-prevent');
          this.parent.menu.setResizeArea(this.parent.deltaMinResize);
       }
       else {
-         this.bttResize.get_children()[0].set_icon_name('zoom-out');
+         this.bttResize.get_children()[0].set_icon_name('view-fullscreen');
+
          this.parent.menu.setResizeArea(0);
       }
    },
@@ -1215,6 +1229,16 @@ ControlBox.prototype = {
       else {
          this.bttViewList.set_style('padding: 0px; border: 1px solid #ffffff;');
          this.bttViewGrid.set_style('padding: 0px;');
+      }
+   },
+
+   changeFullScreen: function(fullScreen) {
+      if(fullScreen) {
+         this.bttFullScreen.get_children()[0].set_icon_name('window-minimize');
+      }
+      else {
+         this.bttFullScreen.get_children()[0].set_icon_name('zoom-fit-best');
+         //this.bttFullScreen.get_children()[0].set_icon_name('window-maximize');
       }
    },
 
@@ -1233,10 +1257,34 @@ ControlBox.prototype = {
    
       btt.connect('notify::hover', Lang.bind(this, function(actor) {
          if(actor.get_hover()) {
+            switch(actor) {
+               case this.bttViewList:
+                  this.parent.selectedAppBox.setSelectedText(_("List View"), _("View the items in list view mode"));
+                  break;
+               case this.bttViewGrid:
+                  this.parent.selectedAppBox.setSelectedText(_("Icon View"), _("View the items in icon view mode"));
+                  break;
+               case this.bttResize:
+                  if(this.bttResize.get_children()[0].get_icon_name() == 'changes-prevent')
+                     this.parent.selectedAppBox.setSelectedText(_("Prevent resize"), _("Prevent resize the menu"));
+                  else
+                     this.parent.selectedAppBox.setSelectedText(_("Allow resize"), _("Allow resize the menu"));
+                  break;
+               case this.bttFullScreen:
+                  if(this.bttFullScreen.get_children()[0].get_icon_name() == 'window-minimize')
+                     this.parent.selectedAppBox.setSelectedText(_("Recover size"), _("Recover the normal menu size"));
+                  else
+                     this.parent.selectedAppBox.setSelectedText(_("Full Screen"), _("Put the menu in full screen mode"));
+                  break;
+               case this.bttSettings:
+                  this.parent.selectedAppBox.setSelectedText(_("Configure..."), _("Configure the menu options"));
+                  break;
+            }
             global.set_cursor(Cinnamon.Cursor.POINTING_HAND);
             actor.set_style_class_name('menu-category-button-selected');
          }
          else {
+            this.parent.selectedAppBox.setSelectedText("", "");
             global.unset_cursor();
             actor.set_style_class_name('menu-category-button');
          }
@@ -3054,11 +3102,12 @@ FavoritesButtonExtended.prototype = {
 
       let icon_size = this.iconSize;
       if(!this.allowName) {
+         let monitor = Main.layoutManager.findMonitorForActor(this.actor);
          let monitorHeight;
          if(this.displayVertical)
-            monitorHeight = Main.layoutManager.primaryMonitor.height;
+            monitorHeight = monitor.height;
          else
-            monitorHeight = Main.layoutManager.primaryMonitor.width;
+            monitorHeight = monitor.width;
          let real_size = (0.7*monitorHeight) / this.nbFavorites;
          icon_size = 0.7*real_size;
          if(icon_size > this.iconSize) icon_size = this.iconSize;
@@ -3099,11 +3148,12 @@ FavoritesButtonExtended.prototype = {
       this.iconSize = iconSize;
       if(this.icon) {
          if(!this.allowName) {
+            let monitor = Main.layoutManager.findMonitorForActor(this.actor);
             let monitorHeight;
             if(this.displayVertical)
-               monitorHeight = Main.layoutManager.primaryMonitor.height;
+               monitorHeight = monitor.height;
             else
-               monitorHeight = Main.layoutManager.primaryMonitor.width;
+               monitorHeight = monitor.width;
             let real_size = (0.7*monitorHeight) / this.nbFavorites;
             let icon_size = 0.7*real_size;
             if(icon_size > this.iconSize) icon_size = this.iconSize;
@@ -3453,7 +3503,7 @@ ConfigurablePointer.prototype = {
            if(sourceAllocation.x1 < 1) {
               this._xOffset = -x - themeNode.get_length('border-left');
            }
-           else if(Math.abs(sourceAllocation.x2 - Main.layoutManager.primaryMonitor.width) < 1) {
+           else if(Math.abs(sourceAllocation.x2 - monitor.x - monitor.width) < 1) {
               this._xOffset = 10 + themeNode.get_length('border-right');
            }
            if(this._arrowSide == St.Side.TOP) {
@@ -3461,8 +3511,8 @@ ConfigurablePointer.prototype = {
            } else if(this._arrowSide == St.Side.BOTTOM) {
               this._yOffset = themeNode.get_length('border-bottom') + gap;
            }
-          // Main.notify("x:" + x + " x1:" + sourceAllocation.x1 + " x2:" + sourceAllocation.x2 + " main:" + Main.layoutManager.primaryMonitor.width);
-         //  Main.notify("y:" + y + " y1:" + sourceAllocation.y1 + " y2:" + sourceAllocation.y2 + " main:" + Main.layoutManager.primaryMonitor.height); 
+          // Main.notify("x:" + x + " x1:" + sourceAllocation.x1 + " x2:" + sourceAllocation.x2 + " main:" + (monitor.x - monitor.width));
+         //  Main.notify("y:" + y + " y1:" + sourceAllocation.y1 + " y2:" + sourceAllocation.y2 + " main:" + (monitor.x - monitor.height)); 
         }
 
         this._xPosition = Math.floor(x);
@@ -3596,9 +3646,9 @@ ConfigurablePointer.prototype = {
       cr.stroke();
 
       if(this.resizeSize > 0) {
-         // Main.notify("llega" + this.resizeSize);
          let maxSpace = Math.max(this.resizeSize, borderRadius);
-         let center = Main.layoutManager.primaryMonitor.width/2;
+         let monitor = Main.layoutManager.findMonitorForActor(this._sourceActor);
+         let center = (monitor.x + monitor.width)/2;
          let sourceAllocation = Cinnamon.util_get_transformed_allocation(this._sourceActor);
 
          if(this._arrowSide == St.Side.BOTTOM) {
@@ -3898,6 +3948,7 @@ MyApplet.prototype = {
          this.appDescriptionSize = 8;
          this.showAppTitle = true;
          this.showAppDescription = true;
+         this.controlingSize = false;
 
          this.RecentManager = new DocInfo.DocManager();
 
@@ -3963,7 +4014,8 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.IN, "show-app-description", "showAppDescription", this._updateAppSelectedText, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "app-description-size", "appDescriptionSize", this._updateAppSelectedText, null);
 
-         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "controling-size", "controlingSize", this._setControlSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "automatic-size", "automaticSize", this._setAutomaticSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "full-screen", "fullScreen", this._setFullScreen, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "width", "width", this._updateSize, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "height", "height", this._updateSize, null);
 
@@ -4558,10 +4610,12 @@ MyApplet.prototype = {
    },
 
    _changeView: function() {
-      this.controlView.changeViewSelected(this.iconView);
-      this._refreshApps();
-      this._refreshFavs();
-      this.updateSize();
+      if(this.controlView) {
+         this.controlView.changeViewSelected(this.iconView);
+         this._refreshApps();
+         this._refreshFavs();
+         this.updateSize();
+      }
    },
 
    _setVisibleFavorites: function() {
@@ -4723,41 +4777,40 @@ MyApplet.prototype = {
          this.powerBox.setSpecialColor(this.showPowerBox);
       }
       this._refreshFavs();
+      this._setFullScreen();
    },
 
-   _setControlSize: function() {
-      this.controlView.changeResizeActive(this.controlingSize);
+   _setAutomaticSize: function() {
+      if(this.controlView)
+         this.controlView.changeResizeActive(false);
+      this._updateSize();
+   },
+
+   _setFullScreen: function() {
+      if(this.controlView)
+         this.controlView.changeFullScreen(this.fullScreen);
+      if(this.fullScreen) {
+         if(this.controlView)
+            this.controlView.changeResizeActive(false);
+         this.menu._boxPointer.setArrow(false);
+         this.menu.fixToCorner(true);
+      } else {
+         this.menu._boxPointer.setArrow(this.showBoxPointer);
+         this.menu.fixToCorner(this.fixMenuCorner);         
+      }
       this._updateSize();
    },
 
    _updateSize: function() {
       if((this.mainBox)&&(this.displayed)) {
-         if(this.controlingSize) {
-            if(this.width > this.mainBox.get_width()) {
-               let monitorWidth = Main.layoutManager.primaryMonitor.width;
-               if(this.width > monitorWidth)
-                  this.width = monitorWidth;
-               this.mainBox.set_width(this.width);
-            } else {
-               this.mainBox.set_width(this.width);
-               this._clearView();
-               Mainloop.idle_add(Lang.bind(this, function() {//checking correct width and revert if it's needed.
-                  let minWidth = this._minimalWidth();
-                  if(this.width < minWidth) {
-                     this.width = minWidth;
-                     this.mainBox.set_width(this.width);
-                     this._updateView();
-                  }
-               }));
-            }
-            let monitorHeight = Main.layoutManager.primaryMonitor.height;
-            if(this.height > monitorHeight)
-               this.height = monitorHeight;
-            if(this.height < 300)
-               this.height = 300;
-            this.mainBox.set_height(this.height);
+         let monitor = Main.layoutManager.findMonitorForActor(this.actor);
+         if(this.fullScreen) {
+            let panelTop = this._processPanelSize(false);
+            let panelButton = this._processPanelSize(true);
+            this.mainBox.set_width(monitor.width);
+            this.mainBox.set_height(monitor.height - panelButton - panelTop);
             this._updateView();
-         } else {
+         } else if(this.automaticSize) {
             this.mainBox.set_width(-1);
             this.mainBox.set_height(-1);
             this._clearView();
@@ -4776,6 +4829,29 @@ MyApplet.prototype = {
             this._updateView();
             this.width = this.mainBox.get_width();
             this.mainBox.set_width(this.width);
+         } else {
+            if(this.width > this.mainBox.get_width()) {
+               if(this.width > monitor.width)
+                  this.width = monitor.width;
+               this.mainBox.set_width(this.width);
+            } else {
+               this.mainBox.set_width(this.width);
+               this._clearView();
+               Mainloop.idle_add(Lang.bind(this, function() {//checking correct width and revert if it's needed.
+                  let minWidth = this._minimalWidth();
+                  if(this.width < minWidth) {
+                     this.width = minWidth;
+                     this.mainBox.set_width(this.width);
+                     this._updateView();
+                  }
+               }));
+            }
+            if(this.height > monitor.height)
+               this.height = monitor.height;
+            if(this.height < 300)
+               this.height = 300;
+            this.mainBox.set_height(this.height);
+            this._updateView();
          }
       }
    },
@@ -4804,9 +4880,9 @@ MyApplet.prototype = {
       }
       if(scrollBoxHeight < 300)
          scrollBoxHeight = 300;
-      let monitorHeight = Main.layoutManager.primaryMonitor.height;
-      if(monitorHeight < scrollBoxHeight)
-         scrollBoxHeight = monitorHeight - 20;
+      let monitor = Main.layoutManager.findMonitorForActor(this.actor);
+      if(monitor.height < scrollBoxHeight)
+         scrollBoxHeight = monitor.height - 20;
       return scrollBoxHeight;
    },
 
@@ -4900,7 +4976,8 @@ MyApplet.prototype = {
    },
 
    _correctPlaceResize: function(mx, my, ax, ay, aw, ah) {
-      let middelScreen = Main.layoutManager.primaryMonitor.width/2;
+      let monitor = Main.layoutManager.findMonitorForActor(this.actor);
+      let middelScreen = (monitor.x + monitor.width)/2;
       let [cx, cy] = this.actor.get_transformed_position();
       switch (this.orientation) {
          case St.Side.TOP:
@@ -4927,7 +5004,8 @@ MyApplet.prototype = {
          let [ax, ay] = this.actorResize.get_transformed_position();
          aw = this.actorResize.get_width();
          ah = this.actorResize.get_height();
-         let middelScreen = Main.layoutManager.primaryMonitor.width/2;
+         let monitor = Main.layoutManager.findMonitorForActor(this.actor);
+         let middelScreen = (monitor.x + monitor.width)/2;
          let [cx, cy] = this.actor.get_transformed_position();
          switch (this.orientation) {
             case St.Side.TOP:
@@ -5059,7 +5137,8 @@ MyApplet.prototype = {
          this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
 
          this.mainBox = new St.BoxLayout({ vertical: false, style_class: 'menu-applications-box' });
-         this.mainBox.set_style('max-width: ' + (Main.layoutManager.primaryMonitor.width) + 'px; max-height: ' + (Main.layoutManager.primaryMonitor.height) + 'px;');
+         let monitor = Main.layoutManager.findMonitorForActor(this.actor);
+         this.mainBox.set_style('max-width: ' + (monitor.width) + 'px; max-height: ' + (monitor.height) + 'px;');
          this.extendedBox = new St.BoxLayout({ vertical: true });
          this.extendedBox.add(this.standardBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
 
@@ -6071,12 +6150,15 @@ MyApplet.prototype = {
          }
          Mainloop.idle_add(Lang.bind(this, this._initial_cat_selection));
          this.displayed = true;
-         this.mainBox.set_width(this.width);
-         this.mainBox.set_height(this.height);
-         if(this.updateTheme) {
-            this.updateTheme = false;
-            Mainloop.idle_add(Lang.bind(this, this._updateSize()));
-         }
+         if(!this.fullScreen) {
+            this.mainBox.set_width(this.width);
+            this.mainBox.set_height(this.height);
+            if(this.updateTheme) {
+               this.updateTheme = false;
+               Mainloop.idle_add(Lang.bind(this, this._updateSize()));
+            }
+         } else
+            this._setFullScreen();
       }
    },
 

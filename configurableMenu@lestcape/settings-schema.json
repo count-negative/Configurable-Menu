@@ -304,11 +304,17 @@
       "description" : "Size of selected application description:",
       "tooltip" : "Size of font in selected application description."
    },
-   "controling-size" : {
+   "automatic-size" : {
       "type" : "checkbox",
-      "default" : true,
-      "description": "Controling the size",
-      "tooltip": "Choose whether or not to controling the size of the menu."
+      "default" : false,
+      "description": "Automatic size",
+      "tooltip": "Choose whether or not to automatic adjust of the menu size."
+   },
+   "full-screen" : {
+      "type" : "checkbox",
+      "default" : false,
+      "description": "Full screen",
+      "tooltip": "Choose whether or not to put the menu in full screen mode."
    },
    "width" : {
       "type": "spinbutton",
