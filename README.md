@@ -73,17 +73,19 @@ Add new languages:
 Change Log:
 ==============
 0.8-Beta
-   - Accessible bar it's now configurable and have two drag and drop areas(Places and Apps(systems)).
-   - Implemented new place buttons(PC, Desktop, Home and Trash).
+   - The Accessible bar it's now configurable and have two drag and drop areas(Places and Apps(systems)).
+   - Implemented new places items(PC, Desktop, Home and Trash).
    - You can add item to accessible bar with submenu and drag and drop option, also places.
-   - Favorites Buttons have submenu now.
-   - Reduce the width of search in windows 7 theme to be the same size or less of Favorites Buttons area.
-   - Power Buttons have now several theme to can be selected.
-   - Accessible Panel can have icons or not now.
+   - The Favorites buttons have now submenu .
+   - Reduced the width of search item in windows 7 theme to be the same size or less of Favorites area.
+   - Power Buttons have now several themes that can be selected.
+   - The Accessible bar can have icons or not now.
    - Categories can have icons or not now.
    - You can remove the Box Pointer of Menu if you want.
    - Implementation of Separator with configurable options.
    - Hover Icon can have configurable border now.
+   - Now you can align the menu to the corner.
+   - When you can resize the menu, now appear a mark in the corresponding corner.
 
 0.7-Beta
    - Fixed a bug in the keyboard navigation, and add for more componets.

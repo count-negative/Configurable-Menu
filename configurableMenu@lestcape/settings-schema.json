@@ -107,14 +107,14 @@
    "accessible-box" : {
       "type" : "checkbox",
       "default" : false,
-      "description": "Accessible Panel have box",
-      "tooltip": "Choose whether or not to have a box in Accessible Panel."
+      "description": "Accessible bar have box",
+      "tooltip": "Choose whether or not to have a box in the Accessible bar."
    },
    "accessible-icons" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "Accessible Panel have icons",
-      "tooltip": "Choose whether or not to have icons in Accessible Panel."
+      "description": "Accessible bar have icons",
+      "tooltip": "Choose whether or not to have icons in Accessible bar."
    },
    "categories-icons" : {
       "type" : "checkbox",
@@ -351,8 +351,8 @@
    "scroll-accessible" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "Scroll of accessible box visible",
-      "tooltip": "Choose whether or not to make the scroll of accessible box visible."
+      "description": "Scroll of accessible bar visible",
+      "tooltip": "Choose whether or not to make the scroll of the accessible bar visible."
    },
    "spacer-line" : {
       "type" : "checkbox",
@@ -375,5 +375,12 @@
       "default" : true,
       "description": "Box Pointer in the menu",
       "tooltip": "Choose whether or not to make the box pointer of menu visible."
+   },
+
+   "fix-menu-corner" : {
+      "type" : "checkbox",
+      "default" : false,
+      "description": "Fix the menu to corner",
+      "tooltip": "Choose whether or not to fix the menu to corner."
    }
 }
