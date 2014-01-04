@@ -103,16 +103,14 @@ ScrollItemsBox.prototype = {
       this.panelToScroll = panelToScroll;
       this.vertical = vertical;
       this.actor = new St.BoxLayout({ vertical: this.vertical });
-      //this.panelResize = new St.BoxLayout({ vertical: this.vertical });
+      this.panelResize = new St.BoxLayout({ vertical: this.vertical });
+      this.panelResize.add(this.panelToScroll, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
 
       this.scroll = this._createScroll(this.vertical);
-      this.scroll.add_actor(this.panelToScroll);
+      this.scroll.add_actor(this.panelResize);
 
-      //this.actor.add(this.panelResize, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.actor.add(this.scroll, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-
-      this.signalAllocationID = 0;
-      //this.actor.connect('allocation_changed', Lang.bind(this, this._onAllocationParentChanged));
+      this.actor.connect('allocation_changed', Lang.bind(this, this._onAllocationChanged));
    },
 
    _createScroll: function(vertical) {
@@ -145,22 +143,30 @@ ScrollItemsBox.prototype = {
       return scrollBox;
    },
 
-   _onAllocationParentChanged: function(actor, event) {
-      //if(!this.vertical) {
-
-             
-        // this.panelToScroll.set_height(-1);
-         //Main.notify("listo");
-   },
-
    _onAllocationChanged: function(actor, event) {
       if(this.visible) {
          if(this.vertical) {
-            this.panelToScroll.set_height(-1);
+            this.panelResize.set_height(-1);
+         } else {
+            this.panelResize.set_width(-1);
+            this.scroll.set_height(-1)
+            this.panelResize.set_height(-1);
+            if(this.actor.get_height() < this.scroll.get_height()) {
+               this.panelResize.set_height(this.scroll.get_height());
+               this.scroll.set_height(this.panelResize.get_height());
+            }
          }
       } else {
          if(this.vertical) {
-            this.panelToScroll.set_height(actor.get_height());// 4 pixels allow
+            this.panelResize.set_height(actor.get_height());// 4 pixels allow
+         } else {
+            this.panelResize.set_width(actor.get_width());
+            if(this.actor.get_height() < this.scroll.get_height()) {
+               this.panelResize.set_height(this.scroll.get_height());
+               this.scroll.set_height(this.panelResize.get_height());
+            } else {
+               this.scroll.set_height(-1);
+            }
          }
       }
    },
@@ -232,15 +238,12 @@ ScrollItemsBox.prototype = {
    setScrollVisible: function(visible) {
       this.visible = visible;
       if(this.visible) {
-         if(this.signalAllocationID > 0)
-            this.actor.disconnect(this.signalAllocationID);
-         this.signalAllocationID = 0;
          if(this.vertical)
-            this.panelToScroll.set_height(-1);
+            this.panelResize.set_height(-1);
+         else
+            this.panelResize.set_width(-1);
       }
       else {
-         if(this.signalAllocationID == 0)
-            this.signalAllocationID = this.actor.connect('allocation_changed', Lang.bind(this, this._onAllocationChanged));
          this._onAllocationChanged(this.actor, null);
       }
    },
@@ -4043,7 +4046,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "iconHoverSize", this._setIconHoverSize, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "icon-accesible-size", "iconAccessibleSize", this._setIconAccessibleSize, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "show-favorites", "showFavorites", this._setVisibleFavorites, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "favorites-lines", "favoritesLinesNumber", this._refreshFavs, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "favorites-lines", "favoritesLinesNumber", this._setVisibleFavorites, null);
 
          this.settings.bindProperty(Settings.BindingDirection.IN, "show-hover-icon", "showHoverIcon", this._setVisibleHoverIcon, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "hover-icon-border", "hoverBorderSize", this._updateBorderHoverSize, null);
@@ -4665,6 +4668,7 @@ MyApplet.prototype = {
    _setVisibleFavorites: function() {
       this.favoritesScrollBox.actor.visible = this.showFavorites;
       this._refreshFavs();
+         this.updateSize();
    },
 
    _setVisiblePowerButtons: function() {
@@ -4717,9 +4721,9 @@ MyApplet.prototype = {
       if(this.staticBox)
          this.staticBox.setSeparatorLine(this.showSpacerLine);
       if(this.spacerApp)
-         this.spacerApp.setLineVisible(this.spacerSize);
+         this.spacerApp.setLineVisible(this.showSpacerLine);
       if(this.spacerWindows)
-         this.spacerWindows.setLineVisible(this.spacerSize);
+         this.spacerWindows.setLineVisible(this.showSpacerLine);
    },
 
    _updateSpacerSize: function() {
@@ -4823,12 +4827,19 @@ MyApplet.prototype = {
          this.powerBox.setSpecialColor(this.showPowerBox);
       }
       this._refreshFavs();
-      this._setFullScreen();
+      if(this.fullScreen) {
+         if(this.controlView) {
+            this.controlView.changeResizeActive(false);
+            this.controlView.changeFullScreen(this.fullScreen);
+         }
+         this.menu._boxPointer.setArrow(false);
+         this.menu.fixToCorner(true);
+      } 
    },
 
    _setAutomaticSize: function() {
       if(this.controlView)
-         this.controlView.changeResizeActive(false);
+         this.controlView.changeResizeActive(false);      
       this._updateSize();
    },
 
@@ -4851,10 +4862,8 @@ MyApplet.prototype = {
       if((this.mainBox)&&(this.displayed)) {
          let monitor = Main.layoutManager.findMonitorForActor(this.actor);
          if(this.fullScreen) {
-            let panelTop = this._processPanelSize(false);
-            let panelButton = this._processPanelSize(true);
             this.mainBox.set_width(monitor.width);
-            this.mainBox.set_height(monitor.height - panelButton - panelTop);
+            this.mainBox.set_height(monitor.height - this._processPanelSize(true) - this._processPanelSize(false));
             this._updateView();
          } else if(this.automaticSize) {
             this.mainBox.set_width(-1);
@@ -4871,6 +4880,10 @@ MyApplet.prototype = {
             } else {
                this.height = this.mainBox.get_height();
                this.mainBox.set_height(this.height);
+               if(this.applicationsScrollBox.actor.get_height() < 100) {
+                  this.height += 100;//support horizontal//
+                  this.mainBox.set_height(this.height);
+               }
             }
             this._updateView();
             this.width = this.mainBox.get_width();
@@ -4892,8 +4905,9 @@ MyApplet.prototype = {
                   }
                }));
             }
-            if(this.height > monitor.height)
-               this.height = monitor.height;
+            let maxHeigth = monitor.height - this._processPanelSize(true) - this._processPanelSize(false);
+            if(this.height > maxHeigth)
+               this.height = maxHeigth;
             if(this.height < 300)
                this.height = 300;
             this.mainBox.set_height(this.height);
@@ -5182,8 +5196,7 @@ MyApplet.prototype = {
          this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
 
          this.mainBox = new St.BoxLayout({ vertical: false, style_class: 'menu-applications-box' });
-         let monitor = Main.layoutManager.findMonitorForActor(this.actor);
-         this.mainBox.set_style('max-width: ' + (monitor.width) + 'px; max-height: ' + (monitor.height) + 'px;');
+
          this.extendedBox = new St.BoxLayout({ vertical: true });
          this.extendedBox.add(this.standardBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
          this.spacerWindows = new SeparatorBox(this.showSpacerLine, this.spacerSize);
@@ -5362,7 +5375,7 @@ MyApplet.prototype = {
       this.categoriesWrapper.set_vertical(false);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, false);
       this.favBoxWrapper.set_vertical(false);
-      this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
+      this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, false);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.END, expand: true });
       //this.categoriesScrollBox.hscrollbar_visible(false);
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
@@ -6212,14 +6225,21 @@ MyApplet.prototype = {
          Mainloop.idle_add(Lang.bind(this, this._initial_cat_selection));
          this.displayed = true;
          if(!this.fullScreen) {
+            let monitor = Main.layoutManager.findMonitorForActor(this.actor);
+            let maxHeigth = monitor.height - this._processPanelSize(true) - this._processPanelSize(false);
+            if(this.height > maxHeigth)
+               this.height = maxHeigth;
+            if(this.width > monitor.width)
+               this.width = monitor.width;
             this.mainBox.set_width(this.width);
             this.mainBox.set_height(this.height);
             if(this.updateTheme) {
                this.updateTheme = false;
                Mainloop.idle_add(Lang.bind(this, this._updateSize()));
             }
-         } else
+         } else {
             this._setFullScreen();
+         }
       }
    },
 
