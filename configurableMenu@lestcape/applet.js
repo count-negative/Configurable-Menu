@@ -103,16 +103,16 @@ ScrollItemsBox.prototype = {
       this.panelToScroll = panelToScroll;
       this.vertical = vertical;
       this.actor = new St.BoxLayout({ vertical: this.vertical });
-      this.panelResize = new St.BoxLayout({ vertical: this.vertical });
+      //this.panelResize = new St.BoxLayout({ vertical: this.vertical });
 
       this.scroll = this._createScroll(this.vertical);
       this.scroll.add_actor(this.panelToScroll);
 
-      this.actor.add(this.panelResize, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.panelResize.add(this.scroll, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      //this.actor.add(this.panelResize, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.actor.add(this.scroll, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
 
       this.signalAllocationID = 0;
-      this.signalParentAllocationID = 0;
+      //this.actor.connect('allocation_changed', Lang.bind(this, this._onAllocationParentChanged));
    },
 
    _createScroll: function(vertical) {
@@ -131,7 +131,7 @@ ScrollItemsBox.prototype = {
                        }));
       } else {
          scrollBox = new St.ScrollView({ x_fill: false, y_fill: true, x_align: St.Align.START, style_class: 'hfade menu-applications-scrollbox' });
-         scrollBox.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER);
+         scrollBox.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
          let hscroll = scrollBox.get_hscroll_bar();
          hscroll.connect('scroll-start',
                           Lang.bind(this, function() {
@@ -146,8 +146,11 @@ ScrollItemsBox.prototype = {
    },
 
    _onAllocationParentChanged: function(actor, event) {
-      this.panelToScroll.set_height(-1);
-      //Main.notify("listo");
+      //if(!this.vertical) {
+
+             
+        // this.panelToScroll.set_height(-1);
+         //Main.notify("listo");
    },
 
    _onAllocationChanged: function(actor, event) {
@@ -230,19 +233,15 @@ ScrollItemsBox.prototype = {
       this.visible = visible;
       if(this.visible) {
          if(this.signalAllocationID > 0)
-            this.panelResize.disconnect(this.signalAllocationID);
-         if(this.signalParentAllocationID > 0)
-            this.actor.disconnect(this.signalParentAllocationID);
+            this.actor.disconnect(this.signalAllocationID);
          this.signalAllocationID = 0;
-         this.signalParentAllocationID = 0;
-         this.panelToScroll.set_height(-1);
+         if(this.vertical)
+            this.panelToScroll.set_height(-1);
       }
       else {
          if(this.signalAllocationID == 0)
-            this.signalAllocationID = this.panelResize.connect('allocation_changed', Lang.bind(this, this._onAllocationChanged));
-         if(this.signalParentAllocationID == 0)
-            this.signalParentAllocationID = this.actor.connect('allocation_changed', Lang.bind(this, this._onAllocationParentChanged));
-         this._onAllocationChanged(this.panelResize, null);
+            this.signalAllocationID = this.actor.connect('allocation_changed', Lang.bind(this, this._onAllocationChanged));
+         this._onAllocationChanged(this.actor, null);
       }
    },
 
@@ -261,7 +260,7 @@ ScrollItemsBox.prototype = {
          var box_width = this.actor.get_allocation_box().x2-this.actor.get_allocation_box().x1;
          var new_scroll_value = current_scroll_value;
          if (current_scroll_value > actor.get_allocation_box().x1-10) new_scroll_value = actor.get_allocation_box().x1-10;
-         if (box_width+current_scroll_value < actor.get_allocation_box().x2+10) new_scroll_value = actor.get_allocation_box().x2-box_width+10;
+         if (box_width+current_scroll_value < actor.get_allocation_box().x2+40) new_scroll_value = actor.get_allocation_box().x2-box_width+40;
          if (new_scroll_value!=current_scroll_value) this.scroll.get_hscroll_bar().get_adjustment().set_value(new_scroll_value);
       }
      } catch(e) {
@@ -3697,32 +3696,33 @@ ConfigurablePointer.prototype = {
 
          if(this._arrowSide == St.Side.BOTTOM) {
             if(sourceAllocation.x1 < center) {
-               cr.moveTo(x2 - maxSpace, y1 - borderWidth);
-               cr.lineTo(x2 - borderWidth, y1 + maxSpace);
-               cr.lineTo(x2 - borderWidth, y1 - borderWidth);
-               cr.lineTo(x2 - maxSpace, y1 - borderWidth);
+               cr.moveTo(x2 - maxSpace - borderWidth, y1 - borderWidth);
+               cr.lineTo(x2 + borderWidth, y1 + maxSpace + borderWidth);
+               cr.lineTo(x2 + borderWidth, y1 - borderWidth);
+               cr.lineTo(x2 - maxSpace - borderWidth, y1 - borderWidth);
             } else {
-               cr.moveTo(x1 + maxSpace, y1 - borderWidth);
-               cr.lineTo(x1 - borderWidth, y1 + maxSpace);
+               cr.moveTo(x1 + maxSpace + borderWidth, y1 - borderWidth);
+               cr.lineTo(x1 - borderWidth, y1 + maxSpace + borderWidth);
                cr.lineTo(x1 - borderWidth, y1 - borderWidth);
-               cr.lineTo(x1 + maxSpace, y1 - borderWidth);
+               cr.lineTo(x1 + maxSpace + borderWidth, y1 - borderWidth);
             }
          } else {
             if(sourceAllocation.x1 < center) {
-               cr.moveTo(x2 - borderWidth, y2 - maxSpace);
-               cr.lineTo(x2 - maxSpace, y2 - borderWidth);
-               cr.lineTo(x2 - borderWidth, y2 - borderWidth);
-               cr.lineTo(x2 - borderWidth, y2 - maxSpace);
+               cr.moveTo(x2 + borderWidth, y2 - maxSpace - borderWidth);
+               cr.lineTo(x2 - maxSpace - borderWidth, y2 + borderWidth);
+               cr.lineTo(x2 + borderWidth, y2 + borderWidth);
+               cr.lineTo(x2 + borderWidth, y2 - maxSpace - borderWidth);
             } else {
-               cr.moveTo(x1 + borderWidth, y2 - maxSpace);
-               cr.lineTo(x1 + maxSpace, y2 - borderWidth);
-               cr.lineTo(x1 + borderWidth, y2 - borderWidth);
-               cr.lineTo(x1 + borderWidth, y2 - maxSpace);
+               cr.moveTo(x1 - borderWidth, y2 - maxSpace - borderWidth);
+               cr.lineTo(x1 + maxSpace + borderWidth, y2 + borderWidth);
+               cr.lineTo(x1 - borderWidth, y2 + borderWidth);
+               cr.lineTo(x1 - borderWidth, y2 - maxSpace - borderWidth);
             }
          }
          try {
          Clutter.cairo_set_source_color(cr, this.selectedColor);
          cr.fillPreserve();
+         Clutter.cairo_set_source_color(cr, borderColor);
          cr.setLineWidth(1);
          cr.stroke();
          } catch(e) {
