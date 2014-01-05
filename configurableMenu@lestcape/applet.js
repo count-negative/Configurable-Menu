@@ -1204,7 +1204,7 @@ ControlBox.prototype = {
       this.bttViewGrid = this._createSymbolicButton('view-grid-symbolic', { x_fill: false, expand: false });
       this.bttViewGrid.connect('clicked', Lang.bind(this, this._onClickedChangeView));
       
-      this.bttFullScreen = this._createSymbolicButton('window-maximize', {x_fill: false, x_align: St.Align.END, expand: true});
+      this.bttFullScreen = this._createSymbolicButton('zoom-fit-best', {x_fill: false, x_align: St.Align.END, expand: true});
       this.bttFullScreen.connect('clicked', Lang.bind(this, this._onClickedChangeFullScreen));
       this.bttResize = this._createSymbolicButton('changes-prevent', {x_fill: false, x_align: St.Align.END, expand: false});
       this.bttResize.connect('clicked', Lang.bind(this, this._onClickedChangeResize));
@@ -1835,23 +1835,15 @@ HoverIcon.prototype = {
    },
     
    toggleMenu: function() {
-      if(!this.menu.isOpen)
+      if(this.menu.isOpen) {
+         this.menu.close(true);
+         this.menu.sourceActor._delegate.setActive(true);
+      } else {
          if(this.actor.get_parent() == this.parent.searchBox)
-            //this.actor.get_parent().set_width(this.actor.get_parent().get_allocation_box().x2 - this.actor.get_parent().get_allocation_box().x1);
             this.parent.searchEntry.set_width(200);
-     try {
-        if(!this.menu.isOpen) {
-           this.menu.open();
-           this.menu.sourceActor._delegate.setActive(true);
-        }
-        else {
-            this.menu.close(true);
-            this.menu.sourceActor._delegate.setActive(true);
-        }
-     }
-     catch(e) {
-        Main.notify("ToggleHover: " + e.message);
-     }
+         this.menu.open();
+         this.menu.sourceActor._delegate.setActive(true);
+      }
    },
 
    _onUserChanged: function() {
@@ -4923,7 +4915,7 @@ MyApplet.prototype = {
                         this.mainBox.set_height(this.height);
                         this._updateView();
                      }
-                     this.minimalHeight = minHeight;
+                     //this.minimalHeight = minHeight;
                   }));
                }
             }
@@ -4971,7 +4963,7 @@ MyApplet.prototype = {
            width += this.hover.actor.get_width() + this.hover.menu.actor.get_width();
          if((!this.favBoxWrapper.get_vertical())&&(this.favBoxWrapper.get_width() > width))
             width = this.favBoxWrapper.get_width();
-      } //else { width += this.favBoxWrapper.get_width() + 10;  }
+      }
       if((this.staticBox)&&(this.staticBox.actor.visible))
          width += this.staticBox.actor.get_width() + 10;
       return width + 10;
