@@ -2860,7 +2860,7 @@ PlaceButtonAccessibleExtended.prototype = {
       if(!this.icon)
          this.icon = new St.Icon({icon_name: "folder", icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR});
       if(this.icon)
-         this.container.add_actor(this.icon);
+         this.container.add(this.icon, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       this.addActor(this.container);
       this.icon.realize();
@@ -3154,7 +3154,7 @@ FavoritesButtonExtended.prototype = {
 
       this.container = new St.BoxLayout();
       this.icon = app.create_icon_texture(icon_size);
-      this.container.add_actor(this.icon);
+      this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
 
       if(this.allowName) {
          this.label = new St.Label({ text: this.app.get_name(), style_class: 'menu-application-button-label' });
@@ -3830,23 +3830,6 @@ AccessibleMetaData.prototype = {
          Main.notify("Eroor: " + e.message);
       }
 
-   },
-
-   _isDirectory: function(fDir) {
-      try {
-         let info = fDir.query_filesystem_info("standard::type", null);
-         if((info)&&(info.get_file_type() != Gio.FileType.DIRECTORY))
-            return true;
-      } catch(e) {
-      }
-      return false;
-   },
-
-   _makeDirectoy: function(fDir) {
-      if(!this._isDirectory(fDir))
-         this._makeDirectoy(fDir.get_parent());
-      if(!this._isDirectory(fDir))
-         fDir.make_directory(null);
    },
 
    _isBookmarks: function(bookmark) {
