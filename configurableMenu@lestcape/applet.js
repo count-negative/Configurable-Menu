@@ -4533,8 +4533,7 @@ MyApplet.prototype = {
          }
       }
 // + 42
-      //this.aviableWidth = this._minimalWidth();
-      this.applicationsScrollBox.actor.get_allocation_box().x2-this.applicationsScrollBox.actor.get_allocation_box().x1 - 42;
+      this.aviableWidth = this.applicationsScrollBox.actor.get_allocation_box().x2-this.applicationsScrollBox.actor.get_allocation_box().x1 - 42;
       if((this.aviableWidth > 0)&&(this._applicationsBoxWidth > 0)) {
          this.iconViewCount = Math.floor(this.aviableWidth/this._applicationsBoxWidth);
          if(this.iconViewCount*this._applicationsBoxWidth > this.aviableWidth)
@@ -4959,12 +4958,12 @@ MyApplet.prototype = {
          let operPanelVisible = this.operativePanel.visible;
          this.operativePanel.visible = true;
          this.favoritesScrollBox.actor.visible = false;
-         interWidth = this.extendedBox.get_width();
+         interMint = this.extendedBox.get_width();
          this.operativePanel.visible = operPanelVisible;
          this.favoritesScrollBox.actor.visible = !operPanelVisible;
       }
-      if(interWidth > width)
-         width = interWidth;
+      if(interMint > width)
+         width = interMint;
       
       if(!this.categoriesBox.get_vertical()) {
          width = this.controlBox.get_width();
