@@ -4915,8 +4915,11 @@ MyApplet.prototype = {
                         this.mainBox.set_height(this.height);
                         this._updateView();
                      }
-                     //this.minimalHeight = minHeight;
+                     this.minimalHeight = minHeight;
                   }));
+               } else {
+                  this.height = this.minimalHeight;
+                  this.mainBox.set_height(this.height);
                }
             }
             this._updateView();
