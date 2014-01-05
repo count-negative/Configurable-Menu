@@ -3810,17 +3810,26 @@ function AccessibleMetaData(parent, onChangeCallBack) {
 AccessibleMetaData.prototype = {
 
    _init: function(parent, onChangeCallBack) {
-      this.parent = parent;
-      let config_source = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + parent.uuid + "/accessible.json";
-      let sourceFile = Gio.File.new_for_path(config_source);
-      let config_path = GLib.get_home_dir() + "/.config/" + parent.uuid + "/accessible.json";
-      this.metaDataFile = Gio.File.new_for_path(config_path);
-      if(!this.metaDataFile.query_exists(null)) {
-         this._makeDirectoy(this.metaDataFile.get_parent());
-         sourceFile.copy(this.metaDataFile, Gio.FileCopyFlags.OVERWRITE, null, null);
-      }      
-      this.onChangeCallBack = onChangeCallBack;
-      this._loadMetaData();
+      try {
+         this.parent = parent;
+         this.onChangeCallBack = onChangeCallBack;
+         let config_source = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + parent.uuid + "/accessible.json";
+         let config_path = GLib.get_home_dir() + "/.config/" + parent.uuid + "/accessible.json";
+         this.metaDataFile = Gio.File.new_for_path(config_path);
+         if(!this.metaDataFile.query_exists(null)) {
+            if(!this._createSettingsFile(config_source)) {
+               global.logError("Problem initializing settings...");
+            }
+         } else {
+            if (!this.updateSettingsFile(config_source)) {
+                global.logError("Problem updating settings...");
+            }
+         }
+         this._loadMetaData();
+      } catch(e) {
+         Main.notify("Eroor: " + e.message);
+      }
+
    },
 
    _isDirectory: function(fDir) {
@@ -3852,10 +3861,155 @@ AccessibleMetaData.prototype = {
    _loadMetaData: function() {
       try {
          let metadataContents = Cinnamon.get_file_contents_utf8_sync(this.metaDataFile.get_path());
-         this.meta = JSON.parse(metadataContents);
+         let checksum = global.get_md5_for_string(metadataContents);
+         try {
+            this.meta = JSON.parse(metadataContents);
+         } catch (e) {
+            global.logError("Cannot parse settings schema file... Error is: " + e);
+            return false;
+         }
       } catch (e) {
-         throw this.logError('Failed to load/parse accessible.json', e);
+         global.logError('Failed to load/parse accessible.json', e);
       }
+   },
+
+   _createSettingsFile: function(origDataPath) {
+      let origDataFile = Gio.File.new_for_path(origDataPath);
+
+      if(!this.metaDataFile.get_parent().query_exists(null)) {
+         this.metaDataFile.get_parent().make_directory_with_parents(null);
+      }
+      let origDataContents = Cinnamon.get_file_contents_utf8_sync(origDataFile.get_path());
+      let checksum = global.get_md5_for_string(origDataContents);
+
+      let init_json
+      try {
+         init_json = JSON.parse(origDataContents);
+      } catch (e) {
+         global.logError("Cannot parse settings schema file... Error is: " + e);
+         return false;
+      }
+
+      for (let key in init_json) {
+         init_json[key]["value"] = init_json[key]["default"]
+      }
+      init_json["__md5__"] = checksum;
+      let out_file = JSON.stringify(init_json, null, 4);
+
+      let fp = this.metaDataFile.create(0, null);
+      fp.write(out_file, null);
+      fp.close(null);
+
+      return true;
+   },
+
+   updateSettingsFile: function(origDataPath) {
+      let orig_file = Gio.File.new_for_path(origDataPath);
+      if (!orig_file.query_exists(null)) {
+         global.logWarning("Failed to locate settings schema file to check for updates...");
+         global.logWarning("Something may not be right");
+         return false;
+      }
+      let init_file_contents = Cinnamon.get_file_contents_utf8_sync(orig_file.get_path());
+      let checksum = global.get_md5_for_string(init_file_contents);
+
+      let existing_settings_file = Cinnamon.get_file_contents_utf8_sync(this.metaDataFile.get_path());
+      let existing_json;
+      let new_json;
+      try {             
+          new_json = JSON.parse(init_file_contents);
+      } catch (e) {
+          global.logError("Problem parsing " + orig_file.get_path() + " while preparing to perform upgrade.");
+          global.logError("Skipping upgrade for now - something may be wrong with the new settings schema file.");
+          return false;
+      }
+      try {
+          existing_json = JSON.parse(existing_settings_file);
+      } catch (e) {
+          global.logError("Problem parsing " + this.metaDataFile.get_path() + " while preparing to perform upgrade.");
+          global.log("Re-creating settings file.");
+          this.metaDataFile.delete(null, null);
+          return this._createSettingsFile(origDataPath);
+      }           
+      if(existing_json["__md5__"] != checksum) {
+         global.log("Updated settings file detected.  Beginning upgrade of existing settings");
+         return this._doUpgrade(new_json, existing_json, checksum);
+      } else {
+         return true;
+      }
+   },
+
+   _doUpgrade: function(new_json, old_json, checksum) {
+      /* We're going to iterate through all the keys in the new settings file
+       * Where the key names and types match up, we'll check the current value against
+       * the new max/mins or other factors (if applicable) and add the 'value' key to the new file.
+       *
+       * If the old setting-key doesn't exist in the new file, we'll drop it entirely.
+       * If there are new keys, we'll assign the default value like normal.
+       */
+       for(let key in new_json) {
+          if(key in old_json) {
+             if(new_json[key]["type"] == old_json[key]["type"]) {
+                if(this._sanityCheck(old_json[key]["value"], new_json[key])) {
+                   new_json[key]["value"] = old_json[key]["value"];
+                } else {
+                   new_json[key]["value"] = new_json[key]["default"];
+                }
+             } else {
+                new_json[key]["value"] = new_json[key]["default"];
+             }
+          } else {
+             new_json[key]["value"] = new_json[key]["default"];
+          }
+       }
+       new_json["__md5__"] = checksum;
+
+       let out_file = JSON.stringify(new_json, null, 4);
+
+       if(this.metaDataFile.delete(null, null)) {
+          let fp = this.metaDataFile(0, null);
+          fp.write(out_file, null);
+          fp.close;
+          global.log("Upgrade complete");
+          return true;
+       } else {
+          global.logError("Failed to gain write access to save updated settings...");
+          return false;
+       }
+   },
+
+   _sanityCheck: function(val, setting) {
+      let found;
+      switch (setting["type"]) {
+         case "spinbutton":
+         case "scale":
+            return (val < setting["max"] && val > setting["min"]);
+            //break;
+         case "combobox":
+            found = false;
+            for(let opt in setting["options"]) {
+               if(val == setting["options"][opt]) {
+                  found = true;
+                  break;
+               }
+            }
+            return found;
+            //break;
+         case "radiogroup":
+            found = false;
+            for (let opt in setting["options"]) {
+               if (val == setting["options"][opt] || setting["options"][opt] == "custom") {
+                  found = true;
+                  break
+               }
+            }
+            return found;
+            //break;
+         default:
+            return true;
+            //break;
+      }
+      return true;
    },
 
    _saveMetaData: function() {
