@@ -3876,6 +3876,17 @@ AccessibleMetaData.prototype = {
       }
    },
 
+   _removeMetaData: function() {
+      let file = Gio.File.new_for_path(this.metaDataFile.get_path());
+      if(file.query_exists(null)) {
+         try {
+            file.delete(null, null);
+         } catch (e) {
+            global.logError("Problem removing desklet config file during cleanup.  UUID is " + uuid + " and filename is " + config_path);
+         }
+      }
+   },
+
    getPlacesList: function() {
       let placesString = this.meta["list-places"];
       let listPlaces = placesString.split(",");
@@ -4969,7 +4980,9 @@ MyApplet.prototype = {
       }
       if((this.staticBox)&&(this.staticBox.actor.visible))
          width += this.staticBox.actor.get_width() + 10;
-      return width + 10;
+      if((this.theme == "mint")||(this.theme == "windows7"))
+         return width + 10;
+      return width + 20;
    },
 
    _onButtonReleaseEvent: function(actor, event) {
