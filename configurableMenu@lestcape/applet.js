@@ -379,13 +379,14 @@ StaticBox.prototype = {
    },
 
    takeHover: function(take) {
+      let parent = this.hover.actor.get_parent();
+      if(parent) {
+         parent.remove_actor(this.hover.actor);
+         parent.remove_actor(this.hover.menu.actor);
+      }
       if(take) {
          this.hoverBox.add(this.hover.actor, { x_fill: false, x_align: St.Align.MIDDLE, expand: true });
          this.hoverBox.add_actor(this.hover.menu.actor);
-      }
-      else if(this.hover.actor.get_parent() == this.hoverBox) {
-         this.hoverBox.remove_actor(this.hover.actor);
-         this.hoverBox.remove_actor(this.hover.menu.actor);
       }
    },
 
@@ -1838,7 +1839,15 @@ HoverIcon.prototype = {
          if(this.actor.get_parent() == this.parent.searchBox)
             //this.actor.get_parent().set_width(this.actor.get_parent().get_allocation_box().x2 - this.actor.get_parent().get_allocation_box().x1);
             this.parent.searchEntry.set_width(200);
-      this.menu.toggle();
+     try {
+        if(!this.menu.isOpen)
+           this.menu.actor.visible = !this.menu.isOpen;
+        else
+           this.menu.actor.hide();
+     }
+     catch(e) {
+        Main.notify("ToggleHover");
+     }
    },
 
    _onUserChanged: function() {
@@ -4520,7 +4529,8 @@ MyApplet.prototype = {
          }
       }
 // + 42
-      this.aviableWidth = this.applicationsScrollBox.actor.get_allocation_box().x2-this.applicationsScrollBox.actor.get_allocation_box().x1 - 42;
+      //this.aviableWidth = this._minimalWidth();
+      this.applicationsScrollBox.actor.get_allocation_box().x2-this.applicationsScrollBox.actor.get_allocation_box().x1 - 42;
       if((this.aviableWidth > 0)&&(this._applicationsBoxWidth > 0)) {
          this.iconViewCount = Math.floor(this.aviableWidth/this._applicationsBoxWidth);
          if(this.iconViewCount*this._applicationsBoxWidth > this.aviableWidth)
@@ -4850,8 +4860,10 @@ MyApplet.prototype = {
       if((this.mainBox)&&(this.displayed)) {
          let monitor = Main.layoutManager.findMonitorForActor(this.actor);
          if(this.fullScreen) {
+            let panelTop = this._processPanelSize(false);
+            let panelButton = this._processPanelSize(true);
             this.mainBox.set_width(monitor.width);
-            this.mainBox.set_height(monitor.height - this._processPanelSize(true) - this._processPanelSize(false));
+            this.mainBox.set_height(monitor.height - panelButton - panelTop);
             this._updateView();
          } else if(this.automaticSize) {
             this.mainBox.set_width(-1);
@@ -4862,17 +4874,16 @@ MyApplet.prototype = {
                this.operativePanel.visible = true;
                this.favoritesScrollBox.actor.visible = false;
                this.height = this.mainBox.get_height();
+               this.mainBox.set_height(this.height);
                this.operativePanel.visible = operPanelVisible;
                this.favoritesScrollBox.actor.visible = !operPanelVisible;
             } else {
                this.height = this.mainBox.get_height();
+               this.mainBox.set_height(this.height);
             }
-            if(this.operativePanel.get_height() < 100) {
-               this.height += 100 - this.operativePanel.get_height();//support horizontal//
-            }
-            this.mainBox.set_height(this.height);
-            this.mainBox.set_width(this.width);
             this._updateView();
+            this.width = this.mainBox.get_width();
+            this.mainBox.set_width(this.width);
          } else {
             if(this.width > this.mainBox.get_width()) {
                if(this.width > monitor.width)
@@ -4883,32 +4894,36 @@ MyApplet.prototype = {
                   this.mainBox.set_width(this.width);
                   this._clearView();
                   Mainloop.idle_add(Lang.bind(this, function() {//checking correct width and revert if it's needed.
-                     let minimalWidth = this._minimalWidth();
-                     if(this.width < minimalWidth) {
-                        this.width = minimalWidth;
+                     let minWidth = this._minimalWidth();
+                     if(this.width < minWidth) {
+                        this.width = minWidth;
                         this.mainBox.set_width(this.width);
                         this._updateView();
                      }
+                    // this.minimalWidth = minWidth;
                   }));
                }
             }
-            let allocOperHeight = this.allocationHeight(this.operativePanel);
-            if(this.height > this.minimalHeight) {
-               let maxHeigth = monitor.height - this._processPanelSize(true) - this._processPanelSize(false);
+            let maxHeigth = monitor.height - this._processPanelSize(true) - this._processPanelSize(false);
+            if(this.height > this.mainBox.get_height()) {
                if(this.height > maxHeigth)
                   this.height = maxHeigth;
-               if(allocOperHeight < 100) {
-                  this.height += 100 - allocOperHeight;//support horizontal//
-                  //this.minimalHeight = this.height;
-               }
-               if(this.height < 300) {
-                  this.height = 300;
-                  this.minimalHeight = this.height;
-               }
+               this.mainBox.set_height(this.height);
             } else {
-               this.height = this.minimalHeight;
+               if(this.height > this.minimalHeight) {
+                  this.mainBox.set_height(this.height);
+                  this._clearView();
+                  Mainloop.idle_add(Lang.bind(this, function() {//checking correct height and revert if it's needed.
+                     let minHeight = this._minimalHeight();
+                     if(this.height < minHeight) {
+                        this.height = minHeight;
+                        this.mainBox.set_height(this.height);
+                        this._updateView();
+                     }
+                     this.minimalHeight = minHeight;
+                  }));
+               }
             }
-            this.mainBox.set_height(this.height);
             this._updateView();
          }
       }
@@ -4923,36 +4938,37 @@ MyApplet.prototype = {
    },
 
    _minimalHeight: function() {
-     let scrollBoxHeight = this.categoriesBox.get_height() + this.controlSearchBox.get_height() + this.endHorizontalBox.get_height() + 10;
-      if(this.favBoxWrapper.get_parent() == this.betterPanel) {
-         if((this.endBox.get_parent() == this.betterPanel) && (this.categoriesWrapper.get_height() + this.endBox.get_height() +
-            this.controlSearchBox.get_height() + 18 > scrollBoxHeight))
-            scrollBoxHeight = this.categoriesWrapper.get_height() + this.endBox.get_height() + this.controlSearchBox.get_height() + 18;
-         else if(this.categoriesWrapper.get_height() + 18 + this.controlSearchBox.get_height() + this.endHorizontalBox.get_height() > scrollBoxHeight)
-            scrollBoxHeight = this.categoriesWrapper.get_height() + 18 + this.controlSearchBox.get_height() + this.endHorizontalBox.get_height();
-      } else if(this.favBoxWrapper.get_height() + this.endHorizontalBox.get_height() + 10 > scrollBoxHeight)
-         scrollBoxHeight = this.favBoxWrapper.get_height() + this.endHorizontalBox.get_height() + 10;
-      if(!this.favBoxWrapper.get_vertical()) {
-         scrollBoxHeight = this.favoritesBox.get_height() + this.categoriesBox.get_height() + this.controlSearchBox.get_height() +
-                           this.endHorizontalBox.get_height() + 100;
-      }
-      if(scrollBoxHeight < 300)
-         scrollBoxHeight = 300;
-      let monitor = Main.layoutManager.findMonitorForActor(this.actor);
-      if(monitor.height < scrollBoxHeight)
-         scrollBoxHeight = monitor.height - 20;
-      return scrollBoxHeight;
+      let scrollBoxHeight =  this.controlSearchBox.get_height() + this.endHorizontalBox.get_height() + 10;
+      if(!this.categoriesBox.get_vertical())
+         scrollBoxHeight += this.categoriesBox.get_height();
+      if(!this.favBoxWrapper.get_vertical())
+         scrollBoxHeight += this.favBoxWrapper.get_height();
+     if(scrollBoxHeight + 20 < 280)
+         scrollBoxHeight = 280;
+      return scrollBoxHeight + 20;
    },
 
    _minimalWidth: function() {
       let width = this.extendedBox.get_width();
+      let interMint = 0;
+      if(this.theme == "mint") {
+         let operPanelVisible = this.operativePanel.visible;
+         this.operativePanel.visible = true;
+         this.favoritesScrollBox.actor.visible = false;
+         interWidth = this.extendedBox.get_width();
+         this.operativePanel.visible = operPanelVisible;
+         this.favoritesScrollBox.actor.visible = !operPanelVisible;
+      }
+      if(interWidth > width)
+         width = interWidth;
+      
       if(!this.categoriesBox.get_vertical()) {
          width = this.controlBox.get_width();
          if(this.hover.actor.visible)
            width += this.hover.actor.get_width() + this.hover.menu.actor.get_width();
          if((!this.favBoxWrapper.get_vertical())&&(this.favBoxWrapper.get_width() > width))
             width = this.favBoxWrapper.get_width();
-      }
+      } //else { width += this.favBoxWrapper.get_width() + 10;  }
       if((this.staticBox)&&(this.staticBox.actor.visible))
          width += this.staticBox.actor.get_width() + 10;
       return width + 10;
@@ -5012,10 +5028,22 @@ MyApplet.prototype = {
       ah = actor.get_height();
       if(this._isInsideMenu(mx, my, ax, ay, aw, ah)) {
          if(this._correctPlaceResize(mx, my, ax, ay, aw, ah)) {
+            this._findMouseDeltha();
             global.set_cursor(Cinnamon.Cursor.DND_MOVE);
             this._doResize();
          }
       }
+   },
+
+   _findMouseDeltha: function(mx, my) {
+      if(this.actorResize) {
+         this.mouseDx = 0;
+         this.mouseDy = 0;
+            this._updatePosResize();
+         this.mouseDx = this.width - this.mainBox.get_width();
+         this.mouseDy = this.height - this.mainBox.get_height();
+      }
+      
    },
 
    _disableResize: function() {
@@ -5056,7 +5084,15 @@ MyApplet.prototype = {
       return false;
    },
 
-   _doResize: function(actor) {
+   _doResize: function() {
+      if(this.actorResize) {
+         this._updatePosResize();
+         this._updateSize();
+         Mainloop.timeout_add(300, Lang.bind(this, this._doResize));
+      }
+   },
+
+   _updatePosResize: function() {
       if(this.actorResize) {
          let [mx, my, mask] = global.get_pointer();
          let [ax, ay] = this.actorResize.get_transformed_position();
@@ -5067,22 +5103,20 @@ MyApplet.prototype = {
          let [cx, cy] = this.actor.get_transformed_position();
          switch (this.orientation) {
             case St.Side.TOP:
-               this.height = this.mainBox.get_height() + my - this._processPanelSize(false) - ah + 4;
+               this.height = this.mainBox.get_height() + my - this._processPanelSize(false) - ah + 4 - this.mouseDy;
                if(cx < middelScreen)
-                  this.width = mx - ax;
+                  this.width = mx - ax - this.mouseDx;
                else
-                  this.width = this.mainBox.get_width() + ax - mx;
+                  this.width = this.mainBox.get_width() + ax - mx - this.mouseDx;
                break;
             case St.Side.BOTTOM:
-               this.height = this.mainBox.get_height() + ay - my + 4;
+               this.height = this.mainBox.get_height() + ay - my + 4 - this.mouseDy;
                if(cx < middelScreen)
-                  this.width = mx - ax;
+                  this.width = mx - ax - this.mouseDx;
                else
-                  this.width = this.mainBox.get_width() + ax - mx;
+                  this.width = this.mainBox.get_width() + ax - mx - this.mouseDx;
                break;
          }
-         this._updateSize();
-         Mainloop.timeout_add(300, Lang.bind(this, this._doResize));
       }
    },
 
@@ -5164,10 +5198,13 @@ MyApplet.prototype = {
          this.controlView = new ControlBox(this, this.iconControlSize);
 
 //search
-
          this.hover = new HoverIcon(this, this.iconHoverSize);
          this.hover.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
          this.hover.menu.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
+
+         this.hoverBox = new St.BoxLayout({ vertical: false });
+         this.hoverBox.add_actor(this.hover.actor);
+         this.hoverBox.add_actor(this.hover.menu.actor);
 
          this.categoriesApplicationsBox = new CategoriesApplicationsBoxExtended();
 
@@ -5272,8 +5309,7 @@ MyApplet.prototype = {
    },
 
    loadClassic: function() {
-      this.controlSearchBox.add(this.hover.actor, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
-      this.controlSearchBox.add(this.hover.menu.actor, {x_fill: false, x_align: St.Align.MIDDLE, expand: true });
+      this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
@@ -5293,8 +5329,7 @@ MyApplet.prototype = {
    },
 
    loadStylized: function() {
-      this.controlSearchBox.add(this.hover.actor, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
-      this.controlSearchBox.add(this.hover.menu.actor, {x_fill: false, x_align: St.Align.MIDDLE, expand: true });
+      this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
@@ -5314,8 +5349,7 @@ MyApplet.prototype = {
    },
 
    loadDragon: function() {
-      this.controlSearchBox.add(this.hover.actor, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
-      this.controlSearchBox.add(this.hover.menu.actor, {x_fill: false, x_align: St.Align.MIDDLE, expand: true });
+      this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
@@ -5338,8 +5372,7 @@ MyApplet.prototype = {
    },
 
    loadDragonInverted: function() {
-      this.controlSearchBox.add(this.hover.actor, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
-      this.controlSearchBox.add(this.hover.menu.actor, {x_fill: false, x_align: St.Align.MIDDLE, expand: true });
+      this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
@@ -5362,8 +5395,7 @@ MyApplet.prototype = {
    },
 
    loadHorizontal: function() {
-      this.controlSearchBox.add(this.hover.actor, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
-      this.controlSearchBox.add(this.hover.menu.actor, {x_fill: false, x_align: St.Align.MIDDLE, expand: true });
+      this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, false, this.favoritesLinesNumber);
