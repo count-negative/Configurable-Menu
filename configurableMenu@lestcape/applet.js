@@ -4645,8 +4645,7 @@ MyApplet.prototype = {
       return null;
    },
 
-   _updateView: function() {
-      this._clearView();
+   _getAppVisibleButtons: function() {
       let visibleAppButtons = new Array();
       for(let i = 0; i < this._applicationsButtons.length; i++) {
          if(this._applicationsButtons[i].actor.visible) {
@@ -4672,25 +4671,57 @@ MyApplet.prototype = {
             visibleAppButtons.push(this._transientButtons[i]);
          }
       }
-// + 42
+      return visibleAppButtons;
+   },
+
+   _updateAppPrefNumIcons: function() {
       this.aviableWidth = this.applicationsScrollBox.actor.get_allocation_box().x2-this.applicationsScrollBox.actor.get_allocation_box().x1 - 42;
-      if((this.aviableWidth > 0)&&(this._applicationsBoxWidth > 0)) {
+      if((this.aviableWidth > 0)&&(this._applicationsBoxWidth > 0)) {// + 42
          this.iconViewCount = Math.floor(this.aviableWidth/this._applicationsBoxWidth);
          if(this.iconViewCount*this._applicationsBoxWidth > this.aviableWidth)
             this.iconViewCount--;
          if(this.iconViewCount < 1)
             this.iconViewCount = 1; 
       }
-
       this.appBoxIter.setNumberView(this.iconViewCount);
 
-      let viewBox, currValue, falseActor;
+      let viewBox;
       for(let i = 0; i < this.iconViewCount; i++) {
          viewBox = new St.BoxLayout({ vertical: true, width: (this._applicationsBoxWidth) });
          this.applicationsBox.add(viewBox, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: true });
       }
+   },
+
+   _updateAppIconSize: function() {
+      this._applicationsBoxWidth = 0;   
+      for(let i = 0; i < this._applicationsButtons.length; i++) {
+         if(this._applicationsButtons[i].actor.get_width() > this._applicationsBoxWidth)
+            this._applicationsBoxWidth = this._applicationsButtons[i].actor.get_width();
+      }
+   },
+
+   _setAppIconDirection: function() {
+      for(let i = 0; i < this._applicationsButtons.length; i++) {
+         this._applicationsButtons[i].setVertical(this.iconView);
+      }
+      for(let i = 0; i < this._placesButtons.length; i++) {
+         this._placesButtons[i].setVertical(this.iconView);
+      }
+      for(let i = 0; i < this._recentButtons.length; i++) {
+         this._recentButtons[i].setVertical(this.iconView);
+      }
+      for(let i = 0; i < this._transientButtons.length; i++) {
+         this._transientButtons[i].setVertical(this.iconView);
+      }
+   },
+
+   _updateView: function() {
+      this._clearView();
+      let visibleAppButtons = this._getAppVisibleButtons();
+      this._updateAppPrefNumIcons();
       try {
-         viewBox = this.applicationsBox.get_children();
+         let currValue, falseActor;
+         let viewBox = this.applicationsBox.get_children();
          for(let i = 0; i < visibleAppButtons.length; i += this.iconViewCount) {
             for(let j = 0; j < this.iconViewCount; j++) {
                currValue = i + j;
@@ -4800,7 +4831,10 @@ MyApplet.prototype = {
    _changeView: function() {
       if(this.controlView) {
          this.controlView.changeViewSelected(this.iconView);
-         this._refreshApps();
+         this._setAppIconDirection();
+         this._updateAppIconSize();
+         this._updateView();
+         //this._refreshApps();
          this._refreshFavs();
          this.updateSize();
       }
@@ -4960,6 +4994,7 @@ MyApplet.prototype = {
       }
       if(this.controlView) {
          this.controlView.setIconSize(this.iconControlSize);
+         this.controlView.changeViewSelected(this.iconView);
       }
       if(this.powerBox) {
          this.powerBox.setIconSize(this.iconPowerSize);
@@ -4968,6 +5003,9 @@ MyApplet.prototype = {
          this.powerBox.setSpecialColor(this.showPowerBox);
       }
       this._refreshFavs();
+      this._setAppIconDirection();
+      this._updateAppIconSize();
+      //this._updateView();
       if(this.fullScreen) {
          if(this.controlView) {
             this.controlView.changeResizeActive(false);
@@ -5442,11 +5480,7 @@ MyApplet.prototype = {
 
          Mainloop.idle_add(Lang.bind(this, function() {
             this._clearAllSelections(true);
-            this._applicationsBoxWidth = 0;   
-            for(let i = 0; i < this._applicationsButtons.length; i++) {
-               if(this._applicationsButtons[i].actor.get_width() > this._applicationsBoxWidth)
-                  this._applicationsBoxWidth = this._applicationsButtons[i].actor.get_width();
-            }
+            this._updateIconSize();   
             if(this.theme == "windows7") {
                this.searchEntry.set_width(this._applicationsBoxWidth);
             }
