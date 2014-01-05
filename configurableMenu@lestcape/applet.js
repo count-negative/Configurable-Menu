@@ -1831,7 +1831,7 @@ HoverIcon.prototype = {
    },
 
    closeMenu: function() {
-      this.menu.close();
+      this.menu.close(true);
    },
     
    toggleMenu: function() {
@@ -1840,13 +1840,17 @@ HoverIcon.prototype = {
             //this.actor.get_parent().set_width(this.actor.get_parent().get_allocation_box().x2 - this.actor.get_parent().get_allocation_box().x1);
             this.parent.searchEntry.set_width(200);
      try {
-        if(!this.menu.isOpen)
-           this.menu.actor.visible = !this.menu.isOpen;
-        else
-           this.menu.actor.hide();
+        if(!this.menu.isOpen) {
+           this.menu.open();
+           this.menu.sourceActor._delegate.setActive(true);
+        }
+        else {
+            this.menu.close(true);
+            this.menu.sourceActor._delegate.setActive(true);
+        }
      }
      catch(e) {
-        Main.notify("ToggleHover");
+        Main.notify("ToggleHover: " + e.message);
      }
    },
 
@@ -6297,6 +6301,7 @@ MyApplet.prototype = {
          }
          this.selectedAppBox.setSelectedText("", "");
          this.hover.refreshFace();
+         this.hover.closeMenu();
          this._previousTreeItemIndex = null;
          this._previousTreeSelectedActor = null;
          this._previousSelectedActor = null;
