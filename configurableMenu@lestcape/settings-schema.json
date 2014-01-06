@@ -122,6 +122,22 @@
       "description": "Categories have icons",
       "tooltip": "Choose whether or not to have icons in Categories."
    },
+  "app-button-width" : {
+      "type": "spinbutton",
+      "default" : 300,
+      "min" : 100,
+      "max" : 300,
+      "step" : 1,
+      "units" : "pixels",
+      "description" : "Maximum application button text width:",
+      "tooltip" : "Set the maximum application button text width."
+   },
+   "app-description" : {
+      "type" : "checkbox",
+      "default" : false,
+      "description": "Application button have description",
+      "tooltip": "Choose whether or not to have description in Application button."
+   },
    "icon-app-size" : {
       "type": "spinbutton",
       "default" : 22,

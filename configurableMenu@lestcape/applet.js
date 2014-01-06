@@ -456,7 +456,8 @@ StaticBox.prototype = {
       for(let i = 0; i < placesList.length; i++) {
          if(placesList[i] != "") {
             currBookmark = this.getBookmarkById(listBookmarks, placesList[i]);
-            item = new PlaceButtonAccessibleExtended(this.parent, this.scrollActor, currBookmark, false, this.iconSize);
+            item = new PlaceButtonAccessibleExtended(this.parent, this.scrollActor, currBookmark, false,
+                                                     this.iconSize, this.appButtonWidth, this.appButtonDescription);
             item.actor.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
             item.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
             item.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, item));
@@ -497,7 +498,8 @@ StaticBox.prototype = {
       let iconSizeDrag = 32;
       let app = appSys.lookup_app(appName);
       if(app) {
-         let item = new FavoritesButtonExtended(this.parent, this.scrollActor, this.vertical, true, app, 4, this.iconSize, true);
+         let item = new FavoritesButtonExtended(this.parent, this.scrollActor, this.vertical, true, app,
+                                                4, this.iconSize, true, this.appButtonWidth, this.appButtonDescription);
          item.actor.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
          item.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
          item.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, item));
@@ -2727,14 +2729,14 @@ SystemButton.prototype = {
    }
 };
 
-function ApplicationButtonExtended(parent, parentScroll, app, vertical, iconSize, iconSizeDrag) {
-   this._init(parent, parentScroll, app, vertical, iconSize, iconSizeDrag);
+function ApplicationButtonExtended(parent, parentScroll, app, vertical, iconSize, iconSizeDrag, appWidth, appDesc) {
+   this._init(parent, parentScroll, app, vertical, iconSize, iconSizeDrag, appWidth, appDesc);
 }
 
 ApplicationButtonExtended.prototype = {
    __proto__: GenericApplicationButtonExtended.prototype,
     
-   _init: function(parent, parentScroll, app, vertical, iconSize, iconSizeDrag) {
+   _init: function(parent, parentScroll, app, vertical, iconSize, iconSizeDrag, appWidth, appDesc) {
       GenericApplicationButtonExtended.prototype._init.call(this, parent, parentScroll, app, true);
       this.iconSize = iconSize;
       this.iconSizeDrag = iconSizeDrag;
@@ -2742,20 +2744,26 @@ ApplicationButtonExtended.prototype = {
       this.actor.set_style_class_name('menu-application-button');
       this.icon = this.app.create_icon_texture(this.iconSize);
       this.name = this.app.get_name();
-      this.label = new St.Label({ text: this.name , style_class: 'menu-application-button-label' });
-      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
-      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.labelName = new St.Label({ text: this.name , style_class: 'menu-application-button-label' });
+ //     this.labelName.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+ //     this.labelName.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+ //     this.labelName.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
+ //     this.labelDesc.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+ //     this.labelDesc.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+ //     this.labelDesc.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.labelDesc.visible = false;
       this.container = new St.BoxLayout();
-      this.textBox = new St.BoxLayout({ vertical: vertical });
+      this.textBox = new St.BoxLayout({ vertical: true });
+      this.setAppMaxWidth(appWidth);
+      this.setAppDescriptionVisible(appDesc);
       this.setVertical(vertical);
-
-      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
       this.addActor(this.container);
       this.icon.realize();
-      this.label.realize();
+      this.labelName.realize();
+      this.labelDesc.realize();
 
       this._draggable = DND.makeDraggable(this.actor);
       this._draggable.connect('drag-end', Lang.bind(this, this._onDragEnd));
@@ -2784,6 +2792,17 @@ ApplicationButtonExtended.prototype = {
       return false;
    },
 
+   setAppDescriptionVisible: function(visible) {
+      this.labelDesc.visible = visible;
+      if(this.app.get_description())
+         this.labelDesc.set_text(this.app.get_description().split("\n")[0]);
+   },
+
+   setAppMaxWidth: function(maxWidth) {
+      this.textBox.set_width(maxWidth);
+      this.appWidth = maxWidth;
+   },
+
    setIconSize: function (iconSize) {
       this.iconSize = iconSize;
       if(this.icon) {
@@ -2794,18 +2813,24 @@ ApplicationButtonExtended.prototype = {
          this.icon.visible = visible;
          this.container.insert_actor(this.icon, 0);
       }
-   },
+   }, 
  
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
-      this.label.clutter_text.line_wrap = vertical;
+      //this.labelName.clutter_text.line_wrap = vertical;
+      //this.labelDesc.clutter_text.line_wrap = vertical;
+      let parentL = this.labelName.get_parent();
+      if(parentL) parentL.remove_actor(this.labelName);
+      let parentL = this.labelDesc.get_parent();
+      if(parentL) parentL.remove_actor(this.labelDesc);
+      this.setAppMaxWidth(this.appWidth);
       if(vertical) {
-         this.textBox.set_width(88);
-         this.textBox.set_height(32);    
+         this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+         this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });  
       }
       else {
-         this.textBox.set_width(-1);
-         this.textBox.set_height(-1);
+         this.textBox.add(this.labelName, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+         this.textBox.add(this.labelDesc, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
       }
    },
  
@@ -2833,29 +2858,35 @@ ApplicationButtonExtended.prototype = {
     }
 };
 
-function PlaceButtonAccessibleExtended(parent, parentScroll, place, vertical, iconSize) {
-   this._init(parent, parentScroll, place, vertical, iconSize);
+function PlaceButtonAccessibleExtended(parent, parentScroll, place, vertical, iconSize, appWidth, appDesc) {
+   this._init(parent, parentScroll, place, vertical, iconSize, appWidth, appDesc);
 }
 
 PlaceButtonAccessibleExtended.prototype = {
    __proto__: GenericApplicationButtonExtended.prototype,
 
-   _init: function(parent, parentScroll, place, vertical, iconSize) {
+   _init: function(parent, parentScroll, place, vertical, iconSize, appWidth, appDesc) {
       GenericApplicationButtonExtended.prototype._init.call(this, parent, parentScroll, this._createAppWrapper(place), (parent._listDevices().indexOf(place) == -1));
       this.iconSize = iconSize;
       this.parent = parent;
       this.place = place;
 
       this.actor.set_style_class_name('menu-application-button');
-      this.label = new St.Label({ text: this.place.name, style_class: 'menu-application-button-label' });
-      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
-      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.labelName = new St.Label({ text: this.place.name, style_class: 'menu-application-button-label' });
+ //     this.labelName.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+ //     this.labelName.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+ //     this.labelName.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
+ //     this.labelDesc.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+ //     this.labelDesc.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+ //     this.labelDesc.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.labelDesc.visible = false;
       this.container = new St.BoxLayout();
-      this.textBox = new St.BoxLayout({ vertical: vertical });
+      this.textBox = new St.BoxLayout({ vertical: true });
+      this.setAppMaxWidth(appWidth);
+      this.setAppDescriptionVisible(appDesc);
       this.setVertical(vertical);
 
-      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       this.icon = this.place.iconFactory(this.iconSize);
       if(!this.icon)
          this.icon = new St.Icon({icon_name: "folder", icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR});
@@ -2864,12 +2895,12 @@ PlaceButtonAccessibleExtended.prototype = {
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       this.addActor(this.container);
       this.icon.realize();
-      this.label.realize();
+      this.labelName.realize();
+      this.labelDesc.realize();
 
       this._draggable = DND.makeDraggable(this.actor);
       this._draggable.connect('drag-end', Lang.bind(this, this._onDragEnd));
       this.isDraggableApp = true;
-
    },
 
    setIconVisible: function(visible) {
@@ -2892,16 +2923,33 @@ PlaceButtonAccessibleExtended.prototype = {
       }
    },
 
+   setAppDescriptionVisible: function(visible) {
+      this.labelDesc.visible = visible;
+      if(this.app.get_description())
+         this.labelDesc.set_text(this.app.get_description());
+   },
+
+   setAppMaxWidth: function(maxWidth) {
+      this.textBox.set_width(maxWidth);
+      this.appWidth = maxWidth;
+   },
+
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
-      this.label.clutter_text.line_wrap = vertical;
+      //this.labelName.clutter_text.line_wrap = vertical;
+      //this.labelDesc.clutter_text.line_wrap = vertical;
+      let parentL = this.labelName.get_parent();
+      if(parentL) parentL.remove_actor(this.labelName);
+      let parentL = this.labelDesc.get_parent();
+      if(parentL) parentL.remove_actor(this.labelDesc);
+      this.setAppMaxWidth(this.appWidth);
       if(vertical) {
-         this.textBox.set_width(88);
-         this.textBox.set_height(32);          
+         this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+         this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });     
       }
       else {
-         this.textBox.set_width(-1);
-         this.textBox.set_height(-1);
+         this.textBox.add(this.labelName, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+         this.textBox.add(this.labelDesc, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
       }
    },
 
@@ -2947,6 +2995,8 @@ PlaceButtonAccessibleExtended.prototype = {
             return place.id;
          },
          get_description: function() {
+            if(place.id.indexOf("bookmark:") == -1)
+               return place.id.slice(13);
             return place.id.slice(16);
          },
          get_name: function() {
@@ -2960,15 +3010,15 @@ PlaceButtonAccessibleExtended.prototype = {
    }
 };
 
-function PlaceButtonExtended(parent, parentScroll, place, vertical, iconSize) {
-   this._init(parent, parentScroll, place, vertical, iconSize);
+function PlaceButtonExtended(parent, parentScroll, place, vertical, iconSize, appWidth, appDesc) {
+   this._init(parent, parentScroll, place, vertical, iconSize, appWidth, appDesc);
 }
 
 PlaceButtonExtended.prototype = {
    __proto__: PlaceButtonAccessibleExtended.prototype,
 
-   _init: function(parent, parentScroll, place, vertical, iconSize) {
-      PlaceButtonAccessibleExtended.prototype._init.call(this, parent, parentScroll, place, vertical, iconSize);
+   _init: function(parent, parentScroll, place, vertical, iconSize, appWidth, appDesc) {
+      PlaceButtonAccessibleExtended.prototype._init.call(this, parent, parentScroll, place, vertical, iconSize, appWidth, appDesc);
       this.actor._delegate = this;
    },
 
@@ -2990,14 +3040,14 @@ PlaceButtonExtended.prototype = {
     }
 };
 
-function RecentButtonExtended(parent, file, vertical, iconSize) {
-   this._init(parent, file, vertical, iconSize);
+function RecentButtonExtended(parent, file, vertical, iconSize, appWidth, appDesc) {
+   this._init(parent, file, vertical, iconSize, appWidth, appDesc);
 }
 
 RecentButtonExtended.prototype = {
    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
 
-   _init: function(parent, file, vertical, iconSize) {
+   _init: function(parent, file, vertical, iconSize, appWidth, appDesc) {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
       this.iconSize = iconSize;
       this.file = file;
@@ -3005,23 +3055,30 @@ RecentButtonExtended.prototype = {
       this.button_name = this.file.name;
       this.actor.set_style_class_name('menu-application-button');
       this.actor._delegate = this;
-      this.label = new St.Label({ text: this.button_name, style_class: 'menu-application-button-label' });
-      this.label.set_style("max-width: 250px;");
-      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
-      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.labelName = new St.Label({ text: this.button_name, style_class: 'menu-application-button-label' });
+      //this.labelName.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+      //this.labelName.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+      //this.labelName.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
+      //this.labelDesc.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+      //this.labelDesc.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+      //this.labelDesc.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.labelDesc.visible = false;
+     // this.label.set_style("max-width: 250px;");
       this.container = new St.BoxLayout();
-      this.textBox = new St.BoxLayout({ vertical: vertical });
+      this.textBox = new St.BoxLayout({ vertical: true });
+      this.setAppMaxWidth(appWidth);
+      this.setAppDescriptionVisible(appDesc);
       this.setVertical(vertical);
 
-      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       this.icon = file.createIcon(this.iconSize);
       this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
 
       this.addActor(this.container);
       this.icon.realize();
-      this.label.realize();
+      this.labelName.realize();
+      this.labelDesc.realize();
    },
 
    _onButtonReleaseEvent: function(actor, event) {
@@ -3042,50 +3099,74 @@ RecentButtonExtended.prototype = {
          this.icon.set_icon_size(this.iconSize);
    },
 
+   setAppMaxWidth: function(maxWidth) {
+      this.textBox.set_width(maxWidth);
+      this.appWidth = maxWidth;
+   },
+
+   setAppDescriptionVisible: function(visible) {
+      this.labelDesc.visible = visible;
+      if(this.file.uri.slice(7))
+         this.labelDesc.set_text(this.file.uri.slice(7));
+   },
+
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
-      this.label.clutter_text.line_wrap = vertical;
+      //this.labelName.clutter_text.line_wrap = vertical;
+      //this.labelDesc.clutter_text.line_wrap = vertical;
+      let parentL = this.labelName.get_parent();
+      if(parentL) parentL.remove_actor(this.labelName);
+      let parentL = this.labelDesc.get_parent();
+      if(parentL) parentL.remove_actor(this.labelDesc);
+      this.setAppMaxWidth(this.appWidth);
       if(vertical) {
-         this.textBox.set_width(88);
-         this.textBox.set_height(32);
+         this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+         this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });  
       }
       else {
-         this.textBox.set_width(-1);
-         this.textBox.set_height(-1);
+         this.textBox.add(this.labelName, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+         this.textBox.add(this.labelDesc, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
       }
    }
 };
 
-function RecentClearButtonExtended(parent, vertical, iconSize) {
-   this._init(parent, vertical, iconSize);
+function RecentClearButtonExtended(parent, vertical, iconSize, appWidth, appDesc) {
+   this._init(parent, vertical, iconSize, appWidth, appDesc);
 }
 
 RecentClearButtonExtended.prototype = {
    __proto__: CinnamonMenu.RecentClearButton.prototype,
 
-   _init: function(parent, vertical, iconSize) {
+   _init: function(parent, vertical, iconSize, appWidth, appDesc) {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
       this.iconSize = iconSize;
       this.parent = parent;
       this.actor.set_style_class_name('menu-application-button');
       this.button_name = _("Clear list");
       this.actor._delegate = this;
-      this.label = new St.Label({ text: this.button_name, style_class: 'menu-application-button-label' });
-      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
-      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.labelName = new St.Label({ text: this.button_name, style_class: 'menu-application-button-label' });
+      //this.labelName.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+      //this.labelName.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+      //this.labelName.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
+      //this.labelDesc.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+      //this.labelDesc.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+      //this.labelDesc.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.labelDesc.visible = false;
       this.container = new St.BoxLayout();
-      this.textBox = new St.BoxLayout({ vertical: vertical });
+      this.textBox = new St.BoxLayout({ vertical: true });
+      this.setAppMaxWidth(appWidth);
+      this.setAppDescriptionVisible(appDesc);
       this.setVertical(vertical);
 
-      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       this.icon = new St.Icon({ icon_name: 'edit-clear', icon_type: St.IconType.SYMBOLIC, icon_size: this.iconSize });
       this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
 
       this.addActor(this.container);      
       this.icon.realize();
-      this.label.realize();
+      this.labelName.realize();
+      this.labelDesc.realize();
    },
 
    _onButtonReleaseEvent: function (actor, event) {
@@ -3108,28 +3189,45 @@ RecentClearButtonExtended.prototype = {
          this.icon.set_icon_size(this.iconSize);
    },
 
+   setAppMaxWidth: function(maxWidth) {
+      this.textBox.set_width(maxWidth);
+      this.appWidth = maxWidth;
+   },
+
+   setAppDescriptionVisible: function(visible) {
+      this.labelDesc.visible = visible;
+     /* if(this.app.get_description())
+         this.labelDesc.set_text("");*/
+   },
+
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
-      this.label.clutter_text.line_wrap = vertical;
+      //this.labelName.clutter_text.line_wrap = vertical;
+      //this.labelDesc.clutter_text.line_wrap = vertical;
+      let parentL = this.labelName.get_parent();
+      if(parentL) parentL.remove_actor(this.labelName);
+      let parentL = this.labelDesc.get_parent();
+      if(parentL) parentL.remove_actor(this.labelDesc);
+      this.setAppMaxWidth( this.appWidth);
       if(vertical) {
-         this.textBox.set_width(88);
-         this.textBox.set_height(32);
+         this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+         this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });  
       }
       else {
-         this.textBox.set_width(-1);
-         this.textBox.set_height(-1);
+         this.textBox.add(this.labelName, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+         this.textBox.add(this.labelDesc, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
       }
    }
 };
 
-function FavoritesButtonExtended(parent, parentScroll, vertical, displayVertical, app, nbFavorites, iconSize, allowName) {
-   this._init(parent, parentScroll, vertical, displayVertical, app, nbFavorites, iconSize, allowName);
+function FavoritesButtonExtended(parent, parentScroll, vertical, displayVertical, app, nbFavorites, iconSize, allowName, appWidth, appDesc) {
+   this._init(parent, parentScroll, vertical, displayVertical, app, nbFavorites, iconSize, allowName, appWidth, appDesc);
 }
 
 FavoritesButtonExtended.prototype = {
    __proto__: GenericApplicationButtonExtended.prototype,
     
-   _init: function(parent, parentScroll, vertical, displayVertical, app, nbFavorites, iconSize, allowName) {
+   _init: function(parent, parentScroll, vertical, displayVertical, app, nbFavorites, iconSize, allowName, appWidth, appDesc) {
       GenericApplicationButtonExtended.prototype._init.call(this, parent, parentScroll, app, true);
       this.iconSize = iconSize;
       this.displayVertical = displayVertical;
@@ -3157,19 +3255,27 @@ FavoritesButtonExtended.prototype = {
       this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
 
       if(this.allowName) {
-         this.label = new St.Label({ text: this.app.get_name(), style_class: 'menu-application-button-label' });
-         this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-         this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
-         this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+         this.labelName = new St.Label({ text: this.app.get_name(), style_class: 'menu-application-button-label' });
+        // this.labelName.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+        // this.labelName.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+        // this.labelName.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+         this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
+        // this.labelDesc.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+        // this.labelDesc.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+        // this.labelDesc.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+           this.labelDesc.visible = false;
 
-         this.textBox = new St.BoxLayout({ vertical: false });
-         this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+         this.textBox = new St.BoxLayout({ vertical: true });
+         this.setAppMaxWidth(appWidth);
+         this.setAppDescriptionVisible(appDesc);
          this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
          this.setVertical(vertical);
       }
 
       this.addActor(this.container);
-      this.icon.realize()
+      this.icon.realize();
+      this.labelName.realize();
+      this.labelDesc.realize();
 
       this._draggable = DND.makeDraggable(this.actor);
       this._draggable.connect('drag-end', Lang.bind(this, this._onDragEnd));  
@@ -3206,16 +3312,33 @@ FavoritesButtonExtended.prototype = {
       }
    },
 
+   setAppMaxWidth: function(maxWidth) {
+      this.textBox.set_width(maxWidth);
+      this.appWidth = maxWidth;
+   },
+
+   setAppDescriptionVisible: function(visible) {
+      this.labelDesc.visible = visible;
+      if(this.app.get_description())
+         this.labelDesc.set_text(this.app.get_description().split("\n")[0]);
+   },
+
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
-      this.label.clutter_text.line_wrap = vertical;
+     // this.labelName.clutter_text.line_wrap = vertical;
+     // this.labelDesc.clutter_text.line_wrap = vertical;
+      let parentL = this.labelName.get_parent();
+      if(parentL) parentL.remove_actor(this.labelName);
+      let parentL = this.labelDesc.get_parent();
+      if(parentL) parentL.remove_actor(this.labelDesc);
+      this.setAppMaxWidth( this.appWidth);
       if(vertical) {
-         this.textBox.set_width(88);
-         this.textBox.set_height(32);    
+         this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+         this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });  
       }
       else {
-         this.textBox.set_width(-1);
-         this.textBox.set_height(-1);
+         this.textBox.add(this.labelName, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+         this.textBox.add(this.labelDesc, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
       }
    },
 
@@ -4179,6 +4302,9 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.IN, "accessible-icons", "showAccessibleIcons", this._setVisibleAccessibleIcons, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "categories-icons", "showCategoriesIcons", this._setVisibleCategoriesIcons, null);
 
+         this.settings.bindProperty(Settings.BindingDirection.IN, "app-button-width", "appButtonWidth", this._changeView, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "app-description", "appButtonDescription", this._changeView, null);
+
          this.settings.bindProperty(Settings.BindingDirection.IN, "icon-app-size", "iconAppSize", this._refreshApps, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "icon-cat-size", "iconCatSize", this._refreshApps, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "icon-max-fav-size", "iconMaxFavSize", this._setIconMaxFavSize, null);
@@ -4649,25 +4775,21 @@ MyApplet.prototype = {
       let visibleAppButtons = new Array();
       for(let i = 0; i < this._applicationsButtons.length; i++) {
          if(this._applicationsButtons[i].actor.visible) {
-            this._applicationsButtons[i].setVertical(this.iconView);
             visibleAppButtons.push(this._applicationsButtons[i]);
          }
       }
       for(let i = 0; i < this._placesButtons.length; i++) {
          if(this._placesButtons[i].actor.visible) {
-            this._placesButtons[i].setVertical(this.iconView);
             visibleAppButtons.push(this._placesButtons[i]);
          }
       }
       for(let i = 0; i < this._recentButtons.length; i++) {
          if(this._recentButtons[i].actor.visible) {
-            this._recentButtons[i].setVertical(this.iconView);
             visibleAppButtons.push(this._recentButtons[i]);
          }
       }
       for(let i = 0; i < this._transientButtons.length; i++) {
          if(this._transientButtons[i].actor.visible) {
-            this._transientButtons[i].setVertical(this.iconView);
             visibleAppButtons.push(this._transientButtons[i]);
          }
       }
@@ -4697,6 +4819,30 @@ MyApplet.prototype = {
       for(let i = 0; i < this._applicationsButtons.length; i++) {
          if(this._applicationsButtons[i].actor.get_width() > this._applicationsBoxWidth)
             this._applicationsBoxWidth = this._applicationsButtons[i].actor.get_width();
+      }
+   },
+
+   _updateAppButtonDesc: function() {  
+      for(let i = 0; i < this._applicationsButtons.length; i++) {
+         this._applicationsButtons[i].setAppDescriptionVisible(this.appButtonDescription);
+      }
+      for(let i = 0; i < this._placesButtons.length; i++) {
+         this._placesButtons[i].setAppDescriptionVisible(this.appButtonDescription);
+      }
+      for(let i = 0; i < this._recentButtons.length; i++) {
+         this._recentButtons[i].setAppDescriptionVisible(this.appButtonDescription);
+      }
+   },
+
+   _updateAppButtonWidth: function() {  
+      for(let i = 0; i < this._applicationsButtons.length; i++) {
+         this._applicationsButtons[i].setAppMaxWidth(this.appButtonWidth);
+      }
+      for(let i = 0; i < this._placesButtons.length; i++) {
+         this._placesButtons[i].setAppMaxWidth(this.appButtonWidth);
+      }
+      for(let i = 0; i < this._recentButtons.length; i++) {
+         this._recentButtons[i].setAppMaxWidth(this.appButtonWidth);
       }
    },
 
@@ -4829,17 +4975,39 @@ MyApplet.prototype = {
    },
 
    _changeView: function() {
+try {
       if(this.controlView) {
          this.controlView.changeViewSelected(this.iconView);
-         this._setAppIconDirection();
-         this._updateAppIconSize();
-         this._updateView();
-         //this._refreshApps();
-         this._refreshFavs();
-         this.updateSize();
+       this._updateAppButtonDesc();
+       this._updateAppButtonWidth();
+       this._setAppIconDirection();
+       this._updateAppIconSize();
+       this._updateView();
+       this._refreshFavs();
       }
+} catch(e) {
+Main.notify("Erp" + e.message);
+}
+   },
+/*
+   _setAppButtonWidth: function() {
+       this._updateAppButtonDesc();
+       this._updateAppButtonWidth();
+       this._setAppIconDirection();
+       this._updateAppIconSize();
+       this._updateView();
+       this._refreshFavs();
    },
 
+   _setAppButtonDesc: function() {
+       this._updateAppButtonDesc();
+       this._updateAppButtonWidth();
+       this._updateAppIconSize();
+       this._setAppIconDirection();
+       this._updateView();
+       this._refreshFavs();
+   }, 
+*/
    _setVisibleFavorites: function() {
       this.favoritesScrollBox.actor.visible = this.showFavorites;
       this._refreshFavs();
@@ -5137,8 +5305,8 @@ MyApplet.prototype = {
       let interMint = 0;
       if(this.theme == "mint") {
          let operPanelVisible = this.operativePanel.visible;
-         this.operativePanel.visible = true;
-         this.favoritesScrollBox.actor.visible = false;
+         this.operativePanel.visible = !operPanelVisible;
+         this.favoritesScrollBox.actor.visible = operPanelVisible;
          interMint = this.extendedBox.get_width();
          this.operativePanel.visible = operPanelVisible;
          this.favoritesScrollBox.actor.visible = !operPanelVisible;
@@ -6003,9 +6171,9 @@ MyApplet.prototype = {
       for(let i = 0; i < launchers.length; ++i) {
          let app = appSys.lookup_app(launchers[i]);
          if(app) {
-            let button = new FavoritesButtonExtended(this, this.favoritesScrollBox, this.iconView, this.favoritesObj.getVertical(), app,
-                                                     launchers.length/this.favoritesLinesNumber,
-                                                     this.iconMaxFavSize, this.allowFavName);
+            let button = new FavoritesButtonExtended(this, this.favoritesScrollBox, this.iconView, this.favoritesObj.getVertical(),
+                                                     app, launchers.length/this.favoritesLinesNumber, this.iconMaxFavSize,
+                                                     this.allowFavName, this.appButtonWidth, this.appButtonDescription);
             // + 3 because we're adding 3 system buttons at the bottom
             //button.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(4)+"px;padding-right: "+(-5)+"px;margin:auto;";
             this._favoritesButtons[app] = button;
@@ -6232,14 +6400,15 @@ MyApplet.prototype = {
          let places = bookmarks.concat(devices);
          for(let i = 0; i < places.length; i++) {
             let place = places[i];
-            let button = new PlaceButtonExtended(this, this.applicationsScrollBox, place, this.iconView, this.iconAppSize);
+            let button = new PlaceButtonExtended(this, this.applicationsScrollBox, place, this.iconView,
+                                                 this.iconAppSize, this.appButtonWidth, this.appButtonDescription);
             this._addEnterEvent(button, Lang.bind(this, function() {
                this._clearPrevAppSelection(button.actor);
                button.actor.style_class = "menu-application-button-selected";
                if(this._listDevices().indexOf(button.place) != -1)
-                  this.selectedAppBox.setSelectedText("", button.place.id.slice(13));
+                  this.selectedAppBox.setSelectedText(button.place.name, button.place.id.slice(13));
                else
-                  this.selectedAppBox.setSelectedText("", button.place.id.slice(16));
+                  this.selectedAppBox.setSelectedText(button.place.name, button.place.id.slice(16));
                this.hover.refreshPlace(button.place);
             }));
             button.actor.connect('leave-event', Lang.bind(this, function() {
@@ -6295,11 +6464,12 @@ MyApplet.prototype = {
          this._categoryButtons.push(this.recentButton);
 
          for(let id = 0; id < MAX_RECENT_FILES && id < this.RecentManager._infosByTimestamp.length; id++) {
-            let button = new RecentButtonExtended(this, this.RecentManager._infosByTimestamp[id], this.iconView, this.iconAppSize);
+            let button = new RecentButtonExtended(this, this.RecentManager._infosByTimestamp[id], this.iconView,
+                                                  this.iconAppSize, this.appButtonWidth, this.appButtonDescription);
             this._addEnterEvent(button, Lang.bind(this, function() {
                this._clearPrevAppSelection(button.actor);
                button.actor.style_class = "menu-application-button-selected";
-               this.selectedAppBox.setSelectedText("", button.file.uri.slice(7));
+               this.selectedAppBox.setSelectedText(button.button_name, button.file.uri.slice(7));
                this.hover.refreshFile(button.file);
             }));
             button.actor.connect('leave-event', Lang.bind(this, function() {
@@ -6311,15 +6481,17 @@ MyApplet.prototype = {
             this._recentButtons.push(button);
          }
          if(this.RecentManager._infosByTimestamp.length > 0) {
-            let button = new RecentClearButtonExtended(this, this.iconView, this.iconAppSize);
+            let button = new RecentClearButtonExtended(this, this.iconView, this.iconAppSize, this.appButtonWidth, this.appButtonDescription);
             this._addEnterEvent(button, Lang.bind(this, function() {
                this._clearPrevAppSelection(button.actor);
                button.actor.style_class = "menu-application-button-selected";
+               this.selectedAppBox.setSelectedText(button.button_name, "");
                this.hover.refresh("edit-clear");
             }));
             button.actor.connect('leave-event', Lang.bind(this, function() {
                button.actor.style_class = "menu-application-button";
                this._previousSelectedActor = button.actor;
+               this.selectedAppBox.setSelectedText("", "");
                this.hover.refreshFace();
             }));
             this._recentButtons.push(button);
@@ -6407,7 +6579,8 @@ MyApplet.prototype = {
                   app.get_description();
                }
                if(!(app_key in this._applicationsButtonFromApp)) {
-                  let applicationButton = new ApplicationButtonExtended(this, this.applicationsScrollBox, app, this.iconView, this.iconAppSize, this.iconMaxFavSize);
+                  let applicationButton = new ApplicationButtonExtended(this, this.applicationsScrollBox, app, this.iconView, this.iconAppSize,
+                                                                        this.iconMaxFavSize, this.appButtonWidth, this.appButtonDescription);
                   this._applicationsButtons.push(applicationButton);
                   applicationButton.actor.connect('realize', Lang.bind(this, this._onApplicationButtonRealized));
                   applicationButton.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, applicationButton));
