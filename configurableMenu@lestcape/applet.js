@@ -4944,8 +4944,8 @@ try {
        this._updateAppButtonWidth();
        this._setAppIconDirection();
        this._updateAppIconSize();
-       this._updateView();
        this._refreshFavs();
+       this._updateSize();
       }
 } catch(e) {
 Main.notify("Erp" + e.message);
@@ -5284,9 +5284,7 @@ Main.notify("Erp" + e.message);
             width = this.favBoxWrapper.get_width();
       }
       if((this.staticBox)&&(this.staticBox.actor.visible))
-         width += this.staticBox.actor.get_width() + 10;
-      if((this.theme == "mint")||(this.theme == "windows7"))
-         return width + 10;
+         width += this.staticBox.actor.get_width();
       return width + 20;
    },
 
