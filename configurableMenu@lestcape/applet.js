@@ -1269,12 +1269,21 @@ ControlBox.prototype = {
       this.parent.iconView = iconView;
       if(iconView) {
          this.bttViewList.set_style('padding: 0px;');
-         this.bttViewGrid.set_style('padding: 0px; border: 1px solid #ffffff;');
+         this.bttViewGrid.set_style('padding: 0px; border: 1px solid ' + this._selectedBorderColor() + ';');
       }
       else {
-         this.bttViewList.set_style('padding: 0px; border: 1px solid #ffffff;');
+         this.bttViewList.set_style('padding: 0px; border: 1px solid ' + this._selectedBorderColor() + ';');
          this.bttViewGrid.set_style('padding: 0px;');
       }
+   },
+
+   _selectedBorderColor: function() {
+      let themeNode = this.parent.menu.actor.get_theme_node();
+      let clutterColorStr = themeNode.get_color('color').to_string();
+      let color = clutterColorStr.substr(0, clutterColorStr.length - 2);
+      if(!color)
+         color = "#ffffff";
+      return color;
    },
 
    changeFullScreen: function(fullScreen) {
@@ -1794,7 +1803,6 @@ HoverIcon.prototype = {
          color = "#ffffff";
       this.actor.style = "padding-top: "+(0)+"px;padding-bottom: "+(0)+"px;padding-left: "+(0)+"px;padding-right: "+(0)+
                          "px;margin:auto;border: "+ borderSize + "px solid" + color + "; border-radius: 12px;";
-      //Main.notify("Fue>" + color);
    },
 
    navegateHoverMenu: function(symbol, actor) {
