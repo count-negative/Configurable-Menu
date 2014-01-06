@@ -733,6 +733,7 @@ ButtonChangerBox.prototype = {
         this.selected = selected;
         this.callBackOnSelectedChange = callBackOnSelectedChange;
         this.removeActor(this.label);
+        this.label.set_style_class_name('menu-selected-app-title');
         this.removeActor(this._triangle);
         this._triangle = new St.Label();
         
@@ -754,6 +755,7 @@ ButtonChangerBox.prototype = {
     },
 
     setActive: function(active) {
+       this.active = active;
        if(!this.parent.actorResize) {
           if(active) {
              global.set_cursor(Cinnamon.Cursor.POINTING_HAND);
@@ -766,11 +768,19 @@ ButtonChangerBox.prototype = {
        }
     },
 
-    _onButtonReleaseEvent: function (actor, event) {
+    _onButtonReleaseEvent: function(actor, event) {
        if(event.get_button() == 1) {
           this.activateNext();
-          /* if (this.parent.leftPane.get_child() == this.parent.favsBox) this.parent.switchPanes("apps");
-           else this.parent.switchPanes("favs");*/
+          Mainloop.idle_add(Lang.bind(this, function() {
+             let [mx, my] = event.get_coords();
+             let [ax, ay] = actor.get_transformed_position();
+             aw = actor.get_width();
+             ah = actor.get_height();
+             if((mx > ax)&&(mx < ax + aw)&&(my > ay)&&(my < ay + ah))
+                this.setActive(true);
+             else
+                this.setActive(false); 
+          }));
         }
     },
 
