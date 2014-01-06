@@ -5,7 +5,7 @@ Applet: Configurable Menu Version: v0.8-Beta
 
 O.S.: Cinnamon 
 
-Release Date: 03 january 2014
+Release Date: 06 january 2014
 
 Author: Lester Carballo Pérez
 
@@ -47,7 +47,9 @@ Skills including:
 
 9.	Auto-Scroll also horizontal.
 
-10.	And more for the future.
+10.	Controlling the maximum size and have the app description in the apps items buttons.
+
+11.	And more for the future.
 
 
 This program is free software:
@@ -87,6 +89,8 @@ Change Log:
    - Now you can align the menu to the corner.
    - When you can resize the menu, now appear a mark in the corresponding corner.
    - Now you can put the menu in full screen mode.
+   - Now you can have the app description in the menu apps items buttons.
+   - Now you can controlling the maximum size of the apps items buttons.
 
 0.7-Beta
    - Fixed a bug in the keyboard navigation, and add for more componets.

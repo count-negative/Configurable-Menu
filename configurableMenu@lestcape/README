@@ -1,5 +1,5 @@
 Applet : Configurable Menu      Version      : v0.8-Beta
-O.S.   : Cinnamon               Release Date : 03 january 2014.
+O.S.   : Cinnamon               Release Date : 06 january 2014.
 Author : Lester Carballo Pérez  Email        : lestcape@gmail.com
 
 Website : https://github.com/lestcape/Configurable-Menu
@@ -30,7 +30,9 @@ Skills including:
 
 9.	Auto-Scroll also horizontal.
 
-10.	And more for the future.
+10.	Controlling the maximum size and have the app description in the apps items buttons.
+
+11.	And more for the future.
 
 
 This program is free software:
@@ -63,7 +65,7 @@ Change Log:
 
 0.8-Beta
    - The Accessible bar it's now configurable and have two drag and drop areas(Places and Apps(systems)).
-   - Implemented new places items(PC, Desktop, Home and Trash).
+   - Implemented new places items(PC, Desktop, Home, Network, and Trash).
    - You can add item to accessible bar with submenu and drag and drop option, also places.
    - The Favorites buttons have now submenu .
    - Reduced the width of search item in windows 7 theme to be the same size or less of Favorites area.
@@ -76,6 +78,8 @@ Change Log:
    - Now you can align the menu to the corner.
    - When you can resize the menu, now appear a mark in the corresponding corner.
    - Now you can put the menu in full screen mode.
+   - Now you can have the app description in the menu apps items buttons.
+   - Now you can controlling the maximum size of the apps items buttons.
 
 0.7-Beta
    - Fixed a bug in the keyboard navigation, and add for more componets.

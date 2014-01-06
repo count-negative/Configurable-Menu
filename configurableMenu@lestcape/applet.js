@@ -1,5 +1,5 @@
 // Applet : Configurable Menu      Version      : v0.8-Beta
-// O.S.   : Cinnamon               Release Date : 03 january 2014.
+// O.S.   : Cinnamon               Release Date : 06 january 2014.
 // Author : Lester Carballo Pérez  Email        : lestcape@gmail.com
 //
 // Website : https://github.com/lestcape/Configurable-Menu
@@ -8,17 +8,6 @@
 // Garibaldo: https://github.com/Garibaldo
 //
 // This is a frock of Main Cinnamon menu applet with more configurable options.
-//
-// Skills including:
-//
-// 1. Can be active OnButtonPress action instead of OnButtonRelease.
-// 2. You can control the menu with scrolling the height.
-// 3. Support for theme change.
-// 4. Enable and disable favorites.
-// 5. Separate power button of favorites.
-// 6. Different modes of view menu items.
-// 7. Favorites with multiple lines.
-// 8. And more for the future.
 //
 // This program is free software:
 //
