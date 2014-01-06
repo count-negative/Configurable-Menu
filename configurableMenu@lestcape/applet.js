@@ -1004,11 +1004,11 @@ PowerBox.prototype = {
    },
 
    _adjustSize: function(actor) {
-      if(actor.get_width() + this.iconSize + 10 > this.activeBar.get_width()) {
-         this.activeBar.set_width(actor.get_width() + this.iconSize + 10);
+      if(actor.get_width() + this.iconSize + 16 > this.activeBar.get_width()) {
+         this.activeBar.set_width(actor.get_width() + this.iconSize + 16);
       }
-      if(actor.get_height()*3 + 10 > this.actor.get_height()) {
-         this.actor.set_height(actor.get_height()*3 + 10);
+      if(actor.get_height()*3 + 16 > this.actor.get_height()) {
+         this.actor.set_height(actor.get_height()*3 + 16);
       }
    },
 
@@ -4782,6 +4782,9 @@ MyApplet.prototype = {
          if(this._applicationsButtons[i].actor.get_width() > this._applicationsBoxWidth)
             this._applicationsBoxWidth = this._applicationsButtons[i].actor.get_width();
       }
+      if(this.theme == "windows7") {
+         this.searchEntry.set_width(this._applicationsBoxWidth + 20);
+      }
    },
 
    _updateAppButtonDesc: function() {  
@@ -5132,9 +5135,11 @@ Main.notify("Erp" + e.message);
          this.powerBox.setTheme(this.powerTheme);
          this.powerBox.setSpecialColor(this.showPowerBox);
       }
-      this._refreshFavs();
+      this._updateAppButtonDesc();
+      this._updateAppButtonWidth();
       this._setAppIconDirection();
       this._updateAppIconSize();
+      this._refreshFavs();
       //this._updateView();
       if(this.fullScreen) {
          if(this.controlView) {
@@ -5608,10 +5613,7 @@ Main.notify("Erp" + e.message);
 
          Mainloop.idle_add(Lang.bind(this, function() {
             this._clearAllSelections(true);
-            this._updateIconSize();   
-            if(this.theme == "windows7") {
-               this.searchEntry.set_width(this._applicationsBoxWidth);
-            }
+            this._updateAppIconSize();
          }));
       } catch(e) {
          Main.notify("ErrorDisplay:", e.message);
@@ -5889,6 +5891,7 @@ Main.notify("Erp" + e.message);
          this.specialBookmarks.push(new SpecialBookmarks(_("Computer"), "computer", "computer:///"));
          this.specialBookmarks.push(new SpecialBookmarks(_("Home"), "folder-home", GLib.get_home_dir()));
          this.specialBookmarks.push(new SpecialBookmarks(_("Desktop"), "desktop", USER_DESKTOP_PATH));
+         this.specialBookmarks.push(new SpecialBookmarks(_("Networking"), "network", "network:///"));
          this.specialBookmarks.push(new SpecialBookmarks(_("Trash"), "user-trash", "trash:///"));
       }
       return this.specialBookmarks;
@@ -6103,9 +6106,6 @@ Main.notify("Erp" + e.message);
       if(actor.get_width() > this._applicationsBoxWidth) {
          this._applicationsBoxWidth = actor.get_width(); // The answer to life...
          //this.applicationsBox.set_width(this.iconViewCount*this._applicationsBoxWidth + 42);
-         if(this.theme == "windows7") {
-            this.searchEntry.set_width(this._applicationsBoxWidth);
-         }
       }
    },
 
