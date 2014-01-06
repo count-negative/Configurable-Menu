@@ -754,14 +754,16 @@ ButtonChangerBox.prototype = {
     },
 
     setActive: function(active) {
-        if(active) {
-           global.set_cursor(Cinnamon.Cursor.POINTING_HAND);
-           this.box.set_style_class_name('menu-category-button-selected');
-        }
-        else {
-           global.unset_cursor();
-           this.box.set_style_class_name('menu-category-button');
-        }
+       if(!this.parent.actorResize) {
+          if(active) {
+             global.set_cursor(Cinnamon.Cursor.POINTING_HAND);
+             this.box.set_style_class_name('menu-category-button-selected');
+          }
+          else {
+             global.unset_cursor();
+             this.box.set_style_class_name('menu-category-button');
+          }
+       }
     },
 
     _onButtonReleaseEvent: function (actor, event) {
@@ -1249,7 +1251,6 @@ ControlBox.prototype = {
       }
       else {
          this.bttResize.get_children()[0].set_icon_name('view-fullscreen');
-
          this.parent.menu.setResizeArea(0);
       }
    },
@@ -1290,37 +1291,39 @@ ControlBox.prototype = {
       this.actor.add(btt, properties);
    
       btt.connect('notify::hover', Lang.bind(this, function(actor) {
-         if(actor.get_hover()) {
-            switch(actor) {
-               case this.bttViewList:
-                  this.parent.selectedAppBox.setSelectedText(_("List View"), _("View the items in list view mode"));
-                  break;
-               case this.bttViewGrid:
-                  this.parent.selectedAppBox.setSelectedText(_("Icon View"), _("View the items in icon view mode"));
-                  break;
-               case this.bttResize:
-                  if(this.bttResize.get_children()[0].get_icon_name() == 'changes-prevent')
-                     this.parent.selectedAppBox.setSelectedText(_("Prevent resize"), _("Prevent resize the menu"));
-                  else
-                     this.parent.selectedAppBox.setSelectedText(_("Allow resize"), _("Allow resize the menu"));
-                  break;
-               case this.bttFullScreen:
-                  if(this.bttFullScreen.get_children()[0].get_icon_name() == 'window-minimize')
-                     this.parent.selectedAppBox.setSelectedText(_("Recover size"), _("Recover the normal menu size"));
-                  else
-                     this.parent.selectedAppBox.setSelectedText(_("Full Screen"), _("Put the menu in full screen mode"));
-                  break;
-               case this.bttSettings:
-                  this.parent.selectedAppBox.setSelectedText(_("Configure..."), _("Configure the menu options"));
-                  break;
+         if(!this.parent.actorResize) {
+            if(actor.get_hover()) {
+               switch(actor) {
+                  case this.bttViewList:
+                     this.parent.selectedAppBox.setSelectedText(_("List View"), _("View the items in list view mode"));
+                     break;
+                  case this.bttViewGrid:
+                     this.parent.selectedAppBox.setSelectedText(_("Icon View"), _("View the items in icon view mode"));
+                     break;
+                  case this.bttResize:
+                     if(this.bttResize.get_children()[0].get_icon_name() == 'changes-prevent')
+                        this.parent.selectedAppBox.setSelectedText(_("Prevent resize"), _("Prevent resize the menu"));
+                     else
+                        this.parent.selectedAppBox.setSelectedText(_("Allow resize"), _("Allow resize the menu"));
+                     break;
+                  case this.bttFullScreen:
+                     if(this.bttFullScreen.get_children()[0].get_icon_name() == 'window-minimize')
+                        this.parent.selectedAppBox.setSelectedText(_("Recover size"), _("Recover the normal menu size"));
+                     else
+                        this.parent.selectedAppBox.setSelectedText(_("Full Screen"), _("Put the menu in full screen mode"));
+                     break;
+                  case this.bttSettings:
+                     this.parent.selectedAppBox.setSelectedText(_("Configure..."), _("Configure the menu options"));
+                     break;
+               }
+               global.set_cursor(Cinnamon.Cursor.POINTING_HAND);
+               actor.set_style_class_name('menu-category-button-selected');
             }
-            global.set_cursor(Cinnamon.Cursor.POINTING_HAND);
-            actor.set_style_class_name('menu-category-button-selected');
-         }
-         else {
-            this.parent.selectedAppBox.setSelectedText("", "");
-            global.unset_cursor();
-            actor.set_style_class_name('menu-category-button');
+            else {
+               this.parent.selectedAppBox.setSelectedText("", "");
+               global.unset_cursor();
+               actor.set_style_class_name('menu-category-button');
+            }
          }
       }));
       btt.set_style_class_name('menu-category-button');
