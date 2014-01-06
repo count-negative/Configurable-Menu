@@ -2738,6 +2738,7 @@ ApplicationButtonExtended.prototype = {
     
    _init: function(parent, parentScroll, app, vertical, iconSize, iconSizeDrag, appWidth, appDesc) {
       GenericApplicationButtonExtended.prototype._init.call(this, parent, parentScroll, app, true);
+
       this.iconSize = iconSize;
       this.iconSizeDrag = iconSizeDrag;
       this.category = new Array();
@@ -2745,13 +2746,7 @@ ApplicationButtonExtended.prototype = {
       this.icon = this.app.create_icon_texture(this.iconSize);
       this.name = this.app.get_name();
       this.labelName = new St.Label({ text: this.name , style_class: 'menu-application-button-label' });
- //     this.labelName.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
- //     this.labelName.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
- //     this.labelName.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
       this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
- //     this.labelDesc.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
- //     this.labelDesc.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
- //     this.labelDesc.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
       this.labelDesc.visible = false;
       this.container = new St.BoxLayout();
       this.textBox = new St.BoxLayout({ vertical: true });
@@ -2817,11 +2812,9 @@ ApplicationButtonExtended.prototype = {
  
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
-      //this.labelName.clutter_text.line_wrap = vertical;
-      //this.labelDesc.clutter_text.line_wrap = vertical;
       let parentL = this.labelName.get_parent();
       if(parentL) parentL.remove_actor(this.labelName);
-      let parentL = this.labelDesc.get_parent();
+      parentL = this.labelDesc.get_parent();
       if(parentL) parentL.remove_actor(this.labelDesc);
       this.setAppMaxWidth(this.appWidth);
       if(vertical) {
@@ -2873,13 +2866,7 @@ PlaceButtonAccessibleExtended.prototype = {
 
       this.actor.set_style_class_name('menu-application-button');
       this.labelName = new St.Label({ text: this.place.name, style_class: 'menu-application-button-label' });
- //     this.labelName.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
- //     this.labelName.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
- //     this.labelName.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
       this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
- //     this.labelDesc.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
- //     this.labelDesc.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
- //     this.labelDesc.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
       this.labelDesc.visible = false;
       this.container = new St.BoxLayout();
       this.textBox = new St.BoxLayout({ vertical: true });
@@ -2936,11 +2923,9 @@ PlaceButtonAccessibleExtended.prototype = {
 
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
-      //this.labelName.clutter_text.line_wrap = vertical;
-      //this.labelDesc.clutter_text.line_wrap = vertical;
       let parentL = this.labelName.get_parent();
       if(parentL) parentL.remove_actor(this.labelName);
-      let parentL = this.labelDesc.get_parent();
+      parentL = this.labelDesc.get_parent();
       if(parentL) parentL.remove_actor(this.labelDesc);
       this.setAppMaxWidth(this.appWidth);
       if(vertical) {
@@ -3056,15 +3041,8 @@ RecentButtonExtended.prototype = {
       this.actor.set_style_class_name('menu-application-button');
       this.actor._delegate = this;
       this.labelName = new St.Label({ text: this.button_name, style_class: 'menu-application-button-label' });
-      //this.labelName.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-      //this.labelName.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
-      //this.labelName.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
       this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
-      //this.labelDesc.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-      //this.labelDesc.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
-      //this.labelDesc.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
       this.labelDesc.visible = false;
-     // this.label.set_style("max-width: 250px;");
       this.container = new St.BoxLayout();
       this.textBox = new St.BoxLayout({ vertical: true });
       this.setAppMaxWidth(appWidth);
@@ -3112,11 +3090,9 @@ RecentButtonExtended.prototype = {
 
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
-      //this.labelName.clutter_text.line_wrap = vertical;
-      //this.labelDesc.clutter_text.line_wrap = vertical;
       let parentL = this.labelName.get_parent();
       if(parentL) parentL.remove_actor(this.labelName);
-      let parentL = this.labelDesc.get_parent();
+      parentL = this.labelDesc.get_parent();
       if(parentL) parentL.remove_actor(this.labelDesc);
       this.setAppMaxWidth(this.appWidth);
       if(vertical) {
@@ -3145,13 +3121,7 @@ RecentClearButtonExtended.prototype = {
       this.button_name = _("Clear list");
       this.actor._delegate = this;
       this.labelName = new St.Label({ text: this.button_name, style_class: 'menu-application-button-label' });
-      //this.labelName.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-      //this.labelName.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
-      //this.labelName.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
       this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
-      //this.labelDesc.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-      //this.labelDesc.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
-      //this.labelDesc.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
       this.labelDesc.visible = false;
       this.container = new St.BoxLayout();
       this.textBox = new St.BoxLayout({ vertical: true });
@@ -3196,17 +3166,14 @@ RecentClearButtonExtended.prototype = {
 
    setAppDescriptionVisible: function(visible) {
       this.labelDesc.visible = visible;
-     /* if(this.app.get_description())
-         this.labelDesc.set_text("");*/
+      this.labelDesc.set_text("");
    },
 
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
-      //this.labelName.clutter_text.line_wrap = vertical;
-      //this.labelDesc.clutter_text.line_wrap = vertical;
       let parentL = this.labelName.get_parent();
       if(parentL) parentL.remove_actor(this.labelName);
-      let parentL = this.labelDesc.get_parent();
+      parentL = this.labelDesc.get_parent();
       if(parentL) parentL.remove_actor(this.labelDesc);
       this.setAppMaxWidth( this.appWidth);
       if(vertical) {
@@ -3256,27 +3223,19 @@ FavoritesButtonExtended.prototype = {
 
       if(this.allowName) {
          this.labelName = new St.Label({ text: this.app.get_name(), style_class: 'menu-application-button-label' });
-        // this.labelName.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-        // this.labelName.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
-        // this.labelName.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
          this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
-        // this.labelDesc.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-        // this.labelDesc.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
-        // this.labelDesc.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
-           this.labelDesc.visible = false;
+         this.labelDesc.visible = false;
 
          this.textBox = new St.BoxLayout({ vertical: true });
          this.setAppMaxWidth(appWidth);
          this.setAppDescriptionVisible(appDesc);
          this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
          this.setVertical(vertical);
+         this.labelName.realize();
+         this.labelDesc.realize();
       }
-
       this.addActor(this.container);
       this.icon.realize();
-      this.labelName.realize();
-      this.labelDesc.realize();
-
       this._draggable = DND.makeDraggable(this.actor);
       this._draggable.connect('drag-end', Lang.bind(this, this._onDragEnd));  
       this.isDraggableApp = true;
@@ -3318,27 +3277,30 @@ FavoritesButtonExtended.prototype = {
    },
 
    setAppDescriptionVisible: function(visible) {
-      this.labelDesc.visible = visible;
-      if(this.app.get_description())
-         this.labelDesc.set_text(this.app.get_description().split("\n")[0]);
+      if(this.allowName) { 
+         this.labelDesc.visible = visible;
+         if(this.app.get_description())
+            this.labelDesc.set_text(this.app.get_description().split("\n")[0]);
+      }
    },
 
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
-     // this.labelName.clutter_text.line_wrap = vertical;
-     // this.labelDesc.clutter_text.line_wrap = vertical;
-      let parentL = this.labelName.get_parent();
-      if(parentL) parentL.remove_actor(this.labelName);
-      let parentL = this.labelDesc.get_parent();
-      if(parentL) parentL.remove_actor(this.labelDesc);
       this.setAppMaxWidth( this.appWidth);
-      if(vertical) {
-         this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-         this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });  
-      }
-      else {
-         this.textBox.add(this.labelName, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
-         this.textBox.add(this.labelDesc, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+      if(this.allowName) {      
+         let parentL = this.labelName.get_parent();
+         if(parentL) parentL.remove_actor(this.labelName);
+         parentL = this.labelDesc.get_parent();
+         if(parentL) parentL.remove_actor(this.labelDesc);
+
+         if(vertical) {
+            this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+            this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });  
+         }
+         else {
+            this.textBox.add(this.labelName, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+            this.textBox.add(this.labelDesc, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+         }
       }
    },
 
