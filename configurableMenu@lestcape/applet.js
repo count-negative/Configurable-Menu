@@ -1741,11 +1741,11 @@ HoverIcon.prototype = {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
       try {
          //this.actor._delegate = this;
+         this.parent = parent;
          this.iconSize = iconSize;
          this.setBorderSize(0);
          this._userIcon = new St.Icon({ icon_size: this.iconSize });
          this.icon = new St.Icon({ icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR });
-         this.parent = parent;
          
          this.menu = new PopupMenu.PopupSubMenu(this.actor);
          this.menu.actor.set_style_class_name('menu-context-menu');
@@ -1787,8 +1787,14 @@ HoverIcon.prototype = {
 
    setBorderSize: function(borderSize) {
       this.borderSize = borderSize;
+      let themeNode = this.parent.menu.actor.get_theme_node();
+      let clutterColorStr = themeNode.get_color('color').to_string();
+      let color = clutterColorStr.substr(0, clutterColorStr.length - 2);
+      if(!color)
+         color = "#ffffff";
       this.actor.style = "padding-top: "+(0)+"px;padding-bottom: "+(0)+"px;padding-left: "+(0)+"px;padding-right: "+(0)+
-                         "px;margin:auto;border: "+ borderSize + "px solid #ffffff; border-radius: 12px;";
+                         "px;margin:auto;border: "+ borderSize + "px solid" + color + "; border-radius: 12px;";
+      //Main.notify("Fue>" + color);
    },
 
    navegateHoverMenu: function(symbol, actor) {
@@ -4339,6 +4345,7 @@ MyApplet.prototype = {
             }
          }));
          Main.placesManager.connect('places-updated', Lang.bind(this, this._refreshPlacesAndRecent));
+         Main.themeManager.connect('theme-set', Lang.bind(this, this._themeChange));
          this.RecentManager.connect('changed', Lang.bind(this, this._refreshPlacesAndRecent));
 
          this._fileFolderAccessActive = false;
@@ -4363,6 +4370,11 @@ MyApplet.prototype = {
    on_orientation_changed: function(orientation) {
       this.orientation = orientation;
       this._updateComplete();   
+   },
+
+
+   _themeChange: function() {
+      this._updateComplete();  
    },
 
    _onMenuKeyPress: function(actor, event) {
