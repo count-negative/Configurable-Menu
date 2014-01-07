@@ -273,7 +273,7 @@ StaticBox.prototype = {
       this.hoverBox = new St.BoxLayout({ vertical: false });
       this.actor.add_actor(this.hoverBox);
       this.controlBox = new St.BoxLayout({ vertical: false });
-      this.controlBox.set_style("padding-left: 30px;padding-right: 30px;");
+      this.controlBox.set_style("padding-left: 10px;padding-right: 10px;");
       this.actor.add_actor(this.controlBox);
       this.itemsBox = new St.BoxLayout({ vertical: true });
       this.itemsBox.set_style("padding-left: 10px;");
@@ -1201,18 +1201,29 @@ ControlBox.prototype = {
       this.parent = parent;
       this.iconSize = iconSize;
       this.actor = new St.BoxLayout({ vertical: false });
-      this.bttViewList = this._createSymbolicButton('view-list-symbolic', { x_fill: false, expand: false });
+      this.actor.style =  "padding-top: "+(0)+"px;padding-bottom: "+(10)+"px;padding-left: "+(4)+"px;padding-right: "+(4)+"px;margin:auto;";
+
+      this.viewBox = new St.BoxLayout({ vertical: false, style_class: 'menu-favorites-box' });
+      this.bttViewList = this._createSymbolicButton('view-list-symbolic');
       this.bttViewList.connect('clicked', Lang.bind(this, this._onClickedChangeView));
-      //this.actor.add(this.bttViewList, { x_fill: false, expand: false });
-      this.bttViewGrid = this._createSymbolicButton('view-grid-symbolic', { x_fill: false, expand: false });
+      this.viewBox.add(this.bttViewList, { x_fill: false, expand: false });
+      this.bttViewGrid = this._createSymbolicButton('view-grid-symbolic');
       this.bttViewGrid.connect('clicked', Lang.bind(this, this._onClickedChangeView));
-      
-      this.bttFullScreen = this._createSymbolicButton('zoom-fit-best', {x_fill: false, x_align: St.Align.END, expand: true});
+      this.viewBox.add(this.bttViewGrid, { x_fill: false, expand: false });
+      this.actor.add(this.viewBox, { x_fill: false, x_align: St.Align.START, expand: true });
+
+      this.resizeBox = new St.BoxLayout({ vertical: false, style_class: 'menu-favorites-box' });
+      this.bttFullScreen = this._createSymbolicButton('zoom-fit-best');
       this.bttFullScreen.connect('clicked', Lang.bind(this, this._onClickedChangeFullScreen));
-      this.bttResize = this._createSymbolicButton('changes-prevent', {x_fill: false, x_align: St.Align.END, expand: false});
+      this.resizeBox.add(this.bttFullScreen, { x_fill: false, expand: false });
+      this.bttResize = this._createSymbolicButton('changes-prevent');
       this.bttResize.connect('clicked', Lang.bind(this, this._onClickedChangeResize));
-      this.bttSettings = this._createSymbolicButton('preferences-system', {x_fill: false, x_align: St.Align.END, expand: false});
+      this.resizeBox.add(this.bttResize, { x_fill: false, expand: false });
+      this.bttSettings = this._createSymbolicButton('preferences-system');
       this.bttSettings.connect('clicked', Lang.bind(this, this._onSettings));
+      this.resizeBox.add(this.bttSettings, { x_fill: false, x_align: St.Align.END, expand: true });
+      this.actor.add(this.resizeBox, { x_fill: true, x_align: St.Align.MIDDLE, expand: true });
+
       this.changeViewSelected(this.parent.iconView);
       this.changeResizeActive(this.parent.controlingSize);
    },
@@ -1286,17 +1297,20 @@ ControlBox.prototype = {
    },
 
    setIconSize: function(iconSize) {
-      let childBtt = this.actor.get_children();
-      for(let i = 0; i < childBtt.length; i++) {
-         childBtt[i].get_children()[0].set_icon_size(iconSize);
+      let childBox = this.actor.get_children();
+      let childBtt;
+      for(let i = 0; i < childBox.length; i++) {
+         childBtt = childBox[i].get_children();
+         for(let j = 0; j < childBtt.length; j++) {
+            childBtt[j].get_children()[0].set_icon_size(iconSize);
+         }
       }
    },
 
-   _createSymbolicButton: function(icon, properties) {
+   _createSymbolicButton: function(icon) {
       let bttIcon = new St.Icon({icon_name: icon, icon_type: St.IconType.SYMBOLIC,
 	                         style_class: 'popup-menu-icon', icon_size: this.iconSize});
       let btt = new St.Button({ child: bttIcon });
-      this.actor.add(btt, properties);
    
       btt.connect('notify::hover', Lang.bind(this, function(actor) {
          if(!this.parent.actorResize) {
@@ -5621,8 +5635,6 @@ Main.notify("Erp" + e.message);
 
          this.favoritesBox.add(this.favoritesObj.actor, { x_fill: true, y_fill: true, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: false });
 
-         this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
-
          this.categoriesApplicationsBox.actor.add(this.betterPanel, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
 
          this.appBoxIter = new VisibleChildIteratorExtended(this, this.applicationsBox, this.iconViewCount);
@@ -5649,12 +5661,12 @@ Main.notify("Erp" + e.message);
    loadClassic: function() {
       this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
-      this.controlView.actor.style = "padding-bottom: "+(6)+"px;margin:auto;";
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.END, expand: true });
+      this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "vertical", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.favBoxWrapper.add(this.powerBox.actor, { y_align: St.Align.END, y_fill: false, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.END, y_fill: true, expand: false });
@@ -5670,12 +5682,12 @@ Main.notify("Erp" + e.message);
    loadStylized: function() {
       this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
-      this.controlView.actor.style = "padding-bottom: "+(6)+"px;margin:auto;";
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.MIDDLE, expand: true });
+      this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
@@ -5691,7 +5703,6 @@ Main.notify("Erp" + e.message);
    loadDragon: function() {
       this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
-      this.controlView.actor.style = "padding-bottom: "+(6)+"px;margin:auto;";
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.operativePanel.set_vertical(true);
@@ -5700,6 +5711,7 @@ Main.notify("Erp" + e.message);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, false);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.MIDDLE, expand: true });
+      this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
@@ -5715,7 +5727,6 @@ Main.notify("Erp" + e.message);
    loadDragonInverted: function() {
       this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
-      this.controlView.actor.style = "padding-bottom: "+(6)+"px;margin:auto;";
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.operativePanel.set_vertical(true);
@@ -5724,6 +5735,7 @@ Main.notify("Erp" + e.message);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, false);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.MIDDLE, expand: true });
+      this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
@@ -5739,7 +5751,6 @@ Main.notify("Erp" + e.message);
    loadHorizontal: function() {
       this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
-      this.controlView.actor.style = "padding-bottom: "+(6)+"px;margin:auto;";
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, false, this.favoritesLinesNumber);
       this.betterPanel.set_vertical(true);
@@ -5750,6 +5761,7 @@ Main.notify("Erp" + e.message);
       this.favBoxWrapper.set_vertical(false);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, false);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: false, x_align: St.Align.MIDDLE, expand: true });
+      this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: false, y_fill: true, y_align: St.Align.MIDDLE, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
@@ -5770,6 +5782,7 @@ Main.notify("Erp" + e.message);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.MIDDLE, expand: true });
+      this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
       this.staticBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
@@ -5793,6 +5806,7 @@ Main.notify("Erp" + e.message);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.MIDDLE, expand: true });
+      this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
       this.staticBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
@@ -5820,6 +5834,7 @@ Main.notify("Erp" + e.message);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
       this.staticBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
@@ -5849,6 +5864,7 @@ Main.notify("Erp" + e.message);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: true, y_align: St.Align.MIDDLE, expand: true });
+      this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
       this.staticBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
