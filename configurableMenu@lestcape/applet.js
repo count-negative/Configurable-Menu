@@ -1203,15 +1203,6 @@ ControlBox.prototype = {
       this.actor = new St.BoxLayout({ vertical: false });
       this.actor.style =  "padding-top: "+(0)+"px;padding-bottom: "+(10)+"px;padding-left: "+(4)+"px;padding-right: "+(4)+"px;margin:auto;";
 
-      this.viewBox = new St.BoxLayout({ vertical: false, style_class: 'menu-favorites-box' });
-      this.bttViewList = this._createSymbolicButton('view-list-symbolic');
-      this.bttViewList.connect('clicked', Lang.bind(this, this._onClickedChangeView));
-      this.viewBox.add(this.bttViewList, { x_fill: false, expand: false });
-      this.bttViewGrid = this._createSymbolicButton('view-grid-symbolic');
-      this.bttViewGrid.connect('clicked', Lang.bind(this, this._onClickedChangeView));
-      this.viewBox.add(this.bttViewGrid, { x_fill: false, expand: false });
-      this.actor.add(this.viewBox, { x_fill: false, x_align: St.Align.START, expand: true });
-
       this.resizeBox = new St.BoxLayout({ vertical: false, style_class: 'menu-favorites-box' });
       this.bttFullScreen = this._createSymbolicButton('zoom-fit-best');
       this.bttFullScreen.connect('clicked', Lang.bind(this, this._onClickedChangeFullScreen));
@@ -1222,7 +1213,16 @@ ControlBox.prototype = {
       this.bttSettings = this._createSymbolicButton('preferences-system');
       this.bttSettings.connect('clicked', Lang.bind(this, this._onSettings));
       this.resizeBox.add(this.bttSettings, { x_fill: false, x_align: St.Align.END, expand: true });
-      this.actor.add(this.resizeBox, { x_fill: true, x_align: St.Align.MIDDLE, expand: true });
+      this.actor.add(this.resizeBox, { x_fill: true, x_align: St.Align.START, expand: true });
+
+      this.viewBox = new St.BoxLayout({ vertical: false, style_class: 'menu-favorites-box' });
+      this.bttViewList = this._createSymbolicButton('view-list-symbolic');
+      this.bttViewList.connect('clicked', Lang.bind(this, this._onClickedChangeView));
+      this.viewBox.add(this.bttViewList, { x_fill: false, expand: false });
+      this.bttViewGrid = this._createSymbolicButton('view-grid-symbolic');
+      this.bttViewGrid.connect('clicked', Lang.bind(this, this._onClickedChangeView));
+      this.viewBox.add(this.bttViewGrid, { x_fill: false, expand: false });
+      this.actor.add(this.viewBox, { x_fill: false, x_align: St.Align.END, expand: true });
 
       this.changeViewSelected(this.parent.iconView);
       this.changeResizeActive(this.parent.controlingSize);
@@ -5526,6 +5526,7 @@ Main.notify("Erp" + e.message);
          this.rightPane = new St.BoxLayout({ vertical: true });        
 //search
          this.controlSearchBox = new St.BoxLayout({ vertical: false });
+         this.controlSearchBox.set_style("padding-left: 20px;")
          this.controlBox = new St.BoxLayout({ vertical: true });
          this.rightPane.add_actor(this.controlSearchBox);
 
@@ -5665,7 +5666,7 @@ Main.notify("Erp" + e.message);
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
-      this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.END, expand: true });
+      this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "vertical", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.favBoxWrapper.add(this.powerBox.actor, { y_align: St.Align.END, y_fill: false, expand: false });
