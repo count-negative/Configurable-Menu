@@ -447,13 +447,13 @@ AccessibleBox.prototype = {
             item.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
             item.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, item));
             this.itemsPlaces.add_actor(item.actor);
-            if(item.menu)
+            //if(item.menu)
                this.itemsPlaces.add_actor(item.menu.actor);
-            else {//Remplace menu actor by a hide false actor.
+            /*else {//Remplace menu actor by a hide false actor.
                falseActor = new St.BoxLayout();
                falseActor.hide();
                this.itemsPlaces.add_actor(falseActor);
-            }
+            }*/
             this._staticButtons.push(item);
          }
       }
@@ -489,13 +489,13 @@ AccessibleBox.prototype = {
          item.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
          item.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, item));
          this.itemsSystem.add_actor(item.actor);
-         if(item.menu)
+         //if(item.menu)
             this.itemsSystem.add_actor(item.menu.actor);
-         else {//Remplace menu actor by a hide false actor.
+         /*else {//Remplace menu actor by a hide false actor.
             falseActor = new St.BoxLayout();
             falseActor.hide();
             this.itemsSystem.add_actor(falseActor);
-         }
+         }*/
          this._staticButtons.push(item);
       }
    },
@@ -626,8 +626,10 @@ SelectedAppBox.prototype = {
    },
 
    setAlign: function(align) {
-      this.actor.remove_actor(this.appTitle);
-      this.actor.remove_actor(this.appDescription);
+      if(this.appTitle.get_parent() == this.actor)
+         this.actor.remove_actor(this.appTitle);
+      if(this.appDescription.get_parent() == this.actor)
+         this.actor.remove_actor(this.appDescription);
       this.actor.add(this.appTitle, {x_fill: false, x_align: align});
       this.actor.add(this.appDescription, {x_fill: false, x_align: align});
    },
@@ -717,9 +719,11 @@ ButtonChangerBox.prototype = {
         this.labels = labels;
         this.selected = selected;
         this.callBackOnSelectedChange = callBackOnSelectedChange;
-        this.removeActor(this.label);
+        if(this.label.get_parent() == this.actor)
+           this.removeActor(this.label);
         this.label.set_style_class_name('menu-selected-app-title');
-        this.removeActor(this._triangle);
+        if(this._triangle.get_parent() == this.actor)
+           this.removeActor(this._triangle);
         this._triangle = new St.Label();
         
         this.icon = new St.Icon({
@@ -2055,6 +2059,7 @@ AccessibleDropBox.prototype = {
      } catch(e) {
         Main.notify("Drag and Drop problem:", e.message);
      }
+     return DND.DragMotionResult.NO_DROP;
    },
     
    // Draggable target interface
@@ -2120,6 +2125,177 @@ AccessibleDropBox.prototype = {
    }
 };
 
+function FavoritesBoxLine(parentBox, vertical) {
+   this._init(parentBox, vertical);
+}
+
+FavoritesBoxLine.prototype = {
+   _init: function(parentBox, vertical) {
+      this.parentBox = parentBox;
+      this.vertical = vertical;
+      this.actor = new St.BoxLayout({ vertical: vertical });
+      this.actor._delegate = this;
+        
+      this._dragPlaceholder = null;
+      this._dragPlaceholderPos = -1;
+      this._animatingPlaceholdersCount = 0;
+   },
+    
+   _clearDragPlaceholder: function() {
+      if(this._dragPlaceholder) {
+         this._dragPlaceholder.animateOutAndDestroy();
+         this._dragPlaceholder = null;
+         this._dragPlaceholderPos = -1;
+      }
+   },
+    
+   handleDragOver : function(source, actor, x, y, time) {
+      try {
+         let app = source.app;
+         // Don't allow favoriting of transient apps
+         if(app == null || app.is_window_backed() || (!(source instanceof FavoritesButtonExtended) && app.get_id() in AppFavorites.getAppFavorites().getFavoriteMap()))
+            return DND.DragMotionResult.NO_DROP;
+
+         let favorites = AppFavorites.getAppFavorites().getFavorites();
+         let favPos = favorites.indexOf(app);
+
+         let children = this.actor.get_children();
+         let numChildren = children.length;
+         let boxSize;
+         let coord;
+         if(this.actor.get_vertical()) {
+            boxSize = this.actor.height;
+            coord = y;
+         } else {
+            boxSize = this.actor.width;
+            coord = x;
+         }
+         // Keep the placeholder out of the index calculation; assuming that
+         // the remove target has the same size as "normal" items, we don't
+         // need to do the same adjustment there.
+         if(this._dragPlaceholder) {
+            if(this.actor.get_vertical())
+               boxSize -= this._dragPlaceholder.actor.height;
+            else
+               boxSize -= this._dragPlaceholder.actor.width;
+            numChildren--;
+         }
+
+         let pos = Math.round(coord * numChildren / (boxSize));
+        // if(pos != this._dragPlaceholderPos && pos <= numChildren) {
+         if(pos <= numChildren) {
+          /*  if(this._animatingPlaceholdersCount > 0) {
+               let appChildren = children.filter(function(actor) {
+                  return (actor._delegate instanceof FavoritesButton);
+               });
+               this._dragPlaceholderPos = children.indexOf(appChildren[pos]);
+            } else {*/
+               this._dragPlaceholderPos = pos;
+         //   }
+
+            // Don't allow positioning before or after self
+           /* if(favPos != -1 && (pos == favPos || pos == favPos + 1)) {
+               if(this._dragPlaceholder) {
+                  this._dragPlaceholder.animateOutAndDestroy();
+                  this._animatingPlaceholdersCount++;
+                  this._dragPlaceholder.actor.connect('destroy',
+                  Lang.bind(this, function() {
+                     this._animatingPlaceholdersCount--;
+                  }));
+               }
+               this._dragPlaceholder = null;
+
+               return DND.DragMotionResult.CONTINUE;
+            }*/
+
+            // If the placeholder already exists, we just move
+            // it, but if we are adding it, expand its size in
+            // an animation
+            let fadeIn;
+            if(this._dragPlaceholder) {
+               let parentPlaceHolder = this._dragPlaceholder.actor.get_parent();
+               if(parentPlaceHolder) parentPlaceHolder.remove_actor(this._dragPlaceholder.actor);
+               this._dragPlaceholder.actor.destroy();
+               fadeIn = false;
+            } else {
+               fadeIn = true;
+            }
+
+            this._dragPlaceholder = new DND.GenericDragPlaceholderItem();
+            this._dragPlaceholder.child.set_width (source.actor.height);
+            this._dragPlaceholder.child.set_height (source.actor.height);
+            this.actor.insert_actor(this._dragPlaceholder.actor, this._dragPlaceholderPos);
+            this.parentBox._onDragPlaceholderChange(this._dragPlaceholder);
+            if(fadeIn)
+               this._dragPlaceholder.animateIn();
+         }
+
+         let srcIsFavorite = (favPos != -1);
+
+         if(srcIsFavorite)
+            return DND.DragMotionResult.MOVE_DROP;
+
+         return DND.DragMotionResult.COPY_DROP;
+      } catch(e) {
+         Main.notify("Invalid Drag: " + e.message);
+      }
+      return DND.DragMotionResult.NO_DROP;
+   },
+    
+   // Draggable target interface
+   acceptDrop : function(source, actor, x, y, time) {
+      try {
+         let app = source.app;
+
+         // Don't allow favoriting of transient apps
+         if(app == null || app.is_window_backed()) {
+            return false;
+         }
+
+         let id = app.get_id();
+
+         let favorites = AppFavorites.getAppFavorites().getFavoriteMap();
+
+         let srcIsFavorite = (id in favorites);
+
+         let favPos = 0;
+         let children = this.actor.get_children();
+         if(children.length == 0)
+            favPos = favorites.length -1;
+         else {
+            for(let i = 0; i < this._dragPlaceholderPos; i++) {
+               if(this._dragPlaceholder &&
+                  children[i] == this._dragPlaceholder.actor)
+                  continue;
+            
+               if(!(children[i]._delegate instanceof FavoritesButtonExtended)) continue;
+
+               let childId = children[i]._delegate.app.get_id();
+               if(childId == id)
+                  continue;
+               if(childId in favorites)
+                  favPos++;
+            }
+            favPos = this.parentBox.getBeginPosAtLine(this, favPos);
+         }
+
+         Meta.later_add(Meta.LaterType.BEFORE_REDRAW, Lang.bind(this, function () {
+            let appFavorites = AppFavorites.getAppFavorites();
+            if(srcIsFavorite)
+               appFavorites.moveFavoriteToPos(id, favPos);
+            else
+               appFavorites.addFavoriteAtPos(id, favPos);
+            return false;
+         }));
+
+         return true;
+      } catch(e) {
+         Main.notify("Drop Fail:" + e.message);
+      }
+      return false;
+   }
+};
+
 function FavoritesBoxExtended(parent, vertical, numberLines) {
    this._init(parent, vertical, numberLines);
 }
@@ -2130,22 +2306,37 @@ FavoritesBoxExtended.prototype = {
       this.favRefresh = false;
       this.actor = new St.BoxLayout();
       this.actor.set_vertical(!vertical);
-      this.actor._delegate = this;
-      this.numberLines = numberLines;
+      //this.actor._delegate = this;
+      this.linesDragPlaces = new Array();
       let internalLine;
-      for(let i = 0; i < this.numberLines; i++) {
-         internalLine = new St.BoxLayout();
-         internalLine.set_vertical(vertical);
-         this.actor.add(internalLine, { x_align: St.Align.MIDDLE, y_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+      for(let i = 0; i < numberLines; i++) {
+         internalLine = new FavoritesBoxLine(this, vertical);
+         this.linesDragPlaces.push(internalLine);
+         this.actor.add(internalLine.actor, { x_align: St.Align.MIDDLE, y_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
       }
       this.setVertical(vertical);
-      this._dragPlaceholder = null;
-      this._dragPlaceholderPos = -1;
-      this._animatingPlaceholdersCount = 0;
+   },
+
+   _onDragPlaceholderChange: function(dragPlaceholder) {
+      let currLinePlaceholder;
+      this._dragPlaceholder = dragPlaceholder;
+      for(let i = 0; i < this.linesDragPlaces.length; i++) {
+         currLinePlaceholder = this.linesDragPlaces[i];
+         if((currLinePlaceholder._dragPlaceholder)&&(currLinePlaceholder._dragPlaceholder != dragPlaceholder)) {
+            currLinePlaceholder._clearDragPlaceholder();
+         }
+      }
    },
 
    getNumberLines: function() {
-      return this.numberLines;
+      return this.linesDragPlaces.length;
+   },
+
+   getBeginPosAtLine: function(line, itemPos) {
+      let sumOfElements = 0;
+      if(itemPos > 0)
+         sumOfElements += this.linesDragPlaces.length*(itemPos);
+      return sumOfElements + this.linesDragPlaces.indexOf(line);
    },
 
    needRefresh: function() {
@@ -2153,31 +2344,32 @@ FavoritesBoxExtended.prototype = {
    },
 
    setNumberLines: function(numberLines) {
-      let childrens = this.actor.get_children();
-      let childrensItems;
+      let childrens;
       let saveItems = new Array();
-      for(let i = 0; i < childrens.length; i++) {
-         childrensItems = childrens[i].get_children();
-         for(let j = 0; j < childrensItems.length; j++) {
-            saveItems.push(childrensItems[j]);
-            childrens[i].remove_actor(childrensItems[j]);
-            childrensItems[j].destroy();
+      for(let i = 0; i < this.linesDragPlaces.length; i++) {
+         childrens = this.linesDragPlaces[i].actor.get_children();
+         for(let j = 0; j < childrens.length; j++) {
+            saveItems.push(childrens[j]);
+            childrens[i].remove_actor(childrens[j]);
          }
       }
-
       let internalLine;
-      for(let i = this.numberLines; i < numberLines; i++) {
-         internalLine = new St.BoxLayout();
-         internalLine.set_vertical(this.isVertical);
-         this.actor.add(internalLine, { x_align: St.Align.MIDDLE, y_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+      for(let i = this.linesDragPlaces.length; i < numberLines; i++) {
+         internalLine = new FavoritesBoxLine(this, this.isVertical);
+         this.linesDragPlaces.push(internalLine);
+         this.actor.add(internalLine.actor, { x_align: St.Align.MIDDLE, y_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
       }
-      for(let i = numberLines; i < this.numberLines; i++) {
-         this.actor.remove_actor(childrens[i]);
+      let lastPos = this.linesDragPlaces.length;
+      while(numberLines < lastPos) {
+         lastPos--;
+         this.actor.remove_actor(this.linesDragPlaces[lastPos].actor);
+         this.linesDragPlaces[lastPos].actor.destroy();
+         this.linesDragPlaces.splice(lastPos, 1);
       }
-      this.numberLines = numberLines;
       for(let i = 0; i < saveItems.length; i++) {
          this.add(saveItems[i]);
       }
+      //Main.notify("chil:" + this.actor.get_children().length + " line:" + this.linesDragPlaces.length);
    },
 
    setVertical: function(vertical) {
@@ -2212,74 +2404,59 @@ FavoritesBoxExtended.prototype = {
    },
 
    add: function(actor, menu, properties) {
+try {
       let childrens = this.actor.get_children();
-      let currentNumberLines = childrens[0].get_children().length;
-      if(currentNumberLines == 0) {
-         this._addInCorrectBox(childrens[0], actor, menu, properties);
-      }
-      else {
-         for(let i = 1; i < childrens.length; i++) {
-            if(currentNumberLines > childrens[i].get_children().length) {
-               this._addInCorrectBox(childrens[i], actor, menu, properties);
-               currentNumberLines--; 
-               break;
-            }
+      let currentNumberItems = childrens[0].get_children().length;
+      for(let i = 1; i < childrens.length; i++) {
+         if(currentNumberItems > childrens[i].get_children().length) {
+            this._addInCorrectBox(childrens[i], actor, menu, properties);
+            currentNumberItems--; 
+            break;
          }
-         if(currentNumberLines == childrens[0].get_children().length)
-            this._addInCorrectBox(childrens[0], actor, menu, properties);
       }
+      if(currentNumberItems == childrens[0].get_children().length)
+         this._addInCorrectBox(childrens[0], actor, menu, properties);
+} catch(e) {
+Main.notify("tamos", e.message);
+}
    },
 
    _addInCorrectBox: function(box, actor, menu, properties) {
       box.add(actor, properties);
-      if(menu)
-         box.add_actor(menu.actor);
-      else {//Remplace menu actor by a hide false actor.
-         falseActor = new St.BoxLayout();
-         falseActor.hide();
-         box.add_actor(falseActor);
-      }
-   },
-
-   insert: function(actor, posX, posY) {
-      if((posX > -1)&&(posY > -1)) {
-         let posI, posE;
-         if(this.isVertical) {
-            posI = posX;
-            posE = posY;
-         }
-         else {
-            posI = posY;
-            posE = posX;
-         }
-         let childrens = this.actor.get_children();
-         if((posI < childrens.length)&&(posE <= childrens[posI].get_children().length)) {
-            childrens[posI].insert_actor(actor, posE);
-         }
-      }
+      box.add_actor(menu.actor);
    },
 
    removeAll: function() {
 try {
-      this.favRefresh = false;
-      //Remove all favorites
-      let childrens = this.actor.get_children();
-      let childrensItems;
-      for(let i = 0; i < childrens.length; i++) {
-         childrensItems = childrens[i].get_children();
-         for(let j = 0; j < childrensItems.length; j++) {
-            childrens[i].remove_actor(childrensItems[j]);
-            childrensItems[j].destroy();
-         }
-         this.actor.remove_actor(childrens[i]);
-         childrens[i].destroy();
+      for(let i = 0; i < this.linesDragPlaces.length; i++) {
+         this.linesDragPlaces[i].visible = false;
+         this.actor.remove_actor(this.linesDragPlaces[i].actor);
       }
-      this.numberLines = 0;
-      this._clearDragPlaceholder();
-      this._dragPlaceholder = null;
-      this._dragPlaceholderPos = -1;
-      this._animatingPlaceholdersCount = 0;
+      this.oldLines = this.linesDragPlaces;
+      this.linesDragPlaces = new Array();
 
+      Mainloop.idle_add(Lang.bind(this, function() {
+         if(this._dragPlaceholder) {
+            let parentHolder = this._dragPlaceholder.actor.get_parent();
+            if(parentHolder)
+               parentHolder.remove_actor(this._dragPlaceholder.actor);
+            this._dragPlaceholder = null;
+         }
+         this.favRefresh = false;
+         //Remove all favorites
+         let childrens;
+         let  lastPos = this.oldLines.length;
+         while(0 < lastPos) {
+            lastPos--;
+           //this.actor.remove_actor(this.linesDragPlaces[lastPos].actor);
+           this.oldLines[lastPos].actor.get_children().forEach(Lang.bind(this, function (child) {
+              child.destroy();
+           }));
+           this.oldLines[lastPos].actor.destroy();
+           //this.oldLines.splice(lastPos, 1);
+         }
+         this.oldLines = null;
+     }));
 } catch(e) {
    Main.notify("err" + e.message);
 }
@@ -2296,193 +2473,6 @@ try {
          }
       }
       return result;
-   },
-
-   _clearDragPlaceholder: function() {
-      if(this._dragPlaceholder) {
-         this._dragPlaceholder.animateOutAndDestroy();
-         this._dragPlaceholder = null;
-         this._dragPlaceholderPosX = -1;
-         this._dragPlaceholderPosY = -1;
-      }
-   },
-    
-   handleDragOver: function(source, actor, x, y, time) {
-   try {
-      let app = source.app;
-      // Don't allow favoriting of transient apps
-      if((source instanceof PlaceButtonAccessibleExtended) || (app == null || app.is_window_backed())/* ||
-         (!(source instanceof FavoritesButtonExtended) && app.get_id() in AppFavorites.getAppFavorites().getFavoriteMap())*/)
-         return DND.DragMotionResult.NO_DROP;
-
-      let favorites = AppFavorites.getAppFavorites().getFavorites();
-      let numFavorites = favorites.length;
-
-      let favPos = favorites.indexOf(app);
-
-      let childrenBox = this.actor.get_children();
-      let numChildrenBox = childrenBox.length;
-      let boxHeight = this.actor.height;
-      let boxWidth = this.actor.width;
-
-      // Keep the placeholder out of the index calculation; assuming that
-      // the remove target has the same size as "normal" items, we don't
-      // need to do the same adjustment there.
-      if(this._dragPlaceholder) {
-         boxHeight -= this._dragPlaceholder.actor.height;
-         boxWidth -= this._dragPlaceholder.actor.width;
-         numChildrenBox--;
-      }
-
-      let posY, posX, itemChild;
-      let itemsInline = 0;
-      if(this.isVertical) {
-         posX = Math.round(x * this.numberLines / boxWidth) - 1;
-         if(posX >= childrenBox.length)
-            posX = childrenBox.length - 1;
-         if(posX < 0)
-            posX = 0;
-         itemChild = childrenBox[posX].get_children();
-         if(itemChild)
-            itemsInline = itemChild.length;
-         posY = Math.round(y * itemsInline / boxHeight);
-         if(posY >= itemsInline - 1)
-            posY = itemsInline - 2;
-         if(posY < 0)
-            posY = 0;
-      }
-      else {
-         posY = Math.round(y * this.numberLines / boxHeight) - 1;
-         if(posY >= childrenBox.length)
-            posY = childrenBox.length - 1;
-         if(posY < 0)
-            posY = 0;
-         itemChild = childrenBox[posY].get_children();
-         if(itemChild)
-            itemsInline = itemChild.length;
-         posX = Math.round(x * itemsInline / boxWidth);
-         if(posX >= itemsInline - 1)
-            posX = itemsInline - 2;
-         if(posX < 0)
-            posX = 0;
-      }
-
-      if(((posY != this._dragPlaceholderPosY)||(posX != this._dragPlaceholderPosX))) {
-         this._dragPlaceholderPosX = posX;
-         this._dragPlaceholderPosY = posY;
-
-            // If the placeholder already exists, we just move
-            // it, but if we are adding it, expand its size in
-            // an animation
-         let fadeIn;
-         if(this._dragPlaceholder) {
-            let parentPlaceHolder = this._dragPlaceholder.actor.get_parent();
-            if(parentPlaceHolder) parentPlaceHolder.remove_actor(this._dragPlaceholder.actor);
-            this._dragPlaceholder.actor.destroy();
-            fadeIn = false;
-         } else {
-            fadeIn = true;
-         }
-
-         this._dragPlaceholder = new DND.GenericDragPlaceholderItem();
-         this._dragPlaceholder.child.set_width(source.actor.width);
-         this._dragPlaceholder.child.set_height(source.actor.height);
-         this.insert(this._dragPlaceholder.actor, this._dragPlaceholderPosX, this._dragPlaceholderPosY);
-         if(fadeIn)
-            this._dragPlaceholder.animateIn();
-      }
-      this.favRefresh = true;
-      let srcIsFavorite = (favPos != -1);
-      if(srcIsFavorite) {
-         return DND.DragMotionResult.MOVE_DROP;
-      }
-      return DND.DragMotionResult.COPY_DROP;
-
-    } catch(e) {
-      Main.notify("efx", e.message);
-    }
-    return DND.DragMotionResult.NO_DROP;
-   },
-    
-   // Draggable target interface
-   acceptDrop: function(source, actor, x, y, time) {
-     try {
-        this.favRefresh = false;
-        let app = source.app;
-        // Don't allow favoriting of transient apps
-        if((source instanceof PlaceButtonAccessibleExtended)||(app == null) || (app.is_window_backed())) {
-            return false;
-        }
-
-        let id = app.get_id();
-
-        let favorites = AppFavorites.getAppFavorites().getFavoriteMap();
-
-        let srcIsFavorite = (id in favorites);
-
-        let posX, posY;
-        if(this.isVertical) {
-           posX = this._dragPlaceholderPosX;
-           posY = this._dragPlaceholderPosY;
-        }
-        else {
-           posX = this._dragPlaceholderPosY;
-           posY = this._dragPlaceholderPosX;
-        }
-
-        if(this._dragPlaceholder) {
-            let parentPlaceHolder = this._dragPlaceholder.actor.get_parent();
-            if(parentPlaceHolder) parentPlaceHolder.remove_actor(this._dragPlaceholder.actor);
-            this._dragPlaceholder.actor.destroy();
-         }
-
-       // Main.notify("posX:" + posX + " posY:" + posY);
-
-        let favPos = 0;
-        let cPosY = 0;
-        let maxPosY = 1;
-        let childrens = this.actor.get_children();
-        let childrensItems;
-        while(cPosY < maxPosY + 1) {
-           for(let i = 0; i < childrens.length; i++) {
-              childrensItems = childrens[i].get_children();
-              maxPosY = childrensItems.length;
-              if(i == posX) {
-                 maxPosY = posY;
-                 if(cPosY == posY)
-                   break;
-              }
-              if(this._dragPlaceholder &&
-                 childrensItems[cPosY] == this._dragPlaceholder.actor)
-                 continue;
-            
-              if(!(childrensItems[cPosY]._delegate instanceof FavoritesButtonExtended)) continue;
-
-              let childId = childrensItems[cPosY]._delegate.app.get_id();
-              if(childId == id)
-                 continue;
-              if(childId in favorites)
-                 favPos++;
-           }
-           cPosY++;
-        }
-
-        Meta.later_add(Meta.LaterType.BEFORE_REDRAW, Lang.bind(this,
-            function () {
-                let appFavorites = AppFavorites.getAppFavorites();
-                if (srcIsFavorite) {
-                    appFavorites.moveFavoriteToPos(id, favPos);
-                }
-                else {
-                    appFavorites.addFavoriteAtPos(id, favPos);
-                }
-                return false;
-            }));
-        return true;
-      } catch(e) {
-        Main.notify("ef", e.message);
-      }
-      return false;
    },
 
    navegateFavBox: function(symbol, actor) {
@@ -3315,7 +3305,8 @@ FavoritesButtonExtended.prototype = {
             if(icon_size > this.iconSize) icon_size = this.iconSize;
          }
          let visible = this.icon.visible;
-         this.container.remove_actor(this.icon);
+         if(this.icon.get_parent() == this.container)
+            this.container.remove_actor(this.icon);
          this.icon.destroy();
          this.icon = this.app.create_icon_texture(this.iconSize);
          if(this.icon) {
@@ -3991,6 +3982,7 @@ AccessibleMetaData.prototype = {
          let checksum = global.get_md5_for_string(metadataContents);
          try {
             this.meta = JSON.parse(metadataContents);
+            return true;
          } catch (e) {
             global.logError("Cannot parse settings schema file... Error is: " + e);
             return false;
@@ -3998,6 +3990,7 @@ AccessibleMetaData.prototype = {
       } catch (e) {
          global.logError('Failed to load/parse accessible.json', e);
       }
+      return false;
    },
 
    _createSettingsFile: function(origDataPath) {
@@ -5043,7 +5036,7 @@ Main.notify("Erp" + e.message);
    _setVisibleFavorites: function() {
       this.favoritesScrollBox.actor.visible = this.showFavorites;
       this._refreshFavs();
-      this.updateSize();
+      this._updateSize();
    },
 
    _setVisiblePowerButtons: function() {
@@ -5390,8 +5383,8 @@ Main.notify("Erp" + e.message);
       if(!this.actorResize) {
          let [mx, my] = event.get_coords();
          let [ax, ay] = actor.get_transformed_position();
-         ar = ax + actor.get_width();
-         at = ay + actor.get_height();
+         let ar = ax + actor.get_width();
+         let at = ay + actor.get_height();
          if(this._isInsideMenu(mx, my, ax, ay, ar, at)) {
             if(this._correctPlaceResize(mx, my, ax, ay, ar, at)) {
                this._cursorChanged = true;
@@ -5411,8 +5404,8 @@ Main.notify("Erp" + e.message);
       this.actorResize = actor;
       let [mx, my] = event.get_coords();
       let [ax, ay] = actor.get_transformed_position();
-      aw = actor.get_width();
-      ah = actor.get_height();
+      let aw = actor.get_width();
+      let ah = actor.get_height();
       if(this._isInsideMenu(mx, my, ax, ay, aw, ah)) {
          if(this._correctPlaceResize(mx, my, ax, ay, aw, ah)) {
             this._findMouseDeltha();
@@ -6199,6 +6192,7 @@ Main.notify("Erp" + e.message);
       this.favoritesBox.add_actor(favoritesBox.actor);*/
       //this.favoritesScrollBox.set_width(-1)
       //this.favoritesBox.set_width(-1);
+
       this.favoritesObj.removeAll();
       if(this.favoritesObj.getNumberLines() != this.favoritesLinesNumber)
          this.favoritesObj.setNumberLines(this.favoritesLinesNumber);
@@ -6235,6 +6229,7 @@ Main.notify("Erp" + e.message);
             ++j;
          }
       }
+
       this.fRef = false;
       return true;
    },
