@@ -1,9 +1,9 @@
 {
    "theme": {
       "type": "combobox",
-      "description": "Selected theme of menu:",
+      "description": "Menu layout:",
       "default": "classic",
-      "tooltip": "Select a theme of paper menu.",
+      "tooltip": "Select a layout of menu.",
       "options": {
          "Classic": "classic",
          "Stylized": "stylized",
@@ -18,9 +18,9 @@
    },
    "power-theme": {
       "type": "combobox",
-      "description": "Selected theme of power buttons:",
+      "description": "System buttons layout:",
       "default": "vertical",
-      "tooltip": "Select a theme of power buttons.",
+      "tooltip": "Select a layout of System buttons.",
       "options": {
          "Vertical": "vertical",
          "Vertical List": "vertical-list",
@@ -101,19 +101,19 @@
    "power-box" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "Power Buttons have box",
-      "tooltip": "Choose whether or not to have a box in Power Buttons."
+      "description": "System buttons have a box",
+      "tooltip": "Choose whether or not to have a box in System buttons."
    },
    "accessible-box" : {
       "type" : "checkbox",
       "default" : false,
-      "description": "Accessible bar have box",
-      "tooltip": "Choose whether or not to have a box in the Accessible bar."
+      "description": "Accessible panel has a box",
+      "tooltip": "Choose whether or not to have a box in the Accessible panel."
    },
    "accessible-icons" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "Accessible bar have icons",
+      "description": "Show icons on the Accessible panel",
       "tooltip": "Choose whether or not to have icons in Accessible bar."
    },
    "categories-icons" : {
@@ -129,14 +129,14 @@
       "max" : 300,
       "step" : 1,
       "units" : "pixels",
-      "description" : "Maximum application button text width:",
-      "tooltip" : "Set the maximum application button text width."
+      "description" : "Maximum Application entries text width:",
+      "tooltip" : "Set the maximum text width in Application entries."
    },
    "app-description" : {
       "type" : "checkbox",
       "default" : false,
-      "description": "Application button have description",
-      "tooltip": "Choose whether or not to have description in Application button."
+      "description": "Application entries have description",
+      "tooltip": "Choose whether or not to have description in Application entries."
    },
    "icon-app-size" : {
       "type": "spinbutton",
@@ -146,7 +146,7 @@
       "step" : 1,
       "units" : "pixels",
       "description" : "Application icon size:",
-      "tooltip" : "Set the application icon size."
+      "tooltip" : "Set the Application icon size."
    },
    "icon-cat-size" : {
       "type": "spinbutton",
@@ -175,8 +175,8 @@
       "max" : 100,
       "step" : 1,
       "units" : "pixels",
-      "description" : "Power icon size:",
-      "tooltip" : "Set the power icon size."
+      "description" : "System icons size:",
+      "tooltip" : "Set the System icons size."
    },
    "icon-control-size" : {
       "type": "spinbutton",
@@ -205,20 +205,20 @@
       "max" : 100,
       "step" : 1,
       "units" : "pixels",
-      "description" : "Accesible icon size:",
-      "tooltip" : "Set the accesible icon size."
+      "description" : "Accessible icons size:",
+      "tooltip" : "Set the Accessible icons size."
    },
    "show-view-item" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "Show view items control",
-      "tooltip": "Choose whether or not to show view items control."
+      "description": "Show Control buttons",
+      "tooltip": "Choose whether or not to show Control buttons."
    },
    "view-item" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "View item of the menu in icon view",
-      "tooltip": "Enable view item of the menu in icon view and disable view item of the menu in list view."
+      "description": "Show Applications entries in grid view",
+      "tooltip": "Enable show Applications entries in grid(icon) view and disable show Applications entries in list view."
    },
    "show-favorites" : {
       "type" : "checkbox",
@@ -259,8 +259,8 @@
    "show-power-buttons" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "Show power buttons",
-      "tooltip": "Choose whether or not to show power buttons in the menu."
+      "description": "Show System buttons",
+      "tooltip": "Choose whether or not to show System buttons in the menu."
    },
    "show-time-date" : {
       "type" : "checkbox",
@@ -287,8 +287,8 @@
    "show-app-title" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "Show selected application title",
-      "tooltip": "Choose whether or not to show selected application title in the menu."
+      "description": "Show name of the selected application",
+      "tooltip": "Choose whether or not to show the selected application name in the menu."
    },
    "app-title-size" : {
       "type": "spinbutton",
@@ -299,14 +299,14 @@
       "units" : "points",
       "indent": true,
       "dependency": "show-app-title",
-      "description" : "Size of selected application title:",
-      "tooltip" : "Size of font in selected application title."
+      "description" : "Font size of the selected application name:",
+      "tooltip" : "Set the font size of the selected application name."
    },
    "show-app-description" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "Show selected application description",
-      "tooltip": "Choose whether or not to show selected application description in the menu."
+      "description": "Show description of the selected application",
+      "tooltip": "Choose whether or not to show the selected application description in the menu."
    },
    "app-description-size" : {
       "type": "spinbutton",
@@ -317,8 +317,8 @@
       "units" : "points",
       "indent": true,
       "dependency": "show-app-description",
-      "description" : "Size of selected application description:",
-      "tooltip" : "Size of font in selected application description."
+      "description" : "Font size of the selected application description:",
+      "tooltip" : "Set the font size of the selected application description."
    },
    "automatic-size" : {
       "type" : "checkbox",
@@ -339,8 +339,8 @@
       "max" : 3000,
       "step" : 5,
       "units" : "pixels",
-      "description" : "Width:",
-      "tooltip" : "Width of menu."
+      "description" : "Menu width:",
+      "tooltip" : "Width of the menu."
    },
    "height" : {
       "type": "spinbutton",
@@ -349,38 +349,38 @@
       "max" : 2000,
       "step" : 5,
       "units" : "pixels",
-      "description" : "Height:",
-      "tooltip" : "Height of menu."
+      "description" : "Menu height:",
+      "tooltip" : "Height of the menu."
    },
    "scroll-favorites" : {
       "type" : "checkbox",
       "default" : false,
-      "description": "Scroll of favorites visible",
-      "tooltip": "Choose whether or not to make the scroll of favorites visible."
+      "description": "Show scrolling area of favorites",
+      "tooltip": "Choose whether or not to show the scrolling area of favorites."
    },
    "scroll-categories" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "Scroll of categories visible",
-      "tooltip": "Choose whether or not to make the scroll of categories visible."
+      "description": "Show scrolling area of categories",
+      "tooltip": "Choose whether or not to show the scrolling area of categories."
    },
    "scroll-applications" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "Scroll of applications visible",
-      "tooltip": "Choose whether or not to make the scroll of applications visible."
+      "description": "Show scrolling area of applications",
+      "tooltip": "Choose whether or not to show the scrolling area of applications."
    },
    "scroll-accessible" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "Scroll of accessible bar visible",
-      "tooltip": "Choose whether or not to make the scroll of the accessible bar visible."
+      "description": "Show scrolling area of accessible panel",
+      "tooltip": "Choose whether or not to show the scrolling area of accessible panel."
    },
    "spacer-line" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "The Separator have line",
-      "tooltip": "Choose whether or not to show a line in the Separator."
+      "description": "Show separator line",
+      "tooltip": "Choose whether or not to show a line in separator."
    },
    "spacer-size" : {
       "type": "spinbutton",
@@ -389,20 +389,20 @@
       "max" : 50,
       "step" : 1,
       "units" : "pixels",
-      "description" : "The Separator size:",
-      "tooltip" : "Size of the Separator."
+      "description" : "Separator size:",
+      "tooltip" : "Choose the size of separator."
    },
    "show-box-pointer" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "Box Pointer in the menu",
-      "tooltip": "Choose whether or not to make the box pointer of menu visible."
+      "description": "Show menu box pointer",
+      "tooltip": "Choose whether or not to show the menu box pointer."
    },
 
    "fix-menu-corner" : {
       "type" : "checkbox",
       "default" : false,
-      "description": "Fix the menu to corner",
-      "tooltip": "Choose whether or not to fix the menu to corner."
+      "description": "Menu bordering screen edge",
+      "tooltip": "Choose whether or not the menu in bordering the screen edge."
    }
 }
