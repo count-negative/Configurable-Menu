@@ -5,7 +5,7 @@ Applet: Configurable Menu Version: v0.8-Beta
 
 O.S.: Cinnamon 
 
-Release Date: 06 january 2014
+Release Date: 07 january 2014
 
 Author: Lester Carballo Pérez
 
@@ -13,43 +13,49 @@ Email: lestcape@gmail.com
 
 Website: https://github.com/lestcape/Configurable-Menu
 
-Thanks for all contribution to: Garibaldo: https://github.com/Garibaldo
+Thanks for all contribution to Garibaldo: https://github.com/Garibaldo
 
 --------------
 
-This is a frock of Main Cinnamon menu applet with more configurable options.
+"This is a fork of the Cinnamon stock menu, but with much more features and extremely configurable."
 
 ![Alt text](/configurableMenu@lestcape/Capture.png)
 
 
 Alert!!!!!: This implementations are unstable and have several bugs... Download this only for test purpose.
 
-Skills including:
+Features:
 --------------
 
-1.	Can be active OnButtonPress action instead of OnButtonRelease.
+1.	The Menu can be opened by pressing & releasing the mouse button, by just pressing the mouse button, or by hovering the mouse pointer on the menu icon.
 
-2.	You can control the menu width and height using the mouse and settings.
+2.	You can define the exact size of the menu (width and height) using the menu settings.
 
-3.	Support the theme change with several differents layouts.
+3.	Now you can also resize the menu by dragging a corner with the mouse!
 
-4.	You have a hover icon like in windows menu.
+4.	You can choose among many different menu layouts.
 
-5.	Enable and disable favorites, hover icon, power buttons...
+5.	You can choose among many different system buttons layouts.
 
-6.	Separate power buttons of favorites.
+6.	The menu can show a magnified picture of the icon which is being hovered, similarly to the windows start menu.
 
-7.	Different modes of view menu items.
+7.	You can Show/Hide favorites, hover icon, system buttons...
 
-8.	Favorites with multiple lines.
+8.	You can separate the system buttons from the favorites.
 
-8.	You can Drag and Drop items to the desktop, physics windows app icon list...
+8.	You have two different modes of viewing the application entries: List View and Grid View.
 
-9.	Auto-Scroll also horizontal.
+9.	You can have Favorites with multiple lines (rows or columns).
 
-10.	Controlling the maximum size and have the app description in the apps items buttons.
+10.	You can drag & drop menu items onto the desktop.
 
-11.	And more for the future.
+11.	Autoscrolling works also horizontally when using some menu layouts.
+
+12.	You can define the size of the application icons, category icons, favorites icons, system buttons and control buttons.
+
+13.	You can define the font size of the application description/name.
+
+14.	And much more coming...
 
 
 This program is free software:
@@ -70,27 +76,27 @@ Installation Instructions:
 
 Add new languages:
 --------------
-  - Unsupported yet.
+  - New languages are not yet supported.
 
 Change Log:
 ==============
 0.8-Beta
-   - The Accessible bar it's now configurable and have two drag and drop areas(Places and Apps(systems)).
-   - Implemented new places items(PC, Desktop, Home and Trash).
-   - You can add item to accessible bar with submenu and drag and drop option, also places.
-   - The Favorites buttons have now submenu .
-   - Reduced the width of search item in windows 7 theme to be the same size or less of Favorites area.
-   - Power Buttons have now several themes that can be selected.
-   - The Accessible bar can have icons or not now.
-   - Categories can have icons or not now.
-   - You can remove the Box Pointer of Menu if you want.
-   - Implementation of Separator with configurable options.
-   - Hover Icon can have configurable border now.
-   - Now you can align the menu to the corner.
-   - When you can resize the menu, now appear a mark in the corresponding corner.
-   - Now you can put the menu in full screen mode.
-   - Now you can have the app description in the menu apps items buttons.
-   - Now you can controlling the maximum size of the apps items buttons.
+   - The accessible panel is now configurable and has two drag and drop areas ( Places and Apps).
+   - Implemented new “Places” fields (PC, Desktop, Home, Network and Trash).
+   - You can add items to the accessible panel with a submenu and a drag and drop operation.
+   - The Favorites icons have now submenus.
+   - Reduced the width of search item on windows 7 layout to be the same size or less of favorites area.
+   - System buttons have now several layouts available.
+   - The accessible panel can have icons or not.
+   - Categories can have icons or not.
+   - You can remove the box pointer from the menu.
+   - Implementation of separators, with configurable options.
+   - The Hover Icon has a configurable border now.
+   - Now you can align the menu to the screen edge.
+   - When the menu is re-sizable, a mark appears on the corresponding corner.
+   - Now you can expand the menu to full screen mode.
+   - Now you can have the application description in the application entries.
+   - Now you can control the maximum size of the application icons.
 
 0.7-Beta
    - Fixed a bug in the keyboard navigation, and add for more componets.

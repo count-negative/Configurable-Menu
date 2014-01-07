@@ -1,13 +1,14 @@
 // Applet : Configurable Menu      Version      : v0.8-Beta
-// O.S.   : Cinnamon               Release Date : 06 january 2014.
+// O.S.   : Cinnamon               Release Date : 07 january 2014.
 // Author : Lester Carballo Pérez  Email        : lestcape@gmail.com
 //
 // Website : https://github.com/lestcape/Configurable-Menu
 //
 // Thanks for all contribution to:
-// Garibaldo: https://github.com/Garibaldo
+// Garibaldo (https://github.com/Garibaldo)
 //
-// This is a frock of Main Cinnamon menu applet with more configurable options.
+// "This is a fork of the Cinnamon stock menu, but with much more features
+//  and extremely configurable."
 //
 // This program is free software:
 //
