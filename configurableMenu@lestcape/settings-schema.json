@@ -98,6 +98,12 @@
       "description": "Enable autoscrolling",
       "tooltip": "Choose whether or not to enable smooth autoscrolling on the menu."
    },
+   "control-box" : {
+      "type" : "checkbox",
+      "default" : true,
+      "description": "Control buttons have a box",
+      "tooltip": "Choose whether or not to have a box on the control buttons."
+   },
    "power-box" : {
       "type" : "checkbox",
       "default" : true,

@@ -28,16 +28,7 @@
 /*
 
 const Signals = imports.signals;
-
-
-
-
-
 const ICON_SIZE = 16;
-
-
-
-
 */
 const Util = imports.misc.util;
 const Tweener = imports.ui.tweener;
@@ -233,6 +224,7 @@ ScrollItemsBox.prototype = {
          if (current_scroll_value > hActor-10) new_scroll_value = hActor-10;
          if (box_height+current_scroll_value < hActor + actor.get_height()+10) new_scroll_value = hActor + actor.get_height()-box_height+10;
          if (new_scroll_value!=current_scroll_value) this.scroll.get_vscroll_bar().get_adjustment().set_value(new_scroll_value);
+   // Main.notify("finish" + new_scroll_value);
       } else {
          var current_scroll_value = this.scroll.get_hscroll_bar().get_adjustment().get_value();
          var box_width = this.actor.get_allocation_box().x2-this.actor.get_allocation_box().x1;
@@ -255,6 +247,7 @@ ScrollItemsBox.prototype = {
             return currHeight + actor.get_allocation_box().y1;
          }
       }
+Main.notify("error", e.message);
       return 0;//Some error
    }
 };
@@ -382,9 +375,11 @@ StaticBox.prototype = {
    takeControl: function(take) {
       if(take) {
          this.controlBox.add(this.control.actor, { x_fill: true, x_align: St.Align.MIDDLE, expand: true });
+         this.control.actor.set_style("padding-top: 10px;padding-bottom: 0px;");
       }
       else if(this.control.actor.get_parent() == this.controlBox) {
          this.controlBox.remove_actor(this.control.actor);
+         this.control.actor.set_style("padding-top: 0px;");
       }
    },
 
@@ -1228,6 +1223,17 @@ ControlBox.prototype = {
       this.changeResizeActive(this.parent.controlingSize);
    },
 
+   setSpecialColor: function(specialColor) {
+      if(specialColor) {
+         this.resizeBox.set_style_class_name('menu-favorites-box');
+         this.viewBox.set_style_class_name('menu-favorites-box');
+      }
+      else {
+         this.resizeBox.set_style_class_name('');
+         this.viewBox.set_style_class_name('');
+      }
+   },
+
    _onClickedChangeView: function(actor, event) {
       this.changeViewSelected(!this.parent.iconView);
       this.parent._changeView();
@@ -1553,7 +1559,6 @@ GenericApplicationButtonExtended.prototype = {
    _subMenuOpenStateChanged: function() {
       if(this.menu.isOpen) {
          this.parentScroll.scrollToActor(this.menu.actor);
-         this.parent._updateSize();
       }
    },
 
@@ -1847,9 +1852,7 @@ HoverIcon.prototype = {
 
    _subMenuOpenStateChanged: function() {
        //if (this.menu.isOpen) this.parent._scrollToButton(this.menu);
-       if(!this.menu.isOpen)
-          this.parent.searchEntry.set_width(-1);
-       else
+       if(this.menu.isOpen)
           this.parent._updateSize();
           //this.menu.actor.can_focus = false;
        /*else
@@ -1871,8 +1874,6 @@ HoverIcon.prototype = {
          this.menu.close(true);
          this.menu.sourceActor._delegate.setActive(true);
       } else {
-         if(this.actor.get_parent() == this.parent.searchBox)
-            this.parent.searchEntry.set_width(200);
          this.menu.open();
          this.menu.sourceActor._delegate.setActive(true);
       }
@@ -4292,6 +4293,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "view-item", "iconView", this._changeView, null);
 
          this.settings.bindProperty(Settings.BindingDirection.IN, "activate-on-press", "activateOnPress", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "control-box", "showControlBox", this._setVisibleControlBox, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "power-box", "showPowerBox", this._setVisiblePowerBox, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "accessible-box", "showAccessibleBox", this._setVisibleAccessibleBox, null);
 
@@ -4360,7 +4362,7 @@ MyApplet.prototype = {
             }
          }));
          Main.placesManager.connect('places-updated', Lang.bind(this, this._refreshPlacesAndRecent));
-         Main.themeManager.connect('theme-set', Lang.bind(this, this._themeChange));
+         Main.themeManager.connect('theme-set', Lang.bind(this, this._onThemeChange));
          this.RecentManager.connect('changed', Lang.bind(this, this._refreshPlacesAndRecent));
 
          this._fileFolderAccessActive = false;
@@ -4385,11 +4387,6 @@ MyApplet.prototype = {
    on_orientation_changed: function(orientation) {
       this.orientation = orientation;
       this._updateComplete();   
-   },
-
-
-   _themeChange: function() {
-      this._updateComplete();  
    },
 
    _onMenuKeyPress: function(actor, event) {
@@ -4927,6 +4924,12 @@ MyApplet.prototype = {
       }
    },
 
+   _setVisibleControlBox: function() {
+      if(this.controlView) {
+         this.controlView.setSpecialColor(this.showControlBox);
+      }
+   },
+
    _setVisiblePowerBox: function() {
       if(this.powerBox) {
          this.powerBox.setSpecialColor(this.showPowerBox);
@@ -5167,6 +5170,7 @@ Main.notify("Erp" + e.message);
       }
       if(this.controlView) {
          this.controlView.setIconSize(this.iconControlSize);
+         this.controlView.setSpecialColor(this.showControlBox);
          this.controlView.changeViewSelected(this.iconView);
       }
       if(this.powerBox) {
