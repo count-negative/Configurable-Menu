@@ -252,11 +252,11 @@ Main.notify("error", e.message);
    }
 };
 
-function StaticBox(parent, hoverIcon, selectedAppBox, controlBox, powerBox, vertical, iconSize) {
+function AccessibleBox(parent, hoverIcon, selectedAppBox, controlBox, powerBox, vertical, iconSize) {
    this._init(parent, hoverIcon, selectedAppBox, controlBox, powerBox, vertical, iconSize);
 }
 
-StaticBox.prototype = {
+AccessibleBox.prototype = {
    _init: function(parent, hoverIcon, selectedAppBox, controlBox, powerBox, vertical, iconSize) {
       this.actor = new St.BoxLayout({ vertical: true });
       this.placeName = new St.Label({ style_class: 'menu-selected-app-title', text: _("Places"), visible: false });
@@ -536,7 +536,7 @@ StaticBox.prototype = {
       }
    },
 
-   navegateStaticBox: function(symbol, actor) {
+   navegateAccessibleBox: function(symbol, actor) {
       if((this._staticSelected != -1)&&(this._staticSelected < this._staticButtons.length)) {
          let changerPos = this._staticSelected;
          this.disableSelected();
@@ -967,7 +967,8 @@ PowerBox.prototype = {
    },
 
    _insertNormalButtons: function(aling) {
-      this.actor.add_actor(this.spacerPower.actor);
+      if((this.theme != "horizontal")&&(this.theme != "horizontal-list")&&(this.theme != "horizontal-icon")&&(this.theme != "horizontal-text"))
+         this.actor.add_actor(this.spacerPower.actor);
       for(let i = 0; i < this._powerButtons.length; i++) {
          if((this.theme == "horizontal")||(this.theme == "vertical")||(this.theme == "vertical-icon"))
             this.actor.add(this._powerButtons[i].actor, { x_fill: false, x_align: aling, expand: true });
@@ -1984,8 +1985,10 @@ AccessibleDropBox.prototype = {
       let numItems = currentObj.length;
 
       let children = this.actor.get_children();
-      let numChildren = children.length/2;
+      let numChildren = children.length;
+
       let boxHeight = this.actor.height;
+
 
       // Keep the placeholder out of the index calculation; assuming that
       // the remove target has the same size as "normal" items, we don't
@@ -1994,21 +1997,20 @@ AccessibleDropBox.prototype = {
          boxHeight -= this._dragPlaceholder.actor.height;
          numChildren--;
       }
-
       let pos = Math.round(y * numItems / boxHeight);
 
-      if(pos != this._dragPlaceholderPos && pos <= numItems) {
-         if(this._animatingPlaceholdersCount > 0) {
+      if(pos <= numItems) {
+        /* if(this._animatingPlaceholdersCount > 0) {
             let appChildren = children.filter(function(actor) {
                return ((actor._delegate instanceof classType1) || (actor._delegate instanceof classType2));
             });
             this._dragPlaceholderPos = children.indexOf(appChildren[pos]);
-         } else {
+         } else {*/
             this._dragPlaceholderPos = pos;
-         }
+      //   }
 
          // Don't allow positioning before or after self
-         if(itemPos != -1 && (pos == itemPos || pos == itemPos + 1)) {
+      /*   if(itemPos != -1 && (pos == itemPos || pos == itemPos + 1)) {
             if(this._dragPlaceholder) {
                this._dragPlaceholder.animateOutAndDestroy();
                this._animatingPlaceholdersCount++;
@@ -2020,13 +2022,15 @@ AccessibleDropBox.prototype = {
             this._dragPlaceholder = null;
 
             return DND.DragMotionResult.CONTINUE;
-         }
+         }*/
 
          // If the placeholder already exists, we just move
          // it, but if we are adding it, expand its size in
          // an animation
          let fadeIn;
          if(this._dragPlaceholder) {
+            let parentPlaceHolder = this._dragPlaceholder.actor.get_parent();
+            if(parentPlaceHolder) parentPlaceHolder.remove_actor(this._dragPlaceholder.actor);
             this._dragPlaceholder.actor.destroy();
             fadeIn = false;
          } else {
@@ -2034,9 +2038,9 @@ AccessibleDropBox.prototype = {
          }
 
          this._dragPlaceholder = new DND.GenericDragPlaceholderItem();
-         this._dragPlaceholder.child.set_width (source.actor.height);
+         this._dragPlaceholder.child.set_width (source.actor.width);
          this._dragPlaceholder.child.set_height (source.actor.height);
-         this.actor.insert_actor(this._dragPlaceholder.actor, this._dragPlaceholderPos);
+         this.actor.insert_actor(this._dragPlaceholder.actor, 2*this._dragPlaceholderPos);
          if(fadeIn)
             this._dragPlaceholder.animateIn();
       }
@@ -2075,23 +2079,22 @@ AccessibleDropBox.prototype = {
       let id = app.get_id();
 
       let itemPos = currentObj.indexOf(app.get_id());
-
       let srcIsCurrentItem = (itemPos != -1);
 
-      itemPos = 0;
-      let children = this.actor.get_children();
-      for(let i = 0; i < this._dragPlaceholderPos; i++) {
-         if(this._dragPlaceholder && children[i] == this._dragPlaceholder.actor)
-            continue;
+      itemPos = this._dragPlaceholderPos;
+/*       let children = this.actor.get_children();
+         for(let i = 0; i < this._dragPlaceholderPos; i++) {
+            if(this._dragPlaceholder && children[i] == this._dragPlaceholder.actor)
+               continue;
             
-         if(!(children[i]._delegate instanceof classType1)) continue;
+            if(!(children[i]._delegate instanceof classType1)) continue;
 
-         let childId = children[i]._delegate.app.get_id();
-         if(childId == id)
-            continue;
-         if(currentObj.indexOf(childId) != -1)
-            itemPos++;
-      }
+            let childId = children[i]._delegate.app.get_id();
+            if(childId == id)
+               continue;
+            if(currentObj.indexOf(childId) != -1)
+               itemPos++;
+         }*/
 
       Meta.later_add(Meta.LaterType.BEFORE_REDRAW, Lang.bind(this, function () {
          if(srcIsCurrentItem) {//moveFavoriteToPos
@@ -2123,6 +2126,7 @@ function FavoritesBoxExtended(parent, vertical, numberLines) {
 FavoritesBoxExtended.prototype = {
    _init: function(parent, vertical, numberLines) {
       this.parent = parent;
+      this.favRefresh = false;
       this.actor = new St.BoxLayout();
       this.actor.set_vertical(!vertical);
       this.actor._delegate = this;
@@ -2141,6 +2145,10 @@ FavoritesBoxExtended.prototype = {
 
    getNumberLines: function() {
       return this.numberLines;
+   },
+
+   needRefresh: function() {
+      return this.favRefresh;
    },
 
    setNumberLines: function(numberLines) {
@@ -2251,6 +2259,8 @@ FavoritesBoxExtended.prototype = {
    },
 
    removeAll: function() {
+try {
+      this.favRefresh = false;
       //Remove all favorites
       let childrens = this.actor.get_children();
       let childrensItems;
@@ -2264,6 +2274,14 @@ FavoritesBoxExtended.prototype = {
          childrens[i].destroy();
       }
       this.numberLines = 0;
+      this._clearDragPlaceholder();
+      this._dragPlaceholder = null;
+      this._dragPlaceholderPos = -1;
+      this._animatingPlaceholdersCount = 0;
+
+} catch(e) {
+   Main.notify("err" + e.message);
+}
    },
 
    _generateChildrenList: function() {
@@ -2292,7 +2310,8 @@ FavoritesBoxExtended.prototype = {
    try {
       let app = source.app;
       // Don't allow favoriting of transient apps
-      if(app == null || app.is_window_backed() || (!(source instanceof FavoritesButtonExtended) && app.get_id() in AppFavorites.getAppFavorites().getFavoriteMap()))
+      if((source instanceof PlaceButtonAccessibleExtended) || (app == null || app.is_window_backed())/* ||
+         (!(source instanceof FavoritesButtonExtended) && app.get_id() in AppFavorites.getAppFavorites().getFavoriteMap())*/)
          return DND.DragMotionResult.NO_DROP;
 
       let favorites = AppFavorites.getAppFavorites().getFavorites();
@@ -2308,13 +2327,11 @@ FavoritesBoxExtended.prototype = {
       // Keep the placeholder out of the index calculation; assuming that
       // the remove target has the same size as "normal" items, we don't
       // need to do the same adjustment there.
-      /*if(this._dragPlaceholder) {
-          if(this.isVertical)
-             boxHeight -= this._dragPlaceholder.actor.height;
-          else
-             boxWidth -= this._dragPlaceholder.actor.width;
-          numChildrenBox--;
-      }*/
+      if(this._dragPlaceholder) {
+         boxHeight -= this._dragPlaceholder.actor.height;
+         boxWidth -= this._dragPlaceholder.actor.width;
+         numChildrenBox--;
+      }
 
       let posY, posX, itemChild;
       let itemsInline = 0;
@@ -2356,46 +2373,43 @@ FavoritesBoxExtended.prototype = {
             // If the placeholder already exists, we just move
             // it, but if we are adding it, expand its size in
             // an animation
-            let fadeIn;
-            if(this._dragPlaceholder) {
-               this._dragPlaceholder.actor.destroy();
-               fadeIn = false;
-            } else {
-               fadeIn = true;
-            }
+         let fadeIn;
+         if(this._dragPlaceholder) {
+            let parentPlaceHolder = this._dragPlaceholder.actor.get_parent();
+            if(parentPlaceHolder) parentPlaceHolder.remove_actor(this._dragPlaceholder.actor);
+            this._dragPlaceholder.actor.destroy();
+            fadeIn = false;
+         } else {
+            fadeIn = true;
+         }
 
-            this._dragPlaceholder = new DND.GenericDragPlaceholderItem();
-            let dragSize = source.actor.height;
-            if((this.actor.get_children().length > 0)&&(this.actor.get_children()[0].get_children().length > 0))
-               dragSize = this.actor.get_children()[0].get_children()[0].height;
-            this._dragPlaceholder.child.set_width(dragSize);
-            this._dragPlaceholder.child.set_height(dragSize);
-           // this.actor.insert_actor(this._dragPlaceholder.actor,
-           //                        this._dragPlaceholderPos);
-            this.insert(this._dragPlaceholder.actor, this._dragPlaceholderPosX, this._dragPlaceholderPosY);
-            if(fadeIn)
-               this._dragPlaceholder.animateIn();
-        }
-
-        let srcIsFavorite = (favPos != -1);
-
-        if(srcIsFavorite)
-           return DND.DragMotionResult.MOVE_DROP;
-
-        return DND.DragMotionResult.COPY_DROP;
-      } catch(e) {
-        Main.notify("efx", e.message);
+         this._dragPlaceholder = new DND.GenericDragPlaceholderItem();
+         this._dragPlaceholder.child.set_width(source.actor.width);
+         this._dragPlaceholder.child.set_height(source.actor.height);
+         this.insert(this._dragPlaceholder.actor, this._dragPlaceholderPosX, this._dragPlaceholderPosY);
+         if(fadeIn)
+            this._dragPlaceholder.animateIn();
       }
-      return null;
+      this.favRefresh = true;
+      let srcIsFavorite = (favPos != -1);
+      if(srcIsFavorite) {
+         return DND.DragMotionResult.MOVE_DROP;
+      }
+      return DND.DragMotionResult.COPY_DROP;
+
+    } catch(e) {
+      Main.notify("efx", e.message);
+    }
+    return DND.DragMotionResult.NO_DROP;
    },
     
    // Draggable target interface
    acceptDrop: function(source, actor, x, y, time) {
      try {
-//this.parent._refreshFavs();
+        this.favRefresh = false;
         let app = source.app;
         // Don't allow favoriting of transient apps
-        if(app == null || app.is_window_backed()) {
+        if((source instanceof PlaceButtonAccessibleExtended)||(app == null) || (app.is_window_backed())) {
             return false;
         }
 
@@ -2414,6 +2428,12 @@ FavoritesBoxExtended.prototype = {
            posX = this._dragPlaceholderPosY;
            posY = this._dragPlaceholderPosX;
         }
+
+        if(this._dragPlaceholder) {
+            let parentPlaceHolder = this._dragPlaceholder.actor.get_parent();
+            if(parentPlaceHolder) parentPlaceHolder.remove_actor(this._dragPlaceholder.actor);
+            this._dragPlaceholder.actor.destroy();
+         }
 
        // Main.notify("posX:" + posX + " posY:" + posY);
 
@@ -2813,7 +2833,8 @@ ApplicationButtonExtended.prototype = {
             global.log(e);
          }
       }
-      this.parent._refreshFavs();
+      if(this.parent.favoritesObj.needRefresh)
+         this.parent._refreshFavs();
       this.parent._onChangeAccessible();
       return false;
    },
@@ -2986,7 +3007,8 @@ PlaceButtonAccessibleExtended.prototype = {
             global.log(e);
          }
       }
-      this.parent._refreshFavs();
+      if(this.parent.favoritesObj.needRefresh)
+         this.parent._refreshFavs();
       this.parent._onChangeAccessible();
       return false;
    },
@@ -3357,7 +3379,8 @@ FavoritesButtonExtended.prototype = {
      /* } catch(e) {
            Main.notify("err", e.message);
       }*/
-      this.parent._refreshFavs();
+      if(this.parent.favoritesObj.needRefresh)
+         this.parent._refreshFavs();
       this.parent._onChangeAccessible();
       return false;
    }
@@ -4380,8 +4403,8 @@ MyApplet.prototype = {
    },
 
    _onChangeAccessible: function() {
-      if(this.staticBox)
-         this.staticBox.refreshAccessibleItems();
+      if(this.accessibleBox)
+         this.accessibleBox.refreshAccessibleItems();
    },
 
    on_orientation_changed: function(orientation) {
@@ -4424,8 +4447,8 @@ MyApplet.prototype = {
            return this._navegateFavBox(symbol, actor);
         } else if(actor == this.powerBox.actor) {
            return this._navegatePowerBox(symbol, actor); 
-        } else if((this.staticBox)&&(actor == this.staticBox.actor)) {
-           return this._navegateStaticBox(symbol, actor); 
+        } else if((this.accessibleBox)&&(actor == this.accessibleBox.actor)) {
+           return this._navegateAccessibleBox(symbol, actor); 
         } else if((this.bttChanger)&&(actor == this.bttChanger.actor)) {
            return this._navegateBttChanger(symbol);
         } else if(actor == this.hover.actor) {
@@ -4466,7 +4489,7 @@ MyApplet.prototype = {
       let staticB = null;
       let favElem = null;
       if(this.bttChanger) tbttChanger = this.bttChanger.actor;
-      if(this.staticBox) staticB = this.staticBox.actor;
+      if(this.accessibleBox) staticB = this.accessibleBox.actor;
       if(this.favoritesObj.getFirstElement()) favElem = this.favoritesScrollBox.actor;
       let activeElements = [this.hover.actor, staticB, this.powerBox.actor, tbttChanger, this.searchEntry, favElem];
       let actors = [this.hover.actor, staticB, this.powerBox.actor, tbttChanger, this.searchEntry, this.favoritesObj.getFirstElement()];
@@ -4717,15 +4740,15 @@ MyApplet.prototype = {
       return true;
    },
 
-   _navegateStaticBox: function(symbol, actor) {
+   _navegateAccessibleBox: function(symbol, actor) {
       if(symbol == Clutter.Tab) {
-         this.staticBox.disableSelected();
-         this.fav_actor = this._changeFocusElement(this.staticBox.actor);
+         this.accessibleBox.disableSelected();
+         this.fav_actor = this._changeFocusElement(this.accessibleBox.actor);
          //global.stage.set_key_focus(this.fav_actor);
          Mainloop.idle_add(Lang.bind(this, this._putFocus));
       }
       else {
-         return this.staticBox.navegateStaticBox(symbol, actor);
+         return this.accessibleBox.navegateAccessibleBox(symbol, actor);
       }
       return true;
    },
@@ -4908,8 +4931,8 @@ MyApplet.prototype = {
       this.applicationsScrollBox.setAutoScrolling(this.autoscroll_enabled);
       this.categoriesScrollBox.setAutoScrolling(this.autoscroll_enabled);
       this.favoritesScrollBox.setAutoScrolling(this.autoscroll_enabled);
-      if(this.staticBox)
-         this.staticBox.setAutoScrolling(this.autoscroll_enabled);
+      if(this.accessibleBox)
+         this.accessibleBox.setAutoScrolling(this.autoscroll_enabled);
    },
 
    _setIconMaxFavSize: function() {
@@ -4937,14 +4960,14 @@ MyApplet.prototype = {
    },
 
    _setVisibleAccessibleBox: function() {
-      if(this.staticBox) {
-         this.staticBox.setSpecialColor(this.showAccessibleBox);
+      if(this.accessibleBox) {
+         this.accessibleBox.setSpecialColor(this.showAccessibleBox);
       }
    },
 
    _setVisibleAccessibleIcons: function() {
-      if(this.staticBox) {
-         this.staticBox.setIconsVisible(this.showAccessibleIcons);
+      if(this.accessibleBox) {
+         this.accessibleBox.setIconsVisible(this.showAccessibleIcons);
          this._updateSize();
       }
    },
@@ -4969,8 +4992,8 @@ MyApplet.prototype = {
    },
 
    _setIconAccessibleSize: function() {
-      if(this.staticBox) {
-         this.staticBox.setIconSize(this.iconAccessibleSize);
+      if(this.accessibleBox) {
+         this.accessibleBox.setIconSize(this.iconAccessibleSize);
          this._updateSize();
       }
    },
@@ -5019,7 +5042,7 @@ Main.notify("Erp" + e.message);
    _setVisibleFavorites: function() {
       this.favoritesScrollBox.actor.visible = this.showFavorites;
       this._refreshFavs();
-         this.updateSize();
+      this.updateSize();
    },
 
    _setVisiblePowerButtons: function() {
@@ -5062,15 +5085,15 @@ Main.notify("Erp" + e.message);
    },
 
    _setVisibleScrollAccess: function() {
-      if(this.staticBox) {
-         this.staticBox.setScrollVisible(this.scrollAccessibleVisible);
+      if(this.accessibleBox) {
+         this.accessibleBox.setScrollVisible(this.scrollAccessibleVisible);
       }
    },
 
    _setVisibleSpacerLine: function() {
       this.powerBox.setSeparatorLine(this.showSpacerLine);
-      if(this.staticBox)
-         this.staticBox.setSeparatorLine(this.showSpacerLine);
+      if(this.accessibleBox)
+         this.accessibleBox.setSeparatorLine(this.showSpacerLine);
       if(this.spacerApp)
          this.spacerApp.setLineVisible(this.showSpacerLine);
       if(this.spacerWindows)
@@ -5079,8 +5102,8 @@ Main.notify("Erp" + e.message);
 
    _updateSpacerSize: function() {
       this.powerBox.setSeparatorSpace(this.spacerSize);
-      if(this.staticBox)
-         this.staticBox.setSeparatorSpace(this.spacerSize);
+      if(this.accessibleBox)
+         this.accessibleBox.setSeparatorSpace(this.spacerSize);
       if(this.spacerApp)
          this.spacerApp.setSpace(this.spacerSize);
       if(this.spacerWindows)
@@ -5126,10 +5149,10 @@ Main.notify("Erp" + e.message);
    },
 
    _updateComplete: function() {
-      if(this.staticBox) {
-         this.staticBox.actor.get_parent().remove_actor(this.staticBox.actor);
-         this.staticBox.actor.destroy(); 
-         this.staticBox = null;
+      if(this.accessibleBox) {
+         this.accessibleBox.actor.get_parent().remove_actor(this.accessibleBox.actor);
+         this.accessibleBox.actor.destroy(); 
+         this.accessibleBox = null;
       }
       if(this.bttChanger)
          this.bttChanger.actor.destroy();
@@ -5163,10 +5186,10 @@ Main.notify("Erp" + e.message);
             this.hover.menu.actor.visible = this.showHoverIcon;
          this.hover.setIconSize(this.iconHoverSize);
       }
-      if(this.staticBox) {
-         this.staticBox.setIconSize(this.iconAccessibleSize);
-         this.staticBox.setSpecialColor(this.showAccessibleBox);
-         this.staticBox.setIconsVisible(this.showAccessibleIcons);
+      if(this.accessibleBox) {
+         this.accessibleBox.setIconSize(this.iconAccessibleSize);
+         this.accessibleBox.setSpecialColor(this.showAccessibleBox);
+         this.accessibleBox.setIconsVisible(this.showAccessibleIcons);
       }
       if(this.controlView) {
          this.controlView.setIconSize(this.iconControlSize);
@@ -5332,8 +5355,8 @@ Main.notify("Erp" + e.message);
          if((!this.favBoxWrapper.get_vertical())&&(this.favBoxWrapper.get_width() > width))
             width = this.favBoxWrapper.get_width();
       }
-      if((this.staticBox)&&(this.staticBox.actor.visible))
-         width += this.staticBox.actor.get_width();
+      if((this.accessibleBox)&&(this.accessibleBox.actor.visible))
+         width += this.accessibleBox.actor.get_width();
       return width + 20;
    },
 
@@ -5789,16 +5812,16 @@ Main.notify("Erp" + e.message);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.MIDDLE, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
-      this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
-      this.staticBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
-      //this.staticBox.takeHover(true);
-      //this.staticBox.takeControl(true);
+      this.accessibleBox = new AccessibleBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
+      this.accessibleBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
+      //this.accessibleBox.takeHover(true);
+      //this.accessibleBox.takeControl(true);
       //this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
       this.rightPane.add_actor(this.spacerWindows.actor);
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.mainBox.add(this.staticBox.actor, { y_fill: true, expand: false });
+      this.mainBox.add(this.accessibleBox.actor, { y_fill: true, expand: false });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endBox.add_actor(this.spacerApp.actor);
@@ -5813,17 +5836,17 @@ Main.notify("Erp" + e.message);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.MIDDLE, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
-      this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
-      this.staticBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
-      //this.staticBox.takeHover(true);
-      //this.staticBox.takeControl(true);
+      this.accessibleBox = new AccessibleBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
+      this.accessibleBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
+      //this.accessibleBox.takeHover(true);
+      //this.accessibleBox.takeControl(true);
       //this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.rightPane.add_actor(this.spacerWindows.actor);
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.mainBox.add(this.staticBox.actor, { y_fill: true });
+      this.mainBox.add(this.accessibleBox.actor, { y_fill: true });
       this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endBox.add_actor(this.spacerApp.actor);
       this.endBox.add_actor(this.endHorizontalBox);
@@ -5841,8 +5864,8 @@ Main.notify("Erp" + e.message);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
-      this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
-      this.staticBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
+      this.accessibleBox = new AccessibleBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
+      this.accessibleBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.favoritesBox.style_class = '';
       this.betterPanel.style_class = 'menu-favorites-box';
@@ -5852,11 +5875,11 @@ Main.notify("Erp" + e.message);
       this.betterPanel.add_actor(this.endHorizontalBox);
       this.favBoxWrapper.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.operativePanel.visible = false;
-      this.mainBox.add(this.staticBox.actor, { y_fill: true });
+      this.mainBox.add(this.accessibleBox.actor, { y_fill: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
-      this.staticBox.setNamesVisible(true);
+      this.accessibleBox.setNamesVisible(true);
       this.searchName.visible = true;
       this.panelAppsName.visible = true;
    },
@@ -5871,8 +5894,8 @@ Main.notify("Erp" + e.message);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: true, y_align: St.Align.MIDDLE, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
-      this.staticBox = new StaticBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
-      this.staticBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
+      this.accessibleBox = new AccessibleBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize);
+      this.accessibleBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.betterPanel.set_vertical(true);
       this.betterPanel.add_actor(this.endHorizontalBox);
@@ -5885,7 +5908,7 @@ Main.notify("Erp" + e.message);
       this.betterPanel.add(this.endBox, { x_fill: true, y_fill: true, y_align: St.Align.END, expand: false });
       this.operativePanel.visible = false;
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.mainBox.add(this.staticBox.actor, { y_fill: true });
+      this.mainBox.add(this.accessibleBox.actor, { y_fill: true });
       this.favoritesBox.style_class = '';
       this.betterPanel.style_class = 'menu-favorites-box';
       this.bttChanger.actor.set_style("padding-top: 6px;");
@@ -5916,7 +5939,7 @@ Main.notify("Erp" + e.message);
       this._clearView();
       this.powerBox.actor.visible = operPanelVisible;
       this.hover.actor.visible = operPanelVisible;
-      this.staticBox.actor.visible = operPanelVisible;
+      this.accessibleBox.actor.visible = operPanelVisible;
       this.operativePanel.visible = !operPanelVisible;
       this.favoritesScrollBox.actor.visible = operPanelVisible;
      /* if((this.showAppTitle)||(this.showAppDescription))
@@ -6029,8 +6052,8 @@ Main.notify("Erp" + e.message);
                this._placesButtons[app].closeMenu();
          }
       }
-      if(this.staticBox)
-         this.staticBox.closeContextMenus(excludeApp, animate);
+      if(this.accessibleBox)
+         this.accessibleBox.closeContextMenus(excludeApp, animate);
    },
 
    _displayButtons: function(appCategory, places, recent, apps, autocompletes) {
@@ -6162,12 +6185,16 @@ Main.notify("Erp" + e.message);
    },
 
    _refreshFavs: function() {
+      if(this.fRef) return false;
+      this.fRef = true;
       //Remove all favorites
-     /* this.favoritesBox.get_children().forEach(Lang.bind(this, function (child) {
+      /*this.favoritesBox.get_children().forEach(Lang.bind(this, function (child) {
           child.destroy();
       }));
+      this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
+      this.favoritesBox.add(this.favoritesObj.actor, { x_fill: true, y_fill: true, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: false });
 
-      let favoritesBox = new CinnamonMenu.FavoritesBox();
+     /* let favoritesBox = new CinnamonMenu.FavoritesBox();
       this.favoritesBox.add_actor(favoritesBox.actor);*/
       //this.favoritesScrollBox.set_width(-1)
       //this.favoritesBox.set_width(-1);
@@ -6207,6 +6234,8 @@ Main.notify("Erp" + e.message);
             ++j;
          }
       }
+      this.fRef = false;
+      return true;
    },
 
    _refreshApps: function() {
@@ -6671,8 +6700,8 @@ Main.notify("Erp" + e.message);
          this.closeApplicationsContextMenus(null, false);
          this._clearAllSelections(false);
          this._refreshFavs();
-         if(this.staticBox)
-            this.staticBox.refreshAccessibleItems();
+         if(this.accessibleBox)
+            this.accessibleBox.refreshAccessibleItems();
          this.destroyVectorBox();
          this.powerBox.disableSelected();
          this.selectedAppBox.setDateTimeVisible(false);
