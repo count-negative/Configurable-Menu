@@ -3551,8 +3551,9 @@ ConfigurablePointer.prototype = {
       this._border.queue_repaint();
    },
 
-   fixToCorner: function(fixCorner) {
+   fixToCorner: function(actor, fixCorner) {
       this.fixCorner = fixCorner;
+      //this.setPosition(actor, this._arrowAlignment);
       this._border.queue_repaint();
    },
 
@@ -3568,94 +3569,97 @@ ConfigurablePointer.prototype = {
    },
 
    _reposition: function(sourceActor, alignment) {
-        // Position correctly relative to the sourceActor
-        let sourceNode = sourceActor.get_theme_node();
-        let sourceContentBox = sourceNode.get_content_box(sourceActor.get_allocation_box());
-        let sourceAllocation = Cinnamon.util_get_transformed_allocation(sourceActor);
-        let sourceCenterX = sourceAllocation.x1 + sourceContentBox.x1 + (sourceContentBox.x2 - sourceContentBox.x1) * this._sourceAlignment;
-        let sourceCenterY = sourceAllocation.y1 + sourceContentBox.y1 + (sourceContentBox.y2 - sourceContentBox.y1) * this._sourceAlignment;
-        let [minWidth, minHeight, natWidth, natHeight] = this.actor.get_preferred_size();
+      // Position correctly relative to the sourceActor
+      let sourceNode = sourceActor.get_theme_node();
+      let sourceContentBox = sourceNode.get_content_box(sourceActor.get_allocation_box());
+      let sourceAllocation = Cinnamon.util_get_transformed_allocation(sourceActor);
+      let sourceCenterX = sourceAllocation.x1 + sourceContentBox.x1 + (sourceContentBox.x2 - sourceContentBox.x1) * this._sourceAlignment;
+      let sourceCenterY = sourceAllocation.y1 + sourceContentBox.y1 + (sourceContentBox.y2 - sourceContentBox.y1) * this._sourceAlignment;
+      let [minWidth, minHeight, natWidth, natHeight] = this.actor.get_preferred_size();
 
-        // We also want to keep it onscreen, and separated from the
-        // edge by the same distance as the main part of the box is
-        // separated from its sourceActor
-        let monitor = Main.layoutManager.findMonitorForActor(sourceActor);
-        let themeNode = this.actor.get_theme_node();
-        let borderWidth = themeNode.get_length('-arrow-border-width');
-        let arrowBase = themeNode.get_length('-arrow-base');
-        let borderRadius = themeNode.get_length('-arrow-border-radius');
-        let margin = (4 * borderRadius + borderWidth + arrowBase);
-        let halfMargin = margin / 2;
+      // We also want to keep it onscreen, and separated from the
+      // edge by the same distance as the main part of the box is
+      // separated from its sourceActor
+      let monitor = Main.layoutManager.findMonitorForActor(sourceActor);
+      let themeNode = this.actor.get_theme_node();
+      let borderWidth = themeNode.get_length('-arrow-border-width');
+      let arrowBase = themeNode.get_length('-arrow-base');
+      let borderRadius = themeNode.get_length('-arrow-border-radius');
+      let margin = (4 * borderRadius + borderWidth + arrowBase);
+      let halfMargin = margin / 2;
 
-        let themeNode = this.actor.get_theme_node();
-        let gap = themeNode.get_length('-boxpointer-gap');
+      let themeNode = this.actor.get_theme_node();
+      let gap = themeNode.get_length('-boxpointer-gap');
 
-        let resX, resY;
+      let resX, resY;
 
-        switch (this._arrowSide) {
-        case St.Side.TOP:
-            resY = sourceAllocation.y2 + gap;
-            break;
-        case St.Side.BOTTOM:
-            resY = sourceAllocation.y1 - natHeight - gap;
-            break;
-        case St.Side.LEFT:
-            resX = sourceAllocation.x2 + gap;
-            break;
-        case St.Side.RIGHT:
-            resX = sourceAllocation.x1 - natWidth - gap;
-            break;
-        }
+      switch (this._arrowSide) {
+      case St.Side.TOP:
+          resY = sourceAllocation.y2 + gap;
+          break;
+      case St.Side.BOTTOM:
+          resY = sourceAllocation.y1 - natHeight - gap;
+          break;
+      case St.Side.LEFT:
+          resX = sourceAllocation.x2 + gap;
+          break;
+      case St.Side.RIGHT:
+          resX = sourceAllocation.x1 - natWidth - gap;
+          break;
+      }
 
-        // Now align and position the pointing axis, making sure
-        // it fits on screen
-        switch (this._arrowSide) {
-        case St.Side.TOP:
-        case St.Side.BOTTOM:
-            resX = sourceCenterX - (halfMargin + (natWidth - margin) * alignment);
+      // Now align and position the pointing axis, making sure
+      // it fits on screen
+      switch (this._arrowSide) {
+      case St.Side.TOP:
+      case St.Side.BOTTOM:
+         resX = sourceCenterX - (halfMargin + (natWidth - margin) * alignment);
 
-            resX = Math.max(resX, monitor.x + 10);
-            resX = Math.min(resX, monitor.x + monitor.width - (10 + natWidth));
-            this.setArrowOrigin(sourceCenterX - resX);
-            break;
+         resX = Math.max(resX, monitor.x + 10);
+         resX = Math.min(resX, monitor.x + monitor.width - (10 + natWidth));
+         this.setArrowOrigin(sourceCenterX - resX);
+         break;
 
-        case St.Side.LEFT:
-        case St.Side.RIGHT:
-            resY = sourceCenterY - (halfMargin + (natHeight - margin) * alignment);
+      case St.Side.LEFT:
+      case St.Side.RIGHT:
+         resY = sourceCenterY - (halfMargin + (natHeight - margin) * alignment);
 
-            resY = Math.max(resY, monitor.y + 10);
-            resY = Math.min(resY, monitor.y + monitor.height - (10 + natHeight));
+         resY = Math.max(resY, monitor.y + 10);
+         resY = Math.min(resY, monitor.y + monitor.height - (10 + natHeight));
 
-            this.setArrowOrigin(sourceCenterY - resY);
-            break;
-        }
+         this.setArrowOrigin(sourceCenterY - resY);
+         break;
+      }
 
-        let parent = this.actor.get_parent();
-        let success, x, y;
-        while (!success) {
-            [success, x, y] = parent.transform_stage_point(resX, resY);
-            parent = parent.get_parent();
-        }
+      let parent = this.actor.get_parent();
+      let success, x, y;
+      while(!success) {
+         [success, x, y] = parent.transform_stage_point(resX, resY);
+         parent = parent.get_parent();
+      }
         
-        if(this.fixCorner) {
-           if(sourceAllocation.x1 < 1) {
-              this._xOffset = -x - themeNode.get_length('border-left');
-           }
-           else if(Math.abs(sourceAllocation.x2 - monitor.x - monitor.width) < 1) {
-              this._xOffset = 10 + themeNode.get_length('border-right');
-           }
-           if(this._arrowSide == St.Side.TOP) {
-              this._yOffset = -themeNode.get_length('border-top') - gap;
-           } else if(this._arrowSide == St.Side.BOTTOM) {
-              this._yOffset = themeNode.get_length('border-bottom') + gap;
-           }
-          // Main.notify("x:" + x + " x1:" + sourceAllocation.x1 + " x2:" + sourceAllocation.x2 + " main:" + (monitor.x - monitor.width));
+      if(this.fixCorner) {
+         if(sourceAllocation.x1 < 1) {
+            this._xOffset = -x - themeNode.get_length('border-left');
+         }
+         else if(Math.abs(sourceAllocation.x2 - monitor.x - monitor.width) < 1) {
+            this._xOffset = 10 + themeNode.get_length('border-right');
+         }
+         if(this._arrowSide == St.Side.TOP) {
+            this._yOffset = -themeNode.get_length('border-top') - gap;
+         } else if(this._arrowSide == St.Side.BOTTOM) {
+            this._yOffset = themeNode.get_length('border-bottom') + gap;
+         }
+         // Main.notify("x:" + x + " x1:" + sourceAllocation.x1 + " x2:" + sourceAllocation.x2 + " main:" + (monitor.x - monitor.width));
          //  Main.notify("y:" + y + " y1:" + sourceAllocation.y1 + " y2:" + sourceAllocation.y2 + " main:" + (monitor.x - monitor.height)); 
-        }
+      } else {
+         this._xOffset = 0;
+         this._yOffset = 0;
+      }
 
-        this._xPosition = Math.floor(x);
-        this._yPosition = Math.floor(y);
-        this._shiftActor();
+      this._xPosition = Math.floor(x);
+      this._yPosition = Math.floor(y);
+      this._shiftActor();
    },
 
    _drawBorder: function(area) {
@@ -3869,7 +3873,7 @@ ConfigurableMenu.prototype = {
    },
 
    fixToCorner: function(fixCorner) {
-      this._boxPointer.fixToCorner(fixCorner);
+      this._boxPointer.fixToCorner(this.sourceActor, fixCorner);
    },
 
    setResizeArea: function(resizeSize) {

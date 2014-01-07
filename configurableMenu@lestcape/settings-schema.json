@@ -102,25 +102,25 @@
       "type" : "checkbox",
       "default" : true,
       "description": "System buttons have a box",
-      "tooltip": "Choose whether or not to have a box in System buttons."
+      "tooltip": "Choose whether or not to have a box in the system buttons."
    },
    "accessible-box" : {
       "type" : "checkbox",
       "default" : false,
       "description": "Accessible panel has a box",
-      "tooltip": "Choose whether or not to have a box in the Accessible panel."
+      "tooltip": "Choose whether or not to have a box in the accessible panel."
    },
    "accessible-icons" : {
       "type" : "checkbox",
       "default" : true,
       "description": "Show icons on the Accessible panel",
-      "tooltip": "Choose whether or not to have icons in Accessible bar."
+      "tooltip": "Choose whether or not to have icons in the accessible bar."
    },
    "categories-icons" : {
       "type" : "checkbox",
       "default" : true,
       "description": "Categories have icons",
-      "tooltip": "Choose whether or not to have icons in Categories."
+      "tooltip": "Choose whether or not to have icons in the categories."
    },
   "app-button-width" : {
       "type": "spinbutton",
@@ -129,14 +129,14 @@
       "max" : 300,
       "step" : 1,
       "units" : "pixels",
-      "description" : "Maximum width of the Application entry text:",
-      "tooltip" : "Set the maximum width of the Application entry text."
+      "description" : "Maximum width of the application entry text:",
+      "tooltip" : "Set the maximum width of the application entry text."
    },
    "app-description" : {
       "type" : "checkbox",
       "default" : false,
       "description": "Application entries have description",
-      "tooltip": "Choose whether or not to have description in Application entries."
+      "tooltip": "Choose whether or not to have description in application entries."
    },
    "icon-app-size" : {
       "type": "spinbutton",
@@ -176,7 +176,7 @@
       "step" : 1,
       "units" : "pixels",
       "description" : "System icons size:",
-      "tooltip" : "Set the System icons size."
+      "tooltip" : "Set the system icons size."
    },
    "icon-control-size" : {
       "type": "spinbutton",
@@ -186,7 +186,7 @@
       "step" : 1,
       "units" : "pixels",
       "description" : "Control icon size:",
-      "tooltip" : "Set the Control icon size."
+      "tooltip" : "Set the control icon size."
    },
    "icon-hover-size" : {
       "type": "spinbutton",
@@ -206,19 +206,19 @@
       "step" : 1,
       "units" : "pixels",
       "description" : "Accessible icons size:",
-      "tooltip" : "Set the Accessible icons size."
+      "tooltip" : "Set the accessible icons size."
    },
    "show-view-item" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "Show Control buttons",
-      "tooltip": "Choose whether or not to show Control buttons."
+      "description": "Show control buttons",
+      "tooltip": "Choose whether or not to show control buttons."
    },
    "view-item" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "Show Application entries in grid view",
-      "tooltip": "Enable show Application entries in grid(icon) view and disable show Application entries in list view."
+      "description": "Show application entries in grid view",
+      "tooltip": "Enable show application entries in grid(icon) view and disable show application entries in list view."
    },
    "show-favorites" : {
       "type" : "checkbox",
@@ -253,14 +253,14 @@
       "units" : "pixels",
       "indent": true,
       "dependency": "show-hover-icon",
-      "description" : "Border width of Hover Icon:",
-      "tooltip" : "The border width of the Hover Icon."
+      "description" : "Border width of hover icon:",
+      "tooltip" : "The border width of the hover icon."
    },
    "show-power-buttons" : {
       "type" : "checkbox",
       "default" : true,
       "description": "Show System buttons",
-      "tooltip": "Choose whether or not to show System buttons in the menu."
+      "tooltip": "Choose whether or not to show system buttons in the menu."
    },
    "show-time-date" : {
       "type" : "checkbox",
