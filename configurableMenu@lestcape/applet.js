@@ -5649,6 +5649,7 @@ Main.notify("Erp" + e.message);
    loadClassic: function() {
       this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
+      this.controlView.actor.style = "padding-bottom: "+(6)+"px;margin:auto;";
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
@@ -5669,6 +5670,7 @@ Main.notify("Erp" + e.message);
    loadStylized: function() {
       this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
+      this.controlView.actor.style = "padding-bottom: "+(6)+"px;margin:auto;";
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
@@ -5689,6 +5691,7 @@ Main.notify("Erp" + e.message);
    loadDragon: function() {
       this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
+      this.controlView.actor.style = "padding-bottom: "+(6)+"px;margin:auto;";
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.operativePanel.set_vertical(true);
@@ -5712,6 +5715,7 @@ Main.notify("Erp" + e.message);
    loadDragonInverted: function() {
       this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
+      this.controlView.actor.style = "padding-bottom: "+(6)+"px;margin:auto;";
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.operativePanel.set_vertical(true);
@@ -5735,6 +5739,7 @@ Main.notify("Erp" + e.message);
    loadHorizontal: function() {
       this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
+      this.controlView.actor.style = "padding-bottom: "+(6)+"px;margin:auto;";
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, false, this.favoritesLinesNumber);
       this.betterPanel.set_vertical(true);

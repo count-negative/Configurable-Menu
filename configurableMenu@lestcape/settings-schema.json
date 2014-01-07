@@ -20,7 +20,7 @@
       "type": "combobox",
       "description": "System buttons layout:",
       "default": "vertical",
-      "tooltip": "Select a layout of System buttons.",
+      "tooltip": "Select a layout of system buttons.",
       "options": {
          "Vertical": "vertical",
          "Vertical List": "vertical-list",
@@ -96,31 +96,31 @@
       "type" : "checkbox",
       "default" : true,
       "description": "Enable autoscrolling",
-      "tooltip": "Choose whether or not to enable smooth autoscrolling in the menu."
+      "tooltip": "Choose whether or not to enable smooth autoscrolling on the menu."
    },
    "power-box" : {
       "type" : "checkbox",
       "default" : true,
       "description": "System buttons have a box",
-      "tooltip": "Choose whether or not to have a box in the system buttons."
+      "tooltip": "Choose whether or not to have a box on the system buttons."
    },
    "accessible-box" : {
       "type" : "checkbox",
       "default" : false,
       "description": "Accessible panel has a box",
-      "tooltip": "Choose whether or not to have a box in the accessible panel."
+      "tooltip": "Choose whether or not to have a box on the accessible panel."
    },
    "accessible-icons" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "Show icons on the Accessible panel",
-      "tooltip": "Choose whether or not to have icons in the accessible bar."
+      "description": "Show icons on the accessible panel",
+      "tooltip": "Choose whether or not to have icons on the accessible bar."
    },
    "categories-icons" : {
       "type" : "checkbox",
       "default" : true,
       "description": "Categories have icons",
-      "tooltip": "Choose whether or not to have icons in the categories."
+      "tooltip": "Choose whether or not to have icons on the categories."
    },
   "app-button-width" : {
       "type": "spinbutton",
@@ -136,7 +136,7 @@
       "type" : "checkbox",
       "default" : false,
       "description": "Application entries have description",
-      "tooltip": "Choose whether or not to have description in application entries."
+      "tooltip": "Choose whether or not to have description on application entries."
    },
    "icon-app-size" : {
       "type": "spinbutton",
@@ -146,7 +146,7 @@
       "step" : 1,
       "units" : "pixels",
       "description" : "Application icon size:",
-      "tooltip" : "Set the Application icon size."
+      "tooltip" : "Set the application icon size."
    },
    "icon-cat-size" : {
       "type": "spinbutton",
@@ -224,7 +224,7 @@
       "type" : "checkbox",
       "default" : true,
       "description": "Show favorites",
-      "tooltip": "Choose whether or not to show favorites in the menu."
+      "tooltip": "Choose whether or not to show favorites on the menu."
    },
    "favorites-lines" : {
       "type": "spinbutton",
@@ -242,7 +242,7 @@
       "type" : "checkbox",
       "default" : true,
       "description": "Show hover icon",
-      "tooltip": "Choose whether or not to show hover icon in the menu."
+      "tooltip": "Choose whether or not to show hover icon on the menu."
    },
    "hover-icon-border" : {
       "type": "spinbutton",
@@ -259,14 +259,14 @@
    "show-power-buttons" : {
       "type" : "checkbox",
       "default" : true,
-      "description": "Show System buttons",
-      "tooltip": "Choose whether or not to show system buttons in the menu."
+      "description": "Show system buttons",
+      "tooltip": "Choose whether or not to show system buttons on the menu."
    },
    "show-time-date" : {
       "type" : "checkbox",
       "default" : false,
       "description": "Show time and date",
-      "tooltip": "Choose whether or not to show time and date in the menu."
+      "tooltip": "Choose whether or not to show time and date on the menu."
    },
    "time-format" : {
       "type" : "entry",
@@ -274,7 +274,7 @@
       "indent": true,
       "dependency": "show-time-date",
       "description": "Time format:",
-      "tooltip": "Choose the time format to show time in the menu."
+      "tooltip": "Choose the time format to show time on the menu."
    },
    "date-format" : {
       "type" : "entry",
@@ -282,13 +282,13 @@
       "indent": true,
       "dependency": "show-time-date",
       "description": "Date format:",
-      "tooltip": "Choose the date format to show time in the menu."
+      "tooltip": "Choose the date format to show time on the menu."
    },
    "show-app-title" : {
       "type" : "checkbox",
       "default" : true,
       "description": "Show name of the selected application",
-      "tooltip": "Choose whether or not to show the selected application name in the menu."
+      "tooltip": "Choose whether or not to show the selected application name on the menu."
    },
    "app-title-size" : {
       "type": "spinbutton",
@@ -306,7 +306,7 @@
       "type" : "checkbox",
       "default" : true,
       "description": "Show description of the selected application",
-      "tooltip": "Choose whether or not to show the selected application description in the menu."
+      "tooltip": "Choose whether or not to show the selected application description on the menu."
    },
    "app-description-size" : {
       "type": "spinbutton",
@@ -380,7 +380,7 @@
       "type" : "checkbox",
       "default" : true,
       "description": "Show separator line",
-      "tooltip": "Choose whether or not to show a line in separator."
+      "tooltip": "Choose whether or not to show a line on separator."
    },
    "spacer-size" : {
       "type": "spinbutton",
@@ -403,6 +403,6 @@
       "type" : "checkbox",
       "default" : false,
       "description": "Menu bordering screen edge",
-      "tooltip": "Choose whether or not the menu in bordering the screen edge."
+      "tooltip": "Choose whether or not the menu bordering the screen edge."
    }
 }
