@@ -4368,7 +4368,8 @@ MyApplet.prototype = {
                                                 icon_type: St.IconType.SYMBOLIC });
 
          appsys.connect('installed-changed', Lang.bind(this, this._refreshApps));
-         AppFavorites.getAppFavorites().connect('changed', Lang.bind(this, this._refreshFavs));
+         //AppFavorites.getAppFavorites().connect('changed', Lang.bind(this, this._refreshFavs));
+         AppFavorites.getAppFavorites().connect('changed', Lang.bind(this, this._updateAppFavs));
 
          global.display.connect('overlay-key', Lang.bind(this, function() {
             try {
@@ -4394,6 +4395,12 @@ MyApplet.prototype = {
          Main.notify("ErrorMain:", e.message);
          global.logError(e);
       }
+   },
+
+   _updateAppFavs: function() {
+      Mainloop.idle_add(Lang.bind(this, function() {
+         this._refreshFavs();
+      }));
    },
 
    _onChangeAccessible: function() {
