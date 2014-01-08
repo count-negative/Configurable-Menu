@@ -17,45 +17,48 @@ Thanks for all contribution to Garibaldo: https://github.com/Garibaldo
 
 --------------
 
-"This is a fork of the Cinnamon stock menu, but with much more features and extremely configurable."
+"Configurable Menu is a fork of the Cinnamon stock menu applet. It has much more features and is extremely configurable."
 
 ![Alt text](/configurableMenu@lestcape/Capture.png)
 
+This latest version brings a lot of cool new stuff.
 
-Alert!!!!!: This implementations are unstable and have several bugs... Download this only for test purpose.
+Be cautious: This applet is still considered non-stable and may have bugs... Install it for testing purposes only.
 
-Features:
+Some features:
 --------------
 
-1.	The Menu can be opened by pressing & releasing the mouse button, by just pressing the mouse button, or by hovering the mouse pointer on the menu icon.
+1.	You choose how the menu should be opened: by pressing & releasing the mouse button, by just pressing the mouse button, or by hovering the mouse pointer on the menu icon.
 
 2.	You can define the exact size of the menu (width and height) using the menu settings.
 
-3.	Now you can also resize the menu by dragging a corner with the mouse!
+3.	Now you can also resize the menu by dragging a resize handle (on the menu corner) with the mouse!
 
 4.	You can choose among many different menu layouts.
 
 5.	You can choose among many different system buttons layouts.
 
-6.	The menu can show a magnified picture of the icon which is being hovered, similarly to the windows start menu.
+6.	The menu can show a magnified picture of the icon which is being hovered, similarly to the Windows 7 start menu.
 
-7.	You can Show/Hide favorites, hover icon, system buttons...
+7.	You can show/hide favorites, hover icon, system buttons, control buttons, data/time, separators etc...
 
 8.	You can separate the system buttons from the favorites.
 
 8.	You have two different modes of viewing the application entries: List View and Grid View.
 
-9.	You can have Favorites with multiple lines (rows or columns).
+9.	List View can have multiple columns.
 
-10.	You can drag & drop menu items onto the desktop.
+10.	You can have favorites with multiple lines (rows or columns).
 
-11.	Autoscrolling works also horizontally when using some menu layouts.
+11.	You can drag & drop menu items onto the desktop.
 
-12.	You can define the size of the application icons, category icons, favorites icons, system buttons and control buttons.
+12.	Autoscrolling works also horizontally when using some menu layouts.
 
-13.	You can define the font size of the application description/name.
+13.	You can define the size of the application icons, category icons, favorites icons, system buttons, control buttons etc.
 
-14.	And much more coming...
+14.	You can define the font size of the application description/name.
+
+15.	And much more coming...
 
 
 This program is free software:
@@ -81,22 +84,23 @@ Add new languages:
 Change Log:
 ==============
 0.8-Beta
-   - The accessible panel is now configurable and has two drag and drop areas ( Places and Apps).
+   - The Accessible panel is now configurable and has two drag and drop areas (Places and Apps).
    - Implemented new “Places” fields (PC, Desktop, Home, Network and Trash).
    - You can add items to the accessible panel with a submenu and a drag and drop operation.
-   - The Favorites icons have now submenus.
+   - The favorites icons have now submenus.
    - Reduced the width of search item on windows 7 layout to be the same size or less of favorites area.
    - System buttons have now several layouts available.
-   - The accessible panel can have icons or not.
+   - The Accessible panel can have icons or not.
    - Categories can have icons or not.
    - You can remove the box pointer from the menu.
    - Implementation of separators, with configurable options.
-   - The Hover Icon has a configurable border now.
+   - The hover icon has a configurable border now.
    - Now you can align the menu to the screen edge.
-   - When the menu is re-sizable, a mark appears on the corresponding corner.
+   - When the menu is re-sizable, a resize handle appears on the corresponding corner.
    - Now you can expand the menu to full screen mode.
    - Now you can have the application description in the application entries.
-   - Now you can control the maximum size of the application icons.
+   - Performance improvements.
+   - Many bug fixes.
 
 0.7-Beta
    - Fixed a bug in the keyboard navigation, and add for more componets.
@@ -153,8 +157,11 @@ Change Log:
    - Initial release.
 
 ==============
-To report problems, request new features, for include a new themes, languages, or anything you want in the applet, visit:
+To report bugs, request new features and make suggestions, please visit:
 https://github.com/lestcape/Configurable-Menu/issues
+
+You can also send us pull requests:
+https://github.com/lestcape/Configurable-Menu/pulls
 
 ==============
 Thank you very much for using this product.

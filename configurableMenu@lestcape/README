@@ -28,21 +28,21 @@ Some features:
 
 8.	You can separate the system buttons from the favorites.
 
-8.	You have two different modes of viewing the application entries: List View and Grid View.
+9.	You have two different modes of viewing the application entries: List View and Grid View.
 
-9.	List View can have multiple columns.
+10.	List View can have multiple columns.
 
-10.	You can have favorites with multiple lines (rows or columns).
+11.	You can have favorites with multiple lines (rows or columns).
 
-11.	You can drag & drop menu items onto the desktop.
+12.	You can drag & drop menu items onto the desktop.
 
-12.	Autoscrolling works also horizontally when using some menu layouts.
+13.	Autoscrolling works also horizontally when using some menu layouts.
 
-13.	You can define the size of the application icons, category icons, favorites icons, system buttons, control buttons etc.
+14.	You can define the size of the application icons, category icons, favorites icons, system buttons, control buttons etc.
 
-14.	You can define the font size of the application description/name.
+15.	You can define the font size of the application description/name.
 
-15.	And much more coming...
+16.	And much more coming...
 
 
 This program is free software:
@@ -80,7 +80,7 @@ Change Log:
    - The favorites icons have now submenus.
    - Reduced the width of search item on windows 7 layout to be the same size or less of favorites area.
    - System buttons have now several layouts available.
-   - The Accessible panel can have icons or not.
+   - The accessible panel can have icons or not.
    - Categories can have icons or not.
    - You can remove the box pointer from the menu.
    - Implementation of separators, with configurable options.

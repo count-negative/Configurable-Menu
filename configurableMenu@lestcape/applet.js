@@ -3948,8 +3948,8 @@ AccessibleMetaData.prototype = {
       try {
          this.parent = parent;
          this.onChangeCallBack = onChangeCallBack;
-         let config_source = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + parent.uuid + "/accessible.json";
-         let config_path = GLib.get_home_dir() + "/.config/" + parent.uuid + "/accessible.json";
+         let config_source = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + parent.uuid + "/config.json";
+         let config_path = GLib.get_home_dir() + "/.config/" + parent.uuid + "/config.json";
          this.metaDataFile = Gio.File.new_for_path(config_path);
          if(!this.metaDataFile.query_exists(null)) {
             if(!this._createSettingsFile(config_source)) {
