@@ -74,6 +74,127 @@ imports.searchPath.unshift(LIB_PATH);
 const CinnamonMenu = imports.applet;
 */
 
+function toUTF8FromHex(hex) {
+   return toUTF8FromAssccii(toAscciiFromHex(hex));
+};
+
+function toAscciiFromHex(encode) {
+   let result = "";
+   try {
+      let splitEncode = encode.split(/%[0-9A-F]{2}/);
+      let last, transcode;
+      for(let i = 0; i < splitEncode.length; i++) {
+        if(splitEncode[i] != "") {
+           result += splitEncode[i];
+        } else {
+           while((i < splitEncode.length)&&(splitEncode[i] == "")) {
+             i++;
+           }
+           if(i == splitEncode.length)
+             last = encode.indexOf(splitEncode[i-1]);
+           else
+             last = encode.indexOf(splitEncode[i]);
+           transcode = encode.substr(result.length, last - result.length).toLowerCase();
+           result += decodeURIComponent(transcode.replace(/\s+/g, '').replace(/%[0-9A-F]{2}/g, '%$&')) + splitEncode[i];
+        }
+      }
+   } catch(e) {
+      Main.notify("Error in transcode" + e.message);
+   }
+   return result;
+};
+
+function toAsscciiFromUTF8(utf8) {
+   // From: http://phpjs.org/functions
+   var tmp_arr = [], i = 0, ac = 0, c1 = 0, c2 = 0, c3 = 0, c4 = 0;
+
+   utf8 += '';
+
+   while(i < utf8.length) {
+      c1 = utf8.charCodeAt(i);
+      if(c1 <= 191) {
+         tmp_arr[ac++] = String.fromCharCode(c1);
+         i++;
+      } else if (c1 <= 223) {
+         c2 = utf8.charCodeAt(i + 1);
+         tmp_arr[ac++] = String.fromCharCode(((c1 & 31) << 6) | (c2 & 63));
+         i += 2;
+      } else if (c1 <= 239) {
+         // http://en.wikipedia.org/wiki/UTF-8#Codepage_layout
+         c2 = utf8.charCodeAt(i + 1);
+         c3 = utf8.charCodeAt(i + 2);
+         tmp_arr[ac++] = String.fromCharCode(((c1 & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+         i += 3;
+      } else {
+         c2 = utf8.charCodeAt(i + 1);
+         c3 = utf8.charCodeAt(i + 2);
+         c4 = utf8.charCodeAt(i + 3);
+         c1 = ((c1 & 7) << 18) | ((c2 & 63) << 12) | ((c3 & 63) << 6) | (c4 & 63);
+         c1 -= 0x10000;
+         tmp_arr[ac++] = String.fromCharCode(0xD800 | ((c1>>10) & 0x3FF));
+         tmp_arr[ac++] = String.fromCharCode(0xDC00 | (c1 & 0x3FF));
+         i += 4;
+      }
+   }
+   return tmp_arr.join('');
+};
+
+function toUTF8FromAssccii(asscii) {
+   // From: http://phpjs.org/functions
+   if(asscii === null || typeof asscii === "undefined") {
+      return "";
+   }
+
+   var string = (asscii + ''); // .replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+   var utftext = '',
+      start, end, stringl = 0;
+
+   start = end = 0;
+   stringl = string.length;
+   for(var n = 0; n < stringl; n++) {
+      var c1 = string.charCodeAt(n);
+      var enc = null;
+
+      if(c1 < 128) {
+         end++;
+      } else if (c1 > 127 && c1 < 2048) {
+         enc = String.fromCharCode(
+           (c1 >> 6)         | 192,
+           ( c1        & 63) | 128
+         );
+      } else if (c1 & 0xF800 != 0xD800) {
+         enc = String.fromCharCode(
+            (c1 >> 12)        | 224,
+            ((c1 >> 6)  & 63) | 128,
+            ( c1        & 63) | 128
+         );
+      } else { // surrogate pairs
+         if(c1 & 0xFC00 != 0xD800) { throw new RangeError("Unmatched trail surrogate at " + n); }
+         var c2 = string.charCodeAt(++n);
+         if (c2 & 0xFC00 != 0xDC00) { throw new RangeError("Unmatched lead surrogate at " + (n-1)); }
+         c1 = ((c1 & 0x3FF) << 10) + (c2 & 0x3FF) + 0x10000;
+         enc = String.fromCharCode(
+            (c1 >> 18)        | 240,
+            ((c1 >> 12) & 63) | 128,
+            ((c1 >> 6)  & 63) | 128,
+            ( c1        & 63) | 128
+         );
+      }
+      if(enc !== null) {
+         if(end > start) {
+            utftext += string.slice(start, end);
+         }
+         utftext += enc;
+         start = end = n + 1;
+      }
+   }
+
+   if(end > start) {
+      utftext += string.slice(start, stringl);
+   }
+   return utftext;
+};
+
 function ScrollItemsBox(parent, panelToScroll, vertical) {
    this._init(parent, panelToScroll, vertical);
 }
@@ -1421,13 +1542,18 @@ ApplicationContextMenuItemExtended.prototype = {
             }*/
             break;
          case "add_to_desktop":
-            let file = Gio.file_new_for_path(this._appButton.app.get_app_info().get_filename());
-            let destFile = Gio.file_new_for_path(USER_DESKTOP_PATH+"/"+this._appButton.app.get_id());
             try {
-               file.copy(destFile, 0, null, function(){});
-               // Need to find a way to do that using the Gio library, but modifying the access::can-execute attribute on the file object seems unsupported
-               Util.spawnCommandLine("chmod +x \""+USER_DESKTOP_PATH+"/"+this._appButton.app.get_id()+"\"");
+               if(this._appButton.app.isPlace) {
+                  this._appButton.app.make_desktop_file();
+               } else {
+                  let file = Gio.file_new_for_path(this._appButton.app.get_app_info().get_filename());
+                  let destFile = Gio.file_new_for_path(USER_DESKTOP_PATH+"/"+this._appButton.app.get_id());
+                  file.copy(destFile, 0, null, function(){});
+                  // Need to find a way to do that using the Gio library, but modifying the access::can-execute attribute on the file object seems unsupported
+                  Util.spawnCommandLine("chmod +x \""+USER_DESKTOP_PATH+"/"+this._appButton.app.get_id()+"\"");
+               }
             } catch(e) {
+               //Main.notify("err:", e.message);
                global.log(e);
             }
             break;
@@ -1448,7 +1574,7 @@ ApplicationContextMenuItemExtended.prototype = {
                }
             } else {
                if(!this._appButton.parent.accessibleMetaData.isInAppsList(this._appButton.app.get_id())) {
-                  let appsList = this._appButton.parent.accessibleMetaData.getAppsList();
+                let appsList = this._appButton.parent.accessibleMetaData.getAppsList();
                   appsList.push(this._appButton.app.get_id());
                   this._appButton.parent.accessibleMetaData.setAppsList(appsList);
                }
@@ -1550,6 +1676,10 @@ GenericApplicationButtonExtended.prototype = {
                this.menu.addMenuItem(menuItem);
             }
          } else {
+            if(USER_DESKTOP_PATH) {
+               menuItem = new ApplicationContextMenuItemExtended(this, _("Add to desktop"), "add_to_desktop");
+               this.menu.addMenuItem(menuItem);
+            }
             if(this.parent.accessibleMetaData.isInPlacesList(this.app.get_id())) {
                menuItem = new ApplicationContextMenuItemExtended(this, _("Remove from accessible bar"), "remove_from_accessible_bar");
                this.menu.addMenuItem(menuItem);
@@ -2280,11 +2410,13 @@ FavoritesBoxLine.prototype = {
          }
 
          Meta.later_add(Meta.LaterType.BEFORE_REDRAW, Lang.bind(this, function () {
-            let appFavorites = AppFavorites.getAppFavorites();
-            if(srcIsFavorite)
-               appFavorites.moveFavoriteToPos(id, favPos);
-            else
-               appFavorites.addFavoriteAtPos(id, favPos);
+            Mainloop.idle_add(Lang.bind(this, function() {
+               let appFavorites = AppFavorites.getAppFavorites();
+               if(srcIsFavorite)
+                  appFavorites.moveFavoriteToPos(id, favPos);
+               else
+                  appFavorites.addFavoriteAtPos(id, favPos);
+            }));
             return false;
          }));
 
@@ -2303,7 +2435,7 @@ function FavoritesBoxExtended(parent, vertical, numberLines) {
 FavoritesBoxExtended.prototype = {
    _init: function(parent, vertical, numberLines) {
       this.parent = parent;
-      this.favRefresh = false;
+      this.favRefresh = true;
       this.actor = new St.BoxLayout();
       this.actor.set_vertical(!vertical);
       //this.actor._delegate = this;
@@ -2333,6 +2465,7 @@ FavoritesBoxExtended.prototype = {
    },
 
    getBeginPosAtLine: function(line, itemPos) {
+      this.favRefresh = false;
       let sumOfElements = 0;
       if(itemPos > 0)
          sumOfElements += this.linesDragPlaces.length*(itemPos);
@@ -2442,7 +2575,7 @@ try {
                parentHolder.remove_actor(this._dragPlaceholder.actor);
             this._dragPlaceholder = null;
          }
-         this.favRefresh = false;
+         this.favRefresh = true;
          //Remove all favorites
          let childrens;
          let  lastPos = this.oldLines.length;
@@ -2605,10 +2738,13 @@ TransientButtonExtended.prototype = {
       // We need this fake app to help appEnterEvent/appLeaveEvent 
       // work with our search result.
       this.app = {
-         get_app_info: {
-            get_filename: function() {
-               return pathOrCommand;
-            }
+         get_app_info: function() {
+            this.appInfo = {
+               get_filename: function() {
+                  return pathOrCommand;
+               }
+            };
+            return this.appInfo;
          },
          get_id: function() {
             return -1;
@@ -2813,19 +2949,21 @@ ApplicationButtonExtended.prototype = {
       let allActor = global.stage.get_actor_at_pos(Clutter.PickMode.ALL, x, y);
       let typeName = "" + allActor;
       if((reactiveActor instanceof Clutter.Stage)&&(typeName.indexOf("MetaWindowGroup") != -1)) {
-         let file = Gio.file_new_for_path(this.app.get_app_info().get_filename());
-         let destFile = Gio.file_new_for_path(USER_DESKTOP_PATH+"/"+this.app.get_id());
          try {
+            let file = Gio.file_new_for_path(this.app.get_app_info().get_filename());
+            let destFile = Gio.file_new_for_path(USER_DESKTOP_PATH+"/"+this.app.get_id());
             file.copy(destFile, 0, null, function(){});
             // Need to find a way to do that using the Gio library, but modifying the access::can-execute attribute on the file object seems unsupported
             Util.spawnCommandLine("chmod +x \""+USER_DESKTOP_PATH+"/"+this.app.get_id()+"\"");
+            this.parent._refreshFavs();
+            this.parent._onChangeAccessible();
             return true;
          } catch(e) {
+            //Main.notify("err:", e.message);
             global.log(e);
          }
       }
-      if(this.parent.favoritesObj.needRefresh)
-         this.parent._refreshFavs();
+      this.parent._refreshFavs();
       this.parent._onChangeAccessible();
       return false;
    },
@@ -2987,19 +3125,25 @@ PlaceButtonAccessibleExtended.prototype = {
       let allActor = global.stage.get_actor_at_pos(Clutter.PickMode.ALL, x, y);
       let typeName = "" + allActor;
       if((reactiveActor instanceof Clutter.Stage)&&(typeName.indexOf("MetaWindowGroup") != -1)) {
-         let file = Gio.file_new_for_path(this.app.get_app_info().get_filename());
-         let destFile = Gio.file_new_for_path(USER_DESKTOP_PATH+"/"+this.app.get_id());
          try {
-            file.copy(destFile, 0, null, function(){});
-            // Need to find a way to do that using the Gio library, but modifying the access::can-execute attribute on the file object seems unsupported
-            Util.spawnCommandLine("chmod +x \""+USER_DESKTOP_PATH+"/"+this.app.get_id()+"\"");
+            if(this.app.isPlace) {
+               this.app.make_desktop_file();
+            } else {
+               let file = Gio.file_new_for_path(this.app.get_app_info().get_filename());
+               let destFile = Gio.file_new_for_path(USER_DESKTOP_PATH+"/"+this.app.get_id());
+               file.copy(destFile, 0, null, function(){});
+               // Need to find a way to do that using the Gio library, but modifying the access::can-execute attribute on the file object seems unsupported
+               Util.spawnCommandLine("chmod +x \""+USER_DESKTOP_PATH+"/"+this.app.get_id()+"\"");
+            }
+            this.parent._refreshFavs();
+            this.parent._onChangeAccessible();
             return true;
          } catch(e) {
+            //Main.notify("err:", e.message);
             global.log(e);
          }
       }
-      if(this.parent.favoritesObj.needRefresh)
-         this.parent._refreshFavs();
+      this.parent._refreshFavs();
       this.parent._onChangeAccessible();
       return false;
    },
@@ -3009,10 +3153,15 @@ PlaceButtonAccessibleExtended.prototype = {
       this.app = {
          isPlace: {
          },
-         get_app_info: {
-            get_filename: function() {
-               return place.name;
-            }
+         get_app_info: function() {
+            this.appInfo = {
+               get_filename: function() {
+                  if(place.id.indexOf("bookmark:") == -1)
+                     return toAscciiFromHex(place.id.slice(6));
+                  return toAscciiFromHex(place.id.slice(9));
+               }
+            };
+            return this.appInfo;
          },
          open_new_window: function(open) {
             place.launch();
@@ -3021,18 +3170,60 @@ PlaceButtonAccessibleExtended.prototype = {
             return false;
          },
          get_id: function() {
-            return place.id;
+            return toAscciiFromHex(place.id);
          },
          get_description: function() {
             if(place.id.indexOf("bookmark:") == -1)
-               return place.id.slice(13);
-            return place.id.slice(16);
+               return toAscciiFromHex(place.id.slice(13));
+            return toAscciiFromHex(place.id.slice(16));
          },
          get_name: function() {
-            return  place.name;
+            return toAscciiFromHex(place.name);
          },
          create_icon_texture: function(appIconSize) {
             return place.iconFactory(appIconSize);
+         },
+         get_icon_name: function() {
+            try {
+               let icon = place.iconFactory(20);
+               if(icon) {
+                  let icon_name = icon.get_icon_name();
+                  icon.destroy();
+                  return icon.get_icon_name();
+               }
+               return place.get_icon_name();
+            } catch(e) {};
+            try {
+               let path = this.get_description(); //try to find the correct Image for a special folder.
+               if(path == GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS))
+                  return "folder-documents";
+               if(path == GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_PICTURES))
+                  return "folder-pictures";
+               if(path == GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_MUSIC))
+                  return "folder-music";
+               if(path == GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_VIDEOS))
+                  return "folder-video";
+               if(path == GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOWNLOAD))
+                  return "folder-download";
+               if(path == GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_TEMPLATES))
+                  return "folder-templates";
+               if(path == GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_PUBLIC_SHARE))
+                  return "folder-publicshare";
+            } catch(e) {};  
+            return "folder";
+         },
+         make_desktop_file: function() {
+            let name = toUTF8FromAssccii(this.get_name());
+            let path = toUTF8FromAssccii(this.get_app_info().get_filename());
+            let raw_file = "[Desktop Entry]\n" + "Name=" + name + "\n" + "Comment=" + path + "\n" +
+                           "Exec=xdg-open \"" + path + "\"\n" + "Icon=" + this.get_icon_name() +
+                           "\n" + "Terminal=false\n" + "StartupNotify=true\n" + "Type=Application\n" +
+                           "Actions=Window;\n" + "NoDisplay=true";
+            let desktopFile = Gio.File.new_for_path(USER_DESKTOP_PATH+"/"+name+".desktop");
+            let fp = desktopFile.create(0, null);
+            fp.write(raw_file, null);
+            fp.close;
+            Util.spawnCommandLine("chmod +x \""+USER_DESKTOP_PATH+"/"+name+".desktop\"");
          }
       };
       return this.app;
@@ -3350,29 +3541,30 @@ FavoritesButtonExtended.prototype = {
    },
 
    _onDragEnd: function(actor, time, acepted) {
-      //try {
-      //Main.notify("actor:" + actor + " time:" + time + " acepted:" + acepted);
       let [x, y, mask] = global.get_pointer();
       let reactiveActor = global.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
       let allActor = global.stage.get_actor_at_pos(Clutter.PickMode.ALL, x, y);
       let typeName = "" + allActor;
       if((reactiveActor instanceof Clutter.Stage)&&(typeName.indexOf("MetaWindowGroup") != -1)) {
-         let file = Gio.file_new_for_path(this.app.get_app_info().get_filename());
-         let destFile = Gio.file_new_for_path(USER_DESKTOP_PATH+"/"+this.app.get_id());
          try {
-            file.copy(destFile, 0, null, function(){});
-            // Need to find a way to do that using the Gio library, but modifying the access::can-execute attribute on the file object seems unsupported
-            Util.spawnCommandLine("chmod +x \""+USER_DESKTOP_PATH+"/"+this.app.get_id()+"\"");
+            if(this.app.isPlace) {
+               this.app.make_desktop_file();
+            } else {
+               let file = Gio.file_new_for_path(this.app.get_app_info().get_filename());
+               let destFile = Gio.file_new_for_path(USER_DESKTOP_PATH+"/"+this.app.get_id());
+               file.copy(destFile, 0, null, function(){});
+               // Need to find a way to do that using the Gio library, but modifying the access::can-execute attribute on the file object seems unsupported
+               Util.spawnCommandLine("chmod +x \""+USER_DESKTOP_PATH+"/"+this.app.get_id()+"\"");
+            }
+            this.parent._refreshFavs();
+            this.parent._onChangeAccessible();
             return true;
          } catch(e) {
+            //Main.notify("err:", e.message);
             global.log(e);
          }
       }
-     /* } catch(e) {
-           Main.notify("err", e.message);
-      }*/
-      if(this.parent.favoritesObj.needRefresh)
-         this.parent._refreshFavs();
+      this.parent._refreshFavs();
       this.parent._onChangeAccessible();
       return false;
    }
@@ -3934,6 +4126,10 @@ SpecialBookmarks.prototype = {
 
    iconFactory: function(iconSize) {
       return new St.Icon({icon_name: this._icon, icon_size: iconSize, icon_type: St.IconType.FULLCOLOR});
+   },
+
+   get_icon_name: function() {
+      return this._icon;
    }
 };
 
@@ -6715,4 +6911,4 @@ Main.notify("Erp" + e.message);
 function main(metadata, orientation, panel_height, instance_id) {  
     let myApplet = new MyApplet(metadata, orientation, panel_height, instance_id);
     return myApplet;      
-}
+}  
