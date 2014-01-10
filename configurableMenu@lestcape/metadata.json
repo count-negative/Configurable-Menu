@@ -1,7 +1,7 @@
 {
-    "last-edited": "1387975012", 
-    "description": "This is a frock of Main Cinnamon menu applet with more configurable options.", 
     "uuid": "configurableMenu@lestcape", 
+    "icon": "applications-other", 
+    "last-edited": "1389309342", 
     "name": "Configurable Menu", 
-    "icon": "applications-other"
+    "description": "This is a frock of Main Cinnamon menu applet with more configurable options."
 }

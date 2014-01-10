@@ -29,36 +29,37 @@ Some features:
 --------------
 
 1.	You choose how the menu should be opened: by pressing & releasing the mouse button, by just pressing the mouse button, or by hovering the mouse pointer on the menu icon.
-
 2.	You can define the exact size of the menu (width and height) using the menu settings.
 
 3.	Now you can also resize the menu by dragging a resize handle (on the menu corner) with the mouse!
 
-4.	You can choose among many different menu layouts.
+4.	Now you can show the menu in full screen mode!
 
-5.	You can choose among many different system buttons layouts.
+5.	You can choose among many different menu layouts.
 
-6.	The menu can show a magnified picture of the icon which is being hovered, similarly to the Windows 7 start menu.
+6.	You can choose among many different system buttons layouts.
 
-7.	You can show/hide favorites, hover icon, system buttons, control buttons, data/time, separators etc...
+7.	The menu can show a magnified picture of the icon which is being hovered, similarly to the Windows 7 start menu.
 
-8.	You can separate the system buttons from the favorites.
+8.	You can show/hide favorites, hover icon, system buttons, control buttons, data/time, separators etc...
 
-8.	You have two different modes of viewing the application entries: List View and Grid View.
+9.	You can separate the system buttons from the favorites.
 
-9.	List View can have multiple columns.
+10.	You have two different modes of viewing the application entries: List View and Grid View.
 
-10.	You can have favorites with multiple lines (rows or columns).
+11.	List View can have multiple columns.
 
-11.	You can drag & drop menu items onto the desktop.
+12.	You can have favorites with multiple lines (rows or columns).
 
-12.	Autoscrolling works also horizontally when using some menu layouts.
+13.	You can drag & drop menu items onto the desktop.
 
-13.	You can define the size of the application icons, category icons, favorites icons, system buttons, control buttons etc.
+14.	Autoscrolling works also horizontally when using some menu layouts.
 
-14.	You can define the font size of the application description/name.
+15.	You can define the size of the application icons, category icons, favorites icons, system buttons, control buttons etc.
 
-15.	And much more coming...
+16.	You can define the font size of the application description/name.
+
+17.	And much more coming...
 
 
 This program is free software:
