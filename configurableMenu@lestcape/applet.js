@@ -5468,31 +5468,17 @@ Main.notify("Erp" + e.message);
       if((this.mainBox)&&(this.displayed)) {
          let monitor = Main.layoutManager.findMonitorForActor(this.actor);
          if(this.fullScreen) {
-try {
-/*            let panelTop = this._processPanelSize(false);
+            let panelTop = this._processPanelSize(false);
             let panelButton = this._processPanelSize(true);
-            this.mainBox.set_width(monitor.width - this.menu.actor.width + this.mainBox.width);
+            this.mainBox.set_width(monitor.width);
+            this.mainBox.set_height(monitor.height - panelButton - panelTop - 40);
             let themeNode = this.menu._boxPointer.actor.get_theme_node();
-            let difference = this.menu.actor.height - this.mainBox.height
-            let borders = themeNode.get_length('border-bottom') + themeNode.get_length('border-top') +
-            themeNode.get_length('padding-top') - themeNode.get_length('padding-bottom');
-            this.mainBox.set_height(monitor.height - panelButton - panelTop + borders - difference);
+            difference = this.menu.actor.get_height() - this.mainBox.get_height();
+            let bordersY = themeNode.get_length('border-bottom') + themeNode.get_length('border-top') +
+            themeNode.get_length('padding-top') + themeNode.get_length('padding-bottom');
+            this.mainBox.set_width(monitor.width - this.menu.actor.width + this.mainBox.width);
+            this.mainBox.set_height(monitor.height - panelButton - panelTop + bordersY - difference);
             this._updateView();
-            this.controlView.actor.visible = false;
-            this.controlView.actor.visible = true;*/
-             let panelTop = this._processPanelSize(false);
-             let panelButton = this._processPanelSize(true);
-             //this.mainBox.set_width(monitor.width);
-             //this.mainBox.set_height(monitor.height - panelButton - panelTop);
-             this.mainBox.set_width(monitor.width - this.menu.actor.width + this.mainBox.width);
-             let themeNode = this.menu._boxPointer.actor.get_theme_node();
-             let difference = this.menu.actor.height - this.mainBox.height
-             let borders = themeNode.get_length('border-bottom') + themeNode.get_length('border-top');
-             this.mainBox.set_height(monitor.height - panelButton - panelTop + borders - difference);
-             this._updateView();
-} catch(e) {
-Main.notify("error:", e.message);
-}
          } else if(this.automaticSize) {
             this.mainBox.set_width(-1);
             this.mainBox.set_height(-1);
