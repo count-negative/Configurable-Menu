@@ -3442,14 +3442,14 @@ RecentClearButtonExtended.prototype = {
    }
 };
 
-function FavoritesButtonExtended(parent, parentScroll, vertical, displayVertical, app, nbFavorites, iconSize, allowName, appWidth, appDesc) {
-   this._init(parent, parentScroll, vertical, displayVertical, app, nbFavorites, iconSize, allowName, appWidth, appDesc);
+function FavoritesButtonExtended(parent, parentScroll, vertical, displayVertical, app, nbFavorites, iconSize, allowName, appWidth, appDesc, maxWidth) {
+   this._init(parent, parentScroll, vertical, displayVertical, app, nbFavorites, iconSize, allowName, appWidth, appDesc, maxWidth);
 }
 
 FavoritesButtonExtended.prototype = {
    __proto__: GenericApplicationButtonExtended.prototype,
     
-   _init: function(parent, parentScroll, vertical, displayVertical, app, nbFavorites, iconSize, allowName, appWidth, appDesc) {
+   _init: function(parent, parentScroll, vertical, displayVertical, app, nbFavorites, iconSize, allowName, appWidth, appDesc, maxWidth) {
       GenericApplicationButtonExtended.prototype._init.call(this, parent, parentScroll, app, true);
       this.iconSize = iconSize;
       this.displayVertical = displayVertical;
@@ -3457,6 +3457,7 @@ FavoritesButtonExtended.prototype = {
       this.allowName = allowName;
       this.nbFavorites = nbFavorites;
 
+      this.container = new St.BoxLayout();
       let icon_size = this.iconSize;
       if(!this.allowName) {
          let monitor = Main.layoutManager.findMonitorForActor(this.actor);
@@ -3472,11 +3473,11 @@ FavoritesButtonExtended.prototype = {
       this.actor.add_style_class_name('menu-favorites-button');
       this.actor.style = "padding-top: "+5+"px;padding-bottom: "+5+"px;padding-left: "+4+"px;padding-right: "+4+"px;margin:auto;";
 
-      this.container = new St.BoxLayout();
       this.icon = app.create_icon_texture(icon_size);
-      this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-
+      
       if(this.allowName) {
+         this.container.set_width(maxWidth);
+         this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
          this.labelName = new St.Label({ text: this.app.get_name(), style_class: 'menu-application-button-label' });
          this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
          this.labelDesc.visible = false;
@@ -3488,7 +3489,8 @@ FavoritesButtonExtended.prototype = {
          this.setVertical(vertical);
          this.labelName.realize();
          this.labelDesc.realize();
-      }
+      } else
+         this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       this.addActor(this.container);
       this.icon.realize();
       this._draggable = DND.makeDraggable(this.actor);
@@ -6450,9 +6452,7 @@ Main.notify("Erp" + e.message);
          if(app) {
             let button = new FavoritesButtonExtended(this, this.favoritesScrollBox, this.iconView, this.favoritesObj.getVertical(),
                                                      app, launchers.length/this.favoritesLinesNumber, this.iconMaxFavSize,
-                                                     this.allowFavName, this.textButtonWidth, this.appButtonDescription);
-            if(this._applicationsBoxWidth > 0)
-               button.container.set_width(this._applicationsBoxWidth);
+                                                     this.allowFavName, this.textButtonWidth, this.appButtonDescription, this._applicationsBoxWidth);
             // + 3 because we're adding 3 system buttons at the bottom
             //button.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(4)+"px;padding-right: "+(-5)+"px;margin:auto;";
             this._favoritesButtons[app] = button;
