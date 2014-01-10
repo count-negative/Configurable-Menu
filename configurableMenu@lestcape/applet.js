@@ -1400,12 +1400,12 @@ ControlBox.prototype = {
    changeViewSelected: function(iconView) {
       this.parent.iconView = iconView;
       if(iconView) {
-         this.bttViewList.set_style('padding: 0px;');
+         this.bttViewList.set_style('padding: 0px; border: 1px;');
          this.bttViewGrid.set_style('padding: 0px; border: 1px solid ' + this._selectedBorderColor() + ';');
       }
       else {
          this.bttViewList.set_style('padding: 0px; border: 1px solid ' + this._selectedBorderColor() + ';');
-         this.bttViewGrid.set_style('padding: 0px;');
+         this.bttViewGrid.set_style('padding: 0px; border: 1px;');
       }
    },
 
@@ -3891,9 +3891,9 @@ ConfigurablePointer.prototype = {
             this._xOffset = 10 + themeNode.get_length('border-right');
          }
          if(this._arrowSide == St.Side.TOP) {
-            this._yOffset = -themeNode.get_length('border-top') + 1 - gap;
+            this._yOffset = -themeNode.get_length('border-top') - gap - borderWidth;
          } else if(this._arrowSide == St.Side.BOTTOM) {
-            this._yOffset = themeNode.get_length('border-bottom') + 2 + gap;
+            this._yOffset = themeNode.get_length('border-bottom') + gap + borderWidth;
          }
          // Main.notify("x:" + x + " x1:" + sourceAllocation.x1 + " x2:" + sourceAllocation.x2 + " main:" + (monitor.x - monitor.width));
          //  Main.notify("y:" + y + " y1:" + sourceAllocation.y1 + " y2:" + sourceAllocation.y2 + " main:" + (monitor.x - monitor.height)); 
@@ -5473,7 +5473,8 @@ Main.notify("Erp" + e.message);
             this.mainBox.set_width(monitor.width - this.menu.actor.width + this.mainBox.width);
             let themeNode = this.menu._boxPointer.actor.get_theme_node();
             let difference = this.menu.actor.height - this.mainBox.height
-            let borders = themeNode.get_length('border-bottom') + themeNode.get_length('border-top');
+            let borders = themeNode.get_length('border-bottom') + themeNode.get_length('border-top') +
+            themeNode.get_length('padding-top') - themeNode.get_length('padding-bottom');
             this.mainBox.set_height(monitor.height - panelButton - panelTop + borders - difference);
             this._updateView();
             this.controlView.actor.visible = false;
