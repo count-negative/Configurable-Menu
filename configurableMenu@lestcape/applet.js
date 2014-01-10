@@ -2686,14 +2686,14 @@ try {
    }
 };
 
-function TransientButtonExtended(parent, pathOrCommand, iconSize) {
-   this._init(parent, pathOrCommand, iconSize);
+function TransientButtonExtended(parent, pathOrCommand, iconSize, vertical, appWidth, appdesc) {
+   this._init(parent, pathOrCommand, iconSize, vertical, appWidth, appdesc);
 }
 
 TransientButtonExtended.prototype = {
    __proto__: PopupMenu.PopupSubMenuMenuItem.prototype,
     
-   _init: function(parent, pathOrCommand, iconSize) {
+   _init: function(parent, pathOrCommand, iconSize, vertical, appWidth, appdesc) {
       this.iconSize = iconSize;
       let displayPath = pathOrCommand;
       if(pathOrCommand.charAt(0) == '~') {
@@ -2725,14 +2725,13 @@ TransientButtonExtended.prototype = {
          let contentType = Gio.content_type_guess(this.pathOrCommand, null);
          let themedIcon = Gio.content_type_get_icon(contentType[0]);
          this.icon = new St.Icon({gicon: themedIcon, icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR });
-         this.actor.set_style_class_name('menu-application-button');
       } catch (e) {
          this.handler = null;
          let iconName = this.isPath ? 'gnome-folder' : 'unknown';
          this.icon = new St.Icon({icon_name: iconName, icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR });
          // @todo Would be nice to indicate we don't have a handler for this file.
-         this.actor.set_style_class_name('menu-application-button');
       }
+      this.actor.set_style_class_name('menu-application-button');
 
       // We need this fake app to help appEnterEvent/appLeaveEvent 
       // work with our search result.
@@ -2767,19 +2766,22 @@ TransientButtonExtended.prototype = {
          }
       };
 
-      this.label = new St.Label({ text: displayPath, style_class: 'menu-application-button-label' });
-      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
-      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.labelName = new St.Label({ text: displayPath, style_class: 'menu-application-button-label' });
+      this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
+      this.labelDesc.visible = false;
       this.container = new St.BoxLayout();
-      this.textBox = new St.BoxLayout({ vertical: false });
-      this.setVertical(false);
+      this.textBox = new St.BoxLayout({ vertical: true });
+      this.setAppMaxWidth(appWidth);
+      this.setAppDescriptionVisible(appdesc);
+      this.setVertical(vertical);
 
-      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       this.addActor(this.container);
-
+      this.icon.realize();
+      this.labelName.realize();
+      this.labelDesc.realize();
       this.isDraggableApp = false;
    },
 
@@ -2810,16 +2812,31 @@ TransientButtonExtended.prototype = {
          this.icon.set_icon_size(this.iconSize);
    },
 
+   setAppDescriptionVisible: function(visible) {
+      this.labelDesc.visible = visible;
+      this.labelDesc.set_text("");
+   },
+
+   setAppMaxWidth: function(maxWidth) {
+      //this.textBox.set_width(maxWidth);
+      this.textBox.style="max-width: "+maxWidth+"px;";
+      this.appWidth = maxWidth;
+   },
+
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
-      this.label.clutter_text.line_wrap = vertical;
+      let parentL = this.labelName.get_parent();
+      if(parentL) parentL.remove_actor(this.labelName);
+      parentL = this.labelDesc.get_parent();
+      if(parentL) parentL.remove_actor(this.labelDesc);
+      this.setAppMaxWidth(this.appWidth);
       if(vertical) {
-         this.textBox.set_width(88);
-         this.textBox.set_height(32);
+         this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+         this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });  
       }
       else {
-         this.textBox.set_width(-1);
-         this.textBox.set_height(-1);
+         this.textBox.add(this.labelName, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+         this.textBox.add(this.labelDesc, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
       }
    }
 };
@@ -2974,7 +2991,8 @@ ApplicationButtonExtended.prototype = {
    },
 
    setAppMaxWidth: function(maxWidth) {
-      this.textBox.set_width(maxWidth);
+      //this.textBox.set_width(maxWidth);
+      this.textBox.style="max-width: "+maxWidth+"px;";
       this.appWidth = maxWidth;
    },
 
@@ -3097,7 +3115,8 @@ PlaceButtonAccessibleExtended.prototype = {
    },
 
    setAppMaxWidth: function(maxWidth) {
-      this.textBox.set_width(maxWidth);
+      //this.textBox.set_width(maxWidth);
+      this.textBox.style="max-width: "+maxWidth+"px;";
       this.appWidth = maxWidth;
    },
 
@@ -3312,7 +3331,8 @@ RecentButtonExtended.prototype = {
    },
 
    setAppMaxWidth: function(maxWidth) {
-      this.textBox.set_width(maxWidth);
+      //this.textBox.set_width(maxWidth);
+      this.textBox.style="max-width: "+maxWidth+"px;";
       this.appWidth = maxWidth;
    },
 
@@ -3394,7 +3414,8 @@ RecentClearButtonExtended.prototype = {
    },
 
    setAppMaxWidth: function(maxWidth) {
-      this.textBox.set_width(maxWidth);
+      //this.textBox.set_width(maxWidth);
+      this.textBox.style="max-width: "+maxWidth+"px;";
       this.appWidth = maxWidth;
    },
 
@@ -3507,7 +3528,8 @@ FavoritesButtonExtended.prototype = {
    },
 
    setAppMaxWidth: function(maxWidth) {
-      this.textBox.set_width(maxWidth);
+      //this.textBox.set_width(maxWidth);
+      this.textBox.style="max-width: "+maxWidth+"px;";
       this.appWidth = maxWidth;
    },
 
@@ -5065,6 +5087,7 @@ MyApplet.prototype = {
       for(let i = 0; i < this._recentButtons.length; i++) {
          this._recentButtons[i].setAppMaxWidth(this.appButtonWidth);
       }
+      //transientButtons are update automatically...
    },
 
    _setAppIconDirection: function() {
@@ -5077,9 +5100,7 @@ MyApplet.prototype = {
       for(let i = 0; i < this._recentButtons.length; i++) {
          this._recentButtons[i].setVertical(this.iconView);
       }
-      for(let i = 0; i < this._transientButtons.length; i++) {
-         this._transientButtons[i].setVertical(this.iconView);
-      }
+      //transientButtons are update automatically...
    },
 
    _updateView: function() {
@@ -5442,7 +5463,7 @@ Main.notify("Erp" + e.message);
             let panelTop = this._processPanelSize(false);
             let panelButton = this._processPanelSize(true);
             this.mainBox.set_width(monitor.width - this.menu.actor.width + this.mainBox.width);
-            let themeNode = this.menu._boxPointer.actor.get_theme_node(); 
+            let themeNode = this.menu._boxPointer.actor.get_theme_node();
             let difference = this.menu.actor.height - this.mainBox.height
             let borders = themeNode.get_length('border-bottom') + themeNode.get_length('border-top');
             this.mainBox.set_height(monitor.height - panelButton - panelTop + borders - difference);
@@ -5558,7 +5579,8 @@ Main.notify("Erp" + e.message);
       }
       if((this.accessibleBox)&&(this.accessibleBox.actor.visible))
          width += this.accessibleBox.actor.get_width();
-      return width + 20;
+      let themeNode = this.menu._boxPointer.actor.get_theme_node();
+      return width;
    },
 
    _onButtonReleaseEvent: function(actor, event) {
@@ -5823,7 +5845,10 @@ Main.notify("Erp" + e.message);
          this.categoriesWrapper = new St.BoxLayout({ vertical: true });
          this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
 
-         this.mainBox = new St.BoxLayout({ vertical: false, style_class: 'menu-applications-box' });
+         this.mainBox = new St.BoxLayout({ vertical: false });
+         this.menuBox = new St.BoxLayout({ vertical: false, style_class: 'menu-applications-box'});
+         this.menuBox.add_actor(this.mainBox);
+
 
          this.extendedBox = new St.BoxLayout({ vertical: true });
          this.extendedBox.add(this.standardBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
@@ -5880,7 +5905,7 @@ Main.notify("Erp" + e.message);
          this.signalKeyPowerID = 0;
          this._update_autoscroll();
          
-         section.actor.add_actor(this.mainBox);
+         section.actor.add_actor(this.menuBox);
 
          Mainloop.idle_add(Lang.bind(this, function() {
             this._clearAllSelections(true);
@@ -6364,7 +6389,7 @@ Main.notify("Erp" + e.message);
       if(autocompletes) {
          let viewBox;
          for(let i = 0; i < autocompletes.length; i++) {
-            let button = new TransientButtonExtended(this, autocompletes[i], this.iconAppSize);
+            let button = new TransientButtonExtended(this, autocompletes[i], this.iconAppSize, this.iconView, this.appButtonWidth, this.appButtonDescription);
             button.actor.connect('realize', Lang.bind(this, this._onApplicationButtonRealized));
             button.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, button));
             this._addEnterEvent(button, Lang.bind(this, this._appEnterEvent, button));
@@ -6372,7 +6397,7 @@ Main.notify("Erp" + e.message);
             button.actor.visible = true;
             button.actor.realize();
             if(!this.iconView) {
-               button.setVertical(this.iconView);
+               //button.setVertical(this.iconView);
                viewBox = new St.BoxLayout({ vertical: true });
                viewBox.add_actor(button.actor);
                this.applicationsBox.add_actor(viewBox);
