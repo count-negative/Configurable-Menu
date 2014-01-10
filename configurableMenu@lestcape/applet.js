@@ -3891,9 +3891,9 @@ ConfigurablePointer.prototype = {
             this._xOffset = 10 + themeNode.get_length('border-right');
          }
          if(this._arrowSide == St.Side.TOP) {
-            this._yOffset = -themeNode.get_length('border-top') - gap - borderWidth;
+            this._yOffset = -themeNode.get_length('border-top') - gap + borderWidth + themeNode.get_length('border');
          } else if(this._arrowSide == St.Side.BOTTOM) {
-            this._yOffset = themeNode.get_length('border-bottom') + gap + borderWidth;
+            this._yOffset = themeNode.get_length('border-bottom') + gap + borderWidth + themeNode.get_length('border');
          }
          // Main.notify("x:" + x + " x1:" + sourceAllocation.x1 + " x2:" + sourceAllocation.x2 + " main:" + (monitor.x - monitor.width));
          //  Main.notify("y:" + y + " y1:" + sourceAllocation.y1 + " y2:" + sourceAllocation.y2 + " main:" + (monitor.x - monitor.height)); 
