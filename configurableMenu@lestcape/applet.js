@@ -562,7 +562,7 @@ AccessibleBox.prototype = {
          if(placesList[i] != "") {
             currBookmark = this.getBookmarkById(listBookmarks, placesList[i]);
             item = new PlaceButtonAccessibleExtended(this.parent, this.scrollActor, currBookmark, false,
-                                                     this.iconSize, this.appButtonWidth, this.appButtonDescription);
+                                                     this.iconSize, this.textButtonWidth, this.appButtonDescription);
             item.actor.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
             item.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
             item.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, item));
@@ -604,7 +604,7 @@ AccessibleBox.prototype = {
       let app = appSys.lookup_app(appName);
       if(app) {
          let item = new FavoritesButtonExtended(this.parent, this.scrollActor, this.vertical, true, app,
-                                                4, this.iconSize, true, this.appButtonWidth, this.appButtonDescription);
+                                                4, this.iconSize, true, this.textButtonWidth, this.appButtonDescription);
          item.actor.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
          item.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
          item.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, item));
@@ -2771,13 +2771,13 @@ TransientButtonExtended.prototype = {
       this.labelDesc.visible = false;
       this.container = new St.BoxLayout();
       this.textBox = new St.BoxLayout({ vertical: true });
-      this.setAppMaxWidth(appWidth);
+      this.setTextMaxWidth(appWidth);
       this.setAppDescriptionVisible(appdesc);
       this.setVertical(vertical);
 
       this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
       this.addActor(this.container);
       this.icon.realize();
       this.labelName.realize();
@@ -2817,10 +2817,10 @@ TransientButtonExtended.prototype = {
       this.labelDesc.set_text("");
    },
 
-   setAppMaxWidth: function(maxWidth) {
+   setTextMaxWidth: function(maxWidth) {
       //this.textBox.set_width(maxWidth);
       this.textBox.style="max-width: "+maxWidth+"px;";
-      this.appWidth = maxWidth;
+      this.textWidth = maxWidth;
    },
 
    setVertical: function(vertical) {
@@ -2829,7 +2829,7 @@ TransientButtonExtended.prototype = {
       if(parentL) parentL.remove_actor(this.labelName);
       parentL = this.labelDesc.get_parent();
       if(parentL) parentL.remove_actor(this.labelDesc);
-      this.setAppMaxWidth(this.appWidth);
+      this.setTextMaxWidth(this.textWidth);
       if(vertical) {
          this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
          this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });  
@@ -2872,7 +2872,7 @@ SystemButton.prototype = {
       this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       this.setTextVisible(false);
       this.setIconVisible(true);
-      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
 
       this.addActor(this.container);
       this.label.realize();
@@ -2944,7 +2944,7 @@ ApplicationButtonExtended.prototype = {
       this.labelDesc.visible = false;
       this.container = new St.BoxLayout();
       this.textBox = new St.BoxLayout({ vertical: true });
-      this.setAppMaxWidth(appWidth);
+      this.setTextMaxWidth(appWidth);
       this.setAppDescriptionVisible(appDesc);
       this.setVertical(vertical);
       this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
@@ -2990,10 +2990,10 @@ ApplicationButtonExtended.prototype = {
          this.labelDesc.set_text(this.app.get_description().split("\n")[0]);
    },
 
-   setAppMaxWidth: function(maxWidth) {
+   setTextMaxWidth: function(maxWidth) {
       //this.textBox.set_width(maxWidth);
       this.textBox.style="max-width: "+maxWidth+"px;";
-      this.appWidth = maxWidth;
+      this.textWidth = maxWidth;
    },
 
    setIconSize: function (iconSize) {
@@ -3014,7 +3014,7 @@ ApplicationButtonExtended.prototype = {
       if(parentL) parentL.remove_actor(this.labelName);
       parentL = this.labelDesc.get_parent();
       if(parentL) parentL.remove_actor(this.labelDesc);
-      this.setAppMaxWidth(this.appWidth);
+      this.setTextMaxWidth(this.textWidth);
       if(vertical) {
          this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
          this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });  
@@ -3068,7 +3068,7 @@ PlaceButtonAccessibleExtended.prototype = {
       this.labelDesc.visible = false;
       this.container = new St.BoxLayout();
       this.textBox = new St.BoxLayout({ vertical: true });
-      this.setAppMaxWidth(appWidth);
+      this.setTextMaxWidth(appWidth);
       this.setAppDescriptionVisible(appDesc);
       this.setVertical(vertical);
 
@@ -3076,8 +3076,8 @@ PlaceButtonAccessibleExtended.prototype = {
       if(!this.icon)
          this.icon = new St.Icon({icon_name: "folder", icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR});
       if(this.icon)
-         this.container.add(this.icon, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+         this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
       this.addActor(this.container);
       this.icon.realize();
       this.labelName.realize();
@@ -3114,10 +3114,10 @@ PlaceButtonAccessibleExtended.prototype = {
          this.labelDesc.set_text(this.app.get_description());
    },
 
-   setAppMaxWidth: function(maxWidth) {
+   setTextMaxWidth: function(maxWidth) {
       //this.textBox.set_width(maxWidth);
       this.textBox.style="max-width: "+maxWidth+"px;";
-      this.appWidth = maxWidth;
+      this.textWidth = maxWidth;
    },
 
    setVertical: function(vertical) {
@@ -3126,7 +3126,7 @@ PlaceButtonAccessibleExtended.prototype = {
       if(parentL) parentL.remove_actor(this.labelName);
       parentL = this.labelDesc.get_parent();
       if(parentL) parentL.remove_actor(this.labelDesc);
-      this.setAppMaxWidth(this.appWidth);
+      this.setTextMaxWidth(this.textWidth);
       if(vertical) {
          this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
          this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });     
@@ -3298,13 +3298,13 @@ RecentButtonExtended.prototype = {
       this.labelDesc.visible = false;
       this.container = new St.BoxLayout();
       this.textBox = new St.BoxLayout({ vertical: true });
-      this.setAppMaxWidth(appWidth);
+      this.setTextMaxWidth(appWidth);
       this.setAppDescriptionVisible(appDesc);
       this.setVertical(vertical);
 
       this.icon = file.createIcon(this.iconSize);
       this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
 
       this.addActor(this.container);
       this.icon.realize();
@@ -3330,10 +3330,10 @@ RecentButtonExtended.prototype = {
          this.icon.set_icon_size(this.iconSize);
    },
 
-   setAppMaxWidth: function(maxWidth) {
+   setTextMaxWidth: function(maxWidth) {
       //this.textBox.set_width(maxWidth);
       this.textBox.style="max-width: "+maxWidth+"px;";
-      this.appWidth = maxWidth;
+      this.textWidth = maxWidth;
    },
 
    setAppDescriptionVisible: function(visible) {
@@ -3348,7 +3348,7 @@ RecentButtonExtended.prototype = {
       if(parentL) parentL.remove_actor(this.labelName);
       parentL = this.labelDesc.get_parent();
       if(parentL) parentL.remove_actor(this.labelDesc);
-      this.setAppMaxWidth(this.appWidth);
+      this.setTextMaxWidth(this.textWidth);
       if(vertical) {
          this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
          this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });  
@@ -3379,13 +3379,13 @@ RecentClearButtonExtended.prototype = {
       this.labelDesc.visible = false;
       this.container = new St.BoxLayout();
       this.textBox = new St.BoxLayout({ vertical: true });
-      this.setAppMaxWidth(appWidth);
+      this.setTextMaxWidth(appWidth);
       this.setAppDescriptionVisible(appDesc);
       this.setVertical(vertical);
 
       this.icon = new St.Icon({ icon_name: 'edit-clear', icon_type: St.IconType.SYMBOLIC, icon_size: this.iconSize });
       this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
 
       this.addActor(this.container);      
       this.icon.realize();
@@ -3413,10 +3413,10 @@ RecentClearButtonExtended.prototype = {
          this.icon.set_icon_size(this.iconSize);
    },
 
-   setAppMaxWidth: function(maxWidth) {
+   setTextMaxWidth: function(maxWidth) {
       //this.textBox.set_width(maxWidth);
       this.textBox.style="max-width: "+maxWidth+"px;";
-      this.appWidth = maxWidth;
+      this.textWidth = maxWidth;
    },
 
    setAppDescriptionVisible: function(visible) {
@@ -3430,7 +3430,7 @@ RecentClearButtonExtended.prototype = {
       if(parentL) parentL.remove_actor(this.labelName);
       parentL = this.labelDesc.get_parent();
       if(parentL) parentL.remove_actor(this.labelDesc);
-      this.setAppMaxWidth( this.appWidth);
+      this.setTextMaxWidth( this.textWidth);
       if(vertical) {
          this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
          this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });  
@@ -3474,7 +3474,7 @@ FavoritesButtonExtended.prototype = {
 
       this.container = new St.BoxLayout();
       this.icon = app.create_icon_texture(icon_size);
-      this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
 
       if(this.allowName) {
          this.labelName = new St.Label({ text: this.app.get_name(), style_class: 'menu-application-button-label' });
@@ -3482,9 +3482,9 @@ FavoritesButtonExtended.prototype = {
          this.labelDesc.visible = false;
 
          this.textBox = new St.BoxLayout({ vertical: true });
-         this.setAppMaxWidth(appWidth);
+         this.setTextMaxWidth(appWidth);
          this.setAppDescriptionVisible(appDesc);
-         this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+         this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
          this.setVertical(vertical);
          this.labelName.realize();
          this.labelDesc.realize();
@@ -3527,10 +3527,10 @@ FavoritesButtonExtended.prototype = {
       }
    },
 
-   setAppMaxWidth: function(maxWidth) {
+   setTextMaxWidth: function(maxWidth) {
       //this.textBox.set_width(maxWidth);
       this.textBox.style="max-width: "+maxWidth+"px;";
-      this.appWidth = maxWidth;
+      this.textWidth = maxWidth;
    },
 
    setAppDescriptionVisible: function(visible) {
@@ -3543,7 +3543,7 @@ FavoritesButtonExtended.prototype = {
 
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
-      this.setAppMaxWidth( this.appWidth);
+      this.setTextMaxWidth( this.textWidth);
       if(this.allowName) {      
          let parentL = this.labelName.get_parent();
          if(parentL) parentL.remove_actor(this.labelName);
@@ -3629,7 +3629,7 @@ CategoryButtonExtended.prototype = {
          this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
          this.icon.realize();
       }
-      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
 
       this.addActor(this.container);
       this.label.realize();
@@ -3684,7 +3684,7 @@ PlaceCategoryButtonExtended.prototype = {
       this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       this.icon = new St.Icon({icon_name: "folder", icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR});
       this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
 
       this.addActor(this.container);
       this.icon.realize();
@@ -3740,7 +3740,7 @@ RecentCategoryButtonExtended.prototype = {
       this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       this.icon = new St.Icon({icon_name: "folder-recent", icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR});
       this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
 
       this.addActor(this.container);
       this.icon.realize();
@@ -4534,7 +4534,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.IN, "accessible-icons", "showAccessibleIcons", this._setVisibleAccessibleIcons, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "categories-icons", "showCategoriesIcons", this._setVisibleCategoriesIcons, null);
 
-         this.settings.bindProperty(Settings.BindingDirection.IN, "app-button-width", "appButtonWidth", this._changeView, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "app-button-width", "textButtonWidth", this._changeView, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "app-description", "appButtonDescription", this._changeView, null);
 
          this.settings.bindProperty(Settings.BindingDirection.IN, "icon-app-size", "iconAppSize", this._refreshApps, null);
@@ -5054,14 +5054,36 @@ MyApplet.prototype = {
       }
    },
 
-   _updateAppIconSize: function() {
+   _updateAppSize: function() {
       this._applicationsBoxWidth = 0;   
       for(let i = 0; i < this._applicationsButtons.length; i++) {
          if(this._applicationsButtons[i].actor.get_width() > this._applicationsBoxWidth)
             this._applicationsBoxWidth = this._applicationsButtons[i].actor.get_width();
       }
+      for(let i = 0; i < this._applicationsButtons.length; i++) {
+         this._applicationsButtons[i].container.set_width(this._applicationsBoxWidth);
+      }
+      for(let i = 0; i < this._placesButtons.length; i++) {
+         this._placesButtons[i].container.set_width(this._applicationsBoxWidth);
+      }
+      for(let i = 0; i < this._recentButtons.length; i++) {
+         this._recentButtons[i].container.set_width(this._applicationsBoxWidth);
+      }
       if(this.theme == "windows7") {
          this.searchEntry.set_width(this._applicationsBoxWidth + 20);
+      }
+   },
+
+   _clearAppSize: function() {
+      this._applicationsBoxWidth = 0;
+      for(let i = 0; i < this._applicationsButtons.length; i++) {
+          this._applicationsButtons[i].container.set_width(-1);
+      } 
+      for(let i = 0; i < this._placesButtons.length; i++) {
+         this._placesButtons[i].container.set_width(-1);
+      }
+      for(let i = 0; i < this._recentButtons.length; i++) {
+         this._recentButtons[i].container.set_width(-1);
       }
    },
 
@@ -5077,15 +5099,15 @@ MyApplet.prototype = {
       }
    },
 
-   _updateAppButtonWidth: function() {  
+   _updateTextButtonWidth: function() {  
       for(let i = 0; i < this._applicationsButtons.length; i++) {
-         this._applicationsButtons[i].setAppMaxWidth(this.appButtonWidth);
+         this._applicationsButtons[i].setTextMaxWidth(this.textButtonWidth);
       }
       for(let i = 0; i < this._placesButtons.length; i++) {
-         this._placesButtons[i].setAppMaxWidth(this.appButtonWidth);
+         this._placesButtons[i].setTextMaxWidth(this.textButtonWidth);
       }
       for(let i = 0; i < this._recentButtons.length; i++) {
-         this._recentButtons[i].setAppMaxWidth(this.appButtonWidth);
+         this._recentButtons[i].setTextMaxWidth(this.textButtonWidth);
       }
       //transientButtons are update automatically...
    },
@@ -5226,10 +5248,11 @@ MyApplet.prototype = {
 try {
       if(this.controlView) {
          this.controlView.changeViewSelected(this.iconView);
+       this._clearAppSize();
        this._updateAppButtonDesc();
-       this._updateAppButtonWidth();
+       this._updateTextButtonWidth();
        this._setAppIconDirection();
-       this._updateAppIconSize();
+       this._updateAppSize();
        this._refreshFavs();
        this._updateSize();
       }
@@ -5237,25 +5260,7 @@ try {
 Main.notify("Erp" + e.message);
 }
    },
-/*
-   _setAppButtonWidth: function() {
-       this._updateAppButtonDesc();
-       this._updateAppButtonWidth();
-       this._setAppIconDirection();
-       this._updateAppIconSize();
-       this._updateView();
-       this._refreshFavs();
-   },
 
-   _setAppButtonDesc: function() {
-       this._updateAppButtonDesc();
-       this._updateAppButtonWidth();
-       this._updateAppIconSize();
-       this._setAppIconDirection();
-       this._updateView();
-       this._refreshFavs();
-   }, 
-*/
    _setVisibleFavorites: function() {
       this.favoritesScrollBox.actor.visible = this.showFavorites;
       this._refreshFavs();
@@ -5419,10 +5424,11 @@ Main.notify("Erp" + e.message);
          this.powerBox.setTheme(this.powerTheme);
          this.powerBox.setSpecialColor(this.showPowerBox);
       }
+      this._clearAppSize();
       this._updateAppButtonDesc();
-      this._updateAppButtonWidth();
+      this._updateTextButtonWidth();
       this._setAppIconDirection();
-      this._updateAppIconSize();
+      this._updateAppSize();
       this._refreshFavs();
       //this._updateView();
       if(this.fullScreen) {
@@ -5909,7 +5915,8 @@ Main.notify("Erp" + e.message);
 
          Mainloop.idle_add(Lang.bind(this, function() {
             this._clearAllSelections(true);
-            this._updateAppIconSize();
+            this._clearAppSize();
+            this._updateAppSize();
          }));
       } catch(e) {
          Main.notify("ErrorDisplay:", e.message);
@@ -6389,7 +6396,7 @@ Main.notify("Erp" + e.message);
       if(autocompletes) {
          let viewBox;
          for(let i = 0; i < autocompletes.length; i++) {
-            let button = new TransientButtonExtended(this, autocompletes[i], this.iconAppSize, this.iconView, this.appButtonWidth, this.appButtonDescription);
+            let button = new TransientButtonExtended(this, autocompletes[i], this.iconAppSize, this.iconView, this.textButtonWidth, this.appButtonDescription);
             button.actor.connect('realize', Lang.bind(this, this._onApplicationButtonRealized));
             button.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, button));
             this._addEnterEvent(button, Lang.bind(this, this._appEnterEvent, button));
@@ -6443,7 +6450,9 @@ Main.notify("Erp" + e.message);
          if(app) {
             let button = new FavoritesButtonExtended(this, this.favoritesScrollBox, this.iconView, this.favoritesObj.getVertical(),
                                                      app, launchers.length/this.favoritesLinesNumber, this.iconMaxFavSize,
-                                                     this.allowFavName, this.appButtonWidth, this.appButtonDescription);
+                                                     this.allowFavName, this.textButtonWidth, this.appButtonDescription);
+            if(this._applicationsBoxWidth > 0)
+               button.container.set_width(this._applicationsBoxWidth);
             // + 3 because we're adding 3 system buttons at the bottom
             //button.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(4)+"px;padding-right: "+(-5)+"px;margin:auto;";
             this._favoritesButtons[app] = button;
@@ -6674,7 +6683,7 @@ Main.notify("Erp" + e.message);
          for(let i = 0; i < places.length; i++) {
             let place = places[i];
             let button = new PlaceButtonExtended(this, this.applicationsScrollBox, place, this.iconView,
-                                                 this.iconAppSize, this.appButtonWidth, this.appButtonDescription);
+                                                 this.iconAppSize, this.textButtonWidth, this.appButtonDescription);
             this._addEnterEvent(button, Lang.bind(this, function() {
                this._clearPrevAppSelection(button.actor);
                button.actor.style_class = "menu-application-button-selected";
@@ -6738,7 +6747,7 @@ Main.notify("Erp" + e.message);
 
          for(let id = 0; id < MAX_RECENT_FILES && id < this.RecentManager._infosByTimestamp.length; id++) {
             let button = new RecentButtonExtended(this, this.RecentManager._infosByTimestamp[id], this.iconView,
-                                                  this.iconAppSize, this.appButtonWidth, this.appButtonDescription);
+                                                  this.iconAppSize, this.textButtonWidth, this.appButtonDescription);
             this._addEnterEvent(button, Lang.bind(this, function() {
                this._clearPrevAppSelection(button.actor);
                button.actor.style_class = "menu-application-button-selected";
@@ -6754,7 +6763,7 @@ Main.notify("Erp" + e.message);
             this._recentButtons.push(button);
          }
          if(this.RecentManager._infosByTimestamp.length > 0) {
-            let button = new RecentClearButtonExtended(this, this.iconView, this.iconAppSize, this.appButtonWidth, this.appButtonDescription);
+            let button = new RecentClearButtonExtended(this, this.iconView, this.iconAppSize, this.textButtonWidth, this.appButtonDescription);
             this._addEnterEvent(button, Lang.bind(this, function() {
                this._clearPrevAppSelection(button.actor);
                button.actor.style_class = "menu-application-button-selected";
@@ -6853,7 +6862,7 @@ Main.notify("Erp" + e.message);
                }
                if(!(app_key in this._applicationsButtonFromApp)) {
                   let applicationButton = new ApplicationButtonExtended(this, this.applicationsScrollBox, app, this.iconView, this.iconAppSize,
-                                                                        this.iconMaxFavSize, this.appButtonWidth, this.appButtonDescription);
+                                                                        this.iconMaxFavSize, this.textButtonWidth, this.appButtonDescription);
                   this._applicationsButtons.push(applicationButton);
                   applicationButton.actor.connect('realize', Lang.bind(this, this._onApplicationButtonRealized));
                   applicationButton.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, applicationButton));
