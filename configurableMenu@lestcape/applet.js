@@ -5482,8 +5482,8 @@ try {
             this.controlView.actor.visible = true;*/
              let panelTop = this._processPanelSize(false);
              let panelButton = this._processPanelSize(true);
-             this.mainBox.set_width(monitor.width);
-             this.mainBox.set_height(monitor.height - panelButton - panelTop);
+             //this.mainBox.set_width(monitor.width);
+             //this.mainBox.set_height(monitor.height - panelButton - panelTop);
              this.mainBox.set_width(monitor.width - this.menu.actor.width + this.mainBox.width);
              let themeNode = this.menu._boxPointer.actor.get_theme_node();
              let difference = this.menu.actor.height - this.mainBox.height
