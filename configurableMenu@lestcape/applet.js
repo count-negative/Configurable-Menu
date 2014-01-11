@@ -58,6 +58,7 @@ const FileUtils = imports.misc.fileUtils;
 const AppletPath = imports.ui.appletManager.applets['configurableMenu@lestcape'];
 const CinnamonMenu = AppletPath.cinnamonMenu;
 const BoxPointer = imports.ui.boxpointer;
+const Gettext = imports.gettext;
 
 let appsys = Cinnamon.AppSystem.get_default();
 
@@ -73,6 +74,17 @@ const LIB_PATH = '/usr/share/cinnamon/applets/menu@cinnamon.org';
 imports.searchPath.unshift(LIB_PATH);
 const CinnamonMenu = imports.applet;
 */
+
+//Gettext.domain('cinnamon');
+Gettext.bindtextdomain("configurableMenu@lestcape", GLib.get_home_dir() + "/.local/share/locale");
+function _(str) {
+   let resultConf = Gettext.dgettext("configurableMenu@lestcape", str);
+   if(resultConf != str) {
+      return resultConf;
+   }
+   return Gettext.gettext(str);
+};
+
 
 function toUTF8FromHex(hex) {
    return toUTF8FromAssccii(toAscciiFromHex(hex));
@@ -1449,10 +1461,10 @@ ControlBox.prototype = {
             if(actor.get_hover()) {
                switch(actor) {
                   case this.bttViewList:
-                     this.parent.selectedAppBox.setSelectedText(_("List View"), _("View the items in list view mode"));
+                     this.parent.selectedAppBox.setSelectedText(_("List View"), _("Show application entries in list view"));
                      break;
                   case this.bttViewGrid:
-                     this.parent.selectedAppBox.setSelectedText(_("Icon View"), _("View the items in icon view mode"));
+                     this.parent.selectedAppBox.setSelectedText(_("Grid View"), _("Show application entries in grid view"));
                      break;
                   case this.bttResize:
                      if(this.bttResize.get_children()[0].get_icon_name() == 'changes-prevent')
@@ -1668,10 +1680,10 @@ GenericApplicationButtonExtended.prototype = {
                this.menu.addMenuItem(menuItem);
             }
             if(this.parent.accessibleMetaData.isInAppsList(this.app.get_id())) {
-               menuItem = new ApplicationContextMenuItemExtended(this, _("Remove from accessible bar"), "remove_from_accessible_bar");
+               menuItem = new ApplicationContextMenuItemExtended(this, _("Remove from accessible panel"), "remove_from_accessible_bar");
                this.menu.addMenuItem(menuItem);
             } else {
-               menuItem = new ApplicationContextMenuItemExtended(this, _("Add to accessible bar"), "add_to_accessible_bar");
+               menuItem = new ApplicationContextMenuItemExtended(this, _("Add to accessible panel"), "add_to_accessible_bar");
                this.menu.addMenuItem(menuItem);
             }
          } else {
@@ -1680,10 +1692,10 @@ GenericApplicationButtonExtended.prototype = {
                this.menu.addMenuItem(menuItem);
             }
             if(this.parent.accessibleMetaData.isInPlacesList(this.app.get_id())) {
-               menuItem = new ApplicationContextMenuItemExtended(this, _("Remove from accessible bar"), "remove_from_accessible_bar");
+               menuItem = new ApplicationContextMenuItemExtended(this, _("Remove from accessible panel"), "remove_from_accessible_bar");
                this.menu.addMenuItem(menuItem);
             } else {
-               menuItem = new ApplicationContextMenuItemExtended(this, _("Add to accessible bar"), "add_to_accessible_bar");
+               menuItem = new ApplicationContextMenuItemExtended(this, _("Add to accessible panel"), "add_to_accessible_bar");
                this.menu.addMenuItem(menuItem);
             }
          }
@@ -4463,7 +4475,6 @@ MyApplet.prototype = {
          this.iconView = false;
          this.iconViewCount = 1;
          this.favoritesLinesNumber = 1;
-         this.set_applet_tooltip(_("Menu"));
          this.orientation = orientation;
          this._searchIconClickedId = 0;
          this._applicationsButtons = new Array();
@@ -4494,6 +4505,11 @@ MyApplet.prototype = {
          this.minimalWidth = -1;
          this.minimalHeight = -1;
 
+         this.execInstallLanguage();
+         //_ = Gettext.domain(this.uuid).gettext;
+         //Gettext.bindtextdomain(this.uuid, GLib.get_home_dir() + "/.local/share/locale");
+
+         this.set_applet_tooltip(_("Menu"));
          this.RecentManager = new DocInfo.DocManager();
 
          this.menu = new ConfigurableMenu(this, orientation);
@@ -4613,6 +4629,58 @@ MyApplet.prototype = {
       catch (e) {
          Main.notify("ErrorMain:", e.message);
          global.logError(e);
+      }
+   },
+
+   _isDirectory: function(fDir) {
+      try {
+         let info = fDir.query_filesystem_info("standard::type", null);
+         if((info)&&(info.get_file_type() != Gio.FileType.DIRECTORY))
+            return true;
+      } catch(e) {
+      }
+      return false;
+   },
+
+   _makeDirectoy: function(fDir) {
+      if(!this._isDirectory(fDir))
+         this._makeDirectoy(fDir.get_parent());
+      if(!this._isDirectory(fDir))
+         fDir.make_directory(null);
+   },
+
+   execInstallLanguage: function() {
+      try {
+         let _shareFolder = GLib.get_home_dir() + "/.local/share/";
+         let _localeFolder = Gio.file_new_for_path(_shareFolder + "locale/");
+         let _moFolder = Gio.file_new_for_path(_shareFolder + "cinnamon/applets/" + this.uuid + "/locale/mo/");
+
+         let children = _moFolder.enumerate_children('standard::name,standard::type',
+                                          Gio.FileQueryInfoFlags.NONE, null);
+         let info, child, _moFile, _moLocale, _moPath;
+                   
+         while ((info = children.next_file(null)) != null) {
+            let type = info.get_file_type();
+            if (type == Gio.FileType.REGULAR) {
+               _moFile = info.get_name();
+               if (_moFile.substring(_moFile.lastIndexOf(".")) == ".mo") {
+                  _moLocale = _moFile.substring(0, _moFile.lastIndexOf("."));
+                  _moPath = _localeFolder.get_path() + "/" + _moLocale + "/LC_MESSAGES/";
+                  let src = Gio.file_new_for_path(String(_moFolder.get_path() + "/" + _moFile));
+                  let dest = Gio.file_new_for_path(String(_moPath + this.uuid + ".mo"));
+                  try {
+                     //if(!this.equalsFile(dest.get_path(), src.get_path())) {
+                        this._makeDirectoy(dest.get_parent());
+                        src.copy(dest, Gio.FileCopyFlags.OVERWRITE, null, null);
+                     //}
+                  } catch(e) {
+                     Main.notify("Error", e.message);
+                  }
+               }
+            }
+         }
+      } catch(e) {
+         Main.notify("Error", e.message);
       }
    },
 
@@ -6703,6 +6771,8 @@ Main.notify("Erp" + e.message);
                this.hover.refreshFace();
             }));
             this._placesButtons.push(button);
+            if(this._applicationsBoxWidth > 0)
+               button.container.set_width(this._applicationsBoxWidth);
          }
       }
       // Now generate recent category and recent files buttons and add to the list
@@ -6764,6 +6834,8 @@ Main.notify("Erp" + e.message);
                this.hover.refreshFace();
             }));
             this._recentButtons.push(button);
+            if(this._applicationsBoxWidth > 0)
+               button.container.set_width(this._applicationsBoxWidth);
          }
          if(this.RecentManager._infosByTimestamp.length > 0) {
             let button = new RecentClearButtonExtended(this, this.iconView, this.iconAppSize, this.textButtonWidth, this.appButtonDescription);
@@ -6780,6 +6852,8 @@ Main.notify("Erp" + e.message);
                this.hover.refreshFace();
             }));
             this._recentButtons.push(button);
+            if(this._applicationsBoxWidth > 0)
+               button.container.set_width(this._applicationsBoxWidth);
          }
       }
       this._setCategoriesButtonActive(!this.searchActive);

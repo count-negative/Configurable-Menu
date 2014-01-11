@@ -63,14 +63,16 @@ This program is free software:
 
 Installation Instructions:
 
-   1- Download this applet from their website : https://github.com/lestcape/Configurable-Menu
-   2- Unzip the downloaded file and copy the folder configurableMenu@lestcape at
-      /home/USERNAME/.local/share/cinnamon/applets/ where USER is the user for your operating system.
-   3- Enable the applet in Cinnamon Settings and use it.
+1. Download this applet from their website : https://github.com/lestcape/Configurable-Menu
+2. Unzip the downloaded file and copy the folder configurableMenu@lestcape at
+   /home/USERNAME/.local/share/cinnamon/applets/ where USER is the user for your operating system.
+3. Enable the applet in Cinnamon Settings and use it.
 
 Add new languages:
 
-  - New languages are not yet supported.
+1. Install the poedit program.
+2. Open the file default.po with poedit. This file is located in the folder /configurableMenu@lestcape/locale/
+3. Make the translation, save the result, and send the .po file updated by the e-mail address here present, or add directly into the website of this software.
 
 Change Log:
 

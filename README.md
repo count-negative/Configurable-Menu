@@ -80,7 +80,10 @@ Installation Instructions:
 
 Add new languages:
 --------------
-  - New languages are not yet supported.
+
+1. Install the poedit program.
+2. Open the file default.po with poedit. This file is located in the folder /configurableMenu@lestcape/locale/
+3. Make the translation, save the result, and send the .po file updated by the e-mail address here present, or add directly into the website of this software.
 
 Change Log:
 ==============
