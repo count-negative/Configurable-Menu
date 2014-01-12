@@ -4555,8 +4555,8 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.IN, "app-button-width", "textButtonWidth", this._changeView, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "app-description", "appButtonDescription", this._changeView, null);
 
-         this.settings.bindProperty(Settings.BindingDirection.IN, "icon-app-size", "iconAppSize", this._refreshApps, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "icon-cat-size", "iconCatSize", this._refreshApps, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "icon-app-size", "iconAppSize", this._onAppsChange, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "icon-cat-size", "iconCatSize", this._onAppsChange, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "icon-max-fav-size", "iconMaxFavSize", this._setIconMaxFavSize, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "icon-power-size", "iconPowerSize", this._setIconPowerSize, null);
          this.settings.bindProperty(Settings.BindingDirection.IN, "icon-control-size", "iconControlSize", this._setIconControlSize, null);
@@ -4602,7 +4602,7 @@ MyApplet.prototype = {
                                                 icon_name: 'edit-clear',
                                                 icon_type: St.IconType.SYMBOLIC });
 
-         appsys.connect('installed-changed', Lang.bind(this, this._refreshApps));
+         appsys.connect('installed-changed', Lang.bind(this, this._onAppsChange));
          //AppFavorites.getAppFavorites().connect('changed', Lang.bind(this, this._refreshFavs));
          AppFavorites.getAppFavorites().connect('changed', Lang.bind(this, this._updateAppFavs));
 
@@ -4616,6 +4616,7 @@ MyApplet.prototype = {
          }));
          Main.placesManager.connect('places-updated', Lang.bind(this, this._refreshPlacesAndRecent));
          Main.themeManager.connect('theme-set', Lang.bind(this, this._onThemeChange));
+         St.TextureCache.get_default().connect("icon-theme-changed", Lang.bind(this, this._onThemeChange));
          this.RecentManager.connect('changed', Lang.bind(this, this._refreshPlacesAndRecent));
 
          this._fileFolderAccessActive = false;
@@ -4688,6 +4689,15 @@ MyApplet.prototype = {
       Mainloop.idle_add(Lang.bind(this, function() {
          this._refreshFavs();
       }));
+   },
+
+   _onAppsChange: function() {
+      this._refreshApps();
+      this._updateAppButtonDesc();
+      this._updateTextButtonWidth();
+      this._setAppIconDirection();
+      this._updateAppSize();
+      this._updateSize();
    },
 
    _onChangeAccessible: function() {
@@ -5245,8 +5255,8 @@ MyApplet.prototype = {
    },
 
    _setIconMaxFavSize: function() {
-      this._refreshApps();
       this._refreshFavs();
+      this._updateSize();
    },
 
    _setIconControlSize: function() {

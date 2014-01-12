@@ -43,7 +43,7 @@
    "menu-label" : {
       "type" : "entry",
       "default" : "Menu",
-      "description" : "Text",
+      "description" : "_(Text)",
       "tooltip" : "Enter custom text to show in the panel."
    }, 
    "show-recent" : {
