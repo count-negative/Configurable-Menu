@@ -422,11 +422,18 @@ DriveMenuItem.prototype = {
    },
 
    _enterEvent: function() {
-      this.actor.set_style_class_name('menu-application-button-selected');
+      this.setActive(true);
    },
 
    _leaveEvent: function() {
-      this.actor.set_style_class_name('menu-application-button');
+      this.setActive(false);
+   },
+
+   setActive: function(active) {
+      if(active)
+         this.actor.set_style_class_name('menu-application-button-selected');
+      else
+         this.actor.set_style_class_name('menu-application-button');
    },
 
    setIconSize: function(iconSize) {
@@ -972,20 +979,21 @@ SelectedAppBox.prototype = {
    }
 };
 
-function ButtonChangerBox(parent, icon, labels, selected, callBackOnSelectedChange) {
-    this._init(parent, icon, labels, selected, callBackOnSelectedChange);
+function ButtonChangerBox(parent, icon, iconSize, labels, selected, callBackOnSelectedChange) {
+    this._init(parent, icon, iconSize, labels, selected, callBackOnSelectedChange);
 }
 
 ButtonChangerBox.prototype = {
     __proto__: PopupMenu.PopupSubMenuMenuItem.prototype,
 
-    _init: function (parent, icon, labels, selected, callBackOnSelectedChange) {
+    _init: function (parent, icon, iconSize, labels, selected, callBackOnSelectedChange) {
         PopupMenu.PopupSubMenuMenuItem.prototype._init.call(this, labels[selected]);
 
         this.visible = true;
         this.actor.set_style_class_name('');
         this.actor.reactive = true;
         this.box = new St.BoxLayout({ style_class: 'menu-category-button', reactive: true, track_hover: true });
+        this.box.set_style("padding-right: 4px; padding-left: 4px; padding-top: 4px; padding-bottom: 4px");
         this.parent = parent;
         this.labels = labels;
         this.selected = selected;
@@ -1001,13 +1009,23 @@ ButtonChangerBox.prototype = {
             style_class: 'popup-menu-icon',
             icon_type: St.IconType.FULLCOLOR,
             icon_name: icon,
-            icon_size: 20
+            icon_size: iconSize
         });
         this.icon.realize();
         this.label.realize();
 	this.box.add(this.label, {x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE });
 	this.box.add(this.icon, {x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE });
         this.addActor(this.box);
+        this.box.connect('enter-event', Lang.bind(this, function() {
+           this.setActive(true);
+        }));
+        this.box.connect('leave-event', Lang.bind(this, function() {
+           this.setActive(false); 
+        }));
+    },
+
+    setIconSize: function(iconSize) {
+       this.icon.set_icon_size(iconSize);
     },
 
     setTextVisible: function(visible) {
@@ -1015,21 +1033,25 @@ ButtonChangerBox.prototype = {
     },
 
     setActive: function(active) {
-       this.active = active;
-       if(!this.parent.actorResize) {
-          if(active) {
-             global.set_cursor(Cinnamon.Cursor.POINTING_HAND);
-             this.box.set_style_class_name('menu-category-button-selected');
+       if(this.active != active) {
+          this.active = active;
+          if(!this.parent.actorResize) {
+             if(active) {
+                global.set_cursor(Cinnamon.Cursor.POINTING_HAND);
+                this.box.set_style_class_name('menu-category-button-selected');
+             }
+             else {
+                global.unset_cursor();
+                this.box.set_style_class_name('menu-category-button');
+             }
           }
-          else {
-             global.unset_cursor();
-             this.box.set_style_class_name('menu-category-button');
-          }
+          this.emit('active-changed', active);
        }
     },
-
+ 
     _onButtonReleaseEvent: function(actor, event) {
        if(event.get_button() == 1) {
+          this.setActive(false);
           this.activateNext();
           Mainloop.idle_add(Lang.bind(this, function() {
              let [mx, my] = event.get_coords();
@@ -1038,10 +1060,9 @@ ButtonChangerBox.prototype = {
              ah = actor.get_height();
              if((mx > ax)&&(mx < ax + aw)&&(my > ay)&&(my < ay + ah))
                 this.setActive(true);
-             else
-                this.setActive(false); 
           }));
         }
+        PopupMenu.PopupSubMenuMenuItem.prototype._onButtonReleaseEvent.call(actor, event);
     },
 
     activateNext: function() {
@@ -1066,8 +1087,9 @@ ButtonChangerBox.prototype = {
     activateIndex: function(index) {
        this.selected = index;
        this.label.set_text(this.labels[this.selected]);
-       if(this.callBackOnSelectedChange)
+       if(this.callBackOnSelectedChange) {
           this.callBackOnSelectedChange(this.labels[this.selected]);
+       }
     }
 };
 
@@ -1258,7 +1280,7 @@ PowerBox.prototype = {
       this.activeBar = new St.BoxLayout({ vertical: false });
       this.spacer = new St.BoxLayout({ vertical: true });
       this.spacer.style = "padding-left: "+(this.iconSize)+"px;margin:auto;";
-      this.bttChanger = new ButtonChangerBox(this, "forward", ["Show Down", "Options"], 0, Lang.bind(this, this._onPowerChange));
+      this.bttChanger = new ButtonChangerBox(this, "forward", this.iconSize, ["Show Down", "Options"], 0, Lang.bind(this, this._onPowerChange));
       this.bttChanger.setTextVisible(false);
       this.activeBar.add(this._powerButtons[2].actor, { x_fill: true, x_align: aling });
       this.activeBar.add(this.bttChanger.actor, { x_fill: false, x_align: aling });
@@ -2041,7 +2063,7 @@ HoverIcon.prototype = {
    __proto__: PopupMenu.PopupSubMenuMenuItem.prototype,
     
    _init: function(parent, iconSize) {
-      PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
+      PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false, focusOnHover: false });
       try {
          //this.actor._delegate = this;
          this.parent = parent;
@@ -2064,7 +2086,7 @@ HoverIcon.prototype = {
          userBox.add(this.userLabel, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
          this.menu.addActor(userBox);
 
-         this.notificationsSwitch = new PopupMenu.PopupSwitchMenuItem(_("Notifications"), this._toggleNotifications);
+         this.notificationsSwitch = new PopupMenu.PopupSwitchMenuItem(_("Notifications"), this._toggleNotifications, { focusOnHover: false });
          this.notificationsSwitch.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(1)+"px;padding-right: "+(1)+"px;margin:auto;";
          this.menu.addMenuItem(this.notificationsSwitch);
          global.settings.connect('changed::display-notifications', Lang.bind(this, function() {
@@ -2074,7 +2096,7 @@ HoverIcon.prototype = {
             global.settings.set_boolean("display-notifications", this.notificationsSwitch.state);
          }));
 
-         this.account = new PopupMenu.PopupMenuItem(_("Account Details"));
+         this.account = new PopupMenu.PopupMenuItem(_("Account Details"), { focusOnHover: false });
          this.account.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(1)+"px;padding-right: "+(1)+"px;margin:auto;";
          this.menu.addMenuItem(this.account);
          this.account.connect('activate', Lang.bind(this, function() {
@@ -2098,6 +2120,11 @@ HoverIcon.prototype = {
       this.actor.style = "padding-top: "+(0)+"px;padding-bottom: "+(0)+"px;padding-left: "+(0)+"px;padding-right: "+(0)+
                          "px;margin:auto;border: "+ borderSize + "px solid" + color + "; border-radius: 12px;";
    },
+/*
+   setActive: function(active) {
+      this.actor.remove_style_pseudo_class('active');
+   },
+*/
 
    navegateHoverMenu: function(symbol, actor) {
       if((symbol == Clutter.KEY_Down)||(symbol == Clutter.KEY_Up)) {
@@ -2111,6 +2138,23 @@ HoverIcon.prototype = {
          }
       }
    },
+
+   _onKeyPressEvent: function(actor, event) {
+      let symbol = event.get_key_symbol();
+
+      if(symbol == Clutter.KEY_Right) {
+         this.toggleMenu();
+         global.stage.set_key_focus(this.notificationsSwitch.actor);
+         //this.menu.actor.navigate_focus(null, Gtk.DirectionType.DOWN, false);
+         return true;
+      } else if (symbol == Clutter.KEY_Left && this.menu.isOpen) {
+         global.stage.set_key_focus(this.actor);
+         this.toggleMenu();
+         return true;
+      }
+
+      return PopupBaseMenuItem.prototype._onKeyPressEvent.call(this, actor, event);
+    },
 
    _putFocus: function() {
       global.stage.set_key_focus(this.fav_actor);
@@ -2132,17 +2176,21 @@ HoverIcon.prototype = {
       }
       if(event.get_button()==3) {
          this.toggleMenu();
+         this.controlBox.visible = false;
+         this.controlBox.visible = true;
       }
       return true;
    },
 
-   _subMenuOpenStateChanged: function() {
-       //if (this.menu.isOpen) this.parent._scrollToButton(this.menu);
-       if(this.menu.isOpen)
+   _subMenuOpenStateChanged: function(menu, open) {
+       if(this.menu.isOpen) {
           this.parent._updateSize();
           //this.menu.actor.can_focus = false;
-       /*else
-          this.menu.actor.can_focus = true;*/
+       }
+       else {
+          //global.stage.set_key_focus(this.parent.searchEntry);
+          //this.menu.actor.can_focus = true;
+       }
    },
     
    activate: function(event) {
@@ -2153,12 +2201,13 @@ HoverIcon.prototype = {
 
    closeMenu: function() {
       this.menu.close(true);
+      this.setActive(false);
    },
     
    toggleMenu: function() {
       if(this.menu.isOpen) {
          this.menu.close(true);
-         this.menu.sourceActor._delegate.setActive(true);
+         this.menu.sourceActor._delegate.setActive(false);
       } else {
          this.menu.open();
          this.menu.sourceActor._delegate.setActive(true);
@@ -6370,7 +6419,7 @@ Main.notify("Erp" + e.message);
    loadMint: function() {
       this.allowFavName = true;
       this.controlBox.add(this.panelAppsName, {x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: false });
-      this.bttChanger = new ButtonChangerBox(this, "forward", [_("All Applications"), _("Favorites")], 0, Lang.bind(this, this._onPanelMintChange));
+      this.bttChanger = new ButtonChangerBox(this, "forward", 20, [_("All Applications"), _("Favorites")], 0, Lang.bind(this, this._onPanelMintChange));
       this.bttChanger.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.controlSearchBox.add(this.bttChanger.actor, {x_fill: false, x_align: St.Align.END, y_align: St.Align.START, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
@@ -6401,8 +6450,9 @@ Main.notify("Erp" + e.message);
 
    loadWindows: function() {
       this.allowFavName = true;
-      this.bttChanger = new ButtonChangerBox(this, "forward", [_("All Applications"), _("Favorites")], 0, Lang.bind(this, this._onPanelWindowsChange));
+      this.bttChanger = new ButtonChangerBox(this, "forward", 20, [_("All Applications"), _("Favorites")], 0, Lang.bind(this, this._onPanelWindowsChange));
       this.bttChanger.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
+      this.searchBox.set_style("padding-right: 0px; padding-left: 0px; padding-top: "+4+"px;");//padding-bottom: "+0+"px;margin:auto;
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
@@ -6432,6 +6482,7 @@ Main.notify("Erp" + e.message);
    },
 
    _onPanelMintChange: function(selected) {
+      global.stage.set_key_focus(this.searchEntry);
       let operPanelVisible = false;
       let titleAppBar = _("All Applications");
       if(titleAppBar == selected) {
@@ -6447,6 +6498,7 @@ Main.notify("Erp" + e.message);
    },
 
    _onPanelWindowsChange: function(selected) {
+      global.stage.set_key_focus(this.searchEntry);
       let operPanelVisible = false;
       let titleAppBar = _("All Applications");
       if(titleAppBar == selected)
@@ -6459,6 +6511,7 @@ Main.notify("Erp" + e.message);
       this.favoritesScrollBox.actor.visible = operPanelVisible;
      /* if((this.showAppTitle)||(this.showAppDescription))
          this.endHorizontalBox.visible = !operPanelVisible;*/
+
       this._updateSize();
    },
 
