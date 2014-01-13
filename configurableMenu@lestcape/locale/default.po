@@ -243,7 +243,7 @@ msgid "Vertical Text"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
-msgid "Horizontal Icon"
+msgid "Horizontal Grid"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
@@ -259,7 +259,7 @@ msgid "Vertical List"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
-msgid "Vertical Icon"
+msgid "Vertical Grid"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
@@ -778,6 +778,16 @@ msgstr ""
 #. configurableMenu@lestcape->settings-schema.json->show-power-
 #. buttons->tooltip
 msgid "Choose whether or not to show system buttons on the menu."
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->show-removable-
+#. drives->description
+msgid "Show removable drives"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->show-removable-
+#. drives->tooltip
+msgid "Choose whether or not to show removable drives on the menu."
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->power-box->description

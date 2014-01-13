@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-01-11 07:11-0600\n"
+"PO-Revision-Date: 2014-01-12 18:07-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -135,8 +135,8 @@ msgid "Vertical Text"
 msgstr "Vertical Solo Texto"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
-msgid "Horizontal Icon"
-msgstr "Horizontal Solo Icono"
+msgid "Horizontal Grid"
+msgstr "Horizontal Modo Cuadrícula"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Vertical"
@@ -151,8 +151,8 @@ msgid "Vertical List"
 msgstr "Vertical Modo Lista"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
-msgid "Vertical Icon"
-msgstr "Vertical Solo Icono"
+msgid "Vertical Grid"
+msgstr "Vertical Modo Cuadrícula"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Horizontal List"
@@ -562,12 +562,22 @@ msgstr ""
 #. configurableMenu@lestcape->settings-schema.json->show-power-
 #. buttons->description
 msgid "Show system buttons"
-msgstr "Mostrar los botones del Sistema"
+msgstr "Mostrar los botones del sistema"
 
 #. configurableMenu@lestcape->settings-schema.json->show-power-
 #. buttons->tooltip
 msgid "Choose whether or not to show system buttons on the menu."
 msgstr "Seleccione si desea o no mostrar los botones del sistema en el menú."
+
+#. configurableMenu@lestcape->settings-schema.json->show-removable-
+#. drives->description
+msgid "Show removable drives"
+msgstr "Mostrar las unidades extraíbles"
+
+#. configurableMenu@lestcape->settings-schema.json->show-removable-
+#. drives->tooltip
+msgid "Choose whether or not to show removable drives on the menu."
+msgstr "Seleccione si desea o no mostrar las unidades extraíbles en el menú."
 
 #. configurableMenu@lestcape->settings-schema.json->power-box->description
 msgid "System buttons have a box"

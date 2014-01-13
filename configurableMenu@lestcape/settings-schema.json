@@ -24,11 +24,11 @@
       "options": {
          "Vertical": "vertical",
          "Vertical List": "vertical-list",
-         "Vertical Icon": "vertical-icon",
+         "Vertical Grid": "vertical-grid",
          "Vertical Text": "vertical-text",
          "Horizontal": "horizontal",
          "Horizontal List": "horizontal-list",
-         "Horizontal Icon": "horizontal-icon",
+         "Horizontal Grid": "horizontal-grid",
          "Horizontal Text": "horizontal-text",
          "Retractable": "retractable",
          "Retractable Text": "retractable-text"
@@ -43,7 +43,7 @@
    "menu-label" : {
       "type" : "entry",
       "default" : "Menu",
-      "description" : "_(Text)",
+      "description" : "Text",
       "tooltip" : "Enter custom text to show in the panel."
    }, 
    "show-recent" : {
@@ -115,6 +115,12 @@
       "default" : false,
       "description": "Accessible panel has a box",
       "tooltip": "Choose whether or not to have a box on the accessible panel."
+   },
+   "show-removable-drives" : {
+      "type" : "checkbox",
+      "default" : false,
+      "description": "Show removable drives",
+      "tooltip": "Choose whether or not to show removable drives on the menu."
    },
    "accessible-icons" : {
       "type" : "checkbox",
