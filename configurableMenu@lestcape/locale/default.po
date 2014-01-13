@@ -782,12 +782,12 @@ msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->show-removable-
 #. drives->description
-msgid "Show removable drives"
+msgid "Show removable drives on the accessible panel"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->show-removable-
 #. drives->tooltip
-msgid "Choose whether or not to show removable drives on the menu."
+msgid "Choose whether or not to show removable drives on the accessible panel."
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->power-box->description

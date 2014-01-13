@@ -5736,11 +5736,13 @@ Main.notify("Erp" + e.message);
          if(this.fullScreen) {
             let panelTop = this._processPanelSize(false);
             let panelButton = this._processPanelSize(true);
-            if(this.menu.actor.get_height() > monitor.height)
-               this.mainBox.set_height(monitor.height - panelButton - panelTop - 40);
-            if(this.menu.actor.get_width() > monitor.width)
-               this.mainBox.set_width(monitor.width);
             let themeNode = this.menu._boxPointer.actor.get_theme_node();
+            let difference = this.menu.actor.get_height() - this.mainBox.get_height();
+            if(difference < 0) {
+               Main.notify("Difference:" + difference);
+               this.mainBox.set_height(monitor.height - panelButton - panelTop - 40);
+               this.mainBox.set_width(monitor.width);
+            }
             difference = this.menu.actor.get_height() - this.mainBox.get_height();
             let bordersY = themeNode.get_length('border-bottom') + themeNode.get_length('border-top') +
             themeNode.get_length('padding-top') + themeNode.get_length('padding-bottom') + themeNode.get_length('-arrow-border-width');

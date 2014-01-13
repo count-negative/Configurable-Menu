@@ -119,8 +119,8 @@
    "show-removable-drives" : {
       "type" : "checkbox",
       "default" : false,
-      "description": "Show removable drives",
-      "tooltip": "Choose whether or not to show removable drives on the menu."
+      "description": "Show removable drives on the accessible panel",
+      "tooltip": "Choose whether or not to show removable drives on the accessible panel."
    },
    "accessible-icons" : {
       "type" : "checkbox",
