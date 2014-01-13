@@ -5739,7 +5739,6 @@ Main.notify("Erp" + e.message);
             let themeNode = this.menu._boxPointer.actor.get_theme_node();
             let difference = this.menu.actor.get_height() - this.mainBox.get_height();
             if(difference < 0) {
-               Main.notify("Difference:" + difference);
                this.mainBox.set_height(monitor.height - panelButton - panelTop - 40);
                this.mainBox.set_width(monitor.width);
             }
