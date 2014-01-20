@@ -16,6 +16,12 @@
          "Windows 7": "windows7"
       }
    },
+   "menu-theme-save-button" : {
+      "type" : "button",
+      "description" : "Save the layout configuration",
+      "callback" : "_saveConfigTheme",
+      "tooltip" : "Press this button to save the layout configuration."
+   },
    "power-theme": {
       "type": "combobox",
       "description": "System buttons layout:",

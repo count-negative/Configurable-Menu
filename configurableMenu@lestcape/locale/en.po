@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-01-13 23:33-0600\n"
+"PO-Revision-Date: 2014-01-20 17:37-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -90,6 +90,16 @@ msgstr "Font size of the selected application name:"
 #. configurableMenu@lestcape->settings-schema.json->app-title-size->tooltip
 msgid "Set the font size of the selected application name."
 msgstr "Set the font size of the selected application name."
+
+#. configurableMenu@lestcape->settings-schema.json->menu-theme-
+#. save-button->description
+msgid "Save the layout configuration"
+msgstr "Save the layout configuration"
+
+#. configurableMenu@lestcape->settings-schema.json->menu-theme-
+#. save-button->tooltip
+msgid "Press this button to save the layout configuration."
+msgstr "Press this button to save the layout configuration."
 
 #. configurableMenu@lestcape->settings-schema.json->app-title-size->units
 msgid "points"

@@ -4637,7 +4637,7 @@ AccessibleMetaData.prototype = {
        let out_file = JSON.stringify(new_json, null, 4);
 
        if(this.metaDataFile.delete(null, null)) {
-          let fp = this.metaDataFile(0, null);
+          let fp = this.metaDataFile.create(0, null);
           fp.write(out_file, null);
           fp.close;
           global.log("Upgrade complete");
@@ -4758,16 +4758,66 @@ AccessibleMetaData.prototype = {
       let themeString = this.meta[theme];
       let themeList = themeString.split(";;");
       let themeProperties = new Array();
-      themeProperties.push(themeList[0]);
+      let property;
+      for(let i = 0; i < themeList.length - 1; i++) {
+         property = themeList[i].split("::");
+         themeProperties[property[0]] = property[1];
+      }
+      //make convertion
+      themeProperties["show-recent"] = (themeProperties["show-recent"] === 'true');
+      themeProperties["show-places"] = (themeProperties["show-places"] === 'true');
+      themeProperties["search-filesystem"] = (themeProperties["search-filesystem"] === 'true');
+      themeProperties["activate-on-hover"] = (themeProperties["activate-on-hover"] === 'true');
+      themeProperties["hover-delay"] = parseInt(themeProperties["hover-delay"]);
+      themeProperties["enable-autoscroll"] = (themeProperties["enable-autoscroll"] === 'true');
+      themeProperties["show-view-item"] = (themeProperties["show-view-item"] === 'true');
+      themeProperties["view-item"] = (themeProperties["view-item"] === 'true');
+      themeProperties["control-box"] = (themeProperties["control-box"] === 'true');
+      themeProperties["power-box"] = (themeProperties["power-box"] === 'true');
+      themeProperties["accessible-box"] = (themeProperties["accessible-box"] === 'true');
+      themeProperties["show-removable-drives"] = (themeProperties["show-removable-drives"] === 'true');
+      themeProperties["accessible-icons"] = (themeProperties["accessible-icons"] === 'true');
+      themeProperties["categories-icons"] = (themeProperties["categories-icons"] === 'true');
+      themeProperties["app-button-width"] = parseInt(themeProperties["app-button-width"]);
+      themeProperties["app-description"] = (themeProperties["app-description"] === 'true');
+      themeProperties["icon-app-size"] = parseInt(themeProperties["icon-app-size"]);
+      themeProperties["icon-cat-size"] = parseInt(themeProperties["icon-cat-size"]);
+      themeProperties["icon-max-fav-size"] = parseInt(themeProperties["icon-max-fav-size"]);
+      themeProperties["icon-power-size"] = parseInt(themeProperties["icon-power-size"]);
+      themeProperties["icon-control-size"] = parseInt(themeProperties["icon-control-size"]);
+      themeProperties["icon-hover-size"] = parseInt(themeProperties["icon-hover-size"]);
+      themeProperties["icon-accesible-size"] = parseInt(themeProperties["icon-accesible-size"]);
+      themeProperties["show-favorites"] = (themeProperties["show-favorites"] === 'true');
+      themeProperties["favorites-lines"] = parseInt(themeProperties["favorites-lines"]);
+      themeProperties["show-hover-icon"] = (themeProperties["show-hover-icon"] === 'true');
+      themeProperties["hover-icon-border"] = parseInt(themeProperties["hover-icon-border"]);
+      themeProperties["show-power-buttons"] = (themeProperties["show-power-buttons"] === 'true');
+      themeProperties["show-time-date"] = (themeProperties["show-time-date"] === 'true');
+      themeProperties["show-app-title"] = (themeProperties["show-app-title"] === 'true');
+      themeProperties["app-title-size"] = parseInt(themeProperties["app-title-size"]);
+      themeProperties["show-app-description"] = (themeProperties["show-app-description"] === 'true');
+      themeProperties["app-description-size"] = parseInt(themeProperties["app-description-size"]);
+      themeProperties["automatic-size"] = (themeProperties["automatic-size"] === 'true');
+      themeProperties["full-screen"] = (themeProperties["full-screen"] === 'true');
+      themeProperties["width"] = parseInt(themeProperties["width"]);
+      themeProperties["height"] = parseInt(themeProperties["height"]);
+      themeProperties["scroll-favorites"] = (themeProperties["scroll-favorites"] === 'true');
+      themeProperties["scroll-categories"] = (themeProperties["scroll-categories"] === 'true');
+      themeProperties["scroll-applications"] = (themeProperties["scroll-applications"] === 'true');
+      themeProperties["scroll-accessible"] = (themeProperties["scroll-accessible"] === 'true');
+      themeProperties["spacer-line"] = (themeProperties["spacer-line"] === 'true');
+      themeProperties["spacer-size"] = parseInt(themeProperties["spacer-size"]);
+      themeProperties["show-box-pointer"] = (themeProperties["show-box-pointer"] === 'true');
+      themeProperties["fix-menu-corner"] = (themeProperties["fix-menu-corner"] === 'true');
       return themeProperties;
    },
 
    setThemeConfig: function(theme, properties) {
       let result = "";
-      for(let i = 0; i < properties.length; i++)
-         result += properties[i].toString() + ";;";
+      for(let key in properties)
+         result += key+"::"+properties[key].toString() + ";;";
       if(properties.length > 0)
-         result +=  properties[i].toString();
+         result +=   key+"::"+properties[key].toString();
       this.meta[theme] = result;
       this._saveMetaData();
    },
@@ -4864,73 +4914,74 @@ MyApplet.prototype = {
          this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPressEvent));
          //this._keyFocusNotifyIDSignal = global.stage.connect('notify::key-focus', Lang.bind(this, this._onKeyFocusChanged));
 
+         this.accessibleMetaData = new AccessibleMetaData(this, Lang.bind(this, this._onChangeAccessible));
          this.settings = new Settings.AppletSettings(this, this.uuid, instance_id);
 
-         this.settings.bindProperty(Settings.BindingDirection.IN, "show-recent", "showRecent", this._refreshPlacesAndRecent, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "show-places", "showPlaces", this._refreshPlacesAndRecent, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "activate-on-hover", "activateOnHover", this._updateActivateOnHover, null);                        
-         this.settings.bindProperty(Settings.BindingDirection.IN, "menu-icon", "menuIcon", this._updateIconAndLabel, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "menu-label", "menuLabel", this._updateIconAndLabel, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "search-filesystem", "searchFilesystem", null, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "hover-delay", "hover_delay_ms", this._update_hover_delay, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "enable-autoscroll", "autoscroll_enabled", this._update_autoscroll, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-recent", "showRecent", this._refreshPlacesAndRecent, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-places", "showPlaces", this._refreshPlacesAndRecent, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "activate-on-hover", "activateOnHover",this._updateActivateOnHover, null);                        
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "menu-icon", "menuIcon", this._updateIconAndLabel, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "menu-label", "menuLabel", this._updateIconAndLabel, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "search-filesystem", "searchFilesystem", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "hover-delay", "hover_delay_ms", this._update_hover_delay, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "enable-autoscroll", "autoscroll_enabled", this._update_autoscroll, null);
 
 //My Setting
-         this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this._onThemeChange, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "power-theme", "powerTheme", this._onThemePowerChange, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "show-view-item", "showView", this._setVisibleViewControl, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this._onSelectedThemeChange, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "power-theme", "powerTheme", this._onThemePowerChange, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-view-item", "showView", this._setVisibleViewControl, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "view-item", "iconView", this._changeView, null);
 
-         this.settings.bindProperty(Settings.BindingDirection.IN, "activate-on-press", "activateOnPress", null, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "control-box", "showControlBox", this._setVisibleControlBox, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "power-box", "showPowerBox", this._setVisiblePowerBox, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "accessible-box", "showAccessibleBox", this._setVisibleAccessibleBox, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "activate-on-press", "activateOnPress", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "control-box", "showControlBox", this._setVisibleControlBox, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "power-box", "showPowerBox", this._setVisiblePowerBox, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "accessible-box", "showAccessibleBox", this._setVisibleAccessibleBox, null);
 
-         this.settings.bindProperty(Settings.BindingDirection.IN, "show-removable-drives", "showRemovable", this._setVisibleRemovable, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "accessible-icons", "showAccessibleIcons", this._setVisibleAccessibleIcons, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "categories-icons", "showCategoriesIcons", this._setVisibleCategoriesIcons, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-removable-drives", "showRemovable", this._setVisibleRemovable, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "accessible-icons", "showAccessibleIcons", this._setVisibleAccessibleIcons, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "categories-icons", "showCategoriesIcons", this._setVisibleCategoriesIcons, null);
 
-         this.settings.bindProperty(Settings.BindingDirection.IN, "app-button-width", "textButtonWidth", this._changeView, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "app-description", "appButtonDescription", this._changeView, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "app-button-width", "textButtonWidth", this._changeView, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "app-description", "appButtonDescription", this._changeView, null);
 
-         this.settings.bindProperty(Settings.BindingDirection.IN, "icon-app-size", "iconAppSize", this._onAppsChange, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "icon-cat-size", "iconCatSize", this._onAppsChange, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "icon-max-fav-size", "iconMaxFavSize", this._setIconMaxFavSize, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "icon-power-size", "iconPowerSize", this._setIconPowerSize, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "icon-control-size", "iconControlSize", this._setIconControlSize, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "icon-hover-size", "iconHoverSize", this._setIconHoverSize, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "icon-accesible-size", "iconAccessibleSize", this._setIconAccessibleSize, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "show-favorites", "showFavorites", this._setVisibleFavorites, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "favorites-lines", "favoritesLinesNumber", this._setVisibleFavorites, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "icon-app-size", "iconAppSize", this._onAppsChange, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "icon-cat-size", "iconCatSize", this._onAppsChange, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "icon-max-fav-size", "iconMaxFavSize", this._setIconMaxFavSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "icon-power-size", "iconPowerSize", this._setIconPowerSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "icon-control-size", "iconControlSize", this._setIconControlSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "icon-hover-size", "iconHoverSize", this._setIconHoverSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "icon-accesible-size", "iconAccessibleSize", this._setIconAccessibleSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-favorites", "showFavorites", this._setVisibleFavorites, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "favorites-lines", "favoritesLinesNumber", this._setVisibleFavorites, null);
 
-         this.settings.bindProperty(Settings.BindingDirection.IN, "show-hover-icon", "showHoverIcon", this._setVisibleHoverIcon, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "hover-icon-border", "hoverBorderSize", this._updateBorderHoverSize, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "show-power-buttons", "showPowerButtons", this._setVisiblePowerButtons, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-hover-icon", "showHoverIcon", this._setVisibleHoverIcon, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "hover-icon-border", "hoverBorderSize", this._updateBorderHoverSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-power-buttons", "showPowerButtons", this._setVisiblePowerButtons, null);
          
-         this.settings.bindProperty(Settings.BindingDirection.IN, "show-time-date", "showTimeDate", this._setVisibleTimeDate, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "time-format", "timeFormat", this._updateTimeDateFormat, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "date-format", "dateFormat", this._updateTimeDateFormat, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-time-date", "showTimeDate", this._setVisibleTimeDate, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "time-format", "timeFormat", this._updateTimeDateFormat, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "date-format", "dateFormat", this._updateTimeDateFormat, null);
 
-         this.settings.bindProperty(Settings.BindingDirection.IN, "show-app-title", "showAppTitle", this._updateAppSelectedText, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "app-title-size", "appTitleSize", this._updateAppSelectedText, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "show-app-description", "showAppDescription", this._updateAppSelectedText, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "app-description-size", "appDescriptionSize", this._updateAppSelectedText, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-app-title", "showAppTitle", this._updateAppSelectedText, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "app-title-size", "appTitleSize", this._updateAppSelectedText, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-app-description", "showAppDescription", this._updateAppSelectedText, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "app-description-size", "appDescriptionSize", this._updateAppSelectedText, null);
 
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "automatic-size", "automaticSize", this._setAutomaticSize, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "full-screen", "fullScreen", this._setFullScreen, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "width", "width", this._updateSize, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "height", "height", this._updateSize, null);
 
-         this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-favorites", "scrollFavoritesVisible", this._setVisibleScrollFav, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-categories", "scrollCategoriesVisible", this._setVisibleScrollCat, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-applications", "scrollApplicationsVisible", this._setVisibleScrollApp, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "scroll-accessible", "scrollAccessibleVisible", this._setVisibleScrollAccess, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "scroll-favorites", "scrollFavoritesVisible", this._setVisibleScrollFav, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "scroll-categories", "scrollCategoriesVisible", this._setVisibleScrollCat, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "scroll-applications", "scrollApplicationsVisible", this._setVisibleScrollApp, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "scroll-accessible", "scrollAccessibleVisible", this._setVisibleScrollAccess, null);
 
-         this.settings.bindProperty(Settings.BindingDirection.IN, "spacer-line", "showSpacerLine", this._setVisibleSpacerLine, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "spacer-size", "spacerSize", this._updateSpacerSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "spacer-line", "showSpacerLine", this._setVisibleSpacerLine, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "spacer-size", "spacerSize", this._updateSpacerSize, null);
 
-         this.settings.bindProperty(Settings.BindingDirection.IN, "show-box-pointer", "showBoxPointer", this._setVisibleBoxPointer, null);
-         this.settings.bindProperty(Settings.BindingDirection.IN, "fix-menu-corner", "fixMenuCorner", this._setFixMenuCorner, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-box-pointer", "showBoxPointer", this._setVisibleBoxPointer, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "fix-menu-corner", "fixMenuCorner", this._setFixMenuCorner, null);
 
 
          this._searchInactiveIcon = new St.Icon({ style_class: 'menu-search-entry-icon',
@@ -4958,7 +5009,6 @@ MyApplet.prototype = {
          this.RecentManager.connect('changed', Lang.bind(this, this._refreshPlacesAndRecent));
 
          this._fileFolderAccessActive = false;
-         this.accessibleMetaData = new AccessibleMetaData(this, Lang.bind(this, this._onChangeAccessible));
          this._pathCompleter = new Gio.FilenameCompleter();
          this._pathCompleter.set_dirs_only(false);
          this.lastAcResults = new Array();
@@ -5786,6 +5836,129 @@ Main.notify("Erp" + e.message);
       this.updateTheme = true;
       this._updateComplete();
       this._updateSize();
+   },
+
+   _onSelectedThemeChange: function() {
+try {
+      this._loadConfigTheme();
+      this._onThemeChange();
+} catch(e) {
+Main.notify("errorTheme", e.message);
+}
+   },
+
+   _loadConfigTheme: function() {
+      let confTheme = this.accessibleMetaData.getThemeConfig(this.theme);
+      this.powerTheme = confTheme["power-theme"];
+      this.showRecent = confTheme["show-recent"];
+      this.showPlaces = confTheme["show-places"];
+      this.activateOnHover = confTheme["activate-on-hover"];
+      this.menuIcon = confTheme["menu-icon"];
+      this.menuLabel = confTheme["menu-label"];
+      this.searchFilesystem = confTheme["search-filesystem"];
+      this.hover_delay_ms = confTheme["hover-delay"];
+      this.autoscroll_enabled = confTheme["enable-autoscroll"];
+
+      this.showView = confTheme["show-view-item"];
+      this.iconView = confTheme["view-item"];
+      this.activateOnPress = confTheme["activate-on-press"];
+      this.showControlBox = confTheme["control-box"];
+      this.showPowerBox = confTheme["power-box"];
+      this.showAccessibleBox = confTheme["accessible-box"];
+      this.showRemovable = confTheme["show-removable-drives"];
+      this.showAccessibleIcons = confTheme["accessible-icons"];
+      this.showCategoriesIcons = confTheme["categories-icons"];
+      this.textButtonWidth = confTheme["app-button-width"];
+      this.appButtonDescription = confTheme["app-description"];
+      this.iconAppSize = confTheme["icon-app-size"];
+      this.iconCatSize = confTheme["icon-cat-size"];
+      this.iconMaxFavSize = confTheme["icon-max-fav-size"];
+      this.iconPowerSize = confTheme["icon-power-size"];
+      this.iconControlSize = confTheme["icon-control-size"];
+      this.iconHoverSize = confTheme["icon-hover-size"];
+      this.iconAccessibleSize = confTheme["icon-accesible-size"];
+      this.showFavorites = confTheme["show-favorites"];
+      this.favoritesLinesNumber = confTheme["favorites-lines"];
+      this.showHoverIcon = confTheme["show-hover-icon"];
+      this.hoverBorderSize = confTheme["hover-icon-border"];
+      this.showPowerButtons = confTheme["show-power-buttons"];
+      this.showTimeDate = confTheme["show-time-date"];
+      this.timeFormat = confTheme["time-format"];
+      this.dateFormat = confTheme["date-format"];
+      this.showAppTitle = confTheme["show-app-title"];
+      this.appTitleSize = confTheme["app-title-size"];
+      this.showAppDescription = confTheme["show-app-description"];
+      this.appDescriptionSize = confTheme["app-description-size"];
+      this.automaticSize = confTheme["automatic-size"];
+      this.fullScreen = confTheme["full-screen"];
+      this.width = confTheme["width"];
+      this.height = confTheme["height"];
+      this.scrollFavoritesVisible = confTheme["scroll-favorites"];
+      this.scrollCategoriesVisible = confTheme["scroll-categories"];
+      this.scrollApplicationsVisible = confTheme["scroll-applications"];
+      this.scrollAccessibleVisible = confTheme["scroll-accessible"];
+      this.showSpacerLine = confTheme["spacer-line"];
+      this.spacerSize = confTheme["spacer-size"];
+      this.showBoxPointer = confTheme["show-box-pointer"];
+      this.fixMenuCorner = confTheme["fix-menu-corner"];
+   },
+
+   _saveConfigTheme: function() {
+      let confTheme = new Array();
+      confTheme["power-theme"] = this.powerTheme;
+
+      confTheme["show-recent"] = this.showRecent;
+      confTheme["show-places"] = this.showPlaces;
+      confTheme["activate-on-hover"] = this.activateOnHover;
+      confTheme["menu-icon"] = this.menuIcon;
+      confTheme["menu-label"] = this.menuLabel;
+      confTheme["search-filesystem"] = this.searchFilesystem;
+      confTheme["hover-delay"] = this.hover_delay_ms;
+      confTheme["enable-autoscroll"] = this.autoscroll_enabled;
+
+      confTheme["show-view-item"] = this.showView;
+      confTheme["view-item"] = this.iconView;
+      confTheme["activate-on-press"] = this.activateOnPress;
+      confTheme["control-box"] = this.showControlBox;
+      confTheme["power-box"] = this.showPowerBox;
+      confTheme["accessible-box"] = this.showAccessibleBox;
+      confTheme["show-removable-drives"] = this.showRemovable;
+      confTheme["accessible-icons"] = this.showAccessibleIcons;
+      confTheme["categories-icons"] = this.showCategoriesIcons;
+      confTheme["app-button-width"] = this.textButtonWidth;
+      confTheme["app-description"] = this.appButtonDescription;
+      confTheme["icon-app-size"] = this.iconAppSize;
+      confTheme["icon-cat-size"] = this.iconCatSize;
+      confTheme["icon-max-fav-size"] = this.iconMaxFavSize;
+      confTheme["icon-power-size"] = this.iconPowerSize;
+      confTheme["icon-control-size"] = this.iconControlSize;
+      confTheme["icon-hover-size"] = this.iconHoverSize;
+      confTheme["icon-accesible-size"] = this.iconAccessibleSize;
+      confTheme["show-favorites"] = this.showFavorites;
+      confTheme["favorites-lines"] = this.favoritesLinesNumber;
+      confTheme["show-hover-icon"] = this.showHoverIcon;
+      confTheme["hover-icon-border"] = this.hoverBorderSize;
+      confTheme["show-power-buttons"] = this.showPowerButtons;
+      confTheme["show-time-date"] = this.showTimeDate;
+      confTheme["time-format"] = this.timeFormat;
+      confTheme["date-format"] = this.dateFormat;
+      confTheme["show-app-title"] = this.showAppTitle;
+      confTheme["app-title-size"] = this.appTitleSize;
+      confTheme["show-app-description"] = this.showAppDescription;
+      confTheme["app-description-size"] = this.appDescriptionSize;
+      confTheme["automatic-size"] = this.automaticSize;
+      confTheme["full-screen"] = this.fullScreen;
+      confTheme["width"] = this.width;
+      confTheme["height"] = this.height;
+      confTheme["scroll-favorites"] = this.scrollFavoritesVisible;
+      confTheme["scroll-categories"] = this.scrollCategoriesVisible;
+      confTheme["scroll-applications"] = this.scrollApplicationsVisible;
+      confTheme["scroll-accessible"] = this.scrollAccessibleVisible;
+      confTheme["spacer-line"] = this.showSpacerLine;
+      confTheme["spacer-size"] = this.spacerSize;
+      confTheme["show-box-pointer"] = this.showBoxPointer;
+      confTheme["fix-menu-corner"] = this.fixMenuCorner;
+      this.accessibleMetaData.setThemeConfig(this.theme, confTheme);
    },
 
    _onThemePowerChange: function() {

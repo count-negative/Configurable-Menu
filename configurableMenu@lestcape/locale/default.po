@@ -196,6 +196,16 @@ msgstr ""
 msgid "Set the font size of the selected application name."
 msgstr ""
 
+#. configurableMenu@lestcape->settings-schema.json->menu-theme-
+#. save-button->description
+msgid "Save the layout configuration"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->menu-theme-
+#. save-button->tooltip
+msgid "Press this button to save the layout configuration."
+msgstr ""
+
 #. configurableMenu@lestcape->settings-schema.json->app-title-size->units
 msgid "points"
 msgstr ""
