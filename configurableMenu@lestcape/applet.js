@@ -1574,12 +1574,12 @@ ControlBox.prototype = {
    changeViewSelected: function(iconView) {
       this.parent.iconView = iconView;
       if(iconView) {
-         this.bttViewList.set_style('padding: 0px; border: 1px;');
-         this.bttViewGrid.set_style('padding: 0px; border: 1px solid ' + this._selectedBorderColor() + ';');
+         this.bttViewList.set_style('border: 1px;');
+         this.bttViewGrid.set_style('border: 1px solid ' + this._selectedBorderColor() + ';');
       }
       else {
-         this.bttViewList.set_style('padding: 0px; border: 1px solid ' + this._selectedBorderColor() + ';');
-         this.bttViewGrid.set_style('padding: 0px; border: 1px;');
+         this.bttViewList.set_style('border: 1px solid ' + this._selectedBorderColor() + ';');
+         this.bttViewGrid.set_style('border: 1px;');
       }
    },
 
@@ -1656,8 +1656,6 @@ ControlBox.prototype = {
             }
          }
       }));
-      btt.set_style_class_name('menu-category-button');
-      btt.set_style('padding: 0px;');
       return btt;
    },
 
