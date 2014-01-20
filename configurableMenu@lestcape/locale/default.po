@@ -694,7 +694,7 @@ msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->categories-
 #. icons->description
-msgid "Categories have icons"
+msgid "Show icons on the categories"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->categories-icons->tooltip

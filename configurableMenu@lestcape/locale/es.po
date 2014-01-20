@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-01-12 21:40-0600\n"
+"PO-Revision-Date: 2014-01-19 18:23-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -99,11 +99,11 @@ msgstr "puntos"
 #. configurableMenu@lestcape->settings-schema.json->hover-icon-
 #. border->description
 msgid "Border width of hover icon:"
-msgstr "Tamaño del borde del icono de visualización:"
+msgstr "Tamaño del borde del ícono de visualización:"
 
 #. configurableMenu@lestcape->settings-schema.json->hover-icon-border->tooltip
 msgid "The border width of the hover icon."
-msgstr "El tamaño del borde del icono de visualización:"
+msgstr "El tamaño del borde del ícono de visualización:"
 
 #. configurableMenu@lestcape->settings-schema.json->favorites-
 #. lines->description
@@ -187,11 +187,11 @@ msgstr "Habilitar abrir el menu cuando se presione el ratón sobre el."
 
 #. configurableMenu@lestcape->settings-schema.json->height->description
 msgid "Menu height:"
-msgstr "Altura de menú:"
+msgstr "Altura del menú:"
 
 #. configurableMenu@lestcape->settings-schema.json->height->tooltip
 msgid "Height of the menu."
-msgstr "Altura que tendrá el menú."
+msgstr "Altura del menú."
 
 #. configurableMenu@lestcape->settings-schema.json->app-
 #. description->description
@@ -207,11 +207,11 @@ msgstr ""
 #. configurableMenu@lestcape->settings-schema.json->icon-control-
 #. size->description
 msgid "Control icon size:"
-msgstr "Tamaño de iconos de control:"
+msgstr "Tamaño de íconos de control:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-control-size->tooltip
 msgid "Set the control icon size."
-msgstr "Establecer el tamaño de los iconos de control."
+msgstr "Establecer el tamaño de los íconos de control."
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. applications->description
@@ -254,7 +254,7 @@ msgstr "Pantalla completa"
 
 #. configurableMenu@lestcape->settings-schema.json->full-screen->tooltip
 msgid "Choose whether or not to put the menu in full screen mode."
-msgstr "Seleccione si desea  o no poner el menú en modo pantalla completa."
+msgstr "Seleccione si desea o no poner el menú en modo pantalla completa."
 
 #. configurableMenu@lestcape->settings-schema.json->show-view-
 #. item->description
@@ -263,15 +263,15 @@ msgstr "Mostrar los botones de control"
 
 #. configurableMenu@lestcape->settings-schema.json->show-view-item->tooltip
 msgid "Choose whether or not to show control buttons."
-msgstr "Seleccione si desea  o no mostrar los botones de control"
+msgstr "Seleccione si desea o no mostrar los botones de control"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-app-size->description
 msgid "Application icon size:"
-msgstr "Tamaño de los iconos de las applicaciones:"
+msgstr "Tamaño de los íconos de las applicaciones:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-app-size->tooltip
 msgid "Set the application icon size."
-msgstr "Establesca el tamaño de los iconos de las applicaciones:"
+msgstr "Establesca el tamaño de los íconos de las applicaciones:"
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-
 #. box->description
@@ -280,7 +280,7 @@ msgstr "El panel accessible tiene caja"
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-box->tooltip
 msgid "Choose whether or not to have a box on the accessible panel."
-msgstr "Seleccione si desea  o no  tener una caja en el panel accessible."
+msgstr "Seleccione si desea o no tener una caja en el panel accessible."
 
 #. configurableMenu@lestcape->settings-schema.json->spacer-size->description
 msgid "Separator size:"
@@ -349,20 +349,20 @@ msgstr "Menta"
 #. configurableMenu@lestcape->settings-schema.json->show-hover-
 #. icon->description
 msgid "Show hover icon"
-msgstr "Mostrar el icono de visualización"
+msgstr "Mostrar el ícono de visualización"
 
 #. configurableMenu@lestcape->settings-schema.json->show-hover-icon->tooltip
 msgid "Choose whether or not to show hover icon on the menu."
-msgstr "Seleccione si desea o no mostrar el icono de visualización en el menú."
+msgstr "Seleccione si desea o no mostrar el ícono de visualización en el menú."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-hover-
 #. size->description
 msgid "Hover icon size:"
-msgstr "Tamaño del icono del icono de visualización"
+msgstr "Tamaño del ícono de visualización"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-hover-size->tooltip
 msgid "Set the hover icon size."
-msgstr "Establesca el tamaño del icono de visualización."
+msgstr "Establesca el tamaño del ícono de visualización."
 
 #. configurableMenu@lestcape->settings-schema.json->view-item->description
 msgid "Show application entries in grid view"
@@ -373,13 +373,13 @@ msgid ""
 "Enable show application entries in grid(icon) view and disable show "
 "application entries in list view."
 msgstr ""
-"Habilitado mostrará las applicaciones en vista de cuadrícula(icono) y "
+"Habilitado mostrará las applicaciones en vista de cuadrícula(ícono) y "
 "desavilitado las mostrará en vista de lista."
 
 #. configurableMenu@lestcape->settings-schema.json->app-button-
 #. width->description
 msgid "Maximum width of the application entry text:"
-msgstr "Ancho máximo  de las aplicaciones "
+msgstr "Ancho máximo de las aplicaciones "
 
 #. configurableMenu@lestcape->settings-schema.json->app-button-width->tooltip
 msgid "Set the maximum width of the application entry text."
@@ -388,11 +388,11 @@ msgstr "Establesca el máximo ancho del texto de las applicaciones."
 #. configurableMenu@lestcape->settings-schema.json->accessible-
 #. icons->description
 msgid "Show icons on the accessible panel"
-msgstr "Mostrar los iconos del panel accessible"
+msgstr "Mostrar íconos en panel accessible"
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-icons->tooltip
 msgid "Choose whether or not to have icons on the accessible panel."
-msgstr "Seleccione si desea o no que el panel accesible contenga iconos."
+msgstr "Seleccione si desea o no que el panel accesible se muestre con íconos."
 
 #. configurableMenu@lestcape->settings-schema.json->fix-menu-
 #. corner->description
@@ -408,29 +408,29 @@ msgstr ""
 #. configurableMenu@lestcape->settings-schema.json->icon-accesible-
 #. size->description
 msgid "Accessible icons size:"
-msgstr "Tamaño de los iconos del panel accessible:"
+msgstr "Tamaño de los íconos del panel accessible:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-accesible-
 #. size->tooltip
 msgid "Set the accessible icons size."
-msgstr "Establesca el tamaño de los iconos del panel accessible."
+msgstr "Establesca el tamaño de los íconos del panel accessible."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-max-fav-
 #. size->description
 msgid "Maximum favorites icon size:"
-msgstr "Máximo tamaño de los iconos de favoritos:"
+msgstr "Máximo tamaño de los íconos de favoritos:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-max-fav-size->tooltip
 msgid "Set the maximum size of the favorites icon."
-msgstr "Establesca el tamaño máximo de los iconos de favoritos."
+msgstr "Establesca el tamaño máximo de los íconos de favoritos."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-cat-size->description
 msgid "Category icon size:"
-msgstr "Tamaño de los iconos de las categorías:"
+msgstr "Tamaño de los íconos de las categorías:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-cat-size->tooltip
 msgid "Set the category icon size."
-msgstr "Establesca el tamaño de los iconos de las categorías."
+msgstr "Establesca el tamaño de los íconos de las categorías."
 
 #. configurableMenu@lestcape->settings-schema.json->show-time-
 #. date->description
@@ -454,11 +454,11 @@ msgstr ""
 #. configurableMenu@lestcape->settings-schema.json->icon-power-
 #. size->description
 msgid "System icons size:"
-msgstr "Tamaño de los iconos  del sistema:"
+msgstr "Tamaño de los íconos del sistema:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-power-size->tooltip
 msgid "Set the system icons size."
-msgstr "Establesca el tamaño de los iconos del sistema."
+msgstr "Establesca el tamaño de los íconos del sistema."
 
 #. configurableMenu@lestcape->settings-schema.json->enable-
 #. autoscroll->description
@@ -489,12 +489,12 @@ msgstr "Seleccione si desea o no que los botones de control tengan caja."
 
 #. configurableMenu@lestcape->settings-schema.json->categories-
 #. icons->description
-msgid "Categories have icons"
-msgstr "Las categorías tienen iconos"
+msgid "Show icons on the categories"
+msgstr "Mostrar íconos en las categorías"
 
 #. configurableMenu@lestcape->settings-schema.json->categories-icons->tooltip
 msgid "Choose whether or not to have icons on the categories."
-msgstr "Seleccione si desea o no que sean mostrado iconos en las categorías."
+msgstr "Seleccione si desea o no que las categorías se muentren con íconos."
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. categories->description

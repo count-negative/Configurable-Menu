@@ -1497,7 +1497,8 @@ ControlBox.prototype = {
       this.actor = new St.BoxLayout({ vertical: false });
       this.actor.style =  "padding-top: "+(0)+"px;padding-bottom: "+(10)+"px;padding-left: "+(4)+"px;padding-right: "+(4)+"px;margin:auto;";
 
-      this.resizeBox = new St.BoxLayout({ vertical: false, style_class: 'menu-favorites-box' });
+      this.resizeBox = new St.BoxLayout({ vertical: false });
+
       this.bttFullScreen = this._createSymbolicButton('zoom-fit-best');
       this.bttFullScreen.connect('clicked', Lang.bind(this, this._onClickedChangeFullScreen));
       this.resizeBox.add(this.bttFullScreen, { x_fill: false, expand: false });
@@ -1615,8 +1616,8 @@ ControlBox.prototype = {
    _createSymbolicButton: function(icon) {
       let bttIcon = new St.Icon({icon_name: icon, icon_type: St.IconType.SYMBOLIC,
 	                         style_class: 'popup-menu-icon', icon_size: this.iconSize});
-      let btt = new St.Button({ child: bttIcon });
-   
+      let btt = new St.Button({ child: bttIcon, style_class: 'menu-category-button' });
+      btt.add_style_class_name('menu-control-button');
       btt.connect('notify::hover', Lang.bind(this, function(actor) {
          if(!this.parent.actorResize) {
             if(actor.get_hover()) {
@@ -1645,11 +1646,13 @@ ControlBox.prototype = {
                }
                global.set_cursor(Cinnamon.Cursor.POINTING_HAND);
                actor.set_style_class_name('menu-category-button-selected');
+               actor.add_style_class_name('menu-control-button-selected');
             }
             else {
                this.parent.selectedAppBox.setSelectedText("", "");
                global.unset_cursor();
                actor.set_style_class_name('menu-category-button');
+               actor.add_style_class_name('menu-control-button');
             }
          }
       }));
@@ -4028,8 +4031,14 @@ ConfigurablePointer.prototype = {
       this.riseArrow = true;
       this.fixCorner = false;
       this.resizeSize = 0;
-      let [res, selectedColor] = Clutter.Color.from_string("#505050");
-      this.selectedColor = selectedColor;
+      try {
+         let [res, selectedColor] = Clutter.Color.from_string("#505050");
+         this.selectedColor = selectedColor;
+      } catch (e) {
+         let selectedColor = new Clutter.Color();
+         selectedColor.from_string("#505050");
+         this.selectedColor = selectedColor;
+      }
    },
 
    setArrow: function(arrow) {
@@ -4049,8 +4058,14 @@ ConfigurablePointer.prototype = {
    },
 
    setResizeAreaColor: function(resizeColor) {
-      let [res, selectedColor] = Clutter.Color.from_string(resizeColor);
-      this.selectedColor = selectedColor;
+      try {
+         let [res, selectedColor] = Clutter.Color.from_string(resizeColor);
+         this.selectedColor = selectedColor;
+      } catch (e) {
+         let selectedColor = new Clutter.Color();
+         selectedColor.from_string(resizeColor);
+         this.selectedColor = selectedColor;
+      }
       this._border.queue_repaint();
    },
 
@@ -6476,7 +6491,6 @@ Main.notify("Erp" + e.message);
       this.mainBox.add(this.accessibleBox.actor, { y_fill: true });
       this.favoritesBox.style_class = '';
       this.betterPanel.style_class = 'menu-favorites-box';
-      this.bttChanger.actor.set_style("padding-top: 6px;");
       this.endHorizontalBox.set_style("padding-right: 0px;");
       //this.endHorizontalBox.visible = false;
    },
