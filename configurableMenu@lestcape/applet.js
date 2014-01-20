@@ -1486,6 +1486,57 @@ PowerBox.prototype = {
    }
 };
 
+function ControlButtonExtended(parent, title, description, iconName, iconSize, callBackExecution) {
+   this._init(parent, title, description, iconName, iconSize, callBackExecution);
+}
+
+ControlButtonExtended.prototype = {
+   __proto__: PopupMenu.PopupSubMenuMenuItem.prototype,
+    
+   _init: function(parent, title, description, iconName, iconSize, callBackExecution) {
+      PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: true});
+      this.parent = parent;
+      this.title = title;
+      this.description = description;
+      this.iconName = iconName;
+      this.iconSize = iconSize;
+      this.callBackExecution = callBackExecution;
+      this.actor.set_style_class_name('menu-category-button');
+      this.actor.add_style_class_name('menu-control-button');
+      
+      this.container = new St.BoxLayout();
+      this.iconObj = new St.Icon({icon_name: this.iconName, icon_type: St.IconType.SYMBOLIC, style_class: 'popup-menu-icon', icon_size: this.iconSize});
+      this.container.add(this.iconObj, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+
+      this.addActor(this.container);
+      this.iconObj.realize();
+   },
+
+   setActive: function(active) {
+      if(active) {
+         this.parent.selectedAppBox.setSelectedText(this.title, this.description);
+         global.set_cursor(Cinnamon.Cursor.POINTING_HAND);
+         this.actor.set_style_class_name('menu-category-button-selected');
+         this.actor.add_style_class_name('menu-control-button-selected');
+      } else {
+         this.parent.selectedAppBox.setSelectedText("", "");
+         global.unset_cursor();
+         this.actor.set_style_class_name('menu-category-button');
+         this.actor.add_style_class_name('menu-control-button');
+      }
+      PopupMenu.PopupBaseMenuItem.prototype.setActive.call(this, active);
+   },
+
+   _onButtonReleaseEvent: function (actor, event) {
+      if(this.callBackExecution)
+         this.callBackExecution(actor, event);
+   }
+    
+/*   activate: function(event) {
+      this.parent.menu.close();
+   }*/
+};
+
 function ControlBox(parent, iconSize) {
    this._init(parent, iconSize);
 }
@@ -1498,7 +1549,8 @@ ControlBox.prototype = {
       this.actor.style =  "padding-top: "+(0)+"px;padding-bottom: "+(10)+"px;padding-left: "+(4)+"px;padding-right: "+(4)+"px;margin:auto;";
 
       this.resizeBox = new St.BoxLayout({ vertical: false, style_class: 'menu-control-button-box' });
-
+      //new ControlButtonExtended(parent, _("Full Screen"), _("Active or not the full screen mode"),
+      //                               "zoom-fit-best", this.iconSize, Lang.bind(this, this._onClickedChangeFullScreen)).actor;
       this.bttFullScreen = this._createSymbolicButton('zoom-fit-best');
       this.bttFullScreen.connect('clicked', Lang.bind(this, this._onClickedChangeFullScreen));
       this.resizeBox.add(this.bttFullScreen, { x_fill: false, expand: false });
@@ -1535,11 +1587,13 @@ ControlBox.prototype = {
    },
 
    _onClickedChangeView: function(actor, event) {
+      this._effectIcon(actor, 0.2);
       this.changeViewSelected(!this.parent.iconView);
       this.parent._changeView();
    },
 
    _onClickedChangeResize: function(actor, event) {
+      this._effectIcon(actor, 0.2);
       this.parent.fullScreen = false;
       this.parent.automaticSize = false;
       this.parent._setFullScreen();
@@ -1548,13 +1602,13 @@ ControlBox.prototype = {
    },
 
    _onClickedChangeFullScreen: function(actor, event) {
+      this._effectIcon(actor, 0.2);
       this.parent.fullScreen = !this.parent.fullScreen;
       this.parent._setFullScreen();
       this.changeFullScreen(this.parent.fullScreen);
    },
 
    _onSettings: function(actor, event) {
-      //this._effectIcon(actor, 0.2);
       this.parent.menu.close();
       Util.spawn(['cinnamon-settings', 'applets', this.parent.uuid]);
    },
@@ -1603,14 +1657,14 @@ ControlBox.prototype = {
    },
 
    setIconSize: function(iconSize) {
-      let childBox = this.actor.get_children();
+     /* let childBox = this.actor.get_children();
       let childBtt;
       for(let i = 0; i < childBox.length; i++) {
          childBtt = childBox[i].get_children();
          for(let j = 0; j < childBtt.length; j++) {
             childBtt[j].get_children()[0].set_icon_size(iconSize);
          }
-      }
+      }*/
    },
 
    _createSymbolicButton: function(icon) {
@@ -1620,6 +1674,7 @@ ControlBox.prototype = {
       btt.add_style_class_name('menu-control-button');
       btt.connect('notify::hover', Lang.bind(this, function(actor) {
          if(!this.parent.actorResize) {
+            this.setActive(actor, actor.hover);
             if(actor.get_hover()) {
                switch(actor) {
                   case this.bttViewList:
@@ -1656,12 +1711,32 @@ ControlBox.prototype = {
             }
          }
       }));
+      this.actor.connect('key-focus-in', Lang.bind(this, function(actor) {
+         this.setActive(actor, true);
+      }));
+      this.actor.connect('key-focus-out', Lang.bind(this, function(actor) {
+         this.setActive(actor, false);
+      }));
       return btt;
    },
 
+
+   setActive: function (actor, active) {
+        let activeChanged = active != this.active;
+        if (activeChanged) {
+            this.active = active;
+            if (active) {
+                actor.add_style_pseudo_class('active');
+                if (this.focusOnHover) this.actor.grab_key_focus();
+            } else
+                actor.remove_style_pseudo_class('active');
+            //this.emit('active-changed', active);
+        }
+    },
+
    navegateControlBox: function(symbol, actor) {
    },
-/*
+
    _effectIcon: function(effectIcon, time) {
       Tweener.addTween(effectIcon,
       {  opacity: 0,
@@ -1675,7 +1750,7 @@ ControlBox.prototype = {
             });
          })
       });
-   }*/
+   }
 };
 
 function ApplicationContextMenuItemExtended(appButton, label, action) {
