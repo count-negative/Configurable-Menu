@@ -1,4 +1,31 @@
 {
     "list-places": "bookmark:file://computer:///,bookmark:file://trash:///",
-    "list-apps": "cinnamon-settings.desktop,synaptic.desktop,update-manager.desktop,gnome-terminal.desktop,yelp.desktop"
+    "list-apps": "cinnamon-settings.desktop,synaptic.desktop,update-manager.desktop,gnome-terminal.desktop,yelp.desktop",
+    "classic": "vertical;;/usr/share/cinnamon/theme/menu.png;;Menu;;true;;true;;false;;false;;0;;false;;true;;true;;true;;"
+               "false;;false;;true;;true;;300;;false;;22;;22;;32;;32;;32;;68;;22;;true;;true;;true;;1;;true;;0;;true;;false;;"
+               "%H:%M;;%A,%e %B;;true;;10;;true;;8;;false;;false;;700;;500;;false;;true;;true;;true;;true;;10;;true;;false",
+    "stylized": "vertical;;/usr/share/cinnamon/theme/menu.png;;Menu;;true;;true;;false;;false;;0;;false;;true;;true;;true;;"
+               "false;;false;;true;;true;;300;;false;;22;;22;;32;;32;;32;;68;;22;;true;;true;;true;;1;;true;;0;;true;;false;;"
+               "%H:%M;;%A,%e %B;;true;;10;;true;;8;;false;;false;;700;;500;;false;;true;;true;;true;;true;;10;;true;;false",
+    "dragon": "vertical;;/usr/share/cinnamon/theme/menu.png;;Menu;;true;;true;;false;;false;;0;;false;;true;;true;;true;;"
+               "false;;false;;true;;true;;300;;false;;22;;22;;32;;32;;32;;68;;22;;true;;true;;true;;1;;true;;0;;true;;false;;"
+               "%H:%M;;%A,%e %B;;true;;10;;true;;8;;false;;false;;700;;500;;false;;true;;true;;true;;true;;10;;true;;false",
+    "dragonInverted": "vertical;;/usr/share/cinnamon/theme/menu.png;;Menu;;true;;true;;false;;false;;0;;false;;true;;true;;true;;"
+               "false;;false;;true;;true;;300;;false;;22;;22;;32;;32;;32;;68;;22;;true;;true;;true;;1;;true;;0;;true;;false;;"
+               "%H:%M;;%A,%e %B;;true;;10;;true;;8;;false;;false;;700;;500;;false;;true;;true;;true;;true;;10;;true;;false",
+    "horizontal": "vertical;;/usr/share/cinnamon/theme/menu.png;;Menu;;true;;true;;false;;false;;0;;false;;true;;true;;true;;"
+               "false;;false;;true;;true;;300;;false;;22;;22;;32;;32;;32;;68;;22;;true;;true;;true;;1;;true;;0;;true;;false;;"
+               "%H:%M;;%A,%e %B;;true;;10;;true;;8;;false;;false;;700;;500;;false;;true;;true;;true;;true;;10;;true;;false",
+    "accessible": "vertical;;/usr/share/cinnamon/theme/menu.png;;Menu;;true;;true;;false;;false;;0;;false;;true;;true;;true;;"
+               "false;;false;;true;;true;;300;;false;;22;;22;;32;;32;;32;;68;;22;;true;;true;;true;;1;;true;;0;;true;;false;;"
+               "%H:%M;;%A,%e %B;;true;;10;;true;;8;;false;;false;;700;;500;;false;;true;;true;;true;;true;;10;;true;;false",
+    "accessibleInverted": "vertical;;/usr/share/cinnamon/theme/menu.png;;Menu;;true;;true;;false;;false;;0;;false;;true;;true;;true;;"
+               "false;;false;;true;;true;;300;;false;;22;;22;;32;;32;;32;;68;;22;;true;;true;;true;;1;;true;;0;;true;;false;;"
+               "%H:%M;;%A,%e %B;;true;;10;;true;;8;;false;;false;;700;;500;;false;;true;;true;;true;;true;;10;;true;;false",
+    "mint":    "vertical;;/usr/share/cinnamon/theme/menu.png;;Menu;;true;;true;;false;;false;;0;;false;;true;;true;;true;;"
+               "false;;false;;true;;true;;300;;false;;22;;22;;32;;32;;32;;68;;22;;true;;true;;true;;1;;true;;0;;true;;false;;"
+               "%H:%M;;%A,%e %B;;true;;10;;true;;8;;false;;false;;700;;500;;false;;true;;true;;true;;true;;10;;true;;false",
+    "windows7": "vertical;;/usr/share/cinnamon/theme/menu.png;;Menu;;true;;true;;false;;false;;0;;false;;true;;true;;true;;"
+               "false;;false;;true;;true;;300;;false;;22;;22;;32;;32;;32;;68;;22;;true;;true;;true;;1;;true;;0;;true;;false;;"
+               "%H:%M;;%A,%e %B;;true;;10;;true;;8;;false;;false;;700;;500;;false;;true;;true;;true;;true;;10;;true;;false"
 }

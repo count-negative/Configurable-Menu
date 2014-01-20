@@ -1497,7 +1497,7 @@ ControlBox.prototype = {
       this.actor = new St.BoxLayout({ vertical: false });
       this.actor.style =  "padding-top: "+(0)+"px;padding-bottom: "+(10)+"px;padding-left: "+(4)+"px;padding-right: "+(4)+"px;margin:auto;";
 
-      this.resizeBox = new St.BoxLayout({ vertical: false });
+      this.resizeBox = new St.BoxLayout({ vertical: false, style_class: 'menu-control-button-box' });
 
       this.bttFullScreen = this._createSymbolicButton('zoom-fit-best');
       this.bttFullScreen.connect('clicked', Lang.bind(this, this._onClickedChangeFullScreen));
@@ -1510,7 +1510,7 @@ ControlBox.prototype = {
       this.resizeBox.add(this.bttSettings, { x_fill: false, x_align: St.Align.END, expand: true });
       this.actor.add(this.resizeBox, { x_fill: true, x_align: St.Align.START, expand: true });
 
-      this.viewBox = new St.BoxLayout({ vertical: false, style_class: 'menu-favorites-box' });
+      this.viewBox = new St.BoxLayout({ vertical: false, style_class: 'menu-control-button-box' });
       this.bttViewList = this._createSymbolicButton('view-list-symbolic');
       this.bttViewList.connect('clicked', Lang.bind(this, this._onClickedChangeView));
       this.viewBox.add(this.bttViewList, { x_fill: false, expand: false });
@@ -1529,8 +1529,8 @@ ControlBox.prototype = {
          this.viewBox.set_style_class_name('menu-favorites-box');
       }
       else {
-         this.resizeBox.set_style_class_name('');
-         this.viewBox.set_style_class_name('');
+         this.resizeBox.set_style_class_name('menu-control-button-box');
+         this.viewBox.set_style_class_name('menu-control-button-box');
       }
    },
 
@@ -1616,7 +1616,6 @@ ControlBox.prototype = {
    _createSymbolicButton: function(icon) {
       let bttIcon = new St.Icon({icon_name: icon, icon_type: St.IconType.SYMBOLIC,
 	                         style_class: 'popup-menu-icon', icon_size: this.iconSize});
-      bttIcon.add_style_class_name('popup-menu-control-icon');
       let btt = new St.Button({ child: bttIcon, style_class: 'menu-category-button' });
       btt.add_style_class_name('menu-control-button');
       btt.connect('notify::hover', Lang.bind(this, function(actor) {
@@ -2107,6 +2106,7 @@ HoverIcon.prototype = {
 
          this._onUserChanged();
          this.refreshFace();
+         this.actor.add_style_class_name('menu-hover-box');
       } catch(e) {
          Main.notifyError("ErrorHover:",e.message);
       }
@@ -2116,11 +2116,13 @@ HoverIcon.prototype = {
       this.borderSize = borderSize;
       let themeNode = this.parent.menu.actor.get_theme_node();
       let clutterColorStr = themeNode.get_color('color').to_string();
-      let color = clutterColorStr.substr(0, clutterColorStr.length - 2);
-      if(!color)
-         color = "#ffffff";
-      this.actor.style = "padding-top: "+(0)+"px;padding-bottom: "+(0)+"px;padding-left: "+(0)+"px;padding-right: "+(0)+
-                         "px;margin:auto;border: "+ borderSize + "px solid" + color + "; border-radius: 12px;";
+      let color = clutterColorStr.substr(0, clutterColorStr.length - 2); 
+      if(this.actor.get_theme_node().get_color('border'))
+         color = this.actor.get_theme_node().get_color('border').to_string();
+      if(this.actor.get_theme_node().get_length('border-radius') == 0)
+         this.actor.style = "border: "+ borderSize + "px solid" + color + "; border-radius: 12px;";
+      else
+         this.actor.style = "border: "+ borderSize + "px solid" + color + ";";
    },
 /*
    setActive: function(active) {
@@ -4676,6 +4678,24 @@ AccessibleMetaData.prototype = {
             pos++;
       }
       return listApps;
+   },
+
+   getThemeConfig: function(theme) {
+      let themeString = this.meta[theme];
+      let themeList = themeString.split(";;");
+      let themeProperties = new Array();
+      themeProperties.push(themeList[0]);
+      return themeProperties;
+   },
+
+   setThemeConfig: function(theme, properties) {
+      let result = "";
+      for(let i = 0; i < properties.length; i++)
+         result += properties[i].toString() + ";;";
+      if(properties.length > 0)
+         result +=  properties[i].toString();
+      this.meta[theme] = result;
+      this._saveMetaData();
    },
 
    setAppsList: function(listApps) {
