@@ -1616,6 +1616,7 @@ ControlBox.prototype = {
    _createSymbolicButton: function(icon) {
       let bttIcon = new St.Icon({icon_name: icon, icon_type: St.IconType.SYMBOLIC,
 	                         style_class: 'popup-menu-icon', icon_size: this.iconSize});
+      bttIcon.add_style_class_name('popup-menu-control-icon');
       let btt = new St.Button({ child: bttIcon, style_class: 'menu-category-button' });
       btt.add_style_class_name('menu-control-button');
       btt.connect('notify::hover', Lang.bind(this, function(actor) {
