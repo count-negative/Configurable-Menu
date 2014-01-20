@@ -1657,14 +1657,14 @@ ControlBox.prototype = {
    },
 
    setIconSize: function(iconSize) {
-     /* let childBox = this.actor.get_children();
+      let childBox = this.actor.get_children();
       let childBtt;
       for(let i = 0; i < childBox.length; i++) {
          childBtt = childBox[i].get_children();
          for(let j = 0; j < childBtt.length; j++) {
             childBtt[j].get_children()[0].set_icon_size(iconSize);
          }
-      }*/
+      }
    },
 
    _createSymbolicButton: function(icon) {
@@ -1719,7 +1719,6 @@ ControlBox.prototype = {
       }));
       return btt;
    },
-
 
    setActive: function (actor, active) {
         let activeChanged = active != this.active;
