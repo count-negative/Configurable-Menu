@@ -1,11 +1,9 @@
-// Applet : Configurable Menu      Version      : v0.8-Beta
-// O.S.   : Cinnamon               Release Date : 07 january 2014.
+// Applet : Configurable Menu      Version      : v0.9-Beta
+// O.S.   : Cinnamon               Release Date : 21 january 2014.
 // Author : Lester Carballo Pérez  Email        : lestcape@gmail.com
+// Author : Garibaldo              Webpage      : https://github.com/Garibaldo
 //
 // Website : https://github.com/lestcape/Configurable-Menu
-//
-// Thanks for all contribution to:
-// Garibaldo (https://github.com/Garibaldo)
 //
 // "This is a fork of the Cinnamon stock menu, but with much more features
 //  and extremely configurable."
@@ -2213,7 +2211,10 @@ HoverIcon.prototype = {
 
          this._onUserChanged();
          this.refreshFace();
-         this.actor.add_style_class_name('menu-hover-box');
+         this.actor.add_style_class_name('menu-hover-icon');
+         this.actor.connect('button-press-event', Lang.bind(this, function() {
+            this.actor.add_style_pseudo_class('pressed');
+         }));
       } catch(e) {
          Main.notifyError("ErrorHover:",e.message);
       }
@@ -2290,6 +2291,7 @@ HoverIcon.prototype = {
          this.controlBox.visible = false;
          this.controlBox.visible = true;
       }
+      this.actor.remove_style_pseudo_class('pressed');
       return true;
    },
 

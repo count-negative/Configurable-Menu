@@ -1,19 +1,17 @@
-Configurable Menu v0.8-Beta
+Configurable Menu v0.9-Beta
 ==============
 
-Applet: Configurable Menu Version: v0.8-Beta
+Applet: Configurable Menu Version: v0.9-Beta
 
 O.S.: Cinnamon 
 
-Release Date: 07 january 2014
+Release Date: 21 january 2014
 
-Author: Lester Carballo Pérez
+Authors: Lester Carballo Pérez and Garibaldo(https://github.com/Garibaldo).
 
 Email: lestcape@gmail.com
 
 Website: https://github.com/lestcape/Configurable-Menu
-
-Thanks for all contribution to Garibaldo: https://github.com/Garibaldo
 
 --------------
 
@@ -80,13 +78,23 @@ Installation Instructions:
 
 Add new languages:
 --------------
-
 1. Install the poedit program.
 2. Open the file default.po with poedit. This file is located in the folder /configurableMenu@lestcape/locale/
 3. Make the translation, save the result, and send the .po file updated by the e-mail address here present, or add directly into the website of this software.
 
 Change Log:
 ==============
+0.9-Beta
+   - Was added support for more languages.
+   - Was added spanish language.
+   - Now you can have a different configuration for for each layouts.
+   - The removable drives are now show in accessible panel and also can be removed.
+   - The full screen mode was improved, now can be see better in more themes.
+   - Now the property "Maximum width of the application entry text" it's really a maximum width and not the width.
+   - Added support for the old Clutter.Color API to fix the bug "Clutter.Color.from_string is not a function" when you start the applet .
+   - Fixed the bug on mint and windows 7 layouts, that make the menu close if searchEntry do not have focus.
+   - Control buttons and hover icon have now an style class and can be used in the css file of the Cinnamon theme.
+
 0.8-Beta
    - The Accessible panel is now configurable and has two drag and drop areas (Places and Apps).
    - Implemented new “Places” fields (PC, Desktop, Home, Network and Trash).
@@ -169,4 +177,4 @@ https://github.com/lestcape/Configurable-Menu/pulls
 
 ==============
 Thank you very much for using this product.
-Lester.
+Lester and Garibaldo.
