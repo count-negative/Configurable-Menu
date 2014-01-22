@@ -1552,22 +1552,42 @@ ControlBox.prototype = {
       //new ControlButtonExtended(parent, _("Full Screen"), _("Active or not the full screen mode"),
       //                               "zoom-fit-best", this.iconSize, Lang.bind(this, this._onClickedChangeFullScreen)).actor;
       this.bttFullScreen = this._createSymbolicButton('zoom-fit-best');
-      this.bttFullScreen.connect('clicked', Lang.bind(this, this._onClickedChangeFullScreen));
+      this.bttFullScreen.connect('button-press-event', Lang.bind(this, function() {
+         this.bttFullScreen.add_style_pseudo_class('pressed');
+      }));
+      this.bttFullScreen.connect('button-release-event', Lang.bind(this, this._onClickedChangeFullScreen));
+      //this.bttFullScreen.connect('clicked', Lang.bind(this, this._onClickedChangeFullScreen));
       this.resizeBox.add(this.bttFullScreen, { x_fill: false, expand: false });
       this.bttResize = this._createSymbolicButton('changes-prevent');
-      this.bttResize.connect('clicked', Lang.bind(this, this._onClickedChangeResize));
+      this.bttResize.connect('button-press-event', Lang.bind(this, function() {
+         this.bttResize.add_style_pseudo_class('pressed');
+      }));
+      this.bttResize.connect('button-release-event', Lang.bind(this, this._onClickedChangeResize));
+      //this.bttResize.connect('clicked', Lang.bind(this, this._onClickedChangeResize));
       this.resizeBox.add(this.bttResize, { x_fill: false, expand: false });
       this.bttSettings = this._createSymbolicButton('preferences-system');
-      this.bttSettings.connect('clicked', Lang.bind(this, this._onSettings));
+      this.bttSettings.connect('button-press-event', Lang.bind(this, function() {
+         this.bttSettings.add_style_pseudo_class('pressed');
+      }));
+      this.bttSettings.connect('button-release-event', Lang.bind(this, this._onSettings));
+      //this.bttSettings.connect('clicked', Lang.bind(this, this._onSettings));
       this.resizeBox.add(this.bttSettings, { x_fill: false, x_align: St.Align.END, expand: true });
       this.actor.add(this.resizeBox, { x_fill: true, x_align: St.Align.START, expand: true });
 
       this.viewBox = new St.BoxLayout({ vertical: false, style_class: 'menu-control-button-box' });
       this.bttViewList = this._createSymbolicButton('view-list-symbolic');
-      this.bttViewList.connect('clicked', Lang.bind(this, this._onClickedChangeView));
+      this.bttViewList.connect('button-press-event', Lang.bind(this, function() {
+         this.bttViewList.add_style_pseudo_class('pressed');
+      }));
+      this.bttViewList.connect('button-release-event', Lang.bind(this, this._onClickedChangeView));
+      //this.bttViewList.connect('clicked', Lang.bind(this, this._onClickedChangeView));
       this.viewBox.add(this.bttViewList, { x_fill: false, expand: false });
       this.bttViewGrid = this._createSymbolicButton('view-grid-symbolic');
-      this.bttViewGrid.connect('clicked', Lang.bind(this, this._onClickedChangeView));
+      this.bttViewGrid.connect('button-press-event', Lang.bind(this, function() {
+         this.bttViewGrid.add_style_pseudo_class('pressed');
+      }));
+      this.bttViewGrid.connect('button-release-event', Lang.bind(this, this._onClickedChangeView));
+      //this.bttViewGrid.connect('clicked', Lang.bind(this, this._onClickedChangeView));
       this.viewBox.add(this.bttViewGrid, { x_fill: false, expand: false });
       this.actor.add(this.viewBox, { x_fill: false, x_align: St.Align.END, expand: true });
 
@@ -1588,12 +1608,15 @@ ControlBox.prototype = {
 
    _onClickedChangeView: function(actor, event) {
       this._effectIcon(actor, 0.2);
+      this.bttViewGrid.remove_style_pseudo_class('pressed');
+      this.bttViewList.remove_style_pseudo_class('pressed');
       this.changeViewSelected(!this.parent.iconView);
       this.parent._changeView();
    },
 
    _onClickedChangeResize: function(actor, event) {
       this._effectIcon(actor, 0.2);
+      this.bttResize.remove_style_pseudo_class('pressed');
       this.parent.fullScreen = false;
       this.parent.automaticSize = false;
       this.parent._setFullScreen();
@@ -1603,12 +1626,14 @@ ControlBox.prototype = {
 
    _onClickedChangeFullScreen: function(actor, event) {
       this._effectIcon(actor, 0.2);
+      this.bttFullScreen.remove_style_pseudo_class('pressed');
       this.parent.fullScreen = !this.parent.fullScreen;
       this.parent._setFullScreen();
       this.changeFullScreen(this.parent.fullScreen);
    },
 
    _onSettings: function(actor, event) {
+      this.bttSettings.remove_style_pseudo_class('pressed');
       this.parent.menu.close();
       Util.spawn(['cinnamon-settings', 'applets', this.parent.uuid]);
    },
@@ -1616,10 +1641,12 @@ ControlBox.prototype = {
    changeResizeActive: function(resizeActive) {
       this.parent.controlingSize = resizeActive;
       if(resizeActive) {
+         this.bttResize.add_style_pseudo_class('open');
          this.bttResize.get_children()[0].set_icon_name('changes-prevent');
          this.parent.menu.setResizeArea(this.parent.deltaMinResize);
       }
       else {
+         this.bttResize.remove_style_pseudo_class('open');
          this.bttResize.get_children()[0].set_icon_name('view-fullscreen');
          this.parent.menu.setResizeArea(0);
       }
@@ -1628,10 +1655,14 @@ ControlBox.prototype = {
    changeViewSelected: function(iconView) {
       this.parent.iconView = iconView;
       if(iconView) {
+         this.bttViewGrid.add_style_pseudo_class('open');
+         this.bttViewList.remove_style_pseudo_class('open');
          this.bttViewList.set_style('border: 1px;');
          this.bttViewGrid.set_style('border: 1px solid ' + this._selectedBorderColor() + ';');
       }
       else {
+         this.bttViewList.add_style_pseudo_class('open');
+         this.bttViewGrid.remove_style_pseudo_class('open');
          this.bttViewList.set_style('border: 1px solid ' + this._selectedBorderColor() + ';');
          this.bttViewGrid.set_style('border: 1px;');
       }
@@ -1648,9 +1679,11 @@ ControlBox.prototype = {
 
    changeFullScreen: function(fullScreen) {
       if(fullScreen) {
+         this.bttFullScreen.add_style_pseudo_class('open');
          this.bttFullScreen.get_children()[0].set_icon_name('window-minimize');
       }
       else {
+         this.bttFullScreen.remove_style_pseudo_class('open')
          this.bttFullScreen.get_children()[0].set_icon_name('zoom-fit-best');
          //this.bttFullScreen.get_children()[0].set_icon_name('window-maximize');
       }
@@ -4759,7 +4792,7 @@ AccessibleMetaData.prototype = {
       let themeList = themeString.split(";;");
       let themeProperties = new Array();
       let property;
-      for(let i = 0; i < themeList.length - 1; i++) {
+      for(let i = 0; i < themeList.length; i++) {
          property = themeList[i].split("::");
          themeProperties[property[0]] = property[1];
       }
@@ -4816,9 +4849,7 @@ AccessibleMetaData.prototype = {
       let result = "";
       for(let key in properties)
          result += key+"::"+properties[key].toString() + ";;";
-      if(properties.length > 0)
-         result +=   key+"::"+properties[key].toString();
-      this.meta[theme] = result;
+      this.meta[theme] = result.substring(0, result.length - 2);
       this._saveMetaData();
    },
 
