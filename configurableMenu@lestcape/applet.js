@@ -4935,6 +4935,7 @@ MyApplet.prototype = {
          this.menuManager = new PopupMenu.PopupMenuManager(this);
          this.menuManager.addMenu(this.menu);   
          this.actor.connect('key-press-event', Lang.bind(this, this._onSourceKeyPress));
+         this.actor.connect('button-release-event', Lang.bind(this, this._onButtonReleaseEvent));
          this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPressEvent));
          //this._keyFocusNotifyIDSignal = global.stage.connect('notify::key-focus', Lang.bind(this, this._onKeyFocusChanged));
 
@@ -6226,15 +6227,19 @@ Main.notify("errorTheme", e.message);
 
    _onButtonReleaseEvent: function(actor, event) {
       if((!this.activateOnPress)&&(!global.settings.get_boolean("panel-edit-mode")))
-         return this._menuEventClicked(actor, event);
+         this._menuEventClicked(actor, event);
+      return true;
    },
 
    _onButtonPressEvent: function(actor, event) {
       if((this.activateOnPress)&&(!global.settings.get_boolean("panel-edit-mode")))
-         return this._menuEventClicked(actor, event);
+         this._menuEventClicked(actor, event);
+      return true;
    },
 
    _menuEventClicked: function(actor, event) {
+      if((this._draggable)&&(!this._draggable.inhibit))
+         return false;
       if(event.get_button()==1){
          if(this._applet_context_menu.isOpen) {
             this._applet_context_menu.toggle(); 
@@ -6246,7 +6251,6 @@ Main.notify("errorTheme", e.message);
             this._applet_context_menu.toggle();			
          }
       }
-      return true;
    },
 
    _updateMenuSection: function() {
