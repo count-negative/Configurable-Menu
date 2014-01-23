@@ -153,7 +153,6 @@ Add theme support:
 	box-shadow: 1px 4px 9px rgb(80,80,80);
 }
 
-
 .menu-control-button-selected {
 	padding: 7px;
 	border: 1px;

@@ -6225,13 +6225,28 @@ Main.notify("errorTheme", e.message);
    },
 
    _onButtonReleaseEvent: function(actor, event) {
-      if(!this.activateOnPress)
-         CinnamonMenu.MyApplet.prototype._onButtonReleaseEvent.call(this, actor, event);
+      if((!this.activateOnPress)&&(!global.settings.get_boolean("panel-edit-mode")))
+         return this._menuEventClicked(actor, event);
    },
 
    _onButtonPressEvent: function(actor, event) {
       if((this.activateOnPress)&&(!global.settings.get_boolean("panel-edit-mode")))
-         CinnamonMenu.MyApplet.prototype._onButtonReleaseEvent.call(this, actor, event);
+         return this._menuEventClicked(actor, event);
+   },
+
+   _menuEventClicked: function(actor, event) {
+      if(event.get_button()==1){
+         if(this._applet_context_menu.isOpen) {
+            this._applet_context_menu.toggle(); 
+         }
+         this.on_applet_clicked(event);            
+      }
+      if(event.get_button()==3){            
+         if(this._applet_context_menu._getMenuItems().length > 0) {
+            this._applet_context_menu.toggle();			
+         }
+      }
+      return true;
    },
 
    _updateMenuSection: function() {
