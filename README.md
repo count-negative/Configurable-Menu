@@ -183,6 +183,7 @@ Change Log:
    - Added support for the old Clutter.Color API to fix the bug "Clutter.Color.from_string is not a function" when you start the applet .
    - Fixed the bug on mint and windows 7 layouts, that make the menu close if searchEntry do not have focus.
    - Control buttons and hover icon have now an style class and can be used in the css file of the Cinnamon theme.
+   - Removed the hover icon borders for theme compatibility reason.
 
 0.8-Beta
    - The Accessible panel is now configurable and has two drag and drop areas (Places and Apps).
