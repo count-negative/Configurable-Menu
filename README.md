@@ -77,18 +77,18 @@ Installation Instructions:
 
 Add theme support:
 
-1. List of new style class and pseudo style class:
+- List of new style class and pseudo style class:
 
-   - menu-hover-icon-box: open
-   - menu-control-button-box: (Not have)
-   - menu-control-button: open, .menu-control-button-selected(when hover or focus)
+    - menu-hover-icon-box: open
+    - menu-control-button-box: (Not have)
+    - menu-control-button: open, .menu-control-button-selected(when hover or focus)
 
-2. Settings restrictions on the style class:
+- Settings restrictions on the style class:
 
-   - menu-hover-icon-box: Can only used if the option "Hover icon have a box"  it's active.
-   - menu-control-button-box: Can only used if the option "Control buttons have a box" it's active.
+    - menu-hover-icon-box: Can only used if the option "Hover icon have a box"  it's active.
+    - menu-control-button-box: Can only used if the option "Control buttons have a box" it's active.
 
-3. Example of style that can be use in void theme(http://cinnamon-spices.linuxmint.com/themes/view/104):
+- Example of style that can be use in void theme(http://cinnamon-spices.linuxmint.com/themes/view/104):
 
 ```css
 .menu-hover-icon-box {
