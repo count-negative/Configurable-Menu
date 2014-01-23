@@ -92,17 +92,17 @@ Add theme support:
 
 ```css
 .menu-hover-icon-box {
-        border: 1px;
-        border-color: rgba(0,0,0,1.0);
+	border: 1px;
+	border-color: rgba(0,0,0,1.0);
 	border-radius: 0px 15px 15px 15px;
-        background-gradient-start: rgba(55,55,55,0.05);
-        background-gradient-end: rgba(55,55,55,0.21);
-        background-gradient-direction: vertical;
+	background-gradient-start: rgba(55,55,55,0.05);
+	background-gradient-end: rgba(55,55,55,0.21);
+	background-gradient-direction: vertical;
 }
 
 .menu-hover-icon-box:open {
-        border: 1px;
-        border-color: rgba(255,255,255,1.0);
+	border: 1px;
+	border-color: rgba(255,255,255,1.0);
 	border-radius: 0px 15px 15px 15px;
 	background-color: rgba(10,10,10,0.0);
 	box-shadow: inset 0px 0px 4px rgba(10,10,10,0.0);
@@ -111,56 +111,55 @@ Add theme support:
 .menu-control-button-box {
 	margin: auto;
 	padding: 10px;
-        border: 1px;
-        border-color: rgba(0,0,0,1);
+	border: 1px;
+	border-color: rgba(0,0,0,1);
 	border-radius: 0px 15px 15px 15px;
-        background-gradient-start: rgba(55,55,55,0.05);
-        background-gradient-end: rgba(55,55,55,0.21);
-        background-gradient-direction: vertical;
+	background-gradient-start: rgba(55,55,55,0.05);
+	background-gradient-end: rgba(55,55,55,0.21);
+	background-gradient-direction: vertical;
 	box-shadow: inset 0px 0px 4px rgba(10,10,10,0.5);
 }
 
 .menu-control-button {
 	padding: 7px;
-        border: 1px;
-        border-color: rgba(0,0,0,1);
+	border: 1px;
+	border-color: rgba(0,0,0,1);
 	border-radius: 0px 15px 15px 15px;
-        background-gradient-start: rgba(55,55,55,0.05);
-        background-gradient-end: rgba(55,55,55,0.21);
-        background-gradient-direction: vertical;
-        box-shadow: 1px 4px 9px rgb(80,80,80);
+	background-gradient-start: rgba(55,55,55,0.05);
+	background-gradient-end: rgba(55,55,55,0.21);
+	background-gradient-direction: vertical;
+	box-shadow: 1px 4px 9px rgb(80,80,80);
 }
 
 .menu-control-button:open {
 	padding: 7px;
-        border: 1px;
-        border-color: rgba(255,255,255,1);
+	border: 1px;
+	border-color: rgba(255,255,255,1);
 	border-radius: 0px 15px 15px 15px;
 	background-color: rgba(70,70,70,1);
-    	color: #fff;
-        box-shadow: 1px 4px 9px rgb(80,80,80);
-
+	color: #fff;
+	box-shadow: 1px 4px 9px rgb(80,80,80);
 }
 
 .menu-control-button-selected:open {
 	padding: 7px;
-        border: 1px;
-        border-color: rgba(255,255,255,1);
- 	border-radius: 0px 15px 15px 15px;
+	border: 1px;
+	border-color: rgba(255,255,255,1);
+	border-radius: 0px 15px 15px 15px;
 	background-gradient-start: rgba(70,70,70,1);
 	background-gradient-end: rgba(10,10,10,.97);
 	background-gradient-direction: vertical;
-    	color: #fff;    
+	color: #fff;
 	box-shadow: 1px 4px 9px rgb(80,80,80);
 }
 
 
 .menu-control-button-selected {
 	padding: 7px;
-        border: 1px;
-        border-color: rgba(0,0,0,1);
-        background-color: rgba(10,10,10,0.0);
-    	color: #fff;    
+	border: 1px;
+	border-color: rgba(0,0,0,1);
+	background-color: rgba(10,10,10,0.0);
+	color: #fff;
 	box-shadow: 1px 4px 9px rgb(80,80,80);
 }
 ```
