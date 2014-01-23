@@ -76,7 +76,7 @@ Installation Instructions:
 3. Enable the applet in Cinnamon Settings and use it.
 
 Add theme support:
-
+--------------
 - List of new style class and pseudo style class:
 
     - menu-hover-icon-box: open
