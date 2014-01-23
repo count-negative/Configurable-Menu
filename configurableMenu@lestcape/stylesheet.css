@@ -1,0 +1,19 @@
+.menu-control-button {
+        border: 1px;
+        border-color: rgba(255,255,255,0);
+}
+
+.menu-control-button-selected {
+        border: 1px;
+        border-color: rgba(255,255,255,0);
+}
+
+.menu-control-button:open {
+        border: 1px;
+        border-color: rgba(255,255,255,1);
+}
+
+.menu-control-button-selected:open {
+        border: 1px;
+        border-color: rgba(255,255,255,1);
+}

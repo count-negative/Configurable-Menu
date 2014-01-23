@@ -627,14 +627,12 @@ AccessibleBox.prototype = {
    },
 
    takeHover: function(take) {
-      let parent = this.hover.actor.get_parent();
+      let parent = this.hover.container.get_parent();
       if(parent) {
-         parent.remove_actor(this.hover.actor);
-         parent.remove_actor(this.hover.menu.actor);
+         parent.remove_actor(this.hover.container);
       }
       if(take) {
-         this.hoverBox.add(this.hover.actor, { x_fill: false, x_align: St.Align.MIDDLE, expand: true });
-         this.hoverBox.add_actor(this.hover.menu.actor);
+         this.hoverBox.add(this.hover.container, { x_fill: false, x_align: St.Align.MIDDLE, expand: true });
       }
    },
 
@@ -1597,10 +1595,12 @@ ControlBox.prototype = {
       if(specialColor) {
          this.resizeBox.set_style_class_name('menu-favorites-box');
          this.viewBox.set_style_class_name('menu-favorites-box');
+         this.resizeBox.add_style_class_name('menu-control-button-box');
+         this.viewBox.add_style_class_name('menu-control-button-box');
       }
       else {
-         this.resizeBox.set_style_class_name('menu-control-button-box');
-         this.viewBox.set_style_class_name('menu-control-button-box');
+         this.resizeBox.set_style_class_name('');
+         this.viewBox.set_style_class_name('');
       }
    },
 
@@ -1655,24 +1655,11 @@ ControlBox.prototype = {
       if(iconView) {
          this.bttViewGrid.add_style_pseudo_class('open');
          this.bttViewList.remove_style_pseudo_class('open');
-         this.bttViewList.set_style('border: 1px;');
-         this.bttViewGrid.set_style('border: 1px solid ' + this._selectedBorderColor() + ';');
       }
       else {
          this.bttViewList.add_style_pseudo_class('open');
          this.bttViewGrid.remove_style_pseudo_class('open');
-         this.bttViewList.set_style('border: 1px solid ' + this._selectedBorderColor() + ';');
-         this.bttViewGrid.set_style('border: 1px;');
       }
-   },
-
-   _selectedBorderColor: function() {
-      let themeNode = this.parent.menu.actor.get_theme_node();
-      let clutterColorStr = themeNode.get_color('color').to_string();
-      let color = clutterColorStr.substr(0, clutterColorStr.length - 2);
-      if(!color)
-         color = "#ffffff";
-      return color;
    },
 
    changeFullScreen: function(fullScreen) {
@@ -2174,11 +2161,15 @@ HoverIcon.prototype = {
          //this.actor._delegate = this;
          this.parent = parent;
          this.iconSize = iconSize;
-         this.setBorderSize(0);
+
+         this.container = new St.BoxLayout({ vertical: false });
+         this.container.add_actor(this.actor);
+
          this._userIcon = new St.Icon({ icon_size: this.iconSize });
          this.icon = new St.Icon({ icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR });
          
          this.menu = new PopupMenu.PopupSubMenu(this.actor);
+         this.container.add_actor(this.menu.actor);
          this.menu.actor.set_style_class_name('menu-context-menu');
          this.menu.connect('open-state-changed', Lang.bind(this, this._subMenuOpenStateChanged));
 
@@ -2211,33 +2202,28 @@ HoverIcon.prototype = {
 
          this._onUserChanged();
          this.refreshFace();
-         this.actor.add_style_class_name('menu-hover-icon');
          this.actor.connect('button-press-event', Lang.bind(this, function() {
-            this.actor.add_style_pseudo_class('pressed');
+            this.container.add_style_pseudo_class('pressed');
          }));
       } catch(e) {
          Main.notifyError("ErrorHover:",e.message);
       }
    },
 
-   setBorderSize: function(borderSize) {
-      this.borderSize = borderSize;
-      let themeNode = this.parent.menu.actor.get_theme_node();
-      let clutterColorStr = themeNode.get_color('color').to_string();
-      let color = clutterColorStr.substr(0, clutterColorStr.length - 2); 
-      if(this.actor.get_theme_node().get_color('border'))
-         color = this.actor.get_theme_node().get_color('border').to_string();
-      if(this.actor.get_theme_node().get_length('border-radius') == 0)
-         this.actor.style = "border: "+ borderSize + "px solid" + color + "; border-radius: 12px;";
-      else
-         this.actor.style = "border: "+ borderSize + "px solid" + color + ";";
+   setSpecialColor: function(specialColor) {
+      if(specialColor) {
+         this.container.set_style_class_name('menu-favorites-box');
+         this.container.add_style_class_name('menu-hover-icon-box');
+      }
+      else {
+         this.container.set_style_class_name('');
+      }
    },
 /*
    setActive: function(active) {
       this.actor.remove_style_pseudo_class('active');
    },
 */
-
    navegateHoverMenu: function(symbol, actor) {
       if((symbol == Clutter.KEY_Down)||(symbol == Clutter.KEY_Up)) {
          if(this.account.active) {
@@ -2315,14 +2301,17 @@ HoverIcon.prototype = {
    closeMenu: function() {
       this.menu.close(true);
       this.setActive(false);
+      this.container.remove_style_pseudo_class('open');
    },
     
    toggleMenu: function() {
       if(this.menu.isOpen) {
          this.menu.close(true);
+         this.container.remove_style_pseudo_class('open');
          this.menu.sourceActor._delegate.setActive(false);
       } else {
          this.menu.open();
+         this.container.add_style_pseudo_class('open');
          this.menu.sourceActor._delegate.setActive(true);
       }
    },
@@ -2349,31 +2338,31 @@ HoverIcon.prototype = {
 
    refresh: function (icon) {
       this._removeIcon();
-      this.addActor(this.icon);
+      this.addActor(this.icon, 0);
       this.icon.set_icon_name(icon);
    },
 
    refreshApp: function (app) {
       this._removeIcon();
       this.lastApp = app.create_icon_texture(this.iconSize);
-      this.addActor(this.lastApp);
+      this.addActor(this.lastApp, 0);
    },
 
    refreshPlace: function (place) {
       this._removeIcon();
       this.lastApp = place.iconFactory(this.iconSize);
-      this.addActor(this.lastApp);
+      this.addActor(this.lastApp, 0);
    },
 
    refreshFile: function (file) {
       this._removeIcon();
       this.lastApp = file.createIcon(this.iconSize);
-      this.addActor(this.lastApp);
+      this.addActor(this.lastApp, 0);
    },
 
    refreshFace: function () {
       this._removeIcon();
-      this.addActor(this._userIcon);
+      this.addActor(this._userIcon, 0);
    },
 
    _removeIcon: function () {
@@ -2382,8 +2371,10 @@ HoverIcon.prototype = {
          this.lastApp.destroy();
          this.lastApp = null;
       }
-      this.removeActor(this.icon);
-      this.removeActor(this._userIcon);
+      if(this.icon.get_parent() == this.actor)
+         this.removeActor(this.icon);
+      if(this._userIcon.get_parent() == this.actor)
+         this.removeActor(this._userIcon);
    }
 };
 
@@ -4807,6 +4798,7 @@ AccessibleMetaData.prototype = {
       themeProperties["enable-autoscroll"] = (themeProperties["enable-autoscroll"] === 'true');
       themeProperties["show-view-item"] = (themeProperties["show-view-item"] === 'true');
       themeProperties["view-item"] = (themeProperties["view-item"] === 'true');
+      themeProperties["hover-box"] = (themeProperties["hover-box"] === 'true');
       themeProperties["control-box"] = (themeProperties["control-box"] === 'true');
       themeProperties["power-box"] = (themeProperties["power-box"] === 'true');
       themeProperties["accessible-box"] = (themeProperties["accessible-box"] === 'true');
@@ -4825,7 +4817,6 @@ AccessibleMetaData.prototype = {
       themeProperties["show-favorites"] = (themeProperties["show-favorites"] === 'true');
       themeProperties["favorites-lines"] = parseInt(themeProperties["favorites-lines"]);
       themeProperties["show-hover-icon"] = (themeProperties["show-hover-icon"] === 'true');
-      themeProperties["hover-icon-border"] = parseInt(themeProperties["hover-icon-border"]);
       themeProperties["show-power-buttons"] = (themeProperties["show-power-buttons"] === 'true');
       themeProperties["show-time-date"] = (themeProperties["show-time-date"] === 'true');
       themeProperties["show-app-title"] = (themeProperties["show-app-title"] === 'true');
@@ -4966,6 +4957,8 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "view-item", "iconView", this._changeView, null);
 
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "activate-on-press", "activateOnPress", null, null);
+
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "hover-box", "showHoverIconBox", this._setVisibleHoverIconBox, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "control-box", "showControlBox", this._setVisibleControlBox, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "power-box", "showPowerBox", this._setVisiblePowerBox, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "accessible-box", "showAccessibleBox", this._setVisibleAccessibleBox, null);
@@ -4988,7 +4981,6 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "favorites-lines", "favoritesLinesNumber", this._setVisibleFavorites, null);
 
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-hover-icon", "showHoverIcon", this._setVisibleHoverIcon, null);
-         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "hover-icon-border", "hoverBorderSize", this._updateBorderHoverSize, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-power-buttons", "showPowerButtons", this._setVisiblePowerButtons, null);
          
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-time-date", "showTimeDate", this._setVisibleTimeDate, null);
@@ -5687,6 +5679,12 @@ MyApplet.prototype = {
       }
    },
 
+   _setVisibleHoverIconBox: function() {
+      if(this.hover) {
+         this.hover.setSpecialColor(this.showHoverIconBox);
+      }
+   },
+
    _setVisibleControlBox: function() {
       if(this.controlView) {
          this.controlView.setSpecialColor(this.showControlBox);
@@ -5784,10 +5782,6 @@ Main.notify("Erp" + e.message);
       if(this.hover.menu.actor.visible)
          this.hover.menu.actor.visible = this.showHoverIcon;
       this._updateSize();
-   },
-
-   _updateBorderHoverSize: function() {
-      this.hover.setBorderSize(this.hoverBorderSize);
    },
 
    _setVisibleTimeDate: function() {
@@ -5895,6 +5889,7 @@ Main.notify("errorTheme", e.message);
       this.showView = confTheme["show-view-item"];
       this.iconView = confTheme["view-item"];
       this.activateOnPress = confTheme["activate-on-press"];
+      this.showHoverIconBox = confTheme["hover-box"];
       this.showControlBox = confTheme["control-box"];
       this.showPowerBox = confTheme["power-box"];
       this.showAccessibleBox = confTheme["accessible-box"];
@@ -5913,7 +5908,6 @@ Main.notify("errorTheme", e.message);
       this.showFavorites = confTheme["show-favorites"];
       this.favoritesLinesNumber = confTheme["favorites-lines"];
       this.showHoverIcon = confTheme["show-hover-icon"];
-      this.hoverBorderSize = confTheme["hover-icon-border"];
       this.showPowerButtons = confTheme["show-power-buttons"];
       this.showTimeDate = confTheme["show-time-date"];
       this.timeFormat = confTheme["time-format"];
@@ -5952,6 +5946,7 @@ Main.notify("errorTheme", e.message);
       confTheme["show-view-item"] = this.showView;
       confTheme["view-item"] = this.iconView;
       confTheme["activate-on-press"] = this.activateOnPress;
+      confTheme["hover-box"] = this.showHoverIconBox;
       confTheme["control-box"] = this.showControlBox;
       confTheme["power-box"] = this.showPowerBox;
       confTheme["accessible-box"] = this.showAccessibleBox;
@@ -5970,7 +5965,6 @@ Main.notify("errorTheme", e.message);
       confTheme["show-favorites"] = this.showFavorites;
       confTheme["favorites-lines"] = this.favoritesLinesNumber;
       confTheme["show-hover-icon"] = this.showHoverIcon;
-      confTheme["hover-icon-border"] = this.hoverBorderSize;
       confTheme["show-power-buttons"] = this.showPowerButtons;
       confTheme["show-time-date"] = this.showTimeDate;
       confTheme["time-format"] = this.timeFormat;
@@ -6020,7 +6014,6 @@ Main.notify("errorTheme", e.message);
       this._setVisibleScrollAccess();
       this._setVisibleSpacerLine();
       this._updateSpacerSize();
-      this._updateBorderHoverSize();
       this.favoritesScrollBox.actor.visible = this.showFavorites;
       this.selectedAppBox.setTitleVisible(this.showAppTitle);
       this.selectedAppBox.setDescriptionVisible(this.showAppDescription);
@@ -6037,6 +6030,7 @@ Main.notify("errorTheme", e.message);
          if(this.hover.menu.actor.visible)
             this.hover.menu.actor.visible = this.showHoverIcon;
          this.hover.setIconSize(this.iconHoverSize);
+         this.hover.setSpecialColor(this.showHoverIconBox);
       }
       if(this.accessibleBox) {
          this.accessibleBox.setIconSize(this.iconAccessibleSize);
@@ -6463,9 +6457,9 @@ Main.notify("errorTheme", e.message);
          this.hover.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
          this.hover.menu.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
 
-         this.hoverBox = new St.BoxLayout({ vertical: false });
+         /*this.hoverBox = new St.BoxLayout({ vertical: false });
          this.hoverBox.add_actor(this.hover.actor);
-         this.hoverBox.add_actor(this.hover.menu.actor);
+         this.hoverBox.add_actor(this.hover.menu.actor);*/
 
          this.categoriesApplicationsBox = new CategoriesApplicationsBoxExtended();
 
@@ -6565,7 +6559,7 @@ Main.notify("errorTheme", e.message);
    },
 
    loadClassic: function() {
-      this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
+      this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
@@ -6586,7 +6580,7 @@ Main.notify("errorTheme", e.message);
    },
 
    loadStylized: function() {
-      this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
+      this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
@@ -6607,7 +6601,7 @@ Main.notify("errorTheme", e.message);
    },
 
    loadDragon: function() {
-      this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
+      this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
@@ -6631,7 +6625,7 @@ Main.notify("errorTheme", e.message);
    },
 
    loadDragonInverted: function() {
-      this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
+      this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
@@ -6655,7 +6649,7 @@ Main.notify("errorTheme", e.message);
    },
 
    loadHorizontal: function() {
-      this.controlSearchBox.add(this.hoverBox, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
+      this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, false, this.favoritesLinesNumber);

@@ -67,6 +67,94 @@ Installation Instructions:
    /home/USERNAME/.local/share/cinnamon/applets/ where USER is the user for your operating system.
 3. Enable the applet in Cinnamon Settings and use it.
 
+Add theme support:
+
+1. List of new style class and pseudo style class:
+
+   - menu-hover-icon-box: open
+   - menu-control-button-box: (Not have)
+   - menu-control-button: open, .menu-control-button-selected(when hover or focus)
+
+2. Settings restrictions on the style class:
+
+   - menu-hover-icon-box: Can only used if the option "Hover icon have a box"  it's active.
+   - menu-control-button-box: Can only used if the option "Control buttons have a box" it's active.
+
+3. Example of style that can be use in void theme(http://cinnamon-spices.linuxmint.com/themes/view/104):
+
+.menu-hover-icon-box {
+        border: 1px;
+        border-color: rgba(0,0,0,1.0);
+	border-radius: 0px 15px 15px 15px;
+        background-gradient-start: rgba(55,55,55,0.05);
+        background-gradient-end: rgba(55,55,55,0.21);
+        background-gradient-direction: vertical;
+}
+
+.menu-hover-icon-box:open {
+        border: 1px;
+        border-color: rgba(255,255,255,1.0);
+	border-radius: 0px 15px 15px 15px;
+	background-color: rgba(10,10,10,0.0);
+	box-shadow: inset 0px 0px 4px rgba(10,10,10,0.0);
+}
+
+.menu-control-button-box {
+	margin: auto;
+	padding: 10px;
+        border: 1px;
+        border-color: rgba(0,0,0,1);
+	border-radius: 0px 15px 15px 15px;
+        background-gradient-start: rgba(55,55,55,0.05);
+        background-gradient-end: rgba(55,55,55,0.21);
+        background-gradient-direction: vertical;
+	box-shadow: inset 0px 0px 4px rgba(10,10,10,0.5);
+}
+
+.menu-control-button {
+	padding: 7px;
+        border: 1px;
+        border-color: rgba(0,0,0,1);
+	border-radius: 0px 15px 15px 15px;
+        background-gradient-start: rgba(55,55,55,0.05);
+        background-gradient-end: rgba(55,55,55,0.21);
+        background-gradient-direction: vertical;
+        box-shadow: 1px 4px 9px rgb(80,80,80);
+}
+
+.menu-control-button:open {
+	padding: 7px;
+        border: 1px;
+        border-color: rgba(255,255,255,1);
+	border-radius: 0px 15px 15px 15px;
+	background-color: rgba(70,70,70,1);
+    	color: #fff;
+        box-shadow: 1px 4px 9px rgb(80,80,80);
+
+}
+
+.menu-control-button-selected:open {
+	padding: 7px;
+        border: 1px;
+        border-color: rgba(255,255,255,1);
+ 	border-radius: 0px 15px 15px 15px;
+	background-gradient-start: rgba(70,70,70,1);
+	background-gradient-end: rgba(10,10,10,.97);
+	background-gradient-direction: vertical;
+    	color: #fff;    
+	box-shadow: 1px 4px 9px rgb(80,80,80);
+}
+
+
+.menu-control-button-selected {
+	padding: 7px;
+        border: 1px;
+        border-color: rgba(0,0,0,1);
+        background-color: rgba(10,10,10,0.0);
+    	color: #fff;    
+	box-shadow: 1px 4px 9px rgb(80,80,80);
+}
+
 Add new languages:
 
 1. Install the poedit program.
@@ -78,13 +166,14 @@ Change Log:
 0.9-Beta
    - Was added support for more languages.
    - Was added spanish language.
-   - Now you can have a different configuration for for each layouts.
+   - Now you can have a different configuration for each layouts.
    - The removable drives are now show in accessible panel and also can be removed.
    - The full screen mode was improved, now can be see better in more themes.
    - Now the property "Maximum width of the application entry text" it's really a maximum width and not the width.
    - Added support for the old Clutter.Color API to fix the bug "Clutter.Color.from_string is not a function" when you start the applet .
    - Fixed the bug on mint and windows 7 layouts, that make the menu close if searchEntry do not have focus.
    - Control buttons and hover icon have now an style class and can be used in the css file of the Cinnamon theme.
+   - Removed the hover icon borders for theme compatibility reason.
 
 0.8-Beta
    - The Accessible panel is now configurable and has two drag and drop areas (Places and Apps).

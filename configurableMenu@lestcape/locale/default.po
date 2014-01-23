@@ -210,15 +210,6 @@ msgstr ""
 msgid "points"
 msgstr ""
 
-#. configurableMenu@lestcape->settings-schema.json->hover-icon-
-#. border->description
-msgid "Border width of hover icon:"
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->hover-icon-border->tooltip
-msgid "The border width of the hover icon."
-msgstr ""
-
 #. configurableMenu@lestcape->settings-schema.json->hover-icon-border->units
 msgid "pixels"
 msgstr ""
@@ -420,6 +411,14 @@ msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->icon-app-size->units
 msgid "pixels"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->hover-box->description
+msgid "Hover icon have a box"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->hover-box->tooltip
+msgid "Choose whether or not to have a box on the hover icon."
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-

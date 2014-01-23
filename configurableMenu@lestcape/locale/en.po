@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-01-20 17:37-0600\n"
+"PO-Revision-Date: 2014-01-23 00:27-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -104,15 +104,6 @@ msgstr "Press this button to save the layout configuration."
 #. configurableMenu@lestcape->settings-schema.json->app-title-size->units
 msgid "points"
 msgstr "points"
-
-#. configurableMenu@lestcape->settings-schema.json->hover-icon-
-#. border->description
-msgid "Border width of hover icon:"
-msgstr "Border width of hover icon:"
-
-#. configurableMenu@lestcape->settings-schema.json->hover-icon-border->tooltip
-msgid "The border width of the hover icon."
-msgstr "The border width of the hover icon."
 
 #. configurableMenu@lestcape->settings-schema.json->favorites-
 #. lines->description
@@ -273,6 +264,14 @@ msgstr "Application icon size:"
 #. configurableMenu@lestcape->settings-schema.json->icon-app-size->tooltip
 msgid "Set the application icon size."
 msgstr "Set the application icon size."
+
+#. configurableMenu@lestcape->settings-schema.json->hover-box->description
+msgid "Hover icon have a box"
+msgstr "Hover icon have a box"
+
+#. configurableMenu@lestcape->settings-schema.json->hover-box->tooltip
+msgid "Choose whether or not to have a box on the hover icon."
+msgstr "Choose whether or not to have a box on the hover icon."
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-
 #. box->description

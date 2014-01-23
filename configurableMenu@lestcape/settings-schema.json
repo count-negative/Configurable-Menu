@@ -104,6 +104,12 @@
       "description": "Enable autoscrolling",
       "tooltip": "Choose whether or not to enable smooth autoscrolling on the menu."
    },
+   "hover-box" : {
+      "type" : "checkbox",
+      "default" : false,
+      "description": "Hover icon have a box",
+      "tooltip": "Choose whether or not to have a box on the hover icon."
+   },
    "control-box" : {
       "type" : "checkbox",
       "default" : true,
@@ -261,18 +267,6 @@
       "default" : true,
       "description": "Show hover icon",
       "tooltip": "Choose whether or not to show hover icon on the menu."
-   },
-   "hover-icon-border" : {
-      "type": "spinbutton",
-      "default" : 0,
-      "min" : 0,
-      "max" : 4,
-      "step" : 1,
-      "units" : "pixels",
-      "indent": true,
-      "dependency": "show-hover-icon",
-      "description" : "Border width of hover icon:",
-      "tooltip" : "The border width of the hover icon."
    },
    "show-power-buttons" : {
       "type" : "checkbox",
