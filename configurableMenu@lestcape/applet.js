@@ -5345,7 +5345,7 @@ MyApplet.prototype = {
             this.applicationsScrollBox.scrollToActor(item_actor._delegate.actor);
          }
       } else if((symbol == Clutter.KEY_Return) || (symbol == Clutter.KP_Enter)) {
-         item_actor = this.applicationsBox.get_child_at_index(index).get_child_at_index(0);
+         item_actor = this.applicationsBox.get_child_at_index(index).get_child_at_index(2*rowIndex);
          item_actor._delegate.activate();
       }
       this._selectedItemIndex = index;
@@ -5426,15 +5426,21 @@ MyApplet.prototype = {
          return true;
       } else {
          this.fav_actor = this.favoritesObj.navegateFavBox(symbol, actor);
-         let fav_obj = this._searchFavActor(this.fav_actor);
-         if(fav_obj) {
-            this.hover.refreshApp(fav_obj.app);
-            if(fav_obj.app.get_description())
-               this.selectedAppBox.setSelectedText(fav_obj.app.get_name(), fav_obj.app.get_description().split("\n")[0]);
-            else
-               this.selectedAppBox.setSelectedText(fav_obj.app.get_name(), "");
+         if(this.fav_actor) {
+            let fav_obj = this._searchFavActor(this.fav_actor);
+            if(fav_obj) {
+               if((symbol == Clutter.KEY_Return) || (symbol == Clutter.KP_Enter)) {
+                  fav_obj.activate();
+                  return true;
+               }
+               this.hover.refreshApp(fav_obj.app);
+               if(fav_obj.app.get_description())
+                  this.selectedAppBox.setSelectedText(fav_obj.app.get_name(), fav_obj.app.get_description().split("\n")[0]);
+               else
+                  this.selectedAppBox.setSelectedText(fav_obj.app.get_name(), "");
+            }
+            this.favoritesScrollBox.scrollToActor(this.fav_actor._delegate.actor);
          }
-         this.favoritesScrollBox.scrollToActor(this.fav_actor._delegate.actor);
          return true;
       }
    },
