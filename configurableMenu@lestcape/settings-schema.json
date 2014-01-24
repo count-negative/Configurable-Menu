@@ -6,6 +6,9 @@
       "tooltip": "Select a layout of menu.",
       "options": {
          "Classic": "classic",
+         "GnoMenu": "gnomenu",
+         "Vampire": "vampire",
+         "Garibaldo": "garibaldo",
          "Stylized": "stylized",
          "Dragon": "dragon",
          "Dragon Inverted": "dragonInverted",
