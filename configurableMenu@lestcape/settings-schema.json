@@ -97,7 +97,7 @@
    },
    "activate-on-press" : {
       "type" : "checkbox",
-      "default" : false,
+      "default" : true,
       "description": "Open the menu when I press my mouse over it",
       "tooltip": "Enable opening the menu when the mouse press over the applet."
    },

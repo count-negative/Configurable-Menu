@@ -491,7 +491,7 @@ function GnoMenuBox(parent, hoverIcon, selectedAppBox, controlBox, powerBox, ver
 
 GnoMenuBox.prototype = {
    _init: function(parent, hoverIcon, selectedAppBox, controlBox, powerBox, vertical, iconSize, showRemovable, callBackFun) {
-      this.actor = new St.BoxLayout({ vertical: true });
+      this.actor = new St.BoxLayout({ vertical: true, reactive: true, track_hover: true });
       this.hoverBox = new St.BoxLayout({ vertical: false });
       this.actor.add_actor(this.hoverBox);
       /*this.controlBox = new St.BoxLayout({ vertical: false });
@@ -517,7 +517,7 @@ GnoMenuBox.prototype = {
 
       this.showRemovable = showRemovable;
       //this.idSignalRemovable = 0;
-      //this._staticSelected = -1;
+      this._gnoMenuSelected = -1;
       this.parent = parent;
       //this.accessibleMetaData = parent.accessibleMetaData;
       this.hover = hoverIcon;
@@ -538,12 +538,13 @@ GnoMenuBox.prototype = {
          this.itemsBox.add(this._actionButtons[i].actor, { x_fill: false, x_align: St.Align.MIDDLE, expand: true });
 
       this.actor.connect('key-focus-in', Lang.bind(this, function(actor, event) {
-      /*   if((this._staticButtons.length > 0)&&(this._staticSelected == -1))
-            this._staticSelected = 0;
-         this.activeSelected();*/
+         if((this._actionButtons.length > 0)&&(this._gnoMenuSelected == -1)) {
+            this._gnoMenuSelected = 0;
+            this._onEnterEvent(this._actionButtons[this._gnoMenuSelected].actor);
+         }
       }));
       this.actor.connect('key-focus-out', Lang.bind(this, function(actor, event) {
-       //  this.disableSelected();
+         this.disableSelected();
       }));
    },
    
@@ -553,7 +554,7 @@ GnoMenuBox.prototype = {
       button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent));
       //button.setAction(Lang.bind(this, this._changeSelectedButton));
-
+      this.favorites = button;
       this._actionButtons.push(button);
         
       //Logout button  //preferences-other  //emblem-package
@@ -561,7 +562,7 @@ GnoMenuBox.prototype = {
       button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent));
       //button.setAction(Lang.bind(this, this._changeSelectedButton));
-
+      this.appList = button;
       this._actionButtons.push(button);
 
       //Shutdown button
@@ -569,7 +570,7 @@ GnoMenuBox.prototype = {
       button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent)); 
       //button.setAction(Lang.bind(this, this._changeSelectedButton));
-
+      this.places = button;
       this._actionButtons.push(button);
 
       //Shutdown button
@@ -577,24 +578,61 @@ GnoMenuBox.prototype = {
       button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent)); 
       //button.setAction(Lang.bind(this, this._changeSelectedButton));
-
+      this.recents = button;
       this._actionButtons.push(button);
    },
 
-   _onEnterEvent: function(actor) {
-       let indexButton = -1;
-       for(let i = 0; i < this._actionButtons.length; i++) {
-         if(this._actionButtons[i].actor == actor) {
-            indexButton = i;
+   disableSelected: function() {
+      this._gnoMenuSelected = -1;
+      this._onEnterEvent(null);
+   },
+
+   getSelected: function() {
+      return this._actionButtons[this._gnoMenuSelected];
+   },
+
+   setSelected: function(selected) {
+      this._gnoMenuSelected = -1;
+      for(let i = 0; i < this._actionButtons.length; i++) {
+         if(this._actionButtons[i].title == selected) {
+            this._gnoMenuSelected = i;
             break;
          }
       }
-      if(indexButton != -1)
-         this.callBackFun(this._actionButtons[indexButton].title);
+      if(this._gnoMenuSelected != -1)
+         this._onEnterEvent(this._actionButtons[this._gnoMenuSelected].actor);
+   },
+
+   _onEnterEvent: function(actor) {
+      //actor.add_style_pseudo_class('active');
+      this._gnoMenuSelected = -1;
+      for(let i = 0; i < this._actionButtons.length; i++) {
+         if(this._actionButtons[i].actor == actor) {
+            this._gnoMenuSelected = i;
+         } else
+            //actor.remove_style_pseudo_class('active');
+            this._actionButtons[i].setActive(false);
+      }
+      if(this._gnoMenuSelected != -1) {
+         this._actionButtons[this._gnoMenuSelected].setActive(true);
+         this.callBackFun(this._actionButtons[this._gnoMenuSelected].title);
+      }
    },
 
    _onLeaveEvent: function(actor) {
-      //this.callBackFun("name");
+      actor.remove_style_pseudo_class('active');
+   },
+
+   showFavorites: function(showFavorites) {
+      this.favorites.actor.visible = showFavorites;
+   },
+
+   showPlaces: function(showPlaces) {
+      this.places.actor.visible = showPlaces;
+   },
+
+   showRecents: function(showRecent) {
+      this.recents.actor.visible = showRecent;
    },
 
    takeHover: function(take) {
@@ -639,6 +677,33 @@ GnoMenuBox.prototype = {
       else {
          this.container.set_style_class_name('');
       }
+   },
+
+   navegateGnoMenuBox: function(symbol, actor) {
+      if((this._gnoMenuSelected != -1)&&(this._gnoMenuSelected < this._actionButtons.length)) {
+         let changerPos = this._gnoMenuSelected;
+         this.disableSelected();
+         if((symbol == Clutter.KEY_Up) || (symbol == Clutter.KEY_Left)) {
+            if(changerPos - 1 < 0)
+               this._gnoMenuSelected = this._actionButtons.length - 1;
+            else
+               this._gnoMenuSelected = changerPos - 1;
+         }
+         else if((symbol == Clutter.KEY_Down) || (symbol == Clutter.KEY_Right)) {
+            if(changerPos + 1 < this._actionButtons.length)
+               this._gnoMenuSelected = changerPos + 1;
+            else
+               this._gnoMenuSelected = 0;
+         } else if((symbol == Clutter.KEY_Return) || (symbol == Clutter.KP_Enter)) {
+            this.executeButtonAction(changerPos);
+         }
+
+      } else if(this._actionButtons.length > 0) {
+         this._gnoMenuSelected = 0;
+      }
+      this.scrollActor.scrollToActor(this._actionButtons[this._gnoMenuSelected].actor);
+      this._onEnterEvent(this._actionButtons[this._gnoMenuSelected].actor);
+      return true;
    }
 };
 
@@ -5320,6 +5385,13 @@ MyApplet.prototype = {
               if(this.searchEntry.text == "")
                  this.bttChanger.activateNext();
         }
+        if((this.gnoMenuBox)&&(this.gnoMenuBox.getSelected() != _("All Applications"))&&(actor == this.searchEntryText)) {
+           if((symbol != Clutter.Return) && (symbol != Clutter.KEY_Return) && (symbol != Clutter.KP_Enter) &&
+              (symbol != Clutter.KEY_Right) && (symbol != Clutter.KEY_Up) && (symbol != Clutter.KEY_Down) &&
+              (symbol != Clutter.KEY_Left) && (symbol != Clutter.Escape) && (symbol != Clutter.Tab))
+              if(this.searchEntry.text == "")
+           this.gnoMenuBox.setSelected(_("All Applications"));
+        }
 
         if(actor._delegate instanceof FavoritesButtonExtended) {
            return this._navegateFavBox(symbol, actor);
@@ -5327,6 +5399,8 @@ MyApplet.prototype = {
            return this._navegatePowerBox(symbol, actor); 
         } else if((this.accessibleBox)&&(actor == this.accessibleBox.actor)) {
            return this._navegateAccessibleBox(symbol, actor); 
+        } else if((this.gnoMenuBox)&&(actor == this.gnoMenuBox.actor)) {
+           return this._navegateGnoMenuBox(symbol, actor); 
         } else if((this.bttChanger)&&(actor == this.bttChanger.actor)) {
            return this._navegateBttChanger(symbol);
         } else if(actor == this.hover.actor) {
@@ -5366,11 +5440,13 @@ MyApplet.prototype = {
       let tbttChanger = null;
       let staticB = null;
       let favElem = null;
+      let gnoMenu = null;
       if(this.bttChanger) tbttChanger = this.bttChanger.actor;
       if(this.accessibleBox) staticB = this.accessibleBox.actor;
       if(this.favoritesObj.getFirstElement()) favElem = this.favoritesScrollBox.actor;
-      let activeElements = [this.hover.actor, staticB, this.powerBox.actor, tbttChanger, this.searchEntry, favElem];
-      let actors = [this.hover.actor, staticB, this.powerBox.actor, tbttChanger, this.searchEntry, this.favoritesObj.getFirstElement()];
+      if(this.gnoMenuBox) gnoMenu = this.gnoMenuBox.actor;
+      let activeElements = [this.hover.actor, staticB, gnoMenu, this.powerBox.actor, tbttChanger, this.searchEntry, favElem];
+      let actors = [this.hover.actor, staticB, gnoMenu, this.powerBox.actor, tbttChanger, this.searchEntry, this.favoritesObj.getFirstElement()];
       let index = actors.indexOf(elementActive);
       let selected = index + 1;
       while((selected < activeElements.length)&&((!activeElements[selected])||(!activeElements[selected].visible))) {
@@ -5492,7 +5568,7 @@ MyApplet.prototype = {
          index = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
          this.applicationsScrollBox.scrollToActor(item_actor._delegate.actor);
       }
-      else if(symbol == Clutter.KEY_Left) {//&& !this.searchActive
+      else if((!this.gnoMenuBox)&&(symbol == Clutter.KEY_Left)) {//&& !this.searchActive
          if(this._previousTreeSelectedActor)
             this._previousTreeSelectedActor._delegate.emit('enter-event');
          if(index == 0) {
@@ -5530,8 +5606,8 @@ MyApplet.prototype = {
          this.fav_actor = this._changeFocusElement(this.searchEntry);
          Mainloop.idle_add(Lang.bind(this, this._putFocus));
          item_actor = this.searchEntry;
-      }
-      else if(this.categoriesBox.get_vertical()) {
+      } 
+      else if((!this.gnoMenuBox)&&(this.categoriesBox.get_vertical())) {
          if(symbol == Clutter.KEY_Up) {
             this._previousTreeSelectedActor = this.categoriesBox.get_child_at_index(0).get_child_at_index(index);
             this._previousTreeSelectedActor._delegate.isHovered = false;
@@ -5555,7 +5631,7 @@ MyApplet.prototype = {
             }
             index = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
          }
-      } else {
+      } else if(!this.gnoMenuBox) {
          if(symbol == Clutter.KEY_Right) {
             this._previousTreeSelectedActor = this.categoriesBox.get_child_at_index(0).get_child_at_index(index);
             this._previousTreeSelectedActor._delegate.isHovered = false;
@@ -5633,6 +5709,19 @@ MyApplet.prototype = {
       }
       else {
          return this.accessibleBox.navegateAccessibleBox(symbol, actor);
+      }
+      return true;
+   },
+
+   _navegateGnoMenuBox: function(symbol, actor) {
+      if(symbol == Clutter.Tab) {
+         this.gnoMenuBox.disableSelected();
+         this.fav_actor = this._changeFocusElement(this.gnoMenuBox.actor);
+         //global.stage.set_key_focus(this.fav_actor);
+         Mainloop.idle_add(Lang.bind(this, this._putFocus));
+      }
+      else {
+         return this.gnoMenuBox.navegateGnoMenuBox(symbol, actor);
       }
       return true;
    },
@@ -5948,6 +6037,8 @@ Main.notify("Erp" + e.message);
    },
 
    _setVisibleFavorites: function() {
+      if(this.gnoMenuBox)
+         this.gnoMenuBox.showFavorites(this.showFavorites);
       this.favoritesScrollBox.actor.visible = this.showFavorites;
       this._refreshFavs();
       this._updateSize();
@@ -6203,6 +6294,8 @@ Main.notify("errorTheme", e.message);
       this._setVisibleScrollAccess();
       this._setVisibleSpacerLine();
       this._updateSpacerSize();
+      if(this.gnoMenuBox)
+         this.gnoMenuBox.showFavorites(this.showFavorites);
       this.favoritesScrollBox.actor.visible = this.showFavorites;
       this.selectedAppBox.setTitleVisible(this.showAppTitle);
       this.selectedAppBox.setDescriptionVisible(this.showAppDescription);
@@ -7061,8 +7154,6 @@ Main.notify("errorTheme", e.message);
 
  loadGnoMenu: function() {
       this.allowFavName = true;
-      //this.hover.actor.style = "padding-top: "+(4)+"px;padding-bottom: "+(4)+"px;padding-left: "+(4)+"px;padding-right: "+(4)+"px;margin:auto;";
-      
       this.controlSearchBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
       this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
@@ -7070,14 +7161,12 @@ Main.notify("errorTheme", e.message);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.categoriesScrollBox.actor.visible = false;
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
-      
       this.gnoMenuBox = new GnoMenuBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox,
                                        false, this.iconAccessibleSize, this.showRemovable, Lang.bind(this, this._onPanelGnoMenuChange));
+      this.gnoMenuBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.favBoxWrapper.add(this.gnoMenuBox.actor, { y_fill: true, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
-
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      //this.endHorizontalBox.add(this.hover.container, { x_fill: false, x_align: St.Align.END, expand: false });
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.rightPane.add_actor(this.spacerWindows.actor);
@@ -7607,6 +7696,10 @@ Main.notify("errorTheme", e.message);
       this._placesButtons = new Array();
       this._recentButtons = new Array();
 
+      if(this.gnoMenuBox) {
+         this.gnoMenuBox.showPlaces(this.showPlaces);
+         this.gnoMenuBox.showRecents(this.showRecent);
+      }
       // Now generate Places category and places buttons and add to the list
       if(this.showPlaces) {
          this.placesButton = new PlaceCategoryButtonExtended(null, this.iconCatSize, this.showCategoriesIcons);
