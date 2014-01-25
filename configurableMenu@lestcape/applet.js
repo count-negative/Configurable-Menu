@@ -517,7 +517,7 @@ GnoMenuBox.prototype = {
 
       this.showRemovable = showRemovable;
       //this.idSignalRemovable = 0;
-      this._gnoMenuSelected = -1;
+      this._gnoMenuSelected = 0;
       this.parent = parent;
       //this.accessibleMetaData = parent.accessibleMetaData;
       this.hover = hoverIcon;
@@ -534,6 +534,7 @@ GnoMenuBox.prototype = {
       this.takePower(true);
       //this.refreshAccessibleItems();
       this._createActionButtons();
+      this._onEnterEvent(this._actionButtons[this._gnoMenuSelected].actor);
       for(let i = 0; i < this._actionButtons.length; i++)
          this.itemsBox.add(this._actionButtons[i].actor, { x_fill: false, x_align: St.Align.MIDDLE, expand: true });
 
@@ -8016,7 +8017,7 @@ Main.notify("errorTheme", e.message);
          if(this.accessibleBox)
             this.accessibleBox.refreshAccessibleItems();
          if(this.gnoMenuBox)
-            this._onPanelGnoMenuChange(_("Favorites"));
+            this.gnoMenuBox.setSelected(_("Favorites"));
          this.destroyVectorBox();
          this.powerBox.disableSelected();
          this.selectedAppBox.setDateTimeVisible(false);
