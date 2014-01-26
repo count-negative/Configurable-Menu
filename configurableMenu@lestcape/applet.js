@@ -485,54 +485,31 @@ DriveMenuItem.prototype = {
    }
 };
 
-function GnoMenuBox(parent, hoverIcon, selectedAppBox, controlBox, powerBox, verticalPanel, iconSize, showRemovable, callBackFun) {
-   this._init(parent, hoverIcon, selectedAppBox, controlBox, powerBox, verticalPanel, iconSize, showRemovable, callBackFun);
+function GnoMenuBox(parent, hoverIcon, selectedAppBox, powerBox, verticalPanel, iconSize, callBackFun) {
+   this._init(parent, hoverIcon, selectedAppBox, powerBox, verticalPanel, iconSize, callBackFun);
 }
 
 GnoMenuBox.prototype = {
-   _init: function(parent, hoverIcon, selectedAppBox, controlBox, powerBox, verticalPanel, iconSize, showRemovable, callBackFun) {
+   _init: function(parent, hoverIcon, selectedAppBox, powerBox, verticalPanel, iconSize, callBackFun) {
       this.actor = new St.BoxLayout({ vertical: verticalPanel, reactive: true, track_hover: true });
       this.hoverBox = new St.BoxLayout({ vertical: false });
       this.actor.add_actor(this.hoverBox);
-      /*this.controlBox = new St.BoxLayout({ vertical: false });
-      this.controlBox.set_style("padding-left: 10px;padding-right: 10px;");
-      this.actor.add_actor(this.controlBox);*/
       this.itemsBox = new St.BoxLayout({ vertical: verticalPanel });
-      //this.itemsBox.set_style("padding-left: 10px;");
-      /*this.itemsDevices = new St.BoxLayout({ vertical: true });
-      this.itemsPlaces = new AccessibleDropBox(this, true).actor;
-      this.itemsSystem = new AccessibleDropBox(this, false).actor;
-      this.itemsBox.add_actor(this.placeName);
-      this.itemsBox.add_actor(this.itemsPlaces);
-      this.itemsBox.add_actor(this.itemsDevices);
-      this.spacerMiddle = new SeparatorBox(false, 20);// St.BoxLayout({ vertical: false, height: 20 });
-      this.itemsBox.add_actor(this.spacerMiddle.actor);
-      this.itemsBox.add_actor(this.systemName);
-      this.itemsBox.add_actor(this.itemsSystem);*/
       this.scrollActor = new ScrollItemsBox(parent, this.itemsBox, true);
-      this.spacerTop = new SeparatorBox(false, 20);//St.BoxLayout({ vertical: false, height: 20 });
+      this.spacerTop = new SeparatorBox(false, 20);
       this.actor.add_actor(this.spacerTop.actor);
       this.actor.add(this.scrollActor.actor, {y_fill: true, expand: true});
       this.actor._delegate = this;
-
-      this.showRemovable = showRemovable;
-      //this.idSignalRemovable = 0;
       this._gnoMenuSelected = 0;
       this.parent = parent;
-      //this.accessibleMetaData = parent.accessibleMetaData;
       this.hover = hoverIcon;
       this.selectedAppBox = selectedAppBox;
-     // this.control = controlBox;
       this.powerBox = powerBox;
       this.vertical = verticalPanel;
       this.iconSize = iconSize;
       this.iconsVisible = true;
       this.callBackFun = callBackFun;
-      //this.takingHover = false;
-      //this.takeHover(true);
-      //this.takeControl(true);
       this.takePower(true);
-      //this.refreshAccessibleItems();
       this._createActionButtons();
       this._onEnterEvent(this._actionButtons[this._gnoMenuSelected].actor);
       this._insertButtons(St.Align.MIDDLE);
@@ -7125,6 +7102,8 @@ Main.notify("errorTheme", e.message);
       this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
+      this.searchBox.set_style('padding-top: 10px; padding-left: 4px;');
+      this.controlView.actor.set_style('padding-left: 4px;');
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
@@ -7192,6 +7171,8 @@ Main.notify("errorTheme", e.message);
       this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
+      this.searchBox.set_style('padding-top: 10px; padding-left: 4px;');
+      this.controlView.actor.set_style('padding-left: 4px;');
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
@@ -7416,8 +7397,7 @@ Main.notify("errorTheme", e.message);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.categoriesScrollBox.actor.visible = false;
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
-      this.gnoMenuBox = new GnoMenuBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox,
-                                       true, this.iconAccessibleSize, this.showRemovable, Lang.bind(this, this._onPanelGnoMenuChange));
+      this.gnoMenuBox = new GnoMenuBox(this, this.hover, this.selectedAppBox, this.powerBox, true, this.iconAccessibleSize, Lang.bind(this, this._onPanelGnoMenuChange));
       this.gnoMenuBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.favBoxWrapper.add(this.gnoMenuBox.actor, { y_fill: true, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
@@ -7449,8 +7429,7 @@ Main.notify("errorTheme", e.message);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.categoriesScrollBox.actor.visible = false;
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
-      this.gnoMenuBox = new GnoMenuBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox,
-                                       false, this.iconAccessibleSize, this.showRemovable, Lang.bind(this, this._onPanelGnoMenuChange));
+      this.gnoMenuBox = new GnoMenuBox(this, this.hover, this.selectedAppBox, this.powerBox, false, this.iconAccessibleSize, Lang.bind(this, this._onPanelGnoMenuChange));
       this.gnoMenuBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, y_fill: true, expand: false });
