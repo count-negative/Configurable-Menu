@@ -485,19 +485,19 @@ DriveMenuItem.prototype = {
    }
 };
 
-function GnoMenuBox(parent, hoverIcon, selectedAppBox, controlBox, powerBox, vertical, iconSize, showRemovable, callBackFun) {
-   this._init(parent, hoverIcon, selectedAppBox, controlBox, powerBox, vertical, iconSize, showRemovable, callBackFun);
+function GnoMenuBox(parent, hoverIcon, selectedAppBox, controlBox, powerBox, verticalPanel, iconSize, showRemovable, callBackFun) {
+   this._init(parent, hoverIcon, selectedAppBox, controlBox, powerBox, verticalPanel, iconSize, showRemovable, callBackFun);
 }
 
 GnoMenuBox.prototype = {
-   _init: function(parent, hoverIcon, selectedAppBox, controlBox, powerBox, vertical, iconSize, showRemovable, callBackFun) {
-      this.actor = new St.BoxLayout({ vertical: true, reactive: true, track_hover: true });
+   _init: function(parent, hoverIcon, selectedAppBox, controlBox, powerBox, verticalPanel, iconSize, showRemovable, callBackFun) {
+      this.actor = new St.BoxLayout({ vertical: verticalPanel, reactive: true, track_hover: true });
       this.hoverBox = new St.BoxLayout({ vertical: false });
       this.actor.add_actor(this.hoverBox);
       /*this.controlBox = new St.BoxLayout({ vertical: false });
       this.controlBox.set_style("padding-left: 10px;padding-right: 10px;");
       this.actor.add_actor(this.controlBox);*/
-      this.itemsBox = new St.BoxLayout({ vertical: true });
+      this.itemsBox = new St.BoxLayout({ vertical: verticalPanel });
       //this.itemsBox.set_style("padding-left: 10px;");
       /*this.itemsDevices = new St.BoxLayout({ vertical: true });
       this.itemsPlaces = new AccessibleDropBox(this, true).actor;
@@ -524,7 +524,7 @@ GnoMenuBox.prototype = {
       this.selectedAppBox = selectedAppBox;
      // this.control = controlBox;
       this.powerBox = powerBox;
-      this.vertical = vertical;
+      this.vertical = verticalPanel;
       this.iconSize = iconSize;
       this.iconsVisible = true;
       this.callBackFun = callBackFun;
@@ -595,11 +595,13 @@ GnoMenuBox.prototype = {
          this._setStyleActive(this._actionButtons[i], false);
       }
       Mainloop.idle_add(Lang.bind(this, function() {
-         let maxWidth = this.itemsBox.get_width();
-         if((this.powerBox.theme == "retractable")||(this.powerBox.theme == "retractable-text"))
-            maxWidth += this.powerBox.iconSize;
-         for(let i = 0; i < this._actionButtons.length; i++)
-            this._actionButtons[i].container.set_width(maxWidth);
+         if(this.itemsBox.get_vertical()) {
+            let maxWidth = this.itemsBox.get_width();
+            if((this.powerBox.theme == "retractable")||(this.powerBox.theme == "retractable-text"))
+               maxWidth += this.powerBox.iconSize;
+            for(let i = 0; i < this._actionButtons.length; i++)
+               this._actionButtons[i].container.set_width(maxWidth);
+         }
       }));
       this._setStyleActive(this.favorites, true);
    },
@@ -3272,6 +3274,34 @@ try {
       return result;
    },
 
+   isInBorder: function(symbol, actor) {
+      let childrens = this.actor.get_children();
+      let childrensItems;
+      let posX, posY;
+      for(let i = 0; i < childrens.length; i++) {
+         childrensItems = childrens[i].get_children();
+         for(let j = 0; j < childrensItems.length; j++) {
+            if(childrensItems[j] == actor)  {
+               posY = i;
+               posX = j;
+               break;
+            }
+         }
+         if(posX)
+            break;
+      }
+      if(symbol == Clutter.KEY_Left)
+         return (((this.isVertical)&&(posY == 0))||((!this.isVertical)&&(posX == 0)));
+      if(symbol == Clutter.KEY_Right)
+         return (((this.isVertical)&&(posY == childrens.length - 1))||((!this.isVertical)&&(posX == childrens[posY].get_children().length - 2)));
+      if(symbol == Clutter.KEY_Down) {
+         return (((this.isVertical)&&(posX  == childrens[posY].get_children().length - 2))||((!this.isVertical)&&(posY == childrens.length - 1)));
+      }
+      if(symbol == Clutter.KEY_Up)
+         return (((this.isVertical)&&(posX == 0))||((!this.isVertical)&&(posY == 0)));
+      return false;
+   },
+
    navegateFavBox: function(symbol, actor) {
       let childrens = this.actor.get_children();
       let childrensItems;
@@ -5796,18 +5826,7 @@ MyApplet.prototype = {
                index = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
             }
          }
-      } else {
-         if(symbol == Clutter.KEY_Right) {// && (this._activeContainer !== this.applicationsBox)
-            if(this._previousVisibleIndex !== null) {
-               item_actor = this.appBoxIter.getVisibleItem(this._previousVisibleIndex);
-            } else {
-               item_actor = this.appBoxIter.getFirstVisible();
-            }
-            index = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
-         }
       }
-      this._selectedItemIndex = index;
-      return item_actor;
    },
 
    _navegateFavBox: function(symbol, actor) {
@@ -5817,13 +5836,15 @@ MyApplet.prototype = {
          Mainloop.idle_add(Lang.bind(this, this._putFocus));
          return true;
       } else {
+         if((this.gnoMenuBox)&&(this._gnoMenuNavegationInvertedKey() == symbol)&&
+            (this.favoritesObj.isInBorder(symbol, this.fav_actor))) {
+            this.fav_actor = this.gnoMenuBox.actor;
+            Mainloop.idle_add(Lang.bind(this, this._putFocus));
+            return true;
+         }
          this.fav_actor = this.favoritesObj.navegateFavBox(symbol, actor);
          if(this.fav_actor) {
-            if((this.fav_actor == actor)&&(this.gnoMenuBox)) {
-               this.fav_actor = this.gnoMenuBox.actor;
-               Mainloop.idle_add(Lang.bind(this, this._putFocus));
-               return true;
-            }
+            
             let fav_obj = this._searchFavActor(this.fav_actor);
             if(fav_obj) {
                if((symbol == Clutter.KEY_Return) || (symbol == Clutter.KP_Enter)) {
@@ -5869,17 +5890,27 @@ MyApplet.prototype = {
    },
 
    _navegateGnoMenuBox: function(symbol, actor) {
+      let gnoKey = this._gnoMenuNavegationKey();
       if(symbol == Clutter.Tab) {
          this.gnoMenuBox.disableSelected();
          this.fav_actor = this._changeFocusElement(this.gnoMenuBox.actor);
          //global.stage.set_key_focus(this.fav_actor);
          Mainloop.idle_add(Lang.bind(this, this._putFocus));
       }
-      else if((this._activeContainer == this.applicationsBox)||(symbol == Clutter.KEY_Right)) {
+      else if((this._activeContainer == this.applicationsBox)||(symbol == gnoKey)) {
+         let item_actor;
          if(this._activeContainer == null) {
            item_actor = this._navegationInit(symbol);
          } else if(this._activeContainer == this.categoriesBox) {
-            item_actor = this._navegateCatBox(symbol, this._selectedRowIndex);
+            if(symbol == gnoKey) {
+               if(this._previousVisibleIndex !== null) {
+                  item_actor = this.appBoxIter.getVisibleItem(this._previousVisibleIndex);
+               } else {
+                  item_actor = this.appBoxIter.getFirstVisible();
+               }
+               index = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
+            }
+            this._selectedItemIndex = index;
          } else if(this._activeContainer == this.applicationsBox) {
             item_actor = this._navegateAppBox(symbol, this._selectedItemIndex, this._selectedRowIndex);
          }
@@ -5894,6 +5925,34 @@ MyApplet.prototype = {
          //this._activeContainer = null;
       }
       return true;
+   },
+
+   _gnoMenuNavegationKey: function() {
+      if(this.gnoMenuBox.actor.get_vertical()) {
+          if(this.gnoMenuBox.actor.get_parent().get_children().indexOf(this.gnoMenuBox.actor) == 0)
+             return Clutter.KEY_Right;
+          else
+             return Clutter.KEY_Left;
+      } else {
+          if(this.gnoMenuBox.actor.get_parent().get_children().indexOf(this.gnoMenuBox.actor) == 0)
+             return Clutter.KEY_Down;
+          else
+             return Clutter.KEY_Up;
+      }
+   },
+
+   _gnoMenuNavegationInvertedKey: function() {
+      if(this.gnoMenuBox.actor.get_vertical()) {
+          if(this.gnoMenuBox.actor.get_parent().get_children().indexOf(this.gnoMenuBox.actor) == 0)
+             return Clutter.KEY_Left;
+          else
+             return Clutter.KEY_Right;
+      } else {
+          if(this.gnoMenuBox.actor.get_parent().get_children().indexOf(this.gnoMenuBox.actor) == 0)
+             return Clutter.KEY_Up;
+          else
+             return Clutter.KEY_Down;
+      }
    },
 
    _navegateBttChanger: function(symbol) {
@@ -6666,7 +6725,9 @@ Main.notify("errorTheme", e.message);
          scrollBoxHeight += this.categoriesBox.get_height();
       if(!this.favBoxWrapper.get_vertical())
          scrollBoxHeight += this.favBoxWrapper.get_height();
-     if(scrollBoxHeight + 20 < 280)
+      if(this.gnoMenuBox)
+         scrollBoxHeight += this.powerBox.actor.get_height() + 40;
+      if(scrollBoxHeight + 20 < 280)
          scrollBoxHeight = 280;
       return scrollBoxHeight + 20;
    },
@@ -6996,6 +7057,9 @@ Main.notify("errorTheme", e.message);
                           break;
             case "gnomenu"         :
                           this.loadGnoMenu(); 
+                          break;
+            case "gnomenuBottom" :
+                          this.loadGnoMenuHorizontal(); 
                           break;
             case "vampire"           :
                           this.loadVampire(); 
@@ -7357,7 +7421,7 @@ Main.notify("errorTheme", e.message);
       this.categoriesScrollBox.actor.visible = false;
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.gnoMenuBox = new GnoMenuBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox,
-                                       false, this.iconAccessibleSize, this.showRemovable, Lang.bind(this, this._onPanelGnoMenuChange));
+                                       true, this.iconAccessibleSize, this.showRemovable, Lang.bind(this, this._onPanelGnoMenuChange));
       this.gnoMenuBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.favBoxWrapper.add(this.gnoMenuBox.actor, { y_fill: true, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
@@ -7378,6 +7442,42 @@ Main.notify("errorTheme", e.message);
       this.operativePanel.visible = false;
       this.favoritesBox.style_class = 'menu-applications-box';
       this.selectedAppBox.actor.set_style('padding-left: 0px; text-align: left');
+   },
+
+   loadGnoMenuHorizontal: function() {
+      this.allowFavName = true;
+      this.controlSearchBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
+      this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
+      this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
+      this.categoriesScrollBox.actor.visible = false;
+      this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
+      this.gnoMenuBox = new GnoMenuBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox,
+                                       false, this.iconAccessibleSize, this.showRemovable, Lang.bind(this, this._onPanelGnoMenuChange));
+      this.gnoMenuBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
+      //this.favBoxWrapper.add(this.gnoMenuBox.actor, { y_fill: true, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
+      this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
+     
+      this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, y_fill: true, expand: false });
+      this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
+      this.rightPane.add_actor(this.spacerWindows.actor);
+      this.styleGnoMenuPanel = new St.BoxLayout({ style_class: 'menu-gno-box', vertical: true });
+      this.styleGnoMenuPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
+      this.styleGnoMenuPanel.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
+      this.betterPanel.add(this.styleGnoMenuPanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.endBox.add_actor(this.spacerApp.actor);
+      this.endBox.add_actor(this.gnoMenuBox.actor);
+      this.endBox.add_actor(this.spacerBottom.actor);
+      this.endHorizontalBox.add_actor(this.searchBox);
+      this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.endBox.add_actor(this.endHorizontalBox);
+      this.selectedAppBox.setAlign(St.Align.START);
+      this.operativePanel.visible = false;
+      this.favoritesBox.style_class = 'menu-applications-box';
+  //    this.selectedAppBox.actor.set_style('padding-left: 0px; text-align: left');
    },
 
    _onPanelGnoMenuChange: function(selected) {
