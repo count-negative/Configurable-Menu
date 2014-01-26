@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-01-23 00:27-0600\n"
+"PO-Revision-Date: 2014-01-25 23:03-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -118,6 +118,30 @@ msgstr "Seleccione el número de lineas que tendrá sus favoritos."
 #. configurableMenu@lestcape->settings-schema.json->favorites-lines->units
 msgid "lines"
 msgstr "lineas"
+
+#. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->description
+msgid "GnoMenu buttons layout:"
+msgstr "Diseño de los botones de GnoMenu:"
+
+#. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->tooltip
+msgid "Select a layout of GnoMenu buttons."
+msgstr "Seleccione un diseño de los botones de GnoMenu."
+
+#. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
+msgid "Only Icons"
+msgstr "Solo Íconos"
+
+#. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
+msgid "Only Text"
+msgstr "Solo Texto"
+
+#. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
+msgid "Grid"
+msgstr "Cuadrícula"
+
+#. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
+msgid "List"
+msgstr "Lista"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->description
 msgid "System buttons layout:"

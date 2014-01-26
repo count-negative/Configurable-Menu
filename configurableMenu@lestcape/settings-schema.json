@@ -43,6 +43,18 @@
          "Retractable Text": "retractable-text"
       }
    },
+   "gnomenu-buttons-theme": {
+      "type": "combobox",
+      "description": "GnoMenu buttons layout:",
+      "default": "icon",
+      "tooltip": "Select a layout of GnoMenu buttons.",
+      "options": {
+         "Only Icons": "icon",
+         "Only Text": "text",
+         "Grid": "grid",
+         "List": "list"
+      }
+   },
    "menu-icon" : {
       "type" : "iconfilechooser",
       "default" : "/usr/share/cinnamon/theme/menu.png",

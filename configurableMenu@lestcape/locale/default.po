@@ -227,6 +227,30 @@ msgstr ""
 msgid "lines"
 msgstr ""
 
+#. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->description
+msgid "GnoMenu buttons layout:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->tooltip
+msgid "Select a layout of GnoMenu buttons."
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
+msgid "Only Icons"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
+msgid "Only Text"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
+msgid "Grid"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
+msgid "List"
+msgstr ""
+
 #. configurableMenu@lestcape->settings-schema.json->power-theme->description
 msgid "System buttons layout:"
 msgstr ""

@@ -535,9 +535,7 @@ GnoMenuBox.prototype = {
       //this.refreshAccessibleItems();
       this._createActionButtons();
       this._onEnterEvent(this._actionButtons[this._gnoMenuSelected].actor);
-      for(let i = 0; i < this._actionButtons.length; i++)
-         this.itemsBox.add(this._actionButtons[i].actor, { x_fill: false, x_align: St.Align.MIDDLE, expand: true });
-
+      this._insertButtons(St.Align.MIDDLE);
       this.actor.connect('key-focus-in', Lang.bind(this, function(actor, event) {
          if((this._actionButtons.length > 0)&&(this._gnoMenuSelected == -1)) {
             this._gnoMenuSelected = 0;
@@ -581,6 +579,73 @@ GnoMenuBox.prototype = {
       //button.setAction(Lang.bind(this, this._changeSelectedButton));
       this.recents = button;
       this._actionButtons.push(button);
+   },
+
+   _insertButtons: function(aling) {
+      for(let i = 0; i < this._actionButtons.length; i++) {
+         if((this.theme == "grid")||(this.theme == "icon"))
+            this.itemsBox.add(this._actionButtons[i].actor, { x_fill: false, x_align: aling, expand: true });
+         else
+            this.itemsBox.add(this._actionButtons[i].actor, { x_fill: true, x_align: aling, expand: true });
+      }
+   },
+
+   _removeButtons: function() {
+      for(let i = 0; i < this._actionButtons.length; i++) {
+         parentBtt = this._actionButtons[i].actor.get_parent();
+         if(parentBtt)
+            parentBtt.remove_actor(this._actionButtons[i].actor);
+      }
+      this.itemsBox.destroy_all_children();
+   },
+
+   setTheme: function(theme) {
+      this.theme = theme;
+      this._removeButtons();
+      switch(theme) {
+         case "icon":
+            this._setVerticalButtons(false);
+            this._insertButtons(St.Align.MIDDLE);
+            this._setTextVisible(false);
+            this._setIconsVisible(true);
+            break;
+         case "text":
+            this._setVerticalButtons(true);
+            this._insertButtons(St.Align.MIDDLE);
+            this._setTextVisible(true);
+            this._setIconsVisible(false);
+            break;
+         case "list":
+            this._setVerticalButtons(false);
+            this._insertButtons(St.Align.START);
+            this._setTextVisible(true);
+            this._setIconsVisible(true);
+            break;
+         case "grid":
+            this._setVerticalButtons(true);
+            this._insertButtons(St.Align.MIDDLE);
+            this._setTextVisible(true);
+            this._setIconsVisible(true);
+            break;
+      }
+   },
+
+   _setIconsVisible: function(visibleIcon) {
+      for(let i = 0; i < this._actionButtons.length; i++) {
+         this._actionButtons[i].setIconVisible(visibleIcon);
+      }
+   },
+
+   _setTextVisible: function(visibleText) {
+      for(let i = 0; i < this._actionButtons.length; i++) {
+         this._actionButtons[i].setTextVisible(visibleText);
+      }
+   },
+
+   _setVerticalButtons: function(vertical) {
+      for(let i = 0; i < this._actionButtons.length; i++) {
+         this._actionButtons[i].setVertical(vertical);
+      }
    },
 
    disableSelected: function() {
@@ -5184,6 +5249,7 @@ MyApplet.prototype = {
 //My Setting
          this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this._onSelectedThemeChange, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "power-theme", "powerTheme", this._onThemePowerChange, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "gnomenu-buttons-theme", "gnoMenuButtonsTheme", this._onThemeGnoMenuButtonsChange, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-view-item", "showView", this._setVisibleViewControl, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "view-item", "iconView", this._changeView, null);
 
@@ -6299,6 +6365,12 @@ Main.notify("errorTheme", e.message);
       this._updateSize();
    },
 
+   _onThemeGnoMenuButtonsChange: function() {
+      if(this.gnoMenuBox)
+         this.gnoMenuBox.setTheme(this.gnoMenuButtonsTheme);
+      this._updateSize();
+   },
+
    _updateComplete: function() {
       if(this.accessibleBox) {
          this.accessibleBox.actor.get_parent().remove_actor(this.accessibleBox.actor);
@@ -6352,6 +6424,7 @@ Main.notify("errorTheme", e.message);
       }
       if(this.gnoMenuBox) {
          this.gnoMenuBox.setIconSize(this.iconAccessibleSize);
+         this.gnoMenuBox.setTheme(this.gnoMenuButtonsTheme);
          this.gnoMenuBox.setSpecialColor(this.showAccessibleBox);
       }
       if(this.controlView) {
