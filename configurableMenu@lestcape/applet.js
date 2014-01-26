@@ -6248,6 +6248,7 @@ Main.notify("errorTheme", e.message);
    _loadConfigTheme: function() {
       let confTheme = this.accessibleMetaData.getThemeConfig(this.theme);
       this.powerTheme = confTheme["power-theme"];
+      this.gnoMenuButtonsTheme = confTheme["gnomenu-buttons-theme"];
       this.showRecent = confTheme["show-recent"];
       this.showPlaces = confTheme["show-places"];
       this.activateOnHover = confTheme["activate-on-hover"];
@@ -6304,6 +6305,7 @@ Main.notify("errorTheme", e.message);
    _saveConfigTheme: function() {
       let confTheme = new Array();
       confTheme["power-theme"] = this.powerTheme;
+      confTheme["gnomenu-buttons-theme"] = this.gnoMenuButtonsTheme;
 
       confTheme["show-recent"] = this.showRecent;
       confTheme["show-places"] = this.showPlaces;
