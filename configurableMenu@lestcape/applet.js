@@ -586,29 +586,15 @@ GnoMenuBox.prototype = {
    },
 
    _insertButtons: function(aling) {
-      this.powerBox.refresh();
       for(let i = 0; i < this._actionButtons.length; i++) {
-         if((this.theme == "grid")||(this.theme == "icon"))
-            this.itemsBox.add(this._actionButtons[i].actor, { x_fill: false, x_align: aling, expand: true });
-         else
-            this.itemsBox.add(this._actionButtons[i].actor, { x_fill: true, x_align: aling, expand: true });
+         this.itemsBox.add(this._actionButtons[i].actor, { x_fill: true, x_align: aling, expand: true });
          this._setStyleActive(this._actionButtons[i], false);
       }
-      Mainloop.idle_add(Lang.bind(this, function() {
-         if(this.itemsBox.get_vertical()) {
-            let maxWidth = this.itemsBox.get_width();
-            if((this.powerBox.theme == "retractable")||(this.powerBox.theme == "retractable-text"))
-               maxWidth += this.powerBox.iconSize;
-            for(let i = 0; i < this._actionButtons.length; i++)
-               this._actionButtons[i].container.set_width(maxWidth);
-         }
-      }));
       this._setStyleActive(this.favorites, true);
    },
 
    _removeButtons: function() {
       for(let i = 0; i < this._actionButtons.length; i++) {
-         this._actionButtons[i].container.set_width(-1);
          parentBtt = this._actionButtons[i].actor.get_parent();
          if(parentBtt)
             parentBtt.remove_actor(this._actionButtons[i].actor);
@@ -1507,7 +1493,7 @@ PowerBox.prototype = {
       switch(theme) {
          case "vertical":
             this.actor.set_vertical(true);
-            this._setVerticalButtons(false);
+            this._setVerticalButtons(true);
             this._insertNormalButtons(St.Align.MIDDLE);
             this._setTextVisible(false);
             this._setIconsVisible(true);
@@ -1529,13 +1515,13 @@ PowerBox.prototype = {
          case "vertical-text":
             this.actor.set_vertical(true);
             this._setVerticalButtons(true);
-            this._insertNormalButtons(St.Align.MIDDLE);
+            this._insertNormalButtons(St.Align.START);
             this._setTextVisible(true);
             this._setIconsVisible(false);
             break;
          case "horizontal":
             this.actor.set_vertical(false);
-            this._setVerticalButtons(false);
+            this._setVerticalButtons(true);
             this._insertNormalButtons(St.Align.MIDDLE);
             this._setTextVisible(false);
             this._setIconsVisible(true);
@@ -1587,11 +1573,6 @@ PowerBox.prototype = {
    },
 
    _removeButtons: function() {
-      //if(this.actor.get_vertical()) {
-         this._powerButtons[0].container.set_width(-1);
-         this._powerButtons[1].container.set_width(-1);
-         this._powerButtons[2].container.set_width(-1);
-      //}
       let parentBtt = this.spacerPower.actor.get_parent();
       if(parentBtt)
          parentBtt.remove_actor(this.spacerPower.actor);
@@ -1609,20 +1590,8 @@ PowerBox.prototype = {
    _insertNormalButtons: function(aling) {
       if((this.theme != "horizontal")&&(this.theme != "horizontal-list")&&(this.theme != "horizontal-grid")&&(this.theme != "horizontal-text"))
          this.actor.add_actor(this.spacerPower.actor);
-      for(let i = 0; i < this._powerButtons.length; i++) {
-         if((this.theme == "horizontal")||(this.theme == "vertical")||(this.theme == "vertical-grid"))
-            this.actor.add(this._powerButtons[i].actor, { x_fill: false, x_align: aling, expand: true });
-         else
+      for(let i = 0; i < this._powerButtons.length; i++)
             this.actor.add(this._powerButtons[i].actor, { x_fill: true, x_align: aling, expand: true });
-      }
-      Mainloop.idle_add(Lang.bind(this, function() {
-         if(this.actor.get_vertical()) {
-            let maxWidth = this.actor.get_width();
-            this._powerButtons[0].container.set_width(maxWidth);
-            this._powerButtons[1].container.set_width(maxWidth);
-            this._powerButtons[2].container.set_width(maxWidth);
-         }
-      }));
    },
 
   _insertRetractableButtons: function(aling) {
@@ -1644,7 +1613,6 @@ PowerBox.prototype = {
          this._adjustSize(this._powerButtons[2].actor);
          this._adjustSize(this._powerButtons[1].actor);
          this._adjustSize(this._powerButtons[0].actor);
-         this._powerButtons[2].container.set_width(-1);
       }));
    },
 
@@ -1655,7 +1623,6 @@ PowerBox.prototype = {
       if(actor.get_height()*3 + 16 > this.actor.get_height()) {
          this.actor.set_height(actor.get_height()*3 + 16);
       }
-      //this.actor.set_height(actor.get_height()*3 + 16);
    },
 
   _onPowerChange: function(actor, event) {
@@ -3577,66 +3544,41 @@ TransientButtonExtended.prototype = {
    }
 };
 
+
 function SystemButton(parent, parentScroll, icon, title, description, hoverIcon, iconSize, haveText) {
    this._init(parent, parentScroll, icon, title, description, hoverIcon, iconSize, haveText);
 }
 
 SystemButton.prototype = {
-   __proto__: GenericApplicationButtonExtended.prototype,
-
    _init: function(parent, parentScroll, icon, title, description, hoverIcon, iconSize, haveText) {
-      GenericApplicationButtonExtended.prototype._init.call(this, parent, parentScroll);
-      this.actor.set_style_class_name('menu-category-button');
-      this.iconSize = iconSize;
-      this.icon = icon;
       this.title = title;
       this.description = description;
-      this.actionCallBack = null;
-      this.active = false;
       this.hoverIcon = hoverIcon;
-      
-      this.container = new St.BoxLayout();
-      this.iconObj = new St.Icon({icon_name: icon, icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR });
-      this.container.add(this.iconObj, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-
-      this.label = new St.Label({ text: this.title, style_class: 'menu-application-button-label' });
-      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
-      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
-      this.textBox = new St.BoxLayout({ vertical: false });
-      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-      this.setTextVisible(false);
-      this.setIconVisible(true);
-      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-
-      this.addActor(this.container);
-      this.label.realize();
-      this.iconObj.realize();
+      this.actor = new St.BoxLayout({ style_class:'menu-category-button', reactive: true, track_hover: true });
+      this.popupButton = new SystemPopupButtom(parent, parentScroll, icon, title, description, iconSize, haveText);
+      this.popupButton.actor.style = "padding-top: "+(0)+"px;padding-bottom: "+(0)+"px;padding-left: "+(0)+"px;padding-right: "+(0)+"px;margin:auto;";
+      this.actor.add(this.popupButton.actor, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
    },
 
    setIconVisible: function(haveIcon) {
-      this.iconObj.visible = haveIcon;
+      this.popupButton.setIconVisible(haveIcon);
    },
 
    setTextVisible: function(haveText) {
-      this.container.remove_actor(this.iconObj);
-      if(haveText)
-         this.container.insert_actor(this.iconObj, 0);
-      else
-         this.container.add(this.iconObj, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-      this.textBox.visible = haveText;
+      this.popupButton.setTextVisible(haveText);
    },
 
    setVertical: function(vertical) {
-      this.container.set_vertical(vertical);
+      this.actor.remove_actor(this.popupButton.actor);
+      if(vertical)
+         this.actor.add(this.popupButton.actor, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      else
+         this.actor.add(this.popupButton.actor, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+       this.popupButton.setVertical(vertical);
    },
 
    setIconSize: function(iconSize) {
-      this.iconSize = iconSize;
-      if(this.icon) {
-         this.iconObj.set_icon_size(this.iconSize);
-         this.iconObj.realize();
-      }
+      this.popupButton.setIconSize(iconSize);
    },
 
    setAction: function(actionCallBack) {
@@ -3652,18 +3594,77 @@ SystemButton.prototype = {
    },
 
    setActive: function(active) {
+      this.popupButton.setActive(active);
       this.active = active;
       if(this.active) {
          this.actor.set_style_class_name('menu-category-button-selected');
-         this.hoverIcon.refresh(this.icon);
+         this.hoverIcon.refresh(this.popupButton.icon);
          this.actor.add_style_pseudo_class('active');
-
       }
       else {
          this.actor.set_style_class_name('menu-category-button');
          this.hoverIcon.refreshFace();
          this.actor.remove_style_pseudo_class('active');
       }
+   }
+};
+
+function SystemPopupButtom(parent, parentScroll, icon, title, description, iconSize, haveText) {
+   this._init(parent, parentScroll, icon, title, description, iconSize, haveText);
+}
+
+SystemPopupButtom.prototype = {
+   __proto__: GenericApplicationButtonExtended.prototype,
+
+   _init: function(parent, parentScroll, icon, title, description, iconSize, haveText) {
+      GenericApplicationButtonExtended.prototype._init.call(this, parent, parentScroll);
+      this.iconSize = iconSize;
+      this.icon = icon;
+      this.title = title;
+      this.description = description;
+      this.active = false;
+      
+      this.container = new St.BoxLayout();
+      this.iconObj = new St.Icon({icon_name: icon, icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR });
+      this.container.add(this.iconObj, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+
+      this.label = new St.Label({ text: this.title, style_class: 'menu-application-button-label' });
+      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.textBox = new St.BoxLayout({ vertical: false });
+      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.setTextVisible(false);
+      this.setIconVisible(true);
+      this.container.add_actor(this.textBox);
+
+      this.addActor(this.container);
+      this.label.realize();
+      this.iconObj.realize();
+   },
+
+   setIconVisible: function(haveIcon) {
+      this.iconObj.visible = haveIcon;
+   },
+
+   setTextVisible: function(haveText) {
+      this.textBox.visible = haveText;
+   },
+
+   setVertical: function(vertical) {
+      this.container.set_vertical(vertical);
+   },
+
+   setIconSize: function(iconSize) {
+      this.iconSize = iconSize;
+      if(this.icon) {
+         this.iconObj.set_icon_size(this.iconSize);
+         this.iconObj.realize();
+      }
+   },
+
+   setActive: function(active) {
+      this.active = active;
    }
 };
 
@@ -6501,11 +6502,6 @@ Main.notify("errorTheme", e.message);
    _onThemePowerChange: function() {
       if(this.powerBox)
          this.powerBox.setTheme(this.powerTheme);
-      if(this.gnoMenuBox) {
-         Mainloop.idle_add(Lang.bind(this, function() {
-            this.gnoMenuBox.refresh();
-         }));
-      }
       this._updateSize();
    },
 
@@ -7456,9 +7452,7 @@ Main.notify("errorTheme", e.message);
       this.gnoMenuBox = new GnoMenuBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox,
                                        false, this.iconAccessibleSize, this.showRemovable, Lang.bind(this, this._onPanelGnoMenuChange));
       this.gnoMenuBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
-      //this.favBoxWrapper.add(this.gnoMenuBox.actor, { y_fill: true, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
-     
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, y_fill: true, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.rightPane.add_actor(this.spacerWindows.actor);
@@ -7477,7 +7471,6 @@ Main.notify("errorTheme", e.message);
       this.selectedAppBox.setAlign(St.Align.START);
       this.operativePanel.visible = false;
       this.favoritesBox.style_class = 'menu-applications-box';
-  //    this.selectedAppBox.actor.set_style('padding-left: 0px; text-align: left');
    },
 
    _onPanelGnoMenuChange: function(selected) {
@@ -7495,21 +7488,23 @@ Main.notify("errorTheme", e.message);
             selectedButton = this.placesButton;
          else if(selected == _("Recent Files"))
             selectedButton = this.recentButton;
-         this._clearPrevCatSelection(selectedButton.actor);
-         selectedButton.actor.style_class = "menu-category-button-selected";
-         if(selected == _("All Applications"))
-            this._select_category(null, selectedButton);
-         else if(selected == _("Places"))
-            this._displayButtons(null, -1);
-         else if(selected == _("Recent Files"))
-            this._displayButtons(null, null, -1);
-         //this._previousTreeItemIndex = this._selectedItemIndex;
-         //this._previousSelectedActor = null;
-         /*this._previousVisibleIndex = this.categoriesBox.get_child_at_index(0).get_children().indexOf(selectedButton.actor); */
-         this._previousTreeItemIndex = this._previousVisibleIndex;
-         let index = this.categoriesBox.get_child_at_index(0).get_children().indexOf(selectedButton.actor)
-         this._previousTreeSelectedActor = this.categoriesBox.get_child_at_index(0).get_child_at_index(index);
-         this._activeContainer = this.categoriesBox;
+         if(selectedButton) {
+            this._clearPrevCatSelection(selectedButton.actor);
+            selectedButton.actor.style_class = "menu-category-button-selected";
+            if(selected == _("All Applications"))
+               this._select_category(null, selectedButton);
+            else if(selected == _("Places"))
+               this._displayButtons(null, -1);
+            else if(selected == _("Recent Files"))
+               this._displayButtons(null, null, -1);
+            //this._previousTreeItemIndex = this._selectedItemIndex;
+            //this._previousSelectedActor = null;
+            //this._previousVisibleIndex = this.categoriesBox.get_child_at_index(0).get_children().indexOf(selectedButton.actor);
+            this._previousTreeItemIndex = this._previousVisibleIndex;
+            let index = this.categoriesBox.get_child_at_index(0).get_children().indexOf(selectedButton.actor)
+            this._previousTreeSelectedActor = this.categoriesBox.get_child_at_index(0).get_child_at_index(index);
+            this._activeContainer = this.categoriesBox;
+         }
       }
       this._updateSize();
    },
