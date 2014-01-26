@@ -581,7 +581,12 @@ GnoMenuBox.prototype = {
       this._actionButtons.push(button);
    },
 
+   refresh: function() {
+      this.setTheme(this.theme);
+   },
+
    _insertButtons: function(aling) {
+      this.powerBox.refresh();
       for(let i = 0; i < this._actionButtons.length; i++) {
          if((this.theme == "grid")||(this.theme == "icon"))
             this.itemsBox.add(this._actionButtons[i].actor, { x_fill: false, x_align: aling, expand: true });
@@ -589,11 +594,19 @@ GnoMenuBox.prototype = {
             this.itemsBox.add(this._actionButtons[i].actor, { x_fill: true, x_align: aling, expand: true });
          this._setStyleActive(this._actionButtons[i], false);
       }
+      Mainloop.idle_add(Lang.bind(this, function() {
+         let maxWidth = this.itemsBox.get_width();
+         if((this.powerBox.theme == "retractable")||(this.powerBox.theme == "retractable-text"))
+            maxWidth += this.powerBox.iconSize;
+         for(let i = 0; i < this._actionButtons.length; i++)
+            this._actionButtons[i].container.set_width(maxWidth);
+      }));
       this._setStyleActive(this.favorites, true);
    },
 
    _removeButtons: function() {
       for(let i = 0; i < this._actionButtons.length; i++) {
+         this._actionButtons[i].container.set_width(-1);
          parentBtt = this._actionButtons[i].actor.get_parent();
          if(parentBtt)
             parentBtt.remove_actor(this._actionButtons[i].actor);
@@ -703,8 +716,6 @@ GnoMenuBox.prototype = {
          else
             button.actor.add_style_class_name('menu-gno-button-bottom' + selected);
       }
-
-         
    },
 
    _onLeaveEvent: function(actor) {
@@ -1484,6 +1495,10 @@ PowerBox.prototype = {
       this.spacerPower.setLineVisible(haveLine);
    },
 
+   refresh: function() {
+      this.setTheme(this.theme);
+   },
+
    setTheme: function(theme) {
       this.theme = theme;
       this._removeButtons();
@@ -1570,6 +1585,11 @@ PowerBox.prototype = {
    },
 
    _removeButtons: function() {
+      //if(this.actor.get_vertical()) {
+         this._powerButtons[0].container.set_width(-1);
+         this._powerButtons[1].container.set_width(-1);
+         this._powerButtons[2].container.set_width(-1);
+      //}
       let parentBtt = this.spacerPower.actor.get_parent();
       if(parentBtt)
          parentBtt.remove_actor(this.spacerPower.actor);
@@ -1593,6 +1613,14 @@ PowerBox.prototype = {
          else
             this.actor.add(this._powerButtons[i].actor, { x_fill: true, x_align: aling, expand: true });
       }
+      Mainloop.idle_add(Lang.bind(this, function() {
+         if(this.actor.get_vertical()) {
+            let maxWidth = this.actor.get_width();
+            this._powerButtons[0].container.set_width(maxWidth);
+            this._powerButtons[1].container.set_width(maxWidth);
+            this._powerButtons[2].container.set_width(maxWidth);
+         }
+      }));
    },
 
   _insertRetractableButtons: function(aling) {
@@ -1602,8 +1630,8 @@ PowerBox.prototype = {
       this.spacer.style = "padding-left: "+(this.iconSize)+"px;margin:auto;";
       this.bttChanger = new ButtonChangerBox(this, "forward", this.iconSize, ["Show Down", "Options"], 0, Lang.bind(this, this._onPowerChange));
       this.bttChanger.setTextVisible(false);
-      this.activeBar.add(this._powerButtons[2].actor, { x_fill: true, x_align: aling });
-      this.activeBar.add(this.bttChanger.actor, { x_fill: false, x_align: aling });
+      this.activeBar.add(this._powerButtons[2].actor, { x_fill: false, x_align: aling });
+      this.activeBar.add(this.bttChanger.actor, { x_fill: true, x_align: aling });
       this.actor.add(this.activeBar, { x_fill: false, y_fill: false, x_align: aling, y_align: aling, expand: true });
       this.spacer.add(this._powerButtons[0].actor, { x_fill: true, x_align: aling, y_align: aling });
       this.spacer.add(this._powerButtons[1].actor, { x_fill: true, x_align: aling, y_align: aling });
@@ -1611,10 +1639,10 @@ PowerBox.prototype = {
       this._powerButtons[0].actor.visible = false;
       this._powerButtons[1].actor.visible = false;
       Mainloop.idle_add(Lang.bind(this, function() {
-         this._adjustSize(this._powerButtons[0].actor);
-         this._adjustSize(this._powerButtons[1].actor);
          this._adjustSize(this._powerButtons[2].actor);
-
+         this._adjustSize(this._powerButtons[1].actor);
+         this._adjustSize(this._powerButtons[0].actor);
+         this._powerButtons[2].container.set_width(-1);
       }));
    },
 
@@ -1625,6 +1653,7 @@ PowerBox.prototype = {
       if(actor.get_height()*3 + 16 > this.actor.get_height()) {
          this.actor.set_height(actor.get_height()*3 + 16);
       }
+      //this.actor.set_height(actor.get_height()*3 + 16);
    },
 
   _onPowerChange: function(actor, event) {
@@ -1724,7 +1753,10 @@ PowerBox.prototype = {
    _onLeaveEvent: function(actor, event) {
       this.selectedAppBox.setSelectedText("", "");
       this.hover.refreshFace();
-      this.disableSelected();
+      if(this.powerSelected != -1) {
+         this._powerButtons[this.powerSelected].setActive(false);
+         this.powerSelected = -1;
+      }
    },
 
    disableSelected: function() {
@@ -3557,6 +3589,11 @@ SystemButton.prototype = {
    },
 
    setTextVisible: function(haveText) {
+      this.container.remove_actor(this.iconObj);
+      if(haveText)
+         this.container.insert_actor(this.iconObj, 0);
+      else
+         this.container.add(this.iconObj, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       this.textBox.visible = haveText;
    },
 
@@ -3568,6 +3605,7 @@ SystemButton.prototype = {
       this.iconSize = iconSize;
       if(this.icon) {
          this.iconObj.set_icon_size(this.iconSize);
+         this.iconObj.realize();
       }
    },
 
@@ -6404,6 +6442,11 @@ Main.notify("errorTheme", e.message);
    _onThemePowerChange: function() {
       if(this.powerBox)
          this.powerBox.setTheme(this.powerTheme);
+      if(this.gnoMenuBox) {
+         Mainloop.idle_add(Lang.bind(this, function() {
+            this.gnoMenuBox.refresh();
+         }));
+      }
       this._updateSize();
    },
 
