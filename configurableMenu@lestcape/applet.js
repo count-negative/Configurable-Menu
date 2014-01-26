@@ -557,7 +557,7 @@ GnoMenuBox.prototype = {
       this._actionButtons.push(button);
         
       //Logout button  //preferences-other  //emblem-package
-      button = new SystemButton(this.parent, null, "preferences-other", _("All Applications"), _("All Applications"), this.hover, this.iconSize, true);        
+      button = new SystemButton(this.parent, null, "preferences-other", _("All Applications"), _("All Applications"), this.hover, this.iconSize, true);
       button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent));
       //button.setAction(Lang.bind(this, this._changeSelectedButton));
@@ -565,7 +565,7 @@ GnoMenuBox.prototype = {
       this._actionButtons.push(button);
 
       //Shutdown button
-      button = new SystemButton(this.parent, null, "folder", _("Places"), _("Places"), this.hover, this.iconSize, true);        
+      button = new SystemButton(this.parent, null, "folder", _("Places"), _("Places"), this.hover, this.iconSize, true);
       button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent)); 
       //button.setAction(Lang.bind(this, this._changeSelectedButton));
@@ -587,7 +587,9 @@ GnoMenuBox.prototype = {
             this.itemsBox.add(this._actionButtons[i].actor, { x_fill: false, x_align: aling, expand: true });
          else
             this.itemsBox.add(this._actionButtons[i].actor, { x_fill: true, x_align: aling, expand: true });
+         this._setStyleActive(this._actionButtons[i], false);
       }
+      this._setStyleActive(this.favorites, true);
    },
 
    _removeButtons: function() {
@@ -674,17 +676,40 @@ GnoMenuBox.prototype = {
       for(let i = 0; i < this._actionButtons.length; i++) {
          if(this._actionButtons[i].actor == actor) {
             this._gnoMenuSelected = i;
-         } else
-            this._actionButtons[i].setActive(false);
+         } else {
+            this._setStyleActive(this._actionButtons[i], false);
+         }
       }
       if(this._gnoMenuSelected != -1) {
-         this._actionButtons[this._gnoMenuSelected].setActive(true);
+         this._setStyleActive(this._actionButtons[this._gnoMenuSelected], true);
          this.callBackFun(this._actionButtons[this._gnoMenuSelected].title);
+
       }
    },
 
+   _setStyleActive: function(button, active) {
+      let selected = '';
+      if(active)
+         selected = '-selected';
+      button.setActive(active);
+      if(this.itemsBox.get_vertical()) {
+         if(this.itemsBox.get_parent().get_children().indexOf(this.itemsBox) == 0)
+            button.actor.add_style_class_name('menu-gno-button-left' + selected);
+         else
+            button.actor.add_style_class_name('menu-gno-button-right' + selected);
+      } else {
+         if(this.itemsBox.get_parent().get_children().indexOf(this.itemsBox) == 0)
+            button.actor.add_style_class_name('menu-gno-button-top' + selected);
+         else
+            button.actor.add_style_class_name('menu-gno-button-bottom' + selected);
+      }
+
+         
+   },
+
    _onLeaveEvent: function(actor) {
-      actor.remove_style_pseudo_class('active');
+      //this._onEnterEvent(null)
+      //this.actor.add_style_class_name('menu-gno-button');
    },
 
    showFavorites: function(showFavorites) {
@@ -739,7 +764,7 @@ GnoMenuBox.prototype = {
          this.actor.set_style_class_name('menu-favorites-box');
       }
       else {
-         this.container.set_style_class_name('');
+         this.actor.set_style_class_name('');
       }
    },
 
@@ -788,13 +813,15 @@ AccessibleBox.prototype = {
       this.controlBox.set_style("padding-left: 10px;padding-right: 10px;");
       this.actor.add_actor(this.controlBox);
       this.itemsBox = new St.BoxLayout({ vertical: true });
-      this.itemsBox.set_style("padding-left: 10px;");
+      this.itemsBox.set_style("padding-left: 10px;padding-right: 10px;");
       this.itemsDevices = new St.BoxLayout({ vertical: true });
       this.itemsPlaces = new AccessibleDropBox(this, true).actor;
       this.itemsSystem = new AccessibleDropBox(this, false).actor;
       this.itemsBox.add_actor(this.placeName);
       this.itemsBox.add_actor(this.itemsPlaces);
       this.itemsBox.add_actor(this.itemsDevices);
+      this.powerBoxItem = new St.BoxLayout({ vertical: true });
+      this.powerBoxItem.set_style("padding-left: 10px;padding-right: 10px;");
       this.spacerMiddle = new SeparatorBox(false, 20);// St.BoxLayout({ vertical: false, height: 20 });
       this.itemsBox.add_actor(this.spacerMiddle.actor);
       this.itemsBox.add_actor(this.systemName);
@@ -803,6 +830,7 @@ AccessibleBox.prototype = {
       this.spacerTop = new SeparatorBox(false, 20);//St.BoxLayout({ vertical: false, height: 20 });
       this.actor.add_actor(this.spacerTop.actor);
       this.actor.add(this.scrollActor.actor, {y_fill: true, expand: true});
+      this.actor.add(this.powerBoxItem, {y_fill: true, expand: true});
       this.actor._delegate = this;
 
       this.showRemovable = showRemovable;
@@ -886,8 +914,10 @@ AccessibleBox.prototype = {
    },
 
    setSpecialColor: function(specialColor) {
-      if(specialColor)
+      if(specialColor) {
          this.actor.set_style_class_name('menu-favorites-box');
+         this.actor.add_style_class_name('menu-accessible-box');
+      }
       else
          this.actor.set_style_class_name('');
    },
@@ -936,11 +966,11 @@ AccessibleBox.prototype = {
 
    takePower: function(take) {
       if(take) {
-         if(this.actor.get_children().indexOf(this.powerBox.actor) == -1)
-            this.actor.add(this.powerBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.END, expand: true });
+         if(this.powerBoxItem.get_children().indexOf(this.powerBox.actor) == -1)
+            this.powerBoxItem.add(this.powerBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.END, expand: true });
       }
-      else if(this.powerBox.actor.get_parent() == this.actor) {
-         this.actor.remove_actor(this.powerBox.actor);
+      else if(this.powerBox.actor.get_parent() == this.powerBoxItem) {
+         this.powerBoxItem.remove_actor(this.powerBox.actor);
       }
    },
 
@@ -1398,7 +1428,7 @@ PowerBox.prototype = {
       this.powerSelected = 0;
 
       this.actor = new St.BoxLayout({ style_class: 'menu-favorites-box' });
-      this.actor.style = "padding-left: "+(10)+"px;padding-right: "+(10)+"px;margin:auto;";
+      //this.actor.style = "padding-left: "+(10)+"px;padding-right: "+(10)+"px;margin:auto;";
       this._powerButtons = new Array();
       this.actor.connect('key-focus-in', Lang.bind(this, function(actor, event) {        
          if(this._powerButtons.length > 0) {
@@ -1677,20 +1707,24 @@ PowerBox.prototype = {
    },
 
    _onEnterEvent: function(actor, event) {
+      if(this.powerSelected != -1)
+         this._powerButtons[this.powerSelected].setActive(false);
       this.parent.applicationsScrollBox.setAutoScrolling(false);
       this.parent.categoriesScrollBox.setAutoScrolling(false);
       //this.parent.favoritesScrollBox.setAutoScrolling(false);
       this.parent.applicationsScrollBox.setAutoScrolling(this.parent.autoscroll_enabled);
       this.parent.categoriesScrollBox.setAutoScrolling(this.parent.autoscroll_enabled);
       //this.parent.favoritesScrollBox.setAutoScrolling(this.autoscroll_enabled);
-      let index = this.indexOf(actor);
-      this.selectedAppBox.setSelectedText(this._powerButtons[index].title, this._powerButtons[index].description);
-      this.hover.refresh(this._powerButtons[index].icon);
+      this.powerSelected = this.indexOf(actor);
+      this._powerButtons[this.powerSelected].setActive(true);
+      this.selectedAppBox.setSelectedText(this._powerButtons[this.powerSelected].title, this._powerButtons[this.powerSelected].description);
+      this.hover.refresh(this._powerButtons[this.powerSelected].icon);
    },
 
    _onLeaveEvent: function(actor, event) {
       this.selectedAppBox.setSelectedText("", "");
       this.hover.refreshFace();
+      this.disableSelected();
    },
 
    disableSelected: function() {
@@ -3490,8 +3524,7 @@ SystemButton.prototype = {
 
    _init: function(parent, parentScroll, icon, title, description, hoverIcon, iconSize, haveText) {
       GenericApplicationButtonExtended.prototype._init.call(this, parent, parentScroll);
-      this.actor.set_style_class_name('menu-favorites-button');
-      this.actor.style = "padding-top: "+(4)+"px;padding-bottom: "+(4)+"px;padding-left: "+(4)+"px;padding-right: "+(4)+"px;margin:auto;";
+      this.actor.set_style_class_name('menu-category-button');
       this.iconSize = iconSize;
       this.icon = icon;
       this.title = title;
@@ -3501,10 +3534,10 @@ SystemButton.prototype = {
       this.hoverIcon = hoverIcon;
       
       this.container = new St.BoxLayout();
-      this.iconObj = new St.Icon({icon_name: icon, icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR});
+      this.iconObj = new St.Icon({icon_name: icon, icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR });
       this.container.add(this.iconObj, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
 
-      this.label = new St.Label({ text: this.title , style_class: 'menu-application-button-label' });
+      this.label = new St.Label({ text: this.title, style_class: 'menu-application-button-label' });
       this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
       this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
       this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
@@ -3553,12 +3586,15 @@ SystemButton.prototype = {
    setActive: function(active) {
       this.active = active;
       if(this.active) {
-         this.hoverIcon.refresh(this.icon);
          this.actor.set_style_class_name('menu-category-button-selected');
+         this.hoverIcon.refresh(this.icon);
+         this.actor.add_style_pseudo_class('active');
+
       }
       else {
+         this.actor.set_style_class_name('menu-category-button');
          this.hoverIcon.refreshFace();
-         this.actor.set_style_class_name('menu-favorites-button');
+         this.actor.remove_style_pseudo_class('active');
       }
    }
 };
@@ -5108,7 +5144,7 @@ AccessibleMetaData.prototype = {
       themeProperties["icon-power-size"] = parseInt(themeProperties["icon-power-size"]);
       themeProperties["icon-control-size"] = parseInt(themeProperties["icon-control-size"]);
       themeProperties["icon-hover-size"] = parseInt(themeProperties["icon-hover-size"]);
-      themeProperties["icon-accesible-size"] = parseInt(themeProperties["icon-accesible-size"]);
+      themeProperties["icon-accessible-size"] = parseInt(themeProperties["icon-accessible-size"]);
       themeProperties["show-favorites"] = (themeProperties["show-favorites"] === 'true');
       themeProperties["favorites-lines"] = parseInt(themeProperties["favorites-lines"]);
       themeProperties["show-hover-icon"] = (themeProperties["show-hover-icon"] === 'true');
@@ -5273,7 +5309,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "icon-power-size", "iconPowerSize", this._setIconPowerSize, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "icon-control-size", "iconControlSize", this._setIconControlSize, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "icon-hover-size", "iconHoverSize", this._setIconHoverSize, null);
-         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "icon-accesible-size", "iconAccessibleSize", this._setIconAccessibleSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "icon-accessible-size", "iconAccessibleSize", this._setIconAccessibleSize, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-favorites", "showFavorites", this._setVisibleFavorites, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "favorites-lines", "favoritesLinesNumber", this._setVisibleFavorites, null);
 
@@ -6192,6 +6228,8 @@ Main.notify("Erp" + e.message);
          this.spacerApp.setLineVisible(this.showSpacerLine);
       if(this.spacerWindows)
          this.spacerWindows.setLineVisible(this.showSpacerLine);
+      if(this.spacerBottom)
+         this.spacerBottom.setLineVisible(this.showSpacerLine);
    },
 
    _updateSpacerSize: function() {
@@ -6202,6 +6240,8 @@ Main.notify("Erp" + e.message);
          this.spacerApp.setSpace(this.spacerSize);
       if(this.spacerWindows)
          this.spacerWindows.setSpace(this.spacerSize);
+      if(this.spacerBottom)
+         this.spacerBottom.setSpace(this.spacerSize);
    },
 
    _setVisibleBoxPointer: function() {
@@ -6276,7 +6316,7 @@ Main.notify("errorTheme", e.message);
       this.iconPowerSize = confTheme["icon-power-size"];
       this.iconControlSize = confTheme["icon-control-size"];
       this.iconHoverSize = confTheme["icon-hover-size"];
-      this.iconAccessibleSize = confTheme["icon-accesible-size"];
+      this.iconAccessibleSize = confTheme["icon-accessible-size"];
       this.showFavorites = confTheme["show-favorites"];
       this.favoritesLinesNumber = confTheme["favorites-lines"];
       this.showHoverIcon = confTheme["show-hover-icon"];
@@ -6334,7 +6374,7 @@ Main.notify("errorTheme", e.message);
       confTheme["icon-power-size"] = this.iconPowerSize;
       confTheme["icon-control-size"] = this.iconControlSize;
       confTheme["icon-hover-size"] = this.iconHoverSize;
-      confTheme["icon-accesible-size"] = this.iconAccessibleSize;
+      confTheme["icon-accessible-size"] = this.iconAccessibleSize;
       confTheme["show-favorites"] = this.showFavorites;
       confTheme["favorites-lines"] = this.favoritesLinesNumber;
       confTheme["show-hover-icon"] = this.showHoverIcon;
@@ -6844,6 +6884,7 @@ Main.notify("errorTheme", e.message);
                                            hint_text: _("Type to search..."),
                                            track_hover: true,
                                            can_focus: true });
+
          this.searchEntry.set_secondary_icon(this._searchInactiveIcon);
 
          this.controlSearchBox.add(this.controlBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.MIDDLE, y_fill: false, expand: false });
@@ -6903,7 +6944,7 @@ Main.notify("errorTheme", e.message);
          this.extendedBox = new St.BoxLayout({ vertical: true });
          this.extendedBox.add(this.standardBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
          this.spacerWindows = new SeparatorBox(this.showSpacerLine, this.spacerSize);
-         this.spacerButtom = new SeparatorBox(this.showSpacerLine, this.spacerSize);
+         this.spacerBottom = new SeparatorBox(this.showSpacerLine, this.spacerSize);
          this.spacerApp = new SeparatorBox(this.showSpacerLine, this.spacerSize);
 
          switch(this.theme) {
@@ -7071,7 +7112,7 @@ Main.notify("errorTheme", e.message);
       this.controlSearchBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.MIDDLE, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.operativePanel.set_vertical(true);
-      this.operativePanel.add(this.spacerButtom.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
+      this.operativePanel.add(this.spacerBottom.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.categoriesBox.set_vertical(false);
       this.categoriesWrapper.set_vertical(false);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, false);
@@ -7097,7 +7138,7 @@ Main.notify("errorTheme", e.message);
       this.controlBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.operativePanel.set_vertical(true);
-      this.operativePanel.add(this.spacerButtom.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
+      this.operativePanel.add(this.spacerBottom.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.categoriesBox.set_vertical(false);
       this.categoriesWrapper.set_vertical(false);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, false);
@@ -7201,28 +7242,33 @@ Main.notify("errorTheme", e.message);
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
+      this.rightPane.add_actor(this.spacerWindows.actor);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.accessibleBox = new AccessibleBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize, this.showRemovable);
       this.accessibleBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.standardBox.add(this.rightPane, { x_fill: true, y_fill: true, expand: true });
-      this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
-      this.favoritesBox.style_class = '';
-      this.betterPanel.style_class = 'menu-favorites-box';
       this.betterPanel.set_vertical(true);
       this.betterPanel.add(this.favBoxWrapper, { x_fill: true, y_fill: true, y_align: St.Align.MIDDLE, expand: true });
-      this.betterPanel.add_actor(this.spacerApp.actor);
-      this.betterPanel.add_actor(this.endHorizontalBox);
       this.favBoxWrapper.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.operativePanel.visible = false;
       this.mainBox.add(this.accessibleBox.actor, { y_fill: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.endBox.add_actor(this.endHorizontalBox);
+      this.extendedBox.add_actor(this.spacerApp.actor);
       this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
-      this.endBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
+      this.endHorizontalBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
+      this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.accessibleBox.setNamesVisible(true);
       this.searchName.visible = true;
       this.panelAppsName.visible = true;
+      this.controlSearchBox.style_class = 'menu-top-mint-box';
+      this.favoritesBox.style_class = '';
+      this.betterPanel.style_class = 'menu-favorites-box';
+      this.betterPanel.add_style_class_name('menu-operative-mint-box');
+      this.endBox.style_class = 'menu-bottom-mint-box';
+      this.selectedAppBox.actor.set_style('padding-right: 0px; padding-left: 4px; text-align: right');
    },
 
    loadWindows: function() {
@@ -7253,6 +7299,7 @@ Main.notify("errorTheme", e.message);
       this.mainBox.add(this.accessibleBox.actor, { y_fill: true });
       this.favoritesBox.style_class = '';
       this.betterPanel.style_class = 'menu-favorites-box';
+      this.betterPanel.add_style_class_name('menu-operative-windows-box');
       this.endHorizontalBox.set_style("padding-right: 0px;");
       //this.endHorizontalBox.visible = false;
    },
@@ -7272,11 +7319,13 @@ Main.notify("errorTheme", e.message);
       this.favBoxWrapper.add(this.gnoMenuBox.actor, { y_fill: true, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
+      this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, y_fill: true, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.rightPane.add_actor(this.spacerWindows.actor);
-      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
-      this.betterPanel.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
+      this.styleGnoMenuPanel = new St.BoxLayout({ style_class: 'menu-gno-box', vertical: true });
+      this.styleGnoMenuPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
+      this.styleGnoMenuPanel.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
+      this.betterPanel.add(this.styleGnoMenuPanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endBox.add_actor(this.spacerApp.actor);
@@ -7284,7 +7333,7 @@ Main.notify("errorTheme", e.message);
       this.endBox.add_actor(this.endHorizontalBox);
       this.selectedAppBox.setAlign(St.Align.START);
       this.operativePanel.visible = false;
-      this.favoritesBox.style_class = '';
+      this.favoritesBox.style_class = 'menu-applications-box';
       this.selectedAppBox.actor.set_style('padding-left: 0px; text-align: left');
    },
 

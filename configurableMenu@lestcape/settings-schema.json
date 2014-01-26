@@ -237,7 +237,7 @@
       "description" : "Hover icon size:",
       "tooltip" : "Set the hover icon size."
    },
-  "icon-accesible-size" : {
+  "icon-accessible-size" : {
       "type": "spinbutton",
       "default" : 22,
       "min" : 10,
