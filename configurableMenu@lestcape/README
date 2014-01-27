@@ -1,15 +1,26 @@
-Applet : Configurable Menu      Version      : v0.9-Beta
-O.S.   : Cinnamon               Release Date : 21 january 2014.
-Author : Lester Carballo Pérez  Email        : lestcape@gmail.com
-Author : Garibaldo              Webpage      : https://github.com/Garibaldo
+Cinnamon Applet: Configurable Menu version v0.9-Beta
+==============
 
-Website : https://github.com/lestcape/Configurable-Menu
+Release Date: 26 january 2014
+
+Authors: Lester Carballo Pérez(https://github.com/lestcape) and Garibaldo(https://github.com/Garibaldo).
+
+Email: lestcape@gmail.com
+
+Website: https://github.com/lestcape/Configurable-Menu
+
+--------------
 
 "Configurable Menu is a fork of the Cinnamon stock menu applet. It has much more features and is extremely configurable."
 
+![Alt text](/configurableMenu@lestcape/Capture.png)
+
 This latest version brings a lot of cool new stuff.
 
+Be cautious: This applet is still considered non-stable and may have bugs... Install it for testing purposes only.
+
 Some features:
+--------------
 
 1.	You choose how the menu should be opened: by pressing & releasing the mouse button, by just pressing the mouse button, or by hovering the mouse pointer on the menu icon.
 2.	You can define the exact size of the menu (width and height) using the menu settings.
@@ -42,138 +53,90 @@ Some features:
 
 16.	You can define the font size of the application description/name.
 
-17.	And much more coming...
+17.	You can have a different configuration for each layout.
+
+18.	And much more coming...
 
 
 This program is free software:
+--------------
+You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-   You can redistribute it and/or modify it under the terms of the
-   GNU General Public License as published by the Free Software
-   Foundation, either version 3 of the License, or (at your option)
-   any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/.
 
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Installation Instructions:
-
+--------------
 1. Download this applet from their website : https://github.com/lestcape/Configurable-Menu
-2. Unzip the downloaded file and copy the folder configurableMenu@lestcape at
-   /home/USERNAME/.local/share/cinnamon/applets/ where USER is the user for your operating system.
+2. Unzip the downloaded file and copy the folder configurableMenu@lestcape at /home/USERNAME/.local/share/cinnamon/applets/ where USER is the user for your operating system.
 3. Enable the applet in Cinnamon Settings and use it.
 
 Add theme support:
+--------------
+- General list of new style class and pseudo style class:
 
-1. List of new style class and pseudo style class:
+    - menu-hover-icon-box: open
+    - menu-control-button-box: (Not have)
+    - menu-control-button: open, .menu-control-button-selected(when hover or focus)
 
-   - menu-hover-icon-box: open
-   - menu-control-button-box: (Not have)
-   - menu-control-button: open, .menu-control-button-selected(when hover or focus)
+- List of new style class and pseudo style class for the accessible panel:
+    - menu-accessible-box: (Not have)
 
-2. Settings restrictions on the style class:
+- List of new style class and pseudo style class for the Mint layout:
 
-   - menu-hover-icon-box: Can only used if the option "Hover icon have a box"  it's active.
-   - menu-control-button-box: Can only used if the option "Control buttons have a box" it's active.
+    - menu-operative-mint-box: (Not have)
+    - menu-top-mint-box: (Not have)
+    - menu-bottom-mint-box: (Not have)
 
-3. Example of style that can be use in void theme(http://cinnamon-spices.linuxmint.com/themes/view/104):
+- List of new style class and pseudo style class for the Windows 7 layout:
 
-.menu-hover-icon-box {
-	border: 1px;
-	border-color: rgba(0,0,0,1.0);
-	border-radius: 0px 15px 15px 15px;
-	background-gradient-start: rgba(55,55,55,0.05);
-	background-gradient-end: rgba(55,55,55,0.21);
-	background-gradient-direction: vertical;
-}
+    - menu-operative-windows-box: (Not have)
 
-.menu-hover-icon-box:open {
-	border: 1px;
-	border-color: rgba(255,255,255,1.0);
-	border-radius: 0px 15px 15px 15px;
-	background-color: rgba(10,10,10,0.0);
-	box-shadow: inset 0px 0px 4px rgba(10,10,10,0.0);
-}
+- List of new style class and pseudo style class for the GnoMenu layouts (Note: The buttons can position in the future in 4 different ways, it's why we have 4 existing style classes):
 
-.menu-control-button-box {
-	margin: auto;
-	padding: 10px;
-	border: 1px;
-	border-color: rgba(0,0,0,1);
-	border-radius: 0px 15px 15px 15px;
-	background-gradient-start: rgba(55,55,55,0.05);
-	background-gradient-end: rgba(55,55,55,0.21);
-	background-gradient-direction: vertical;
-	box-shadow: inset 0px 0px 4px rgba(10,10,10,0.5);
-}
+    - menu-gno-button-box: (Not have)
+    - menu-gno-operative-box: (Not have)
+    - menu-gno-button-left: .menu-gno-button-left-selected(when hover or focus)
+    - menu-gno-button-right: .menu-gno-button-right-selected(when hover or focus)
+    - menu-gno-button-top: .menu-gno-button-top-selected(when hover or focus)
+    - menu-gno-button-bottom: .menu-gno-button-bottom-selected(when hover or focus)
 
-.menu-control-button {
-	padding: 7px;
-	border: 1px;
-	border-color: rgba(0,0,0,1);
-	border-radius: 0px 15px 15px 15px;
-	background-gradient-start: rgba(55,55,55,0.05);
-	background-gradient-end: rgba(55,55,55,0.21);
-	background-gradient-direction: vertical;
-	box-shadow: 1px 4px 9px rgb(80,80,80);
-}
+- Settings restrictions on the style class:
 
-.menu-control-button:open {
-	padding: 7px;
-	border: 1px;
-	border-color: rgba(255,255,255,1);
-	border-radius: 0px 15px 15px 15px;
-	background-color: rgba(70,70,70,1);
-	color: #fff;
-	box-shadow: 1px 4px 9px rgb(80,80,80);
-}
+    - menu-accessible-box: Can only used if the option "Accessible panel has a box" it's active.
+    - menu-hover-icon-box: Can only used if the option "Hover icon have a box" it's active.
+    - menu-control-button-box: Can only used if the option "Control buttons have a box" it's active.
+    - menu-gno-button-box: Can only used if the option "GnoMenu buttons have a box" it's active.
 
-.menu-control-button-selected:open {
-	padding: 7px;
-	border: 1px;
-	border-color: rgba(255,255,255,1);
-	border-radius: 0px 15px 15px 15px;
-	background-gradient-start: rgba(70,70,70,1);
-	background-gradient-end: rgba(10,10,10,.97);
-	background-gradient-direction: vertical;
-	color: #fff;
-	box-shadow: 1px 4px 9px rgb(80,80,80);
-}
 
-.menu-control-button-selected {
-	padding: 7px;
-	border: 1px;
-	border-color: rgba(0,0,0,1);
-	background-color: rgba(10,10,10,0.0);
-	color: #fff;
-	box-shadow: 1px 4px 9px rgb(80,80,80);
-}
+More info: https://github.com/lestcape/Configurable-Menu/wiki/Add-theme-support
 
 Add new languages:
+--------------
 
 1. Install the poedit program.
-2. Open the file default.po with poedit. This file is located in the folder /configurableMenu@lestcape/locale/
-3. Make the translation, save the result, and send the .po file updated by the e-mail address here present, or add directly into the website of this software.
+2. Open the file default.po with the poedit software. This file is located in the folder /home/USER/.local/share/cinnamon/applets/configurableMenu@lestcape/locale/
+3. Make the translation, save the result, and send the .po file updated by the e-mail address here present, or add directly into the website of this software
+
+More info: https://github.com/lestcape/Configurable-Menu/wiki/Add-new-languages
 
 Change Log:
-
+==============
 0.9-Beta
    - Was added support for more languages.
    - Was added spanish language.
-   - Now you can have a different configuration for each layouts.
+   - Now you can have a different configuration for each layout.
    - The removable drives are now show in accessible panel and also can be removed.
    - The full screen mode was improved, now can be see better in more themes.
    - Now the property "Maximum width of the application entry text" it's really a maximum width and not the width.
-   - Added support for the old Clutter.Color API to fix the bug "Clutter.Color.from_string is not a function" when you start the applet .
-   - Fixed the bug on mint and windows 7 layouts, that make the menu close if searchEntry do not have focus.
-   - Control buttons and hover icon have now an style class and can be used in the css file of the Cinnamon theme.
-   - Removed the hover icon borders for theme compatibility reason.
-   - The new themes Vampire, Garibaldo and GnoMenu was added.
-   - Improved visual for several themes, especially the horizontal theme.
+   - Added support for the old Clutter.Color API to fix the bug "Clutter.Color.from_string is not a function" when you start the applet.
+   - Fixed the bug on mint and windows 7 layouts. This error involves the closure of the menu in the case of the searchEntry do not has a focus.
+   - The Menu now can be improved using the css file of any Cinnamon theme.
+   - Removed the hover icon borders, due to allow more compatibility with cinnamon themes.
+   - The new layouts of Vampire, Garibaldo, GnoMenu and GnoMenu Bottom was added.
+   - Several visually improvement in different layouts, especially the horizontal.
 
 0.8-Beta
    - The Accessible panel is now configurable and has two drag and drop areas (Places and Apps).
@@ -182,7 +145,7 @@ Change Log:
    - The favorites icons have now submenus.
    - Reduced the width of search item on windows 7 layout to be the same size or less of favorites area.
    - System buttons have now several layouts available.
-   - The accessible panel can have icons or not.
+   - The Accessible panel can have icons or not.
    - Categories can have icons or not.
    - You can remove the box pointer from the menu.
    - Implementation of separators, with configurable options.
@@ -245,14 +208,16 @@ Change Log:
 0.2-Beta
    - Added functionality and menu on hover icon.
 
-0.1- Beta
+0.1-Beta
    - Initial release.
 
+==============
 To report bugs, request new features and make suggestions, please visit:
 https://github.com/lestcape/Configurable-Menu/issues
 
 You can also send us pull requests:
 https://github.com/lestcape/Configurable-Menu/pulls
 
+==============
 Thank you very much for using this product.
 Lester and Garibaldo.
