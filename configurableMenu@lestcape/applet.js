@@ -738,6 +738,7 @@ GnoMenuBox.prototype = {
    setSpecialColor: function(specialColor) {
       if(specialColor) {
          this.actor.set_style_class_name('menu-favorites-box');
+         this.actor.add_style_class_name('menu-gno-box');
       }
       else {
          this.actor.set_style_class_name('');
@@ -5179,6 +5180,7 @@ AccessibleMetaData.prototype = {
       themeProperties["control-box"] = (themeProperties["control-box"] === 'true');
       themeProperties["power-box"] = (themeProperties["power-box"] === 'true');
       themeProperties["accessible-box"] = (themeProperties["accessible-box"] === 'true');
+      themeProperties["gnomenu-box"] = (themeProperties["gnomenu-box"] === 'true');
       themeProperties["show-removable-drives"] = (themeProperties["show-removable-drives"] === 'true');
       themeProperties["accessible-icons"] = (themeProperties["accessible-icons"] === 'true');
       themeProperties["categories-icons"] = (themeProperties["categories-icons"] === 'true');
@@ -5191,6 +5193,7 @@ AccessibleMetaData.prototype = {
       themeProperties["icon-control-size"] = parseInt(themeProperties["icon-control-size"]);
       themeProperties["icon-hover-size"] = parseInt(themeProperties["icon-hover-size"]);
       themeProperties["icon-accessible-size"] = parseInt(themeProperties["icon-accessible-size"]);
+      themeProperties["icon-gnomenu-size"] = parseInt(themeProperties["icon-gnomenu-size"]);
       themeProperties["show-favorites"] = (themeProperties["show-favorites"] === 'true');
       themeProperties["favorites-lines"] = parseInt(themeProperties["favorites-lines"]);
       themeProperties["show-hover-icon"] = (themeProperties["show-hover-icon"] === 'true');
@@ -5208,6 +5211,7 @@ AccessibleMetaData.prototype = {
       themeProperties["scroll-categories"] = (themeProperties["scroll-categories"] === 'true');
       themeProperties["scroll-applications"] = (themeProperties["scroll-applications"] === 'true');
       themeProperties["scroll-accessible"] = (themeProperties["scroll-accessible"] === 'true');
+      themeProperties["scroll-gnomenu"] = (themeProperties["scroll-gnomenu"] === 'true');
       themeProperties["spacer-line"] = (themeProperties["spacer-line"] === 'true');
       themeProperties["spacer-size"] = parseInt(themeProperties["spacer-size"]);
       themeProperties["show-box-pointer"] = (themeProperties["show-box-pointer"] === 'true');
@@ -5341,6 +5345,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "control-box", "showControlBox", this._setVisibleControlBox, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "power-box", "showPowerBox", this._setVisiblePowerBox, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "accessible-box", "showAccessibleBox", this._setVisibleAccessibleBox, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "gnomenu-box", "showGnoMenuBox", this._setVisibleGnoMenuBox, null);
 
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-removable-drives", "showRemovable", this._setVisibleRemovable, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "accessible-icons", "showAccessibleIcons", this._setVisibleAccessibleIcons, null);
@@ -5356,6 +5361,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "icon-control-size", "iconControlSize", this._setIconControlSize, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "icon-hover-size", "iconHoverSize", this._setIconHoverSize, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "icon-accessible-size", "iconAccessibleSize", this._setIconAccessibleSize, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "icon-gnomenu-size", "iconGnoMenuSize", this._setIconGnoMenuSize, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-favorites", "showFavorites", this._setVisibleFavorites, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "favorites-lines", "favoritesLinesNumber", this._setVisibleFavorites, null);
 
@@ -5380,6 +5386,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "scroll-categories", "scrollCategoriesVisible", this._setVisibleScrollCat, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "scroll-applications", "scrollApplicationsVisible", this._setVisibleScrollApp, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "scroll-accessible", "scrollAccessibleVisible", this._setVisibleScrollAccess, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "scroll-gnomenu", "scrollGnoMenuVisible", this._setVisibleScrollGnoMenu, null);
 
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "spacer-line", "showSpacerLine", this._setVisibleSpacerLine, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "spacer-size", "spacerSize", this._updateSpacerSize, null);
@@ -6172,8 +6179,11 @@ MyApplet.prototype = {
       if(this.accessibleBox) {
          this.accessibleBox.setSpecialColor(this.showAccessibleBox);
       }
+   },
+
+   _setVisibleGnoMenuBox: function() {
       if(this.gnoMenuBox) {
-         this.gnoMenuBox.setSpecialColor(this.showAccessibleBox);  
+         this.gnoMenuBox.setSpecialColor(this.showGnoMenuBox);
       }
    },
 
@@ -6213,8 +6223,12 @@ MyApplet.prototype = {
       if(this.accessibleBox) {
          this.accessibleBox.setIconSize(this.iconAccessibleSize);   
       }
+      this._updateSize();
+   },
+
+   _setIconGnoMenuSize: function() {
       if(this.gnoMenuBox) {
-         this.gnoMenuBox.setIconSize(this.iconAccessibleSize);   
+         this.gnoMenuBox.setIconSize(this.iconGnoMenuSize);
       }
       this._updateSize();
    },
@@ -6290,8 +6304,11 @@ Main.notify("Erp" + e.message);
       if(this.accessibleBox) {
          this.accessibleBox.setScrollVisible(this.scrollAccessibleVisible);
       }
+   },
+
+   _setVisibleScrollGnoMenu: function() {
       if(this.gnoMenuBox) {
-         this.gnoMenuBox.setScrollVisible(this.scrollAccessibleVisible);
+         this.gnoMenuBox.setScrollVisible(this.scrollGnoMenuVisible);
       }
    },
 
@@ -6380,6 +6397,7 @@ Main.notify("errorTheme", e.message);
       this.showControlBox = confTheme["control-box"];
       this.showPowerBox = confTheme["power-box"];
       this.showAccessibleBox = confTheme["accessible-box"];
+      this.showGnoMenuBox = confTheme["gnomenu-box"];
       this.showRemovable = confTheme["show-removable-drives"];
       this.showAccessibleIcons = confTheme["accessible-icons"];
       this.showCategoriesIcons = confTheme["categories-icons"];
@@ -6392,6 +6410,7 @@ Main.notify("errorTheme", e.message);
       this.iconControlSize = confTheme["icon-control-size"];
       this.iconHoverSize = confTheme["icon-hover-size"];
       this.iconAccessibleSize = confTheme["icon-accessible-size"];
+      this.iconGnoMenuSize = confTheme["icon-gnomenu-size"];
       this.showFavorites = confTheme["show-favorites"];
       this.favoritesLinesNumber = confTheme["favorites-lines"];
       this.showHoverIcon = confTheme["show-hover-icon"];
@@ -6411,6 +6430,7 @@ Main.notify("errorTheme", e.message);
       this.scrollCategoriesVisible = confTheme["scroll-categories"];
       this.scrollApplicationsVisible = confTheme["scroll-applications"];
       this.scrollAccessibleVisible = confTheme["scroll-accessible"];
+      this.scrollGnoMenuVisible = confTheme["scroll-gnomenu"];
       this.showSpacerLine = confTheme["spacer-line"];
       this.spacerSize = confTheme["spacer-size"];
       this.showBoxPointer = confTheme["show-box-pointer"];
@@ -6438,6 +6458,7 @@ Main.notify("errorTheme", e.message);
       confTheme["control-box"] = this.showControlBox;
       confTheme["power-box"] = this.showPowerBox;
       confTheme["accessible-box"] = this.showAccessibleBox;
+      confTheme["gnomenu-box"] = this.showGnoMenuBox;
       confTheme["show-removable-drives"] = this.showRemovable;
       confTheme["accessible-icons"] = this.showAccessibleIcons;
       confTheme["categories-icons"] = this.showCategoriesIcons;
@@ -6450,6 +6471,7 @@ Main.notify("errorTheme", e.message);
       confTheme["icon-control-size"] = this.iconControlSize;
       confTheme["icon-hover-size"] = this.iconHoverSize;
       confTheme["icon-accessible-size"] = this.iconAccessibleSize;
+      confTheme["icon-gnomenu-size"] = this.iconGnoMenuSize;
       confTheme["show-favorites"] = this.showFavorites;
       confTheme["favorites-lines"] = this.favoritesLinesNumber;
       confTheme["show-hover-icon"] = this.showHoverIcon;
@@ -6469,6 +6491,7 @@ Main.notify("errorTheme", e.message);
       confTheme["scroll-categories"] = this.scrollCategoriesVisible;
       confTheme["scroll-applications"] = this.scrollApplicationsVisible;
       confTheme["scroll-accessible"] = this.scrollAccessibleVisible;
+      confTheme["scroll-gnomenu"] = this.scrollGnoMenuVisible;
       confTheme["spacer-line"] = this.showSpacerLine;
       confTheme["spacer-size"] = this.spacerSize;
       confTheme["show-box-pointer"] = this.showBoxPointer;
@@ -6511,6 +6534,7 @@ Main.notify("errorTheme", e.message);
       this._setVisibleScrollCat();
       this._setVisibleScrollApp();
       this._setVisibleScrollAccess();
+      this._setVisibleScrollGnoMenu();
       this._setVisibleSpacerLine();
       this._updateSpacerSize();
       if(this.gnoMenuBox)
@@ -6540,9 +6564,9 @@ Main.notify("errorTheme", e.message);
          this.accessibleBox.setIconsVisible(this.showAccessibleIcons);
       }
       if(this.gnoMenuBox) {
-         this.gnoMenuBox.setIconSize(this.iconAccessibleSize);
+         this.gnoMenuBox.setIconSize(this.iconGnoMenuSize);
          this.gnoMenuBox.setTheme(this.gnoMenuButtonsTheme);
-         this.gnoMenuBox.setSpecialColor(this.showAccessibleBox);
+         this.gnoMenuBox.setSpecialColor(this.showGnoMenuBox);
       }
       if(this.controlView) {
          this.controlView.setIconSize(this.iconControlSize);
@@ -7435,7 +7459,7 @@ Main.notify("errorTheme", e.message);
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, y_fill: true, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.rightPane.add_actor(this.spacerWindows.actor);
-      this.styleGnoMenuPanel = new St.BoxLayout({ style_class: 'menu-gno-box', vertical: true });
+      this.styleGnoMenuPanel = new St.BoxLayout({ style_class: 'menu-gno-operative-box', vertical: true });
       this.styleGnoMenuPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.styleGnoMenuPanel.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.betterPanel.add(this.styleGnoMenuPanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });

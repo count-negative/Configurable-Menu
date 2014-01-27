@@ -18,8 +18,7 @@
             "Accessible Inverted": "accessibleInverted",
             "Mint": "mint",
             "Windows 7": "windows7"
-        },
-        "value": "classic"
+        }
     },
     "menu-theme-save-button": {
         "type": "button",
@@ -43,8 +42,7 @@
             "Horizontal Text": "horizontal-text",
             "Retractable": "retractable",
             "Retractable Text": "retractable-text"
-        },
-        "value": "vertical"
+        }
     },
     "gnomenu-buttons-theme": {
         "type": "combobox",
@@ -56,50 +54,43 @@
             "Only Text": "text",
             "Grid": "grid",
             "List": "list"
-        },
-        "value": "icon"
+        }
     },
     "menu-icon": {
         "type": "iconfilechooser",
         "default": "/usr/share/cinnamon/theme/menu.png",
         "description": "Icon",
-        "tooltip": "Select an icon to show in the panel.",
-        "value": "/usr/share/cinnamon/theme/menu.png"
+        "tooltip": "Select an icon to show in the panel."
     },
     "menu-label": {
         "type": "entry",
         "default": "Menu",
         "description": "Text",
-        "tooltip": "Enter custom text to show in the panel.",
-        "value": "Menu"
+        "tooltip": "Enter custom text to show in the panel."
     },
     "show-recent": {
         "type": "checkbox",
         "default": true,
         "description": "Show recent files",
-        "tooltip": "Choose whether or not to show a recent file list in the menu.",
-        "value": true
+        "tooltip": "Choose whether or not to show a recent file list in the menu."
     },
     "show-places": {
         "type": "checkbox",
         "default": true,
         "description": "Show bookmarks and places",
-        "tooltip": "Choose whether or not to show bookmarks and places in the menu.",
-        "value": true
+        "tooltip": "Choose whether or not to show bookmarks and places in the menu."
     },
     "search-filesystem": {
         "type": "checkbox",
         "default": false,
         "description": "Enable filesystem path entry in search box",
-        "tooltip": "Allows path entry in the menu search box.",
-        "value": false
+        "tooltip": "Allows path entry in the menu search box."
     },
     "activate-on-hover": {
         "type": "checkbox",
         "default": false,
         "description": "Open the menu when I move my mouse over it",
-        "tooltip": "Enable opening the menu when the mouse enters the applet.",
-        "value": false
+        "tooltip": "Enable opening the menu when the mouse enters the applet."
     },
     "hover-delay": {
         "type": "spinbutton",
@@ -109,8 +100,7 @@
         "step": 50,
         "units": "milliseconds",
         "description": "Menu hover delay:",
-        "tooltip": "Delay between switching categories.",
-        "value": 0
+        "tooltip": "Delay between switching categories."
     },
     "menu-editor-button": {
         "type": "button",
@@ -122,64 +112,61 @@
         "type": "checkbox",
         "default": true,
         "description": "Open the menu when I press my mouse over it",
-        "tooltip": "Enable opening the menu when the mouse press over the applet.",
-        "value": true
+        "tooltip": "Enable opening the menu when the mouse press over the applet."
     },
     "enable-autoscroll": {
         "type": "checkbox",
         "default": true,
         "description": "Enable autoscrolling",
-        "tooltip": "Choose whether or not to enable smooth autoscrolling on the menu.",
-        "value": true
+        "tooltip": "Choose whether or not to enable smooth autoscrolling on the menu."
     },
     "hover-box": {
         "type": "checkbox",
         "default": false,
         "description": "Hover icon have a box",
-        "tooltip": "Choose whether or not to have a box on the hover icon.",
-        "value": false
+        "tooltip": "Choose whether or not to have a box on the hover icon."
     },
     "control-box": {
         "type": "checkbox",
         "default": true,
         "description": "Control buttons have a box",
-        "tooltip": "Choose whether or not to have a box on the control buttons.",
-        "value": true
+        "tooltip": "Choose whether or not to have a box on the control buttons."
     },
     "power-box": {
         "type": "checkbox",
         "default": true,
         "description": "System buttons have a box",
-        "tooltip": "Choose whether or not to have a box on the system buttons.",
-        "value": true
+        "tooltip": "Choose whether or not to have a box on the system buttons."
     },
     "accessible-box": {
         "type": "checkbox",
         "default": false,
         "description": "Accessible panel has a box",
-        "tooltip": "Choose whether or not to have a box on the accessible panel.",
-        "value": false
+        "tooltip": "Choose whether or not to have a box on the accessible panel."
+    },
+    "gnomenu-box": {
+        "type": "checkbox",
+        "default": false,
+        "description": "GnoMenu buttons have a box",
+        "tooltip": "Choose whether or not to have a box on the GnoMenu buttons."
     },
     "show-removable-drives": {
         "type": "checkbox",
         "default": false,
         "description": "Show removable drives on the accessible panel",
-        "tooltip": "Choose whether or not to show removable drives on the accessible panel.",
-        "value": false
+        "tooltip": "Choose whether or not to show removable drives on the accessible panel."
     },
     "accessible-icons": {
         "type": "checkbox",
         "default": true,
         "description": "Show icons on the accessible panel",
-        "tooltip": "Choose whether or not to have icons on the accessible panel.",
-        "value": true
+        "tooltip": "Choose whether or not to have icons on the accessible panel."
     },
     "categories-icons": {
         "type": "checkbox",
         "default": true,
         "description": "Show icons on the categories",
-        "tooltip": "Choose whether or not to have icons on the categories.",
-        "value": true
+        "tooltip": "Choose whether or not to have icons on the categories."
     },
     "app-button-width": {
         "type": "spinbutton",
@@ -189,15 +176,13 @@
         "step": 1,
         "units": "pixels",
         "description": "Maximum width of the application entry text:",
-        "tooltip": "Set the maximum width of the application entry text.",
-        "value": 300
+        "tooltip": "Set the maximum width of the application entry text."
     },
     "app-description": {
         "type": "checkbox",
         "default": false,
         "description": "Application entries have description",
-        "tooltip": "Choose whether or not to have description on application entries.",
-        "value": false
+        "tooltip": "Choose whether or not to have description on application entries."
     },
     "icon-app-size": {
         "type": "spinbutton",
@@ -207,8 +192,7 @@
         "step": 1,
         "units": "pixels",
         "description": "Application icon size:",
-        "tooltip": "Set the application icon size.",
-        "value": 22
+        "tooltip": "Set the application icon size."
     },
     "icon-cat-size": {
         "type": "spinbutton",
@@ -218,8 +202,7 @@
         "step": 1,
         "units": "pixels",
         "description": "Category icon size:",
-        "tooltip": "Set the category icon size.",
-        "value": 22
+        "tooltip": "Set the category icon size."
     },
     "icon-max-fav-size": {
         "type": "spinbutton",
@@ -229,8 +212,7 @@
         "step": 1,
         "units": "pixels",
         "description": "Maximum favorites icon size:",
-        "tooltip": "Set the maximum size of the favorites icon.",
-        "value": 32
+        "tooltip": "Set the maximum size of the favorites icon."
     },
     "icon-power-size": {
         "type": "spinbutton",
@@ -240,8 +222,7 @@
         "step": 1,
         "units": "pixels",
         "description": "System icons size:",
-        "tooltip": "Set the system icons size.",
-        "value": 32
+        "tooltip": "Set the system icons size."
     },
     "icon-control-size": {
         "type": "spinbutton",
@@ -251,8 +232,7 @@
         "step": 1,
         "units": "pixels",
         "description": "Control icon size:",
-        "tooltip": "Set the control icon size.",
-        "value": 32
+        "tooltip": "Set the control icon size."
     },
     "icon-hover-size": {
         "type": "spinbutton",
@@ -262,8 +242,7 @@
         "step": 1,
         "units": "pixels",
         "description": "Hover icon size:",
-        "tooltip": "Set the hover icon size.",
-        "value": 68
+        "tooltip": "Set the hover icon size."
     },
     "icon-accessible-size": {
         "type": "spinbutton",
@@ -273,29 +252,35 @@
         "step": 1,
         "units": "pixels",
         "description": "Accessible icons size:",
-        "tooltip": "Set the accessible icons size.",
-        "value": 22
+        "tooltip": "Set the accessible icons size."
+    },
+    "icon-gnomenu-size": {
+        "type": "spinbutton",
+        "default": 80,
+        "min": 10,
+        "max": 100,
+        "step": 1,
+        "units": "pixels",
+        "description": "GnoMenu icons size:",
+        "tooltip": "Set the GnoMenu icons size."
     },
     "show-view-item": {
         "type": "checkbox",
         "default": true,
         "description": "Show control buttons",
-        "tooltip": "Choose whether or not to show control buttons.",
-        "value": true
+        "tooltip": "Choose whether or not to show control buttons."
     },
     "view-item": {
         "type": "checkbox",
         "default": true,
         "description": "Show application entries in grid view",
-        "tooltip": "Enable show application entries in grid(icon) view and disable show application entries in list view.",
-        "value": true
+        "tooltip": "Enable show application entries in grid(icon) view and disable show application entries in list view."
     },
     "show-favorites": {
         "type": "checkbox",
         "default": true,
         "description": "Show favorites",
-        "tooltip": "Choose whether or not to show favorites on the menu.",
-        "value": true
+        "tooltip": "Choose whether or not to show favorites on the menu."
     },
     "favorites-lines": {
         "type": "spinbutton",
@@ -307,29 +292,25 @@
         "description": "Number of favorites lines:",
         "tooltip": "Choose the number of favorites lines.",
         "indent": true,
-        "dependency": "how-favorites",
-        "value": 1
+        "dependency": "how-favorites"
     },
     "show-hover-icon": {
         "type": "checkbox",
         "default": true,
         "description": "Show hover icon",
-        "tooltip": "Choose whether or not to show hover icon on the menu.",
-        "value": true
+        "tooltip": "Choose whether or not to show hover icon on the menu."
     },
     "show-power-buttons": {
         "type": "checkbox",
         "default": true,
         "description": "Show system buttons",
-        "tooltip": "Choose whether or not to show system buttons on the menu.",
-        "value": true
+        "tooltip": "Choose whether or not to show system buttons on the menu."
     },
     "show-time-date": {
         "type": "checkbox",
         "default": false,
         "description": "Show time and date",
-        "tooltip": "Choose whether or not to show time and date on the menu.",
-        "value": false
+        "tooltip": "Choose whether or not to show time and date on the menu."
     },
     "time-format": {
         "type": "entry",
@@ -337,8 +318,7 @@
         "indent": true,
         "dependency": "show-time-date",
         "description": "Time format:",
-        "tooltip": "Choose the time format to show time on the menu.",
-        "value": "%H:%M"
+        "tooltip": "Choose the time format to show time on the menu."
     },
     "date-format": {
         "type": "entry",
@@ -346,15 +326,13 @@
         "indent": true,
         "dependency": "show-time-date",
         "description": "Date format:",
-        "tooltip": "Choose the date format to show time on the menu.",
-        "value": "%A,%e %B"
+        "tooltip": "Choose the date format to show time on the menu."
     },
     "show-app-title": {
         "type": "checkbox",
         "default": true,
         "description": "Show name of the selected application",
-        "tooltip": "Choose whether or not to show the selected application name on the menu.",
-        "value": true
+        "tooltip": "Choose whether or not to show the selected application name on the menu."
     },
     "app-title-size": {
         "type": "spinbutton",
@@ -366,15 +344,13 @@
         "indent": true,
         "dependency": "show-app-title",
         "description": "Font size of the selected application name:",
-        "tooltip": "Set the font size of the selected application name.",
-        "value": 10
+        "tooltip": "Set the font size of the selected application name."
     },
     "show-app-description": {
         "type": "checkbox",
         "default": true,
         "description": "Show description of the selected application",
-        "tooltip": "Choose whether or not to show the selected application description on the menu.",
-        "value": true
+        "tooltip": "Choose whether or not to show the selected application description on the menu."
     },
     "app-description-size": {
         "type": "spinbutton",
@@ -386,22 +362,19 @@
         "indent": true,
         "dependency": "show-app-description",
         "description": "Font size of the selected application description:",
-        "tooltip": "Set the font size of the selected application description.",
-        "value": 8
+        "tooltip": "Set the font size of the selected application description."
     },
     "automatic-size": {
         "type": "checkbox",
         "default": false,
         "description": "Automatic size",
-        "tooltip": "Choose whether or not to automatic adjust of the menu size.",
-        "value": false
+        "tooltip": "Choose whether or not to automatic adjust of the menu size."
     },
     "full-screen": {
         "type": "checkbox",
         "default": false,
         "description": "Full screen",
-        "tooltip": "Choose whether or not to put the menu in full screen mode.",
-        "value": false
+        "tooltip": "Choose whether or not to put the menu in full screen mode."
     },
     "width": {
         "type": "spinbutton",
@@ -411,8 +384,7 @@
         "step": 5,
         "units": "pixels",
         "description": "Menu width:",
-        "tooltip": "Width of the menu.",
-        "value": 700
+        "tooltip": "Width of the menu."
     },
     "height": {
         "type": "spinbutton",
@@ -422,43 +394,43 @@
         "step": 5,
         "units": "pixels",
         "description": "Menu height:",
-        "tooltip": "Height of the menu.",
-        "value": 500
+        "tooltip": "Height of the menu."
     },
     "scroll-favorites": {
         "type": "checkbox",
         "default": false,
         "description": "Show scrolling area of favorites",
-        "tooltip": "Choose whether or not to show the scrolling area of favorites.",
-        "value": false
+        "tooltip": "Choose whether or not to show the scrolling area of favorites."
     },
     "scroll-categories": {
         "type": "checkbox",
         "default": true,
         "description": "Show scrolling area of categories",
-        "tooltip": "Choose whether or not to show the scrolling area of categories.",
-        "value": true
+        "tooltip": "Choose whether or not to show the scrolling area of categories."
     },
     "scroll-applications": {
         "type": "checkbox",
         "default": true,
         "description": "Show scrolling area of applications",
-        "tooltip": "Choose whether or not to show the scrolling area of applications.",
-        "value": true
+        "tooltip": "Choose whether or not to show the scrolling area of applications."
     },
     "scroll-accessible": {
         "type": "checkbox",
         "default": true,
         "description": "Show scrolling area of accessible panel",
-        "tooltip": "Choose whether or not to show the scrolling area of accessible panel.",
-        "value": true
+        "tooltip": "Choose whether or not to show the scrolling area of accessible panel."
+    },
+    "scroll-gnomenu": {
+        "type": "checkbox",
+        "default": false,
+        "description": "Show scrolling area of GnoMenu panel",
+        "tooltip": "Choose whether or not to show the scrolling area of GnoMenu panel."
     },
     "spacer-line": {
         "type": "checkbox",
         "default": true,
         "description": "Show separator line",
-        "tooltip": "Choose whether or not to show a line on separator.",
-        "value": true
+        "tooltip": "Choose whether or not to show a line on separator."
     },
     "spacer-size": {
         "type": "spinbutton",
@@ -468,21 +440,18 @@
         "step": 1,
         "units": "pixels",
         "description": "Separator size:",
-        "tooltip": "Choose the size of separator.",
-        "value": 10
+        "tooltip": "Choose the size of separator."
     },
     "show-box-pointer": {
         "type": "checkbox",
         "default": true,
         "description": "Show menu box pointer",
-        "tooltip": "Choose whether or not to show the menu box pointer.",
-        "value": true
+        "tooltip": "Choose whether or not to show the menu box pointer."
     },
     "fix-menu-corner": {
         "type": "checkbox",
         "default": false,
         "description": "Menu bordering screen edge",
-        "tooltip": "Choose whether or not the menu bordering the screen edge.",
-        "value": false
+        "tooltip": "Choose whether or not the menu bordering the screen edge."
     }
 }

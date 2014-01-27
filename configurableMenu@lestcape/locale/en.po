@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-01-25 23:03-0600\n"
+"PO-Revision-Date: 2014-01-26 17:59-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -253,6 +253,15 @@ msgstr "Show scrolling area of accessible panel"
 msgid "Choose whether or not to show the scrolling area of accessible panel."
 msgstr "Choose whether or not to show the scrolling area of accessible panel."
 
+#. configurableMenu@lestcape->settings-schema.json->scroll-
+#. gnomenu->description
+msgid "Show scrolling area of GnoMenu panel"
+msgstr "Show scrolling area of GnoMenu panel"
+
+#. configurableMenu@lestcape->settings-schema.json->scroll-gnomenu->tooltip
+msgid "Choose whether or not to show the scrolling area of GnoMenu panel."
+msgstr "Choose whether or not to show the scrolling area of GnoMenu panel."
+
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. title->description
 msgid "Show name of the selected application"
@@ -305,6 +314,14 @@ msgstr "Accessible panel has a box"
 #. configurableMenu@lestcape->settings-schema.json->accessible-box->tooltip
 msgid "Choose whether or not to have a box on the accessible panel."
 msgstr "Choose whether or not to have a box on the accessible panel."
+
+#. configurableMenu@lestcape->settings-schema.json->gnomenu-box->description
+msgid "GnoMenu buttons have a box"
+msgstr "GnoMenu buttons have a box"
+
+#. configurableMenu@lestcape->settings-schema.json->gnomenu-box->tooltip
+msgid "Choose whether or not to have a box on the GnoMenu buttons."
+msgstr "Choose whether or not to have a box on the GnoMenu buttons."
 
 #. configurableMenu@lestcape->settings-schema.json->spacer-size->description
 msgid "Separator size:"
@@ -436,6 +453,16 @@ msgstr "Accessible icons size:"
 #. size->tooltip
 msgid "Set the accessible icons size."
 msgstr "Set the accessible icons size."
+
+#. configurableMenu@lestcape->settings-schema.json->icon-gnomenu-
+#. size->description
+msgid "GnoMenu icons size:"
+msgstr "GnoMenu icons size:"
+
+#. configurableMenu@lestcape->settings-schema.json->icon-gnomenu-
+#. size->tooltip
+msgid "Set the GnoMenu icons size."
+msgstr "Set the GnoMenu icons size."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-max-fav-
 #. size->description
