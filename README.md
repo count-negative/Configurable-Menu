@@ -8,6 +8,9 @@ Authors: Lester Carballo Pérez(https://github.com/lestcape) and Garibaldo(https
 Email: lestcape@gmail.com
 
 Website: https://github.com/lestcape/Configurable-Menu
+
+More Information: https://github.com/lestcape/Configurable-Menu/wiki
+
 --------------
 
 "Configurable Menu is a fork of the Cinnamon stock menu applet. It has much more features and is extremely configurable."
