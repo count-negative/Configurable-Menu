@@ -857,7 +857,6 @@ AccessibleBox.prototype = {
       this.idSignalRemovable = 0;
       this._staticSelected = -1;
       this.parent = parent;
-      this.accessibleMetaData = parent.accessibleMetaData;
       this.hover = hoverIcon;
       this.selectedAppBox = selectedAppBox;
       this.control = controlBox;
@@ -1045,8 +1044,8 @@ AccessibleBox.prototype = {
    initItemsPlaces: function() {
      try {
       let listBookmarks = this.parent._listBookmarks();
-      let placesList = this.accessibleMetaData.getPlacesList();
-      let placesName = this.accessibleMetaData.getPlacesNamesList();
+      let placesList = this.parent.getPlacesList();
+      let placesName = this.parent.getPlacesNamesList();
       let currBookmark, item;
       for(let i = 0; i < placesList.length; i++) {
          if(placesList[i] != "") {
@@ -1077,7 +1076,7 @@ AccessibleBox.prototype = {
 
    initItemsSystem: function() {
       let appSys = Cinnamon.AppSystem.get_default();
-      let appsList = this.accessibleMetaData.getAppsList();
+      let appsList = this.parent.getAppsList();
       for(let i = 0; i < appsList.length; i++) {
          if(appsList[i] != "") {
             this._createApp(appSys, appsList[i]);
@@ -2184,16 +2183,16 @@ ApplicationContextMenuItemExtended.prototype = {
          case "add_to_accessible_panel":
            try {
             if(this._appButton.app.isPlace) {
-               if(!this._appButton.parent.accessibleMetaData.isInPlacesList(this._appButton.app.get_id())) {
-                  let placesList = this._appButton.parent.accessibleMetaData.getPlacesList();
+               if(!this._appButton.parent.isInPlacesList(this._appButton.app.get_id())) {
+                  let placesList = this._appButton.parent.getPlacesList();
                   placesList.push(this._appButton.app.get_id());
-                  this._appButton.parent.accessibleMetaData.setPlacesList(placesList);
+                  this._appButton.parent.setPlacesList(placesList);
                }
             } else {
-               if(!this._appButton.parent.accessibleMetaData.isInAppsList(this._appButton.app.get_id())) {
-                let appsList = this._appButton.parent.accessibleMetaData.getAppsList();
+               if(!this._appButton.parent.isInAppsList(this._appButton.app.get_id())) {
+                let appsList = this._appButton.parent.getAppsList();
                   appsList.push(this._appButton.app.get_id());
-                  this._appButton.parent.accessibleMetaData.setAppsList(appsList);
+                  this._appButton.parent.setAppsList(appsList);
                }
             }
            } catch (e) {Main.notify("access", e.message);}
@@ -2201,16 +2200,16 @@ ApplicationContextMenuItemExtended.prototype = {
          case "remove_from_accessible_panel":
             try {
             if(this._appButton.app.isPlace) {
-               if(this._appButton.parent.accessibleMetaData.isInPlacesList(this._appButton.app.get_id())) {
-                  let placesList = this._appButton.parent.accessibleMetaData.getPlacesList();
+               if(this._appButton.parent.isInPlacesList(this._appButton.app.get_id())) {
+                  let placesList = this._appButton.parent.getPlacesList();
                   placesList.splice(placesList.indexOf(this._appButton.app.get_id()), 1);
-                  this._appButton.parent.accessibleMetaData.setPlacesList(placesList);
+                  this._appButton.parent.setPlacesList(placesList);
                }
             } else {
-               if(this._appButton.parent.accessibleMetaData.isInAppsList(this._appButton.app.get_id())) {
-                  let appsList = this._appButton.parent.accessibleMetaData.getAppsList();
+               if(this._appButton.parent.isInAppsList(this._appButton.app.get_id())) {
+                  let appsList = this._appButton.parent.getAppsList();
                   appsList.splice(appsList.indexOf(this._appButton.app.get_id()), 1);
-                  this._appButton.parent.accessibleMetaData.setAppsList(appsList);
+                  this._appButton.parent.setAppsList(appsList);
                }
             }
            } catch (e) {Main.notify("access", e.message);}
@@ -2306,7 +2305,7 @@ GenericApplicationButtonExtended.prototype = {
                menuItem = new ApplicationContextMenuItemExtended(this, _("Add to favorites"), "add_to_favorites");
                this.menu.addMenuItem(menuItem);
             }
-            if(this.parent.accessibleMetaData.isInAppsList(this.app.get_id())) {
+            if(this.parent.isInAppsList(this.app.get_id())) {
                menuItem = new ApplicationContextMenuItemExtended(this, _("Remove from accessible panel"), "remove_from_accessible_panel");
                this.menu.addMenuItem(menuItem);
             } else {
@@ -2318,7 +2317,7 @@ GenericApplicationButtonExtended.prototype = {
                menuItem = new ApplicationContextMenuItemExtended(this, _("Add to desktop"), "add_to_desktop");
                this.menu.addMenuItem(menuItem);
             }
-            if(this.parent.accessibleMetaData.isInPlacesList(this.app.get_id())) {
+            if(this.parent.isInPlacesList(this.app.get_id())) {
                menuItem = new ApplicationContextMenuItemExtended(this, _("Remove from accessible panel"), "remove_from_accessible_panel");
                this.menu.addMenuItem(menuItem);
             } else {
@@ -2789,11 +2788,11 @@ AccessibleDropBox.prototype = {
     try {
       let currentObj, classType1, classType2;
       if(this.place) {
-         currentObj = this.parent.accessibleMetaData.getPlacesList();
+         currentObj = this.parent.getPlacesList();
          classType1 = PlaceButtonAccessibleExtended;
          classType2 = PlaceButtonExtended;
       } else {
-         currentObj = this.parent.accessibleMetaData.getAppsList();
+         currentObj = this.parent.getAppsList();
          classType1 = FavoritesButtonExtended;
          classType2 = ApplicationButtonExtended;
       }
@@ -2882,11 +2881,11 @@ AccessibleDropBox.prototype = {
    acceptDrop: function(source, actor, x, y, time) {
       let currentObj, classType1, classType2;
       if(this.place) {
-         currentObj = this.parent.accessibleMetaData.getPlacesList();
+         currentObj = this.parent.getPlacesList();
          classType1 = PlaceButtonAccessibleExtended;
          classType2 = PlaceButtonExtended;
       } else {
-         currentObj = this.parent.accessibleMetaData.getAppsList();
+         currentObj = this.parent.getAppsList();
          classType1 = FavoritesButtonExtended;
          classType2 = ApplicationButtonExtended;
       }
@@ -2923,16 +2922,16 @@ AccessibleDropBox.prototype = {
             currentObj.splice(currentObj.indexOf(app.get_id()), 1);
             currentObj.splice(itemPos, 0, id);
             if(this.place)
-               this.parent.accessibleMetaData.setPlacesList(currentObj);
+               this.parent.setPlacesList(currentObj);
             else
-               this.parent.accessibleMetaData.setAppsList(currentObj);
+               this.parent.setAppsList(currentObj);
          }
          else {
             currentObj.splice(itemPos, 0, id);
             if(this.place)
-               this.parent.accessibleMetaData.setPlacesList(currentObj);
+               this.parent.setPlacesList(currentObj);
             else
-               this.parent.accessibleMetaData.setAppsList(currentObj);
+               this.parent.setAppsList(currentObj);
          }
          return false;
       }));
@@ -3900,7 +3899,7 @@ PlaceButtonAccessibleExtended.prototype = {
             global.stage.set_key_focus(this.parent.searchEntry);
             this.place.name = this.nameEntry.get_text();
             this.labelName.set_text(this.nameEntry.get_text());
-            this.parent.accessibleMetaData.changePlaceName(this.place.id, this.place.name);
+            this.parent.changePlaceName(this.place.id, this.place.name);
          }
          this.nameEntry.visible = false;
          this.labelName.visible = true;
@@ -4991,396 +4990,6 @@ SpecialBookmarks.prototype = {
    }
 };
 
-
-function AccessibleMetaData(parent, onChangeCallBack) {
-   this._init(parent, onChangeCallBack);
-}
-
-AccessibleMetaData.prototype = {
-
-   _init: function(parent, onChangeCallBack) {
-      try {
-         this.parent = parent;
-         this.onChangeCallBack = onChangeCallBack;
-         let config_source = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + parent.uuid + "/config.json";
-         let config_path = GLib.get_home_dir() + "/.config/" + parent.uuid + "/config.json";
-         this.metaDataFile = Gio.File.new_for_path(config_path);
-         if(!this.metaDataFile.query_exists(null)) {
-            if(!this._createSettingsFile(config_source)) {
-               global.logError("Problem initializing settings...");
-            }
-         } else {
-            if (!this.updateSettingsFile(config_source)) {
-                global.logError("Problem updating settings...");
-            }
-         }
-         this._loadMetaData();
-      } catch(e) {
-         Main.notify("Eroor: " + e.message);
-      }
-
-   },
-
-   _isBookmarks: function(bookmark) {
-      let listBookmarks = this.parent._listBookmarks();
-      for(let i = 0; i < listBookmarks.length; i++) {
-         if(listBookmarks[i].id == bookmark)
-            return true;
-      }
-      return false;
-   },
-
-   _loadMetaData: function() {
-      try {
-         let metadataContents = Cinnamon.get_file_contents_utf8_sync(this.metaDataFile.get_path());
-         let checksum = global.get_md5_for_string(metadataContents);
-         try {
-            this.meta = JSON.parse(metadataContents);
-            return true;
-         } catch (e) {
-            global.logError("Cannot parse settings schema file... Error is: " + e);
-            return false;
-         }
-      } catch (e) {
-         global.logError('Failed to load/parse accessible.json', e);
-      }
-      return false;
-   },
-
-   _createSettingsFile: function(origDataPath) {
-      let origDataFile = Gio.File.new_for_path(origDataPath);
-
-      if(!this.metaDataFile.get_parent().query_exists(null)) {
-         this.metaDataFile.get_parent().make_directory_with_parents(null);
-      }
-      let origDataContents = Cinnamon.get_file_contents_utf8_sync(origDataFile.get_path());
-      let checksum = global.get_md5_for_string(origDataContents);
-
-      let init_json
-      try {
-         init_json = JSON.parse(origDataContents);
-      } catch (e) {
-         global.logError("Cannot parse settings schema file... Error is: " + e);
-         return false;
-      }
-
-      for (let key in init_json) {
-         init_json[key]["value"] = init_json[key]["default"]
-      }
-      init_json["__md5__"] = checksum;
-      let out_file = JSON.stringify(init_json, null, 4);
-
-      let fp = this.metaDataFile.create(0, null);
-      fp.write(out_file, null);
-      fp.close(null);
-
-      return true;
-   },
-
-   updateSettingsFile: function(origDataPath) {
-      let orig_file = Gio.File.new_for_path(origDataPath);
-      if (!orig_file.query_exists(null)) {
-         global.logWarning("Failed to locate settings schema file to check for updates...");
-         global.logWarning("Something may not be right");
-         return false;
-      }
-      let init_file_contents = Cinnamon.get_file_contents_utf8_sync(orig_file.get_path());
-      let checksum = global.get_md5_for_string(init_file_contents);
-
-      let existing_settings_file = Cinnamon.get_file_contents_utf8_sync(this.metaDataFile.get_path());
-      let existing_json;
-      let new_json;
-      try {             
-          new_json = JSON.parse(init_file_contents);
-      } catch (e) {
-          global.logError("Problem parsing " + orig_file.get_path() + " while preparing to perform upgrade.");
-          global.logError("Skipping upgrade for now - something may be wrong with the new settings schema file.");
-          return false;
-      }
-      try {
-          existing_json = JSON.parse(existing_settings_file);
-      } catch (e) {
-          global.logError("Problem parsing " + this.metaDataFile.get_path() + " while preparing to perform upgrade.");
-          global.log("Re-creating settings file.");
-          this.metaDataFile.delete(null, null);
-          return this._createSettingsFile(origDataPath);
-      }           
-      if(existing_json["__md5__"] != checksum) {
-         global.log("Updated settings file detected.  Beginning upgrade of existing settings");
-         return this._doUpgrade(new_json, existing_json, checksum);
-      } else {
-         return true;
-      }
-   },
-
-   _doUpgrade: function(new_json, old_json, checksum) {
-      /* We're going to iterate through all the keys in the new settings file
-       * Where the key names and types match up, we'll check the current value against
-       * the new max/mins or other factors (if applicable) and add the 'value' key to the new file.
-       *
-       * If the old setting-key doesn't exist in the new file, we'll drop it entirely.
-       * If there are new keys, we'll assign the default value like normal.
-       */
-       for(let key in new_json) {
-          if(key in old_json) {
-             if(new_json[key]["type"] == old_json[key]["type"]) {
-                if(this._sanityCheck(old_json[key]["value"], new_json[key])) {
-                   new_json[key]["value"] = old_json[key]["value"];
-                } else {
-                   new_json[key]["value"] = new_json[key]["default"];
-                }
-             } else {
-                new_json[key]["value"] = new_json[key]["default"];
-             }
-          } else {
-             new_json[key]["value"] = new_json[key]["default"];
-          }
-       }
-       new_json["__md5__"] = checksum;
-
-       let out_file = JSON.stringify(new_json, null, 4);
-
-       if(this.metaDataFile.delete(null, null)) {
-          let fp = this.metaDataFile.create(0, null);
-          fp.write(out_file, null);
-          fp.close;
-          global.log("Upgrade complete");
-          return true;
-       } else {
-          global.logError("Failed to gain write access to save updated settings...");
-          return false;
-       }
-   },
-
-   _sanityCheck: function(val, setting) {
-      let found;
-      switch (setting["type"]) {
-         case "spinbutton":
-         case "scale":
-            return (val < setting["max"] && val > setting["min"]);
-            //break;
-         case "combobox":
-            found = false;
-            for(let opt in setting["options"]) {
-               if(val == setting["options"][opt]) {
-                  found = true;
-                  break;
-               }
-            }
-            return found;
-            //break;
-         case "radiogroup":
-            found = false;
-            for (let opt in setting["options"]) {
-               if (val == setting["options"][opt] || setting["options"][opt] == "custom") {
-                  found = true;
-                  break
-               }
-            }
-            return found;
-            //break;
-         default:
-            return true;
-            //break;
-      }
-      return true;
-   },
-
-   _saveMetaData: function() {
-      try {
-         let metadataContents = Cinnamon.get_file_contents_utf8_sync(this.metaDataFile.get_path());
-         let raw_file = JSON.stringify(this.meta, null, 4);
-         if(this.metaDataFile.delete(null, null)) {
-            let fp = this.metaDataFile.create(0, null);
-            fp.write(raw_file, null);
-            fp.close;
-            if(this.onChangeCallBack) {
-               Mainloop.idle_add(Lang.bind(this, function() {
-                  this.onChangeCallBack();
-               }));
-            }
-         } else {
-            global.logError('Failed gain write access to accessible.json');
-         }
-      } catch (e) {
-         global.logError('Failed gain write access to accessible.json', e);
-      }
-   },
-
-   _removeMetaData: function() {
-      let file = Gio.File.new_for_path(this.metaDataFile.get_path());
-      if(file.query_exists(null)) {
-         try {
-            file.delete(null, null);
-         } catch (e) {
-            global.logError("Problem removing desklet config file during cleanup.  UUID is " + uuid + " and filename is " + config_path);
-         }
-      }
-   },
-
-   getPlacesList: function() {
-      let placesString = this.meta["list-places"];
-      let listPlaces = placesString.split(";;");
-      let pos = 0;
-      while(pos < listPlaces.length) {
-         if((listPlaces[pos] == "")||(!this._isBookmarks(listPlaces[pos])))
-            listPlaces.splice(pos, 1);
-         else
-            pos++;
-      }
-      return listPlaces;
-   },
-
-   setPlacesList: function(listPlaces) {
-      let result = "";
-      for(let i = 0; i < listPlaces.length - 1; i++) {
-         if(listPlaces[i] != "")
-            result += listPlaces[i] + ";;";
-      }
-      if((listPlaces.length > 0)&&(listPlaces[listPlaces.length-1] != ""))
-         result += listPlaces[listPlaces.length-1];
-      this.meta["list-places"] = result;
-      this._saveMetaData();
-   },
-
-   isInPlacesList: function(placeId) {
-      return (this.getPlacesList().indexOf(placeId) != -1);
-   },
-
-   getPlacesNamesList: function() {
-      let placesNamesString = this.meta["list-places-names"];
-      let listPlacesNames = placesNamesString.split(";;");
-      let listPlaces = this.getPlacesList();
-      let result = new Array();
-      for(let i = 0; i < listPlacesNames.length; i++) {
-         property = listPlacesNames[i].split("::");
-         if(listPlaces.indexOf(property[0]) != -1) {
-            result[property[0]] = property[1];
-         }
-      }
-      return result;
-   },
-
-   setPlacesNamesList: function(listPlacesNames) {
-      let result = "";
-      for(let id in listPlacesNames)
-         result += id+"::"+listPlacesNames[id].toString() + ";;";
-      this.meta["list-places-names"] = result.substring(0, result.length - 2);
-      this._saveMetaData();
-   },
-
-   changePlaceName: function(placeId, newName) {
-      if(newName != "") {
-         let listPlaces = this.getPlacesList();
-         let index = listPlaces.indexOf(placeId);
-         if(index != -1) {
-            let placesNamesList = this.getPlacesNamesList();
-            placesNamesList[placeId] = newName;
-            this.setPlacesNamesList(placesNamesList);
-         }
-      }
-   },
-
-   getAppsList: function() {
-      let appsString = this.meta["list-apps"];
-      let listApps = appsString.split(";;");
-      let appSys = Cinnamon.AppSystem.get_default();
-      let pos = 0;
-      while(pos < listApps.length) {
-         if((listApps[pos] == "")||(!appSys.lookup_app(listApps[pos])))
-            listApps.splice(pos, 1);
-         else
-            pos++;
-      }
-      return listApps;
-   },
-
-   setAppsList: function(listApps) {
-      let result = "";
-      for(let i = 0; i < listApps.length - 1; i++) {
-         if(listApps[i] != "")
-            result += listApps[i] + ";;";
-      }
-      if((listApps.length > 0)&&(listApps[listApps.length-1] != ""))
-         result += listApps[listApps.length-1];
-      this.meta["list-apps"] = result;
-      this._saveMetaData();
-   },
-
-   isInAppsList: function(appId) {
-      return (this.getAppsList().indexOf(appId) != -1);
-   },
-
-   getThemeConfig: function(theme) {
-      let themeString = this.meta[theme];
-      let themeList = themeString.split(";;");
-      let themeProperties = new Array();
-      let property;
-      for(let i = 0; i < themeList.length; i++) {
-         property = themeList[i].split("::");
-         themeProperties[property[0]] = property[1];
-      }
-      //make convertion
-      themeProperties["show-recent"] = (themeProperties["show-recent"] === 'true');
-      themeProperties["show-places"] = (themeProperties["show-places"] === 'true');
-      themeProperties["search-filesystem"] = (themeProperties["search-filesystem"] === 'true');
-      themeProperties["activate-on-hover"] = (themeProperties["activate-on-hover"] === 'true');
-      themeProperties["hover-delay"] = parseInt(themeProperties["hover-delay"]);
-      themeProperties["enable-autoscroll"] = (themeProperties["enable-autoscroll"] === 'true');
-      themeProperties["show-view-item"] = (themeProperties["show-view-item"] === 'true');
-      themeProperties["view-item"] = (themeProperties["view-item"] === 'true');
-      themeProperties["hover-box"] = (themeProperties["hover-box"] === 'true');
-      themeProperties["control-box"] = (themeProperties["control-box"] === 'true');
-      themeProperties["power-box"] = (themeProperties["power-box"] === 'true');
-      themeProperties["accessible-box"] = (themeProperties["accessible-box"] === 'true');
-      themeProperties["gnomenu-box"] = (themeProperties["gnomenu-box"] === 'true');
-      themeProperties["show-removable-drives"] = (themeProperties["show-removable-drives"] === 'true');
-      themeProperties["accessible-icons"] = (themeProperties["accessible-icons"] === 'true');
-      themeProperties["categories-icons"] = (themeProperties["categories-icons"] === 'true');
-      themeProperties["app-button-width"] = parseInt(themeProperties["app-button-width"]);
-      themeProperties["app-description"] = (themeProperties["app-description"] === 'true');
-      themeProperties["icon-app-size"] = parseInt(themeProperties["icon-app-size"]);
-      themeProperties["icon-cat-size"] = parseInt(themeProperties["icon-cat-size"]);
-      themeProperties["icon-max-fav-size"] = parseInt(themeProperties["icon-max-fav-size"]);
-      themeProperties["icon-power-size"] = parseInt(themeProperties["icon-power-size"]);
-      themeProperties["icon-control-size"] = parseInt(themeProperties["icon-control-size"]);
-      themeProperties["icon-hover-size"] = parseInt(themeProperties["icon-hover-size"]);
-      themeProperties["icon-accessible-size"] = parseInt(themeProperties["icon-accessible-size"]);
-      themeProperties["icon-gnomenu-size"] = parseInt(themeProperties["icon-gnomenu-size"]);
-      themeProperties["show-favorites"] = (themeProperties["show-favorites"] === 'true');
-      themeProperties["favorites-lines"] = parseInt(themeProperties["favorites-lines"]);
-      themeProperties["show-hover-icon"] = (themeProperties["show-hover-icon"] === 'true');
-      themeProperties["show-power-buttons"] = (themeProperties["show-power-buttons"] === 'true');
-      themeProperties["show-time-date"] = (themeProperties["show-time-date"] === 'true');
-      themeProperties["show-app-title"] = (themeProperties["show-app-title"] === 'true');
-      themeProperties["app-title-size"] = parseInt(themeProperties["app-title-size"]);
-      themeProperties["show-app-description"] = (themeProperties["show-app-description"] === 'true');
-      themeProperties["app-description-size"] = parseInt(themeProperties["app-description-size"]);
-      themeProperties["automatic-size"] = (themeProperties["automatic-size"] === 'true');
-      themeProperties["full-screen"] = (themeProperties["full-screen"] === 'true');
-      themeProperties["width"] = parseInt(themeProperties["width"]);
-      themeProperties["height"] = parseInt(themeProperties["height"]);
-      themeProperties["scroll-favorites"] = (themeProperties["scroll-favorites"] === 'true');
-      themeProperties["scroll-categories"] = (themeProperties["scroll-categories"] === 'true');
-      themeProperties["scroll-applications"] = (themeProperties["scroll-applications"] === 'true');
-      themeProperties["scroll-accessible"] = (themeProperties["scroll-accessible"] === 'true');
-      themeProperties["scroll-gnomenu"] = (themeProperties["scroll-gnomenu"] === 'true');
-      themeProperties["spacer-line"] = (themeProperties["spacer-line"] === 'true');
-      themeProperties["spacer-size"] = parseInt(themeProperties["spacer-size"]);
-      themeProperties["show-box-pointer"] = (themeProperties["show-box-pointer"] === 'true');
-      themeProperties["fix-menu-corner"] = (themeProperties["fix-menu-corner"] === 'true');
-      return themeProperties;
-   },
-
-   setThemeConfig: function(theme, properties) {
-      let result = "";
-      for(let key in properties)
-         result += key+"::"+properties[key].toString() + ";;";
-      this.meta[theme] = result.substring(0, result.length - 2);
-      this._saveMetaData();
-   }
-};
-
 function MyApplet(metadata, orientation, panel_height, instance_id) {
    this._init(metadata, orientation, panel_height, instance_id);
 }
@@ -5457,7 +5066,6 @@ MyApplet.prototype = {
          this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPressEvent));
          //this._keyFocusNotifyIDSignal = global.stage.connect('notify::key-focus', Lang.bind(this, this._onKeyFocusChanged));
 
-         this.accessibleMetaData = new AccessibleMetaData(this, Lang.bind(this, this._onChangeAccessible));
          this.settings = new Settings.AppletSettings(this, this.uuid, instance_id);
 
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-recent", "showRecent", this._refreshPlacesAndRecent, null);
@@ -5530,7 +5138,27 @@ MyApplet.prototype = {
 
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-box-pointer", "showBoxPointer", this._setVisibleBoxPointer, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "fix-menu-corner", "fixMenuCorner", this._setFixMenuCorner, null);
+//Config//
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "list-places", "stringPlaces", this._onAccessiblePlacesChanged, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "list-places-names", "stringPlacesNames", this._onAccessiblePlacesNamesChanged, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "list-apps", "stringApps", this._onAccessibleAppsChanged, null);
 
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "classic", "stringClassic", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "gnomenuLeft", "stringGnoMenuLeft", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "gnomenuRight", "stringGnoMenuRight", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "gnomenuTop", "stringGnoMenuTop", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "gnomenuBottom", "stringGnoMenuBottom", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "vampire", "stringVampire", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "garibaldo", "stringGaribaldo", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "stylized", "stringStylized", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "dragon", "stringDragon", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "dragonInverted", "stringDragonInverted", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "horizontal", "stringHorizontal", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "accessible", "stringAccessible", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "accessibleInverted", "stringAccessibleInverted", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "mint", "stringMint", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "windows7", "stringWindows7", null, null);
+//Config//
 
          this._searchInactiveIcon = new St.Icon({ style_class: 'menu-search-entry-icon',
                                                   icon_name: 'edit-find',
@@ -5561,6 +5189,7 @@ MyApplet.prototype = {
          this._pathCompleter.set_dirs_only(false);
          this.lastAcResults = new Array();
 
+         this._updateConfig();
          this._updateComplete();
       }
       catch (e) {
@@ -5620,7 +5249,275 @@ MyApplet.prototype = {
          Main.notify("Error", e.message);
       }
    },
+//Config//
+   _updateConfig: function() {
+      this._onAccessiblePlacesChanged();
+      this._onAccessiblePlacesNamesChanged();
+      this._onAccessibleAppsChanged();
+      this._createArrayOfThemes();
+   },
 
+   _createArrayOfThemes: function() {
+      this.themes = new Array();
+      this.themes["classic"] = this.stringClassic;
+      this.themes["gnomenuLeft"] = this.stringGnoMenuLeft;
+      this.themes["gnomenuRight"] = this.stringGnoMenuRight;
+      this.themes["gnomenuTop"] = this.stringGnoMenuTop;
+      this.themes["gnomenuBottom"] = this.stringGnoMenuBottom;
+      this.themes["vampire"] = this.stringVampire;
+      this.themes["garibaldo"] = this.stringGaribaldo;
+      this.themes["stylized"] = this.stringStylized;
+      this.themes["dragon"] = this.stringDragon;
+      this.themes["dragonInverted"] = this.stringDragonInverted;
+      this.themes["horizontal"] = this.stringHorizontal;
+      this.themes["accessible"] = this.stringAccessible;
+      this.themes["accessibleInverted"] = this.stringAccessibleInverted;
+      this.themes["mint"] = this.stringMint;
+      this.themes["windows7"] = this.stringWindows7;
+   },
+
+   _saveTheme: function(theme) {
+      switch(theme) {
+         case "classic"            :
+            this.stringClassic = this.themes["classic"]
+            break;
+         case "gnomenuLeft"        :
+            this.stringGnoMenuLeft = this.themes["gnomenuLeft"];
+            break;
+         case "gnomenuRight"       :
+            this.stringGnoMenuRight = this.themes["gnomenuRight"];
+            break;
+         case "gnomenuTop"         :
+            this.stringGnoMenuTop = this.themes["gnomenuTop"];
+            break;
+         case "gnomenuBottom"      :
+            this.stringGnoMenuBottom = this.themes["gnomenuBottom"];
+            break;
+         case "vampire"            :
+            this.stringVampire = this.themes["vampire"];
+            break;
+         case "garibaldo"          :
+            this.stringGaribaldo = this.themes["garibaldo"];
+            break;
+         case "stylized"           :
+            this.stringStylized = this.themes["stylized"];
+            break;
+         case "dragon"             :
+            this.stringDragon = this.themes["dragon"];
+            break;
+         case "dragonInverted"     :
+            this.stringDragonInverted = this.themes["dragonInverted"];
+            break;
+         case "horizontal"         :
+            this.stringHorizontal = this.themes["horizontal"];
+            break;
+         case "accessible"         :
+            this.stringAccessible = this.themes["accessible"];
+            break;
+         case "accessibleInverted" :
+            this.stringAccessibleInverted = this.themes["accessibleInverted"];
+            break;
+         case "mint"               :
+            this.stringMint = this.themes["mint"];
+            break;
+         case "windows7"           :
+            this.stringWindows7 = this.themes["windows7"];
+            break;
+      }
+   },
+
+   _onAccessiblePlacesChanged: function() {
+      this.places = this.stringPlaces.split(";;");
+      let pos = 0;
+      while(pos < this.places.length) {
+         if((this.places[pos] == "")||(!this._isBookmarks(this.places[pos])))
+            this.places.splice(pos, 1);
+         else
+            pos++;
+      }
+      this._onChangeAccessible();
+   },
+
+   _onAccessiblePlacesNamesChanged: function() {
+      this.placesNamesList = this.stringPlacesNames.split(";;");
+      this.placesNames = new Array();
+      for(let i = 0; i < this.placesNamesList.length; i++) {
+         property = this.placesNamesList[i].split("::");
+         if((property[0] != "")&&(property[1] != "")) {
+            this.placesNames[property[0]] = property[1];
+         }
+      }
+      this._onChangeAccessible();
+   },
+
+   _onAccessibleAppsChanged: function() {
+      this.apps = this.stringApps.split(";;");
+      let appSys = Cinnamon.AppSystem.get_default();
+      let pos = 0;
+      while(pos < this.apps.length) {
+         if((this.apps[pos] == "")||(!appSys.lookup_app(this.apps[pos])))
+            this.apps.splice(pos, 1);
+         else
+            pos++;
+      }
+      this._onChangeAccessible();
+   },
+
+   _isBookmarks: function(bookmark) {
+      let listBookmarks = this._listBookmarks();
+      for(let i = 0; i < listBookmarks.length; i++) {
+         if(listBookmarks[i].id == bookmark)
+            return true;
+      }
+      return false;
+   },
+
+   getPlacesList: function() {
+      if(!this.places)
+         Main.notify("error");
+      return this.places;
+   },
+
+   setPlacesList: function(listPlaces) {
+      let result = "";
+      this.places = new Array();
+      for(let i = 0; i < listPlaces.length - 1; i++) {
+         if((listPlaces[i] != "")&&(this._isBookmarks(listPlaces[i]))) {
+            this.places.push(listPlaces[i]);
+            result += listPlaces[i] + ";;";
+         }
+      }
+      if((listPlaces.length > 0)&&(listPlaces[listPlaces.length-1] != "")&&(this._isBookmarks(listPlaces[listPlaces.length-1]))) {
+         this.places.push(listPlaces[listPlaces.length-1]);
+         result += listPlaces[listPlaces.length-1];
+      }
+      this.stringPlaces = result;//commit
+   },
+
+   isInPlacesList: function(placeId) {
+      return (this.places.indexOf(placeId) != -1);
+   },
+
+   getPlacesNamesList: function() {
+      return this.placesNames;
+   },
+
+   setPlacesNamesList: function(listPlacesNames) {
+      let result = "";
+      this.placesNames = new Array();
+      for(let id in listPlacesNames) {
+         if((id != "")&&(listPlacesNames[id].toString() != "")) {
+            this.placesNames[id] = listPlacesNames[id].toString();
+            result += id+"::"+listPlacesNames[id].toString() + ";;";
+         }
+      }
+      this.stringPlacesNames = result.substring(0, result.length - 2);//commit
+   },
+
+   changePlaceName: function(placeId, newName) {
+      if(newName != "") {
+         let index = this.places.indexOf(placeId);
+         if(index != -1) {
+            this.placesNames[placeId] = newName;
+            this.setPlacesNamesList(this.placesNames);
+            this.closeApplicationsContextMenus(null, false);
+         }
+      }
+   },
+
+   getAppsList: function() {
+      return this.apps;
+   },
+
+   setAppsList: function(listApps) {
+      let result = "";
+      this.apps = new Array();
+      for(let i = 0; i < listApps.length - 1; i++) {
+         if(listApps[i] != "") {
+            result += listApps[i] + ";;";
+            this.apps.push(listApps[i]);
+         }
+      }
+      if((listApps.length > 0)&&(listApps[listApps.length-1] != "")) {
+         result += listApps[listApps.length-1];
+         this.apps.push(listApps[listApps.length-1]);
+      }
+      this.stringApps = result;//commit
+   },
+
+   isInAppsList: function(appId) {
+      return (this.apps.indexOf(appId) != -1);
+   },
+
+   getThemeConfig: function(theme) {
+      let themeString = this.themes[theme];
+      let themeList = themeString.split(";;");
+      let themeProperties = new Array();
+      let property;
+      for(let i = 0; i < themeList.length; i++) {
+         property = themeList[i].split("::");
+         themeProperties[property[0]] = property[1];
+      }
+      //make convertion
+      themeProperties["show-recent"] = (themeProperties["show-recent"] === 'true');
+      themeProperties["show-places"] = (themeProperties["show-places"] === 'true');
+      themeProperties["search-filesystem"] = (themeProperties["search-filesystem"] === 'true');
+      themeProperties["activate-on-hover"] = (themeProperties["activate-on-hover"] === 'true');
+      themeProperties["hover-delay"] = parseInt(themeProperties["hover-delay"]);
+      themeProperties["enable-autoscroll"] = (themeProperties["enable-autoscroll"] === 'true');
+      themeProperties["show-view-item"] = (themeProperties["show-view-item"] === 'true');
+      themeProperties["view-item"] = (themeProperties["view-item"] === 'true');
+      themeProperties["hover-box"] = (themeProperties["hover-box"] === 'true');
+      themeProperties["control-box"] = (themeProperties["control-box"] === 'true');
+      themeProperties["power-box"] = (themeProperties["power-box"] === 'true');
+      themeProperties["accessible-box"] = (themeProperties["accessible-box"] === 'true');
+      themeProperties["gnomenu-box"] = (themeProperties["gnomenu-box"] === 'true');
+      themeProperties["show-removable-drives"] = (themeProperties["show-removable-drives"] === 'true');
+      themeProperties["accessible-icons"] = (themeProperties["accessible-icons"] === 'true');
+      themeProperties["categories-icons"] = (themeProperties["categories-icons"] === 'true');
+      themeProperties["app-button-width"] = parseInt(themeProperties["app-button-width"]);
+      themeProperties["app-description"] = (themeProperties["app-description"] === 'true');
+      themeProperties["icon-app-size"] = parseInt(themeProperties["icon-app-size"]);
+      themeProperties["icon-cat-size"] = parseInt(themeProperties["icon-cat-size"]);
+      themeProperties["icon-max-fav-size"] = parseInt(themeProperties["icon-max-fav-size"]);
+      themeProperties["icon-power-size"] = parseInt(themeProperties["icon-power-size"]);
+      themeProperties["icon-control-size"] = parseInt(themeProperties["icon-control-size"]);
+      themeProperties["icon-hover-size"] = parseInt(themeProperties["icon-hover-size"]);
+      themeProperties["icon-accessible-size"] = parseInt(themeProperties["icon-accessible-size"]);
+      themeProperties["icon-gnomenu-size"] = parseInt(themeProperties["icon-gnomenu-size"]);
+      themeProperties["show-favorites"] = (themeProperties["show-favorites"] === 'true');
+      themeProperties["favorites-lines"] = parseInt(themeProperties["favorites-lines"]);
+      themeProperties["show-hover-icon"] = (themeProperties["show-hover-icon"] === 'true');
+      themeProperties["show-power-buttons"] = (themeProperties["show-power-buttons"] === 'true');
+      themeProperties["show-time-date"] = (themeProperties["show-time-date"] === 'true');
+      themeProperties["show-app-title"] = (themeProperties["show-app-title"] === 'true');
+      themeProperties["app-title-size"] = parseInt(themeProperties["app-title-size"]);
+      themeProperties["show-app-description"] = (themeProperties["show-app-description"] === 'true');
+      themeProperties["app-description-size"] = parseInt(themeProperties["app-description-size"]);
+      themeProperties["automatic-size"] = (themeProperties["automatic-size"] === 'true');
+      themeProperties["full-screen"] = (themeProperties["full-screen"] === 'true');
+      themeProperties["width"] = parseInt(themeProperties["width"]);
+      themeProperties["height"] = parseInt(themeProperties["height"]);
+      themeProperties["scroll-favorites"] = (themeProperties["scroll-favorites"] === 'true');
+      themeProperties["scroll-categories"] = (themeProperties["scroll-categories"] === 'true');
+      themeProperties["scroll-applications"] = (themeProperties["scroll-applications"] === 'true');
+      themeProperties["scroll-accessible"] = (themeProperties["scroll-accessible"] === 'true');
+      themeProperties["scroll-gnomenu"] = (themeProperties["scroll-gnomenu"] === 'true');
+      themeProperties["spacer-line"] = (themeProperties["spacer-line"] === 'true');
+      themeProperties["spacer-size"] = parseInt(themeProperties["spacer-size"]);
+      themeProperties["show-box-pointer"] = (themeProperties["show-box-pointer"] === 'true');
+      themeProperties["fix-menu-corner"] = (themeProperties["fix-menu-corner"] === 'true');
+      return themeProperties;
+   },
+
+   setThemeConfig: function(theme, properties) {
+      let result = "";
+      for(let key in properties)
+         result += key+"::"+properties[key].toString() + ";;";
+      this.themes[theme] = result.substring(0, result.length - 2);
+      this._saveTheme(theme);
+   },
+//Config//
    _updateAppFavs: function() {
       Mainloop.idle_add(Lang.bind(this, function() {
          this._refreshFavs();
@@ -5638,7 +5535,6 @@ MyApplet.prototype = {
 
    _onChangeAccessible: function() {
       if(this.accessibleBox) {
-         this.closeApplicationsContextMenus(null, false);
          this.accessibleBox.refreshAccessibleItems();
       }
    },
@@ -6517,7 +6413,7 @@ Main.notify("errorTheme", e.message);
    },
 
    _loadConfigTheme: function() {
-      let confTheme = this.accessibleMetaData.getThemeConfig(this.theme);
+      let confTheme = this.getThemeConfig(this.theme);
       this.powerTheme = confTheme["power-theme"];
       this.gnoMenuButtonsTheme = confTheme["gnomenu-buttons-theme"];
       this.showRecent = confTheme["show-recent"];
@@ -6635,7 +6531,7 @@ Main.notify("errorTheme", e.message);
       confTheme["spacer-size"] = this.spacerSize;
       confTheme["show-box-pointer"] = this.showBoxPointer;
       confTheme["fix-menu-corner"] = this.fixMenuCorner;
-      this.accessibleMetaData.setThemeConfig(this.theme, confTheme);
+      this.setThemeConfig(this.theme, confTheme);
    },
 
    _onThemePowerChange: function() {

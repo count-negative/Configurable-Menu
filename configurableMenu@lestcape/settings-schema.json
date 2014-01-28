@@ -1,4 +1,11 @@
 {
+    "header-theme": {
+        "type": "header",
+        "description": "Layouts options:"
+    },
+    "separator-theme": {
+       "type": "separator"
+    },
     "theme": {
         "type": "combobox",
         "description": "Menu layout:",
@@ -27,6 +34,16 @@
         "description": "Save the layout configuration",
         "callback": "_saveConfigTheme",
         "tooltip": "Press this button to save the layout configuration."
+    },
+    "separator-show": {
+       "type": "separator"
+    },
+    "header-show": {
+        "type": "header",
+        "description": "Show options:"
+    },
+    "separator-next": {
+       "type": "separator"
     },
     "power-theme": {
         "type": "combobox",
@@ -455,5 +472,77 @@
         "default": false,
         "description": "Menu bordering screen edge",
         "tooltip": "Choose whether or not the menu bordering the screen edge."
+    },
+    "list-places": {
+        "type": "generic",
+        "default": "bookmark:file://computer:///;;bookmark:file://trash:///"
+    },
+    "list-apps": {
+        "type": "generic",
+        "default": "cinnamon-settings.desktop;;synaptic.desktop;;update-manager.desktop;;gnome-terminal.desktop;;yelp.desktop"
+    },
+    "list-places-names": {
+        "type": "generic",
+        "default": ""
+    },
+    "classic": {
+        "type": "generic",
+        "default": "power-theme::vertical;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;search-filesystem::false;;hover-delay::0;;enable-autoscroll::true;;show-view-item::true;;view-item::false;;activate-on-press::true;;hover-box::false;;control-box::true;;power-box::true;;accessible-box::false;;gnomenu-box::false;;show-removable-drives::false;;accessible-icons::true;;categories-icons::true;;app-button-width::300;;app-description::false;;icon-app-size::22;;icon-cat-size::32;;icon-max-fav-size::32;;icon-power-size::32;;icon-control-size::22;;icon-hover-size::68;;icon-accessible-size::22;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::1;;show-hover-icon::true;;show-power-buttons::true;;show-time-date::false;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;full-screen::false;;width::579;;height::563;;scroll-favorites::false;;scroll-categories::true;;scroll-applications::true;;scroll-accessible::true;;scroll-gnomenu::false;;spacer-line::true;;spacer-size::10;;show-box-pointer::true;;fix-menu-corner::false"
+    },
+    "vampire": {
+        "type": "generic",
+        "default": "power-theme::horizontal;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;search-filesystem::false;;hover-delay::0;;enable-autoscroll::true;;show-view-item::true;;view-item::false;;activate-on-press::true;;hover-box::false;;control-box::true;;power-box::true;;accessible-box::false;;gnomenu-box::false;;show-removable-drives::false;;accessible-icons::true;;categories-icons::true;;app-button-width::300;;app-description::false;;icon-app-size::22;;icon-cat-size::32;;icon-max-fav-size::32;;icon-power-size::32;;icon-control-size::22;;icon-hover-size::52;;icon-accessible-size::22;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::1;;show-hover-icon::true;;show-power-buttons::true;;show-time-date::true;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;full-screen::false;;width::563;;height::540;;scroll-favorites::false;;scroll-categories::true;;scroll-applications::true;;scroll-accessible::true;;scroll-gnomenu::false;;spacer-line::true;;spacer-size::10;;show-box-pointer::true;;fix-menu-corner::false"
+    },
+    "garibaldo": {
+        "type": "generic",
+        "default": "power-theme::vertical;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;search-filesystem::false;;hover-delay::0;;enable-autoscroll::true;;show-view-item::true;;view-item::false;;activate-on-press::true;;hover-box::false;;control-box::true;;power-box::true;;accessible-box::false;;gnomenu-box::false;;show-removable-drives::false;;accessible-icons::true;;categories-icons::true;;app-button-width::300;;app-description::false;;icon-app-size::22;;icon-cat-size::32;;icon-max-fav-size::32;;icon-power-size::32;;icon-control-size::22;;icon-hover-size::52;;icon-accessible-size::22;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::1;;show-hover-icon::true;;show-power-buttons::true;;show-time-date::false;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;full-screen::false;;width::543;;height::557.0001220703125;;scroll-favorites::false;;scroll-categories::true;;scroll-applications::true;;scroll-accessible::true;;scroll-gnomenu::false;;spacer-line::true;;spacer-size::10;;show-box-pointer::true;;fix-menu-corner::false"
+    },
+    "stylized": {
+        "type": "generic",
+        "default": "power-theme::horizontal;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;search-filesystem::false;;hover-delay::0;;enable-autoscroll::true;;show-view-item::true;;view-item::false;;activate-on-press::true;;hover-box::false;;control-box::true;;power-box::true;;accessible-box::false;;gnomenu-box::false;;show-removable-drives::false;;accessible-icons::true;;categories-icons::true;;app-button-width::300;;app-description::false;;icon-app-size::22;;icon-cat-size::32;;icon-max-fav-size::32;;icon-power-size::32;;icon-control-size::22;;icon-hover-size::68;;icon-accessible-size::22;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::1;;show-hover-icon::true;;show-power-buttons::true;;show-time-date::false;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;full-screen::false;;width::563;;height::540;;scroll-favorites::false;;scroll-categories::true;;scroll-applications::true;;scroll-accessible::true;;scroll-gnomenu::false;;spacer-line::true;;spacer-size::10;;show-box-pointer::true;;fix-menu-corner::false"
+    },
+    "dragon": {
+        "type": "generic",
+        "default": "power-theme::horizontal-grid;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;search-filesystem::false;;hover-delay::0;;enable-autoscroll::true;;show-view-item::true;;view-item::false;;activate-on-press::true;;hover-box::false;;control-box::true;;power-box::true;;accessible-box::false;;gnomenu-box::false;;show-removable-drives::false;;accessible-icons::true;;categories-icons::true;;app-button-width::300;;app-description::false;;icon-app-size::22;;icon-cat-size::32;;icon-max-fav-size::32;;icon-power-size::32;;icon-control-size::22;;icon-hover-size::68;;icon-accessible-size::22;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::1;;show-hover-icon::true;;show-power-buttons::true;;show-time-date::false;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;full-screen::false;;width::1312;;height::697.000244140625;;scroll-favorites::false;;scroll-categories::true;;scroll-applications::true;;scroll-accessible::true;;scroll-gnomenu::false;;spacer-line::true;;spacer-size::10;;show-box-pointer::true;;fix-menu-corner::false"
+    },
+    "dragonInverted": {
+        "type": "generic",
+        "default": "power-theme::horizontal-grid;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;search-filesystem::false;;hover-delay::0;;enable-autoscroll::true;;show-view-item::true;;view-item::false;;activate-on-press::true;;hover-box::false;;control-box::true;;power-box::true;;accessible-box::false;;gnomenu-box::false;;show-removable-drives::false;;accessible-icons::true;;categories-icons::true;;app-button-width::300;;app-description::false;;icon-app-size::22;;icon-cat-size::32;;icon-max-fav-size::32;;icon-power-size::32;;icon-control-size::22;;icon-hover-size::68;;icon-accessible-size::22;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::1;;show-hover-icon::true;;show-power-buttons::true;;show-time-date::false;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;full-screen::false;;width::1273;;height::729.0009765625;;scroll-favorites::false;;scroll-categories::true;;scroll-applications::true;;scroll-accessible::true;;scroll-gnomenu::false;;spacer-line::true;;spacer-size::10;;show-box-pointer::true;;fix-menu-corner::false"
+    },
+    "horizontal": {
+        "type": "generic",
+        "default": "power-theme::horizontal-list;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;search-filesystem::false;;hover-delay::0;;enable-autoscroll::true;;show-view-item::true;;view-item::false;;activate-on-press::true;;hover-box::false;;control-box::true;;power-box::true;;accessible-box::false;;gnomenu-box::false;;show-removable-drives::false;;accessible-icons::true;;categories-icons::true;;app-button-width::300;;app-description::false;;icon-app-size::22;;icon-cat-size::32;;icon-max-fav-size::32;;icon-power-size::32;;icon-control-size::22;;icon-hover-size::68;;icon-accessible-size::22;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::1;;show-hover-icon::true;;show-power-buttons::true;;show-time-date::false;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;full-screen::true;;width::700;;height::500;;scroll-favorites::false;;scroll-categories::true;;scroll-applications::true;;scroll-accessible::true;;scroll-gnomenu::false;;spacer-line::true;;spacer-size::10;;show-box-pointer::true;;fix-menu-corner::false"
+    },
+    "accessible": {
+        "type": "generic",
+        "default": "power-theme::horizontal;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;search-filesystem::false;;hover-delay::0;;enable-autoscroll::true;;show-view-item::true;;view-item::true;;activate-on-press::true;;hover-box::false;;control-box::true;;power-box::false;;accessible-box::true;;gnomenu-box::false;;show-removable-drives::true;;accessible-icons::true;;categories-icons::true;;app-button-width::300;;app-description::true;;icon-app-size::22;;icon-cat-size::32;;icon-max-fav-size::32;;icon-power-size::32;;icon-control-size::22;;icon-hover-size::68;;icon-accessible-size::22;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::1;;show-hover-icon::true;;show-power-buttons::true;;show-time-date::false;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;full-screen::false;;width::830;;height::544;;scroll-favorites::false;;scroll-categories::true;;scroll-applications::true;;scroll-accessible::true;;scroll-gnomenu::false;;spacer-line::true;;spacer-size::10;;show-box-pointer::true;;fix-menu-corner::false"
+    },
+    "accessibleInverted": {
+        "type": "generic",
+        "default": "power-theme::horizontal-grid;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;search-filesystem::false;;hover-delay::0;;enable-autoscroll::true;;show-view-item::true;;view-item::false;;activate-on-press::true;;hover-box::false;;control-box::true;;power-box::false;;accessible-box::true;;gnomenu-box::false;;show-removable-drives::true;;accessible-icons::true;;categories-icons::true;;app-button-width::300;;app-description::false;;icon-app-size::22;;icon-cat-size::32;;icon-max-fav-size::32;;icon-power-size::32;;icon-control-size::22;;icon-hover-size::68;;icon-accessible-size::22;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::1;;show-hover-icon::true;;show-power-buttons::true;;show-time-date::false;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;full-screen::false;;width::797;;height::500;;scroll-favorites::false;;scroll-categories::true;;scroll-applications::true;;scroll-accessible::true;;scroll-gnomenu::false;;spacer-line::true;;spacer-size::10;;show-box-pointer::true;;fix-menu-corner::false"
+    },
+    "mint": {
+        "type": "generic",
+        "default": "power-theme::vertical-list;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;search-filesystem::false;;hover-delay::0;;enable-autoscroll::true;;show-view-item::true;;view-item::false;;activate-on-press::true;;hover-box::false;;control-box::true;;power-box::false;;accessible-box::false;;gnomenu-box::false;;show-removable-drives::false;;accessible-icons::true;;categories-icons::true;;app-button-width::200;;app-description::true;;icon-app-size::22;;icon-cat-size::32;;icon-max-fav-size::32;;icon-power-size::22;;icon-control-size::22;;icon-hover-size::68;;icon-accessible-size::22;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::2;;show-hover-icon::false;;show-power-buttons::true;;show-time-date::false;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;full-screen::false;;width::757;;height::451.00006103515625;;scroll-favorites::false;;scroll-categories::true;;scroll-applications::true;;scroll-accessible::true;;scroll-gnomenu::false;;spacer-line::true;;spacer-size::10;;show-box-pointer::true;;fix-menu-corner::false"
+    },
+    "windows7": {
+        "type": "generic",
+        "default": "power-theme::retractable;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;search-filesystem::false;;hover-delay::0;;enable-autoscroll::true;;show-view-item::true;;view-item::false;;activate-on-press::true;;hover-box::false;;control-box::true;;power-box::false;;accessible-box::false;;gnomenu-box::false;;show-removable-drives::true;;accessible-icons::false;;categories-icons::true;;app-button-width::300;;app-description::false;;icon-app-size::22;;icon-cat-size::32;;icon-max-fav-size::32;;icon-power-size::22;;icon-control-size::22;;icon-hover-size::68;;icon-accessible-size::23;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::1;;show-hover-icon::true;;show-power-buttons::true;;show-time-date::false;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;full-screen::false;;width::509;;height::615;;scroll-favorites::true;;scroll-categories::true;;scroll-applications::true;;scroll-accessible::true;;scroll-gnomenu::false;;spacer-line::true;;spacer-size::10;;show-box-pointer::false;;fix-menu-corner::true"
+    },
+    "gnomenuLeft": {
+        "type": "generic",
+        "default": "power-theme::vertical;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;search-filesystem::false;;hover-delay::0;;enable-autoscroll::true;;show-view-item::true;;view-item::false;;activate-on-press::true;;hover-box::true;;control-box::true;;power-box::false;;accessible-box::true;;gnomenu-box::false;;show-removable-drives::false;;accessible-icons::true;;categories-icons::true;;app-button-width::300;;app-description::false;;icon-app-size::22;;icon-cat-size::32;;icon-max-fav-size::22;;icon-power-size::60;;icon-control-size::22;;icon-hover-size::60;;icon-accessible-size::60;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::1;;show-hover-icon::true;;show-power-buttons::true;;show-time-date::true;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;full-screen::false;;width::387;;height::677;;scroll-favorites::true;;scroll-categories::true;;scroll-applications::true;;scroll-accessible::false;;scroll-gnomenu::false;;spacer-line::true;;spacer-size::10;;show-box-pointer::true;;fix-menu-corner::false"
+    },
+    "gnomenuRight": {
+        "type": "generic",
+        "default": "power-theme::vertical;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;search-filesystem::false;;hover-delay::0;;enable-autoscroll::true;;show-view-item::true;;view-item::false;;activate-on-press::true;;hover-box::true;;control-box::true;;power-box::false;;accessible-box::true;;gnomenu-box::false;;show-removable-drives::false;;accessible-icons::true;;categories-icons::true;;app-button-width::300;;app-description::false;;icon-app-size::22;;icon-cat-size::32;;icon-max-fav-size::22;;icon-power-size::60;;icon-control-size::22;;icon-hover-size::60;;icon-accessible-size::60;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::1;;show-hover-icon::true;;show-power-buttons::true;;show-time-date::true;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;full-screen::false;;width::387;;height::677;;scroll-favorites::true;;scroll-categories::true;;scroll-applications::true;;scroll-accessible::false;;scroll-gnomenu::false;;spacer-line::true;;spacer-size::10;;show-box-pointer::true;;fix-menu-corner::false"
+    },
+    "gnomenuTop": {
+        "type": "generic",
+        "default": "power-theme::vertical;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;search-filesystem::false;;hover-delay::0;;enable-autoscroll::true;;show-view-item::true;;view-item::false;;activate-on-press::true;;hover-box::true;;control-box::true;;power-box::false;;accessible-box::true;;gnomenu-box::false;;show-removable-drives::false;;accessible-icons::true;;categories-icons::true;;app-button-width::300;;app-description::false;;icon-app-size::22;;icon-cat-size::32;;icon-max-fav-size::22;;icon-power-size::60;;icon-control-size::22;;icon-hover-size::60;;icon-accessible-size::60;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::1;;show-hover-icon::true;;show-power-buttons::true;;show-time-date::true;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;full-screen::false;;width::387;;height::677;;scroll-favorites::true;;scroll-categories::true;;scroll-applications::true;;scroll-accessible::false;;scroll-gnomenu::false;;spacer-line::true;;spacer-size::10;;show-box-pointer::true;;fix-menu-corner::false"
+    },
+    "gnomenuBottom": {
+        "type": "generic",
+        "default": "power-theme::vertical;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;search-filesystem::false;;hover-delay::0;;enable-autoscroll::true;;show-view-item::true;;view-item::false;;activate-on-press::true;;hover-box::true;;control-box::true;;power-box::false;;accessible-box::true;;gnomenu-box::false;;show-removable-drives::false;;accessible-icons::true;;categories-icons::true;;app-button-width::300;;app-description::false;;icon-app-size::22;;icon-cat-size::32;;icon-max-fav-size::22;;icon-power-size::60;;icon-control-size::22;;icon-hover-size::60;;icon-accessible-size::60;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::1;;show-hover-icon::true;;show-power-buttons::true;;show-time-date::true;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;full-screen::false;;width::387;;height::677;;scroll-favorites::true;;scroll-categories::true;;scroll-applications::true;;scroll-accessible::false;;scroll-gnomenu::false;;spacer-line::true;;spacer-size::10;;show-box-pointer::true;;fix-menu-corner::false"
     }
 }
