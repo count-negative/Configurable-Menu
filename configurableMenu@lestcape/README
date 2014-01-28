@@ -1,7 +1,7 @@
 Cinnamon Applet: Configurable Menu version v0.9-Beta
 ==============
 
-Release Date: 26 january 2014
+Release Date: 28 january 2014
 
 Authors: Lester Carballo Pérez(https://github.com/lestcape) and Garibaldo(https://github.com/Garibaldo).
 
@@ -77,41 +77,67 @@ Installation Instructions:
 
 Add theme support:
 --------------
-- General list of new style class and pseudo style class:
+- List of new style class and pseudo style class for the main menu box:
+    - menu-main-box
 
-    - menu-hover-icon-box: open
-    - menu-control-button-box: (Not have)
-    - menu-control-button: open, .menu-control-button-selected(when hover or focus)
+- List of new style class and pseudo style class for the hover icon:
+    - menu-hover-icon-box
+    - menu-hover-icon-box:open
+
+- List of new style class and pseudo style class for the control buttons:
+    - menu-control-buttons-box
+    - menu-control-resize-box
+    - menu-control-view-box
+    - menu-control-button
+    - menu-control-button:open
+    - menu-control-button-selected (when hover or focus)
 
 - List of new style class and pseudo style class for the accessible panel:
-    - menu-accessible-box: (Not have)
+    - menu-accessible-box
+    - menu-accessible-devices-box
+    - menu-accessible-places-box
+    - menu-accessible-system-box
 
 - List of new style class and pseudo style class for the Mint layout:
-
-    - menu-operative-mint-box: (Not have)
-    - menu-top-mint-box: (Not have)
-    - menu-bottom-mint-box: (Not have)
+    - menu-operative-mint-box
+    - menu-top-mint-box
+    - menu-bottom-mint-box
 
 - List of new style class and pseudo style class for the Windows 7 layout:
+    - menu-operative-windows-box
+    - menu-top-windows-box
+    - menu-bottom-windows-box
 
-    - menu-operative-windows-box: (Not have)
+- List of new style class and pseudo style class for all layouts except the Windows 7 and Mint layout:
+    - menu-top-box
+    - menu-bottom-box
 
 - List of new style class and pseudo style class for the GnoMenu layouts (Note: The buttons can position in the future in 4 different ways, it's why we have 4 existing style classes):
 
-    - menu-gno-button-box: (Not have)
-    - menu-gno-operative-box: (Not have)
-    - menu-gno-button-left: .menu-gno-button-left-selected(when hover or focus)
-    - menu-gno-button-right: .menu-gno-button-right-selected(when hover or focus)
-    - menu-gno-button-top: .menu-gno-button-top-selected(when hover or focus)
-    - menu-gno-button-bottom: .menu-gno-button-bottom-selected(when hover or focus)
+    - menu-gno-button-box
+    - menu-gno-operative-box
+    - menu-gno-operative-box-selected (when hover or focus on any gno button)
+    - menu-gno-button-left
+    - menu-gno-button-left-selected (when hover or focus)
+    - menu-gno-button-right
+    - menu-gno-button-right-selected (when hover or focus)
+    - menu-gno-button-top
+    - menu-gno-button-top-selected (when hover or focus)
+    - menu-gno-button-bottom
+    - menu-gno-button-bottom-selected (when hover or focus)
+    - menu-gno-power-left (just the parent of power panel, not the power panel)
+    - menu-gno-power-right (just the parent of power panel, not the power panel)
+    - menu-gno-power-top (just the parent of power panel, not the power panel)
+    - menu-gno-power-bottom (just the parent of power panel, not the power panel)
 
 - Settings restrictions on the style class:
 
-    - menu-accessible-box: Can only used if the option "Accessible panel has a box" it's active.
-    - menu-hover-icon-box: Can only used if the option "Hover icon have a box" it's active.
-    - menu-control-button-box: Can only used if the option "Control buttons have a box" it's active.
-    - menu-gno-button-box: Can only used if the option "GnoMenu buttons have a box" it's active.
-
+    - menu-accessible-box:         Can only used if the option "Accessible panel has a box" it's active.
+    - menu-accessible-devices-box: Can only show if you have any removable device.
+    - menu-hover-icon-box:         Can only show if the option "Hover icon have a box" it's active.
+    - menu-control-resize-box:     Can only show if the option "Control buttons have a box" it's active.
+    - menu-control-view-box:       Can only show if the option "Control buttons have a box" it's active.
+    - menu-gno-button-box:         Can only used if the option "GnoMenu buttons have a box" it's active.
 
 More info: https://github.com/lestcape/Configurable-Menu/wiki/Add-theme-support
 
@@ -137,7 +163,7 @@ Change Log:
    - Fixed the bug on mint and windows 7 layouts. This error involves the closure of the menu in the case of the searchEntry do not has a focus.
    - The Menu now can be improved using the css file of any Cinnamon theme.
    - Removed the hover icon borders, due to allow more compatibility with cinnamon themes.
-   - The new layouts of Vampire, Garibaldo, GnoMenu and GnoMenu Bottom was added.
+   - The new layouts of Vampire, Garibaldo, GnoMenu Left, GnoMenu Right GnoMenu Top and GnoMenu Bottom was added.
    - Several visually improvement in different layouts, especially the horizontal.
 
 0.8-Beta

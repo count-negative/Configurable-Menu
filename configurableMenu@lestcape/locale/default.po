@@ -547,6 +547,30 @@ msgstr ""
 msgid "Mint"
 msgstr ""
 
+#. configurableMenu@lestcape->settings-schema.json->theme->options
+msgid "Vampire"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->theme->options
+msgid "Garibaldo"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->theme->options
+msgid "GnoMenu Left"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->theme->options
+msgid "GnoMenu Right"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->theme->options
+msgid "GnoMenu Top"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->theme->options
+msgid "GnoMenu Bottom"
+msgstr ""
+
 #. configurableMenu@lestcape->settings-schema.json->show-hover-
 #. icon->description
 msgid "Show hover icon"

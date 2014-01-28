@@ -6,7 +6,9 @@
         "tooltip": "Select a layout of menu.",
         "options": {
             "Classic": "classic",
-            "GnoMenu": "gnomenu",
+            "GnoMenu Left": "gnomenuLeft",
+            "GnoMenu Right": "gnomenuRight",
+            "GnoMenu Top": "gnomenuTop",
             "GnoMenu Bottom": "gnomenuBottom",
             "Vampire": "vampire",
             "Garibaldo": "garibaldo",
