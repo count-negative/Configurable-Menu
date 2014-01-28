@@ -294,7 +294,7 @@
         "description": "Number of favorites lines:",
         "tooltip": "Choose the number of favorites lines.",
         "indent": true,
-        "dependency": "how-favorites"
+        "dependency": "show-favorites"
     },
     "show-hover-icon": {
         "type": "checkbox",

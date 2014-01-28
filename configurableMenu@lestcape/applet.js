@@ -1046,10 +1046,14 @@ AccessibleBox.prototype = {
      try {
       let listBookmarks = this.parent._listBookmarks();
       let placesList = this.accessibleMetaData.getPlacesList();
+      let placesName = this.accessibleMetaData.getPlacesNamesList();
       let currBookmark, item;
       for(let i = 0; i < placesList.length; i++) {
          if(placesList[i] != "") {
             currBookmark = this.getBookmarkById(listBookmarks, placesList[i]);
+            if((placesName[placesList[i]])&&(placesName[placesList[i]] != "")) {
+               currBookmark.name = placesName[placesList[i]];
+            }
             item = new PlaceButtonAccessibleExtended(this.parent, this.scrollActor, currBookmark, false,
                                                      this.iconSize, this.textButtonWidth, this.appButtonDescription);
             item.actor.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
@@ -2211,6 +2215,27 @@ ApplicationContextMenuItemExtended.prototype = {
             }
            } catch (e) {Main.notify("access", e.message);}
             break;
+         case "edit_place_name":
+            try {
+            if(this._appButton.app.isPlace) {
+               if(!(this._appButton instanceof PlaceButtonExtended)&&(this._appButton instanceof PlaceButtonAccessibleExtended)&&(!this._appButton.nameEntry.visible))
+                  this._appButton.editText(true);
+            } else {
+
+            }
+           } catch (e) {Main.notify("access", e.message);}
+            break;
+         case "save_place_name":
+            try {
+            if(this._appButton.app.isPlace) {
+               if(!(this._appButton instanceof PlaceButtonExtended)&&(this._appButton instanceof PlaceButtonAccessibleExtended)&&(this._appButton.nameEntry.visible)) {
+                  this._appButton.editText(false);
+               }
+            } else {
+
+            }
+           } catch (e) {Main.notify("access", e.message);}
+            break;
       }
       this._appButton.toggleMenu();
       return false;
@@ -2299,6 +2324,15 @@ GenericApplicationButtonExtended.prototype = {
             } else {
                menuItem = new ApplicationContextMenuItemExtended(this, _("Add to accessible panel"), "add_to_accessible_panel");
                this.menu.addMenuItem(menuItem);
+            }
+            if(!(this instanceof PlaceButtonExtended)&&(this instanceof PlaceButtonAccessibleExtended)) {
+               if(this.nameEntry.visible) {
+                  menuItem = new ApplicationContextMenuItemExtended(this, _("Save place name"), "save_place_name");
+                  this.menu.addMenuItem(menuItem);
+               } else {
+                  menuItem = new ApplicationContextMenuItemExtended(this, _("Edit place name"), "edit_place_name");
+                  this.menu.addMenuItem(menuItem);
+               }
             }
          }
       }
@@ -3827,8 +3861,10 @@ PlaceButtonAccessibleExtended.prototype = {
       this.place = place;
 
       this.actor.set_style_class_name('menu-application-button');
+      this.nameEntry = new St.Entry({ name: 'menu-name-entry', hint_text: _("Type the new name..."), track_hover: true, can_focus: true });
       this.labelName = new St.Label({ text: this.place.name, style_class: 'menu-application-button-label' });
       this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
+      this.nameEntry.visible = false;
       this.labelDesc.visible = false;
       this.container = new St.BoxLayout();
       this.textBox = new St.BoxLayout({ vertical: true });
@@ -3852,6 +3888,26 @@ PlaceButtonAccessibleExtended.prototype = {
       this.isDraggableApp = true;
    },
 
+   editText: function(edit) {
+      if(edit) {
+         this.nameEntry.visible = true;
+         global.stage.set_key_focus(this.nameEntry);
+         this.labelName.visible = false;
+         this.labelDesc.visible = false;
+      }
+      else {
+         if(this.nameEntry.get_text() != "") {
+            global.stage.set_key_focus(this.parent.searchEntry);
+            this.place.name = this.nameEntry.get_text();
+            this.labelName.set_text(this.nameEntry.get_text());
+            this.parent.accessibleMetaData.changePlaceName(this.place.id, this.place.name);
+         }
+         this.nameEntry.visible = false;
+         this.labelName.visible = true;
+         this.labelDesc.visible = this.haveDesc;
+      }
+   },
+
    setIconVisible: function(visible) {
       if(this.icon)
          this.icon.visible = visible;
@@ -3873,6 +3929,7 @@ PlaceButtonAccessibleExtended.prototype = {
    },
 
    setAppDescriptionVisible: function(visible) {
+      this.haveDesc = visible;
       this.labelDesc.visible = visible;
       if(this.app.get_description())
          this.labelDesc.set_text(this.app.get_description());
@@ -3893,11 +3950,13 @@ PlaceButtonAccessibleExtended.prototype = {
       this.setTextMaxWidth(this.textWidth);
       if(vertical) {
          this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-         this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });     
+         this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+         this.textBox.add(this.nameEntry, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });     
       }
       else {
          this.textBox.add(this.labelName, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
          this.textBox.add(this.labelDesc, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+         this.textBox.add(this.nameEntry, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
       }
    },
 
@@ -5135,8 +5194,11 @@ AccessibleMetaData.prototype = {
             let fp = this.metaDataFile.create(0, null);
             fp.write(raw_file, null);
             fp.close;
-            if(this.onChangeCallBack)
-               this.onChangeCallBack();
+            if(this.onChangeCallBack) {
+               Mainloop.idle_add(Lang.bind(this, function() {
+                  this.onChangeCallBack();
+               }));
+            }
          } else {
             global.logError('Failed gain write access to accessible.json');
          }
@@ -5158,7 +5220,7 @@ AccessibleMetaData.prototype = {
 
    getPlacesList: function() {
       let placesString = this.meta["list-places"];
-      let listPlaces = placesString.split(",");
+      let listPlaces = placesString.split(";;");
       let pos = 0;
       while(pos < listPlaces.length) {
          if((listPlaces[pos] == "")||(!this._isBookmarks(listPlaces[pos])))
@@ -5173,7 +5235,7 @@ AccessibleMetaData.prototype = {
       let result = "";
       for(let i = 0; i < listPlaces.length - 1; i++) {
          if(listPlaces[i] != "")
-            result += listPlaces[i] + ",";
+            result += listPlaces[i] + ";;";
       }
       if((listPlaces.length > 0)&&(listPlaces[listPlaces.length-1] != ""))
          result += listPlaces[listPlaces.length-1];
@@ -5185,9 +5247,43 @@ AccessibleMetaData.prototype = {
       return (this.getPlacesList().indexOf(placeId) != -1);
    },
 
+   getPlacesNamesList: function() {
+      let placesNamesString = this.meta["list-places-names"];
+      let listPlacesNames = placesNamesString.split(";;");
+      let listPlaces = this.getPlacesList();
+      let result = new Array();
+      for(let i = 0; i < listPlacesNames.length; i++) {
+         property = listPlacesNames[i].split("::");
+         if(listPlaces.indexOf(property[0]) != -1) {
+            result[property[0]] = property[1];
+         }
+      }
+      return result;
+   },
+
+   setPlacesNamesList: function(listPlacesNames) {
+      let result = "";
+      for(let id in listPlacesNames)
+         result += id+"::"+listPlacesNames[id].toString() + ";;";
+      this.meta["list-places-names"] = result.substring(0, result.length - 2);
+      this._saveMetaData();
+   },
+
+   changePlaceName: function(placeId, newName) {
+      if(newName != "") {
+         let listPlaces = this.getPlacesList();
+         let index = listPlaces.indexOf(placeId);
+         if(index != -1) {
+            let placesNamesList = this.getPlacesNamesList();
+            placesNamesList[placeId] = newName;
+            this.setPlacesNamesList(placesNamesList);
+         }
+      }
+   },
+
    getAppsList: function() {
       let appsString = this.meta["list-apps"];
-      let listApps = appsString.split(",");
+      let listApps = appsString.split(";;");
       let appSys = Cinnamon.AppSystem.get_default();
       let pos = 0;
       while(pos < listApps.length) {
@@ -5197,6 +5293,22 @@ AccessibleMetaData.prototype = {
             pos++;
       }
       return listApps;
+   },
+
+   setAppsList: function(listApps) {
+      let result = "";
+      for(let i = 0; i < listApps.length - 1; i++) {
+         if(listApps[i] != "")
+            result += listApps[i] + ";;";
+      }
+      if((listApps.length > 0)&&(listApps[listApps.length-1] != ""))
+         result += listApps[listApps.length-1];
+      this.meta["list-apps"] = result;
+      this._saveMetaData();
+   },
+
+   isInAppsList: function(appId) {
+      return (this.getAppsList().indexOf(appId) != -1);
    },
 
    getThemeConfig: function(theme) {
@@ -5266,22 +5378,6 @@ AccessibleMetaData.prototype = {
          result += key+"::"+properties[key].toString() + ";;";
       this.meta[theme] = result.substring(0, result.length - 2);
       this._saveMetaData();
-   },
-
-   setAppsList: function(listApps) {
-      let result = "";
-      for(let i = 0; i < listApps.length - 1; i++) {
-         if(listApps[i] != "")
-            result += listApps[i] + ",";
-      }
-      if((listApps.length > 0)&&(listApps[listApps.length-1] != ""))
-         result += listApps[listApps.length-1];
-      this.meta["list-apps"] = result;
-      this._saveMetaData();
-   },
-
-   isInAppsList: function(appId) {
-      return (this.getAppsList().indexOf(appId) != -1);
    }
 };
 
@@ -5541,8 +5637,10 @@ MyApplet.prototype = {
    },
 
    _onChangeAccessible: function() {
-      if(this.accessibleBox)
+      if(this.accessibleBox) {
+         this.closeApplicationsContextMenus(null, false);
          this.accessibleBox.refreshAccessibleItems();
+      }
    },
 
    on_orientation_changed: function(orientation) {
