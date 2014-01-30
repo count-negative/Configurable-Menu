@@ -1092,8 +1092,10 @@ AccessibleBox.prototype = {
    _createApp: function(appSys, appName) {
       let iconSizeDrag = 32;
       let app = appSys.lookup_app(appName);
+      let appsName = this.parent.getAppsNamesList();
       if(app) {
-         let item = new FavoritesButtonExtended(this.parent, this.scrollActor, this.vertical, true, app,
+         //Main.notify("Fue:" + appsName[app.get_id()]);
+         let item = new FavoritesButtonExtended(this.parent, this.scrollActor, this.vertical, true, app, appsName[app.get_id()],
                                                 4, this.iconSize, true, this.textButtonWidth, this.appButtonDescription);
          item.actor.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
          item.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
@@ -2216,10 +2218,13 @@ ApplicationContextMenuItemExtended.prototype = {
          case "edit_name":
             try {
             if(this._appButton.app.isPlace) {
-               if(!(this._appButton instanceof PlaceButtonExtended)&&(this._appButton instanceof PlaceButtonAccessibleExtended)&&(!this._appButton.nameEntry.visible))
+               if(!(this._appButton instanceof PlaceButtonExtended)&&(this._appButton instanceof PlaceButtonAccessibleExtended)&&
+                  (!this._appButton.nameEntry.visible))
                   this._appButton.editText(true);
             } else {
-
+               if((this._appButton instanceof FavoritesButtonExtended)&&
+                  (this._appButton.scrollActor != this._appButton.parent.favoritesScrollBox)&&(!this._appButton.nameEntry.visible))
+                  this._appButton.editText(true);
             }
            } catch (e) {Main.notify("access", e.message);}
             break;
@@ -2230,18 +2235,25 @@ ApplicationContextMenuItemExtended.prototype = {
                   this._appButton.setDefaultText();
                }
             } else {
-
+               if((this._appButton instanceof FavoritesButtonExtended)&&
+                  (this._appButton.scrollActor != this._appButton.parent.favoritesScrollBox)) {
+                  this._appButton.setDefaultText();
+               }
             }
            } catch (e) {Main.notify("access", e.message);}
             break;
          case "save_name":
             try {
             if(this._appButton.app.isPlace) {
-               if(!(this._appButton instanceof PlaceButtonExtended)&&(this._appButton instanceof PlaceButtonAccessibleExtended)&&(this._appButton.nameEntry.visible)) {
+               if(!(this._appButton instanceof PlaceButtonExtended)&&(this._appButton instanceof PlaceButtonAccessibleExtended)&&
+                 (this._appButton.nameEntry.visible)) {
                   this._appButton.editText(false);
                }
             } else {
-
+               if((this._appButton instanceof FavoritesButtonExtended)&&
+                  (this._appButton.scrollActor != this._appButton.parent.favoritesScrollBox)&&(this._appButton.nameEntry.visible)) {
+                  this._appButton.editText(false);
+               }
             }
            } catch (e) {Main.notify("access", e.message);}
             break;
@@ -2321,6 +2333,19 @@ GenericApplicationButtonExtended.prototype = {
             } else {
                menuItem = new ApplicationContextMenuItemExtended(this, _("Add to accessible panel"), "add_to_accessible_panel");
                this.menu.addMenuItem(menuItem);
+            }
+            if((this instanceof FavoritesButtonExtended)&&(this.parentScroll != this.parent.favoritesScrollBox)) {
+               if(this.nameEntry.visible) {
+                  menuItem = new ApplicationContextMenuItemExtended(this, _("Save name"), "save_name");
+                  this.menu.addMenuItem(menuItem);
+               } else {
+                  menuItem = new ApplicationContextMenuItemExtended(this, _("Edit name"), "edit_name");
+                  this.menu.addMenuItem(menuItem);
+               }
+               if((this.alterName)&&(this.alterName != "")) {
+                  menuItem = new ApplicationContextMenuItemExtended(this, _("Default name"), "default_name");
+                  this.menu.addMenuItem(menuItem);
+               }
             }
          } else {
             if(USER_DESKTOP_PATH) {
@@ -4317,20 +4342,21 @@ RecentClearButtonExtended.prototype = {
    }
 };
 
-function FavoritesButtonExtended(parent, parentScroll, vertical, displayVertical, app, nbFavorites, iconSize, allowName, appWidth, appDesc, maxWidth) {
-   this._init(parent, parentScroll, vertical, displayVertical, app, nbFavorites, iconSize, allowName, appWidth, appDesc, maxWidth);
+function FavoritesButtonExtended(parent, parentScroll, vertical, displayVertical, app, alterText, nbFavorites, iconSize, allowName, appWidth, appDesc, maxWidth) {
+   this._init(parent, parentScroll, vertical, displayVertical, app, alterText, nbFavorites, iconSize, allowName, appWidth, appDesc, maxWidth);
 }
 
 FavoritesButtonExtended.prototype = {
    __proto__: GenericApplicationButtonExtended.prototype,
     
-   _init: function(parent, parentScroll, vertical, displayVertical, app, nbFavorites, iconSize, allowName, appWidth, appDesc, maxWidth) {
+   _init: function(parent, parentScroll, vertical, displayVertical, app, alterName, nbFavorites, iconSize, allowName, appWidth, appDesc, maxWidth) {
       GenericApplicationButtonExtended.prototype._init.call(this, parent, parentScroll, app, true);
       this.iconSize = iconSize;
       this.displayVertical = displayVertical;
       this.vertical = vertical;
       this.allowName = allowName;
       this.nbFavorites = nbFavorites;
+      this.alterName = alterName;
 
       this.container = new St.BoxLayout();
       let icon_size = this.iconSize;
@@ -4353,8 +4379,13 @@ FavoritesButtonExtended.prototype = {
       if(this.allowName) {
          this.container.set_width(maxWidth);
          this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-         this.labelName = new St.Label({ text: this.app.get_name(), style_class: 'menu-application-button-label' });
+         this.nameEntry = new St.Entry({ name: 'menu-name-entry', hint_text: _("Type the new name..."), track_hover: true, can_focus: true });
+         if((this.alterName)&&(this.alterName != ""))
+            this.labelName = new St.Label({ text: this.alterName, style_class: 'menu-application-button-label' });
+         else
+            this.labelName = new St.Label({ text: this.app.get_name(), style_class: 'menu-application-button-label' });
          this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
+         this.nameEntry.visible = false;
          this.labelDesc.visible = false;
 
          this.textBox = new St.BoxLayout({ vertical: true });
@@ -4371,6 +4402,41 @@ FavoritesButtonExtended.prototype = {
       this._draggable = DND.makeDraggable(this.actor);
       this._draggable.connect('drag-end', Lang.bind(this, this._onDragEnd));  
       this.isDraggableApp = true;
+   },
+
+   editText: function(edit) {
+      if((edit)&&(!this.nameEntry.visible)) {
+         this.nameEntry.set_text(this.labelName.get_text());
+         this.nameEntry.visible = true;
+         global.stage.set_key_focus(this.nameEntry);
+         this.labelName.visible = false;
+         this.labelDesc.visible = false;
+      }
+      else {
+         if(this.nameEntry.get_text() != "") {
+            global.stage.set_key_focus(this.parent.searchEntry);
+            this.labelName.set_text(this.nameEntry.get_text());
+            this.alterName = this.nameEntry.get_text();
+            this.nameEntry.set_text("");
+            this.parent.changeAppName(this.app.get_id(), this.alterName);
+         } else
+            global.stage.set_key_focus(this.actor);
+
+         this.labelName.visible = true;
+         this.labelDesc.visible = this.haveDesc;
+         this.nameEntry.visible = false;
+      }
+   },
+
+   setDefaultText: function() {
+      global.stage.set_key_focus(this.parent.searchEntry);
+      this.labelName.set_text(this.app.get_name());
+      this.alterName = "";
+      this.nameEntry.set_text("");
+      this.parent.changeAppName(this.app.get_id(), this.alterName);
+      this.labelName.visible = true;
+      this.labelDesc.visible = this.haveDesc;
+      this.nameEntry.visible = false;
    },
 
    setIconVisible: function(visible) {
@@ -4411,6 +4477,7 @@ FavoritesButtonExtended.prototype = {
    },
 
    setAppDescriptionVisible: function(visible) {
+      this.haveDesc = visible;
       if(this.allowName) { 
          this.labelDesc.visible = visible;
          if(this.app.get_description())
@@ -4425,14 +4492,18 @@ FavoritesButtonExtended.prototype = {
          let parentL = this.labelName.get_parent();
          if(parentL) parentL.remove_actor(this.labelName);
          parentL = this.labelDesc.get_parent();
-         if(parentL) parentL.remove_actor(this.labelDesc);
-
+         if(parentL) parentL.remove_actor(this.labelName);
+         parentL = this.nameEntry.get_parent();
+         if(parentL) parentL.remove_actor(this.nameEntry);
          if(vertical) {
             this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-            this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });  
+            this.textBox.add(this.nameEntry, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });  
+            this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+            
          }
          else {
             this.textBox.add(this.labelName, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+            this.textBox.add(this.nameEntry, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
             this.textBox.add(this.labelDesc, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
          }
       }
@@ -5195,6 +5266,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "list-places", "stringPlaces", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "list-places-names", "stringPlacesNames", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "list-apps", "stringApps", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "list-apps-names", "stringAppsNames", null, null);
 
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "classic", "stringClassic", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "gnomenuLeft", "stringGnoMenuLeft", null, null);
@@ -5307,6 +5379,7 @@ MyApplet.prototype = {
       this._readAccessiblePlaces();
       this._readAccessiblePlacesNames();
       this._readAccessibleApps();
+      this._readAccessibleAppsNames();
       this._createArrayOfThemes();
       this._updateValues();
    },
@@ -5342,7 +5415,8 @@ MyApplet.prototype = {
          new_json = JSON.parse(init_file_contents);
          for(let key in new_json) {
             if(new_json[key]["type"] == "generic") {
-               if((new_json[key] != "list-places")&&(new_json[key] != "list-apps")&&(new_json[key] != "list-places-names")) {
+               if((new_json[key] != "list-places")&&(new_json[key] != "list-apps")&&
+                  (new_json[key] != "list-places-names")&&(new_json[key] != "list-apps-names")) {
                   newSettings[key] = new_json[key]["default"];
                }
             }
@@ -5437,6 +5511,7 @@ MyApplet.prototype = {
    _readAccessiblePlacesNames: function() {
       let placesNamesList = this.stringPlacesNames.split(";;");
       this.placesNames = new Array();
+      let property;
       for(let i = 0; i < placesNamesList.length; i++) {
          property = placesNamesList[i].split("::");
          if((property[0] != "")&&(property[1] != "")) {
@@ -5454,6 +5529,18 @@ MyApplet.prototype = {
             this.apps.splice(pos, 1);
          else
             pos++;
+      }
+   },
+
+   _readAccessibleAppsNames: function() {
+      let appsNamesList = this.stringAppsNames.split(";;");
+      this.appsNames = new Array();
+      let property;
+      for(let i = 0; i < appsNamesList.length; i++) {
+         property = appsNamesList[i].split("::");
+         if((property[0] != "")&&(property[1] != "")) {
+            this.appsNames[property[0]] = property[1];
+         }
       }
    },
 
@@ -5520,12 +5607,46 @@ MyApplet.prototype = {
             this.setPlacesNamesList(this.placesNames);
          }
          else {
-            let newplaces = new Array();
+            let newPlaces = new Array();
             for(id in this.placesNames) {
                if(id != placeId)
-                 newplaces[id] = this.placesNames[id];
+                 newPlaces[id] = this.placesNames[id];
             }
-            this.setPlacesNamesList(newplaces);
+            this.setPlacesNamesList(newPlaces);
+         }
+      }
+   },
+
+   getAppsNamesList: function() {
+      return this.appsNames;
+   },
+
+   setAppsNamesList: function(listAppsNames) {
+      let result = "";
+      this.appsNames = new Array();
+      for(let id in listAppsNames) {
+         if((id != "")&&(listAppsNames[id].toString() != "")) {
+            this.appsNames[id] = listAppsNames[id].toString();
+            result += id+"::"+listAppsNames[id].toString() + ";;";
+         }
+      }
+      this.stringAppsNames = result.substring(0, result.length - 2);//commit
+      this._onChangeAccessible();
+   },
+
+   changeAppName: function(appId, newName) {
+      if(this.apps.indexOf(appId) != -1) {
+         if(newName != "") {
+            this.appsNames[appId] = newName;
+            this.setAppsNamesList(this.appsNames);
+         }
+         else {
+            let newApps = new Array();
+            for(id in this.appsNames) {
+               if(id != appId)
+                 newApps[id] = this.appsNames[id];
+            }
+            this.setAppsNamesList(newApps);
          }
       }
    },
@@ -8069,7 +8190,7 @@ Main.notify("errorTheme", e.message);
          let app = appSys.lookup_app(launchers[i]);
          if(app) {
             let button = new FavoritesButtonExtended(this, this.favoritesScrollBox, this.iconView, this.favoritesObj.getVertical(),
-                                                     app, launchers.length/this.favoritesLinesNumber, this.iconMaxFavSize,
+                                                     app, "", launchers.length/this.favoritesLinesNumber, this.iconMaxFavSize,
                                                      this.allowFavName, this.textButtonWidth, this.appButtonDescription, this._applicationsBoxWidth);
             // + 3 because we're adding 3 system buttons at the bottom
             //button.actor.style = "padding-top: "+(2)+"px;padding-bottom: "+(2)+"px;padding-left: "+(4)+"px;padding-right: "+(-5)+"px;margin:auto;";
