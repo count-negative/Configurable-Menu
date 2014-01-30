@@ -2375,6 +2375,7 @@ GenericApplicationButtonExtended.prototype = {
          }
       }
       this.menu.toggle();
+      this.parent._updateSize();
    },
     
    _subMenuOpenStateChanged: function() {
@@ -6429,36 +6430,42 @@ MyApplet.prototype = {
    _setVisibleHoverIconBox: function() {
       if(this.hover) {
          this.hover.setSpecialColor(this.showHoverIconBox);
+         this._updateSize();
       }
    },
 
    _setVisibleControlBox: function() {
       if(this.controlView) {
          this.controlView.setSpecialColor(this.showControlBox);
+         this._updateSize();
       }
    },
 
    _setVisiblePowerBox: function() {
       if(this.powerBox) {
          this.powerBox.setSpecialColor(this.showPowerBox);
+         this._updateSize();
       }
    },
 
    _setVisibleAccessibleBox: function() {
       if(this.accessibleBox) {
          this.accessibleBox.setSpecialColor(this.showAccessibleBox);
+         this._updateSize();
       }
    },
 
    _setVisibleGnoMenuBox: function() {
       if(this.gnoMenuBox) {
          this.gnoMenuBox.setSpecialColor(this.showGnoMenuBox);
+         this._updateSize();
       }
    },
 
    _setVisibleRemovable: function() {
       if(this.accessibleBox) {
          this.accessibleBox.showRemovableDrives(this.showRemovable);
+         this._updateSize();
       }
    },
 
