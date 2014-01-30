@@ -130,6 +130,18 @@ msgstr ""
 msgid "Add to accessible bar"
 msgstr ""
 
+#: applet.js:1674 applet.js:1686
+msgid "Save name"
+msgstr ""
+
+#: applet.js:1674 applet.js:1686
+msgid "Edit name"
+msgstr ""
+
+#: applet.js:1674 applet.js:1686
+msgid "Default name"
+msgstr ""
+
 #: applet.js:1916
 msgid "Notifications"
 msgstr ""

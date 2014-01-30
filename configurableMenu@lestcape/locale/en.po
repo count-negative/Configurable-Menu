@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-01-28 02:55-0600\n"
+"PO-Revision-Date: 2014-01-30 00:47-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -73,6 +73,18 @@ msgstr "Remove from accessible panel"
 #: applet.js:1674 applet.js:1686
 msgid "Add to accessible panel"
 msgstr "Add to accessible panel"
+
+#: applet.js:1674 applet.js:1686
+msgid "Save name"
+msgstr "Save name"
+
+#: applet.js:1674 applet.js:1686
+msgid "Edit name"
+msgstr "Edit name"
+
+#: applet.js:1674 applet.js:1686
+msgid "Default name"
+msgstr "Default name"
 
 #: applet.js:5815
 msgid "Filter:"

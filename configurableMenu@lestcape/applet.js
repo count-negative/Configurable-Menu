@@ -83,7 +83,7 @@ function _(str) {
 
 
 function toUTF8FromHex(hex) {
-   return toUTF8FromAssccii(toAscciiFromHex(hex));
+   return toUTF8FromAscii(toAscciiFromHex(hex));
 };
 
 function toAscciiFromHex(encode) {
@@ -112,7 +112,7 @@ function toAscciiFromHex(encode) {
    return result;
 };
 
-function toAsscciiFromUTF8(utf8) {
+function toAsciiFromUTF8(utf8) {
    // From: http://phpjs.org/functions
    var tmp_arr = [], i = 0, ac = 0, c1 = 0, c2 = 0, c3 = 0, c4 = 0;
 
@@ -147,13 +147,13 @@ function toAsscciiFromUTF8(utf8) {
    return tmp_arr.join('');
 };
 
-function toUTF8FromAssccii(asscii) {
+function toUTF8FromAscii(ascii) {
    // From: http://phpjs.org/functions
-   if(asscii === null || typeof asscii === "undefined") {
+   if(ascii === null || typeof ascii === "undefined") {
       return "";
    }
 
-   var string = (asscii + ''); // .replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+   var string = (ascii + ''); // .replace(/\r\n/g, "\n").replace(/\r/g, "\n");
    var utftext = '',
       start, end, stringl = 0;
 
@@ -833,9 +833,9 @@ AccessibleBox.prototype = {
       this.itemsBox = new St.BoxLayout({ vertical: true });
       this.itemsBox.set_style("padding-left: 10px;padding-right: 10px;");
       this.itemsDevices = new St.BoxLayout({ style_class: 'menu-accessible-devices-box', vertical: true });
-      this.itemsPlaces = new AccessibleDropBox(this, true).actor;
+      this.itemsPlaces = new AccessibleDropBox(parent, true).actor;
       this.itemsPlaces.set_style_class_name('menu-accessible-places-box');
-      this.itemsSystem = new AccessibleDropBox(this, false).actor;
+      this.itemsSystem = new AccessibleDropBox(parent, false).actor;
       this.itemsSystem.set_style_class_name('menu-accessible-system-box');
       this.itemsBox.add_actor(this.placeName);
       this.itemsBox.add_actor(this.itemsPlaces);
@@ -958,6 +958,7 @@ AccessibleBox.prototype = {
                this._staticButtons[app].toggleMenu();
             else
                this._staticButtons[app].closeMenu();
+
          }
       }
    },
@@ -1050,10 +1051,7 @@ AccessibleBox.prototype = {
       for(let i = 0; i < placesList.length; i++) {
          if(placesList[i] != "") {
             currBookmark = this.getBookmarkById(listBookmarks, placesList[i]);
-            if((placesName[placesList[i]])&&(placesName[placesList[i]] != "")) {
-               currBookmark.name = placesName[placesList[i]];
-            }
-            item = new PlaceButtonAccessibleExtended(this.parent, this.scrollActor, currBookmark, false,
+            item = new PlaceButtonAccessibleExtended(this.parent, this.scrollActor, currBookmark, placesName[placesList[i]], false,
                                                      this.iconSize, this.textButtonWidth, this.appButtonDescription);
             item.actor.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
             item.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
@@ -2183,10 +2181,11 @@ ApplicationContextMenuItemExtended.prototype = {
          case "add_to_accessible_panel":
            try {
             if(this._appButton.app.isPlace) {
-               if(!this._appButton.parent.isInPlacesList(this._appButton.app.get_id())) {
+               if(!this._appButton.parent.isInPlacesList(this._appButton.place.id)) {
                   let placesList = this._appButton.parent.getPlacesList();
-                  placesList.push(this._appButton.app.get_id());
+                  placesList.push(this._appButton.place.id);
                   this._appButton.parent.setPlacesList(placesList);
+                  
                }
             } else {
                if(!this._appButton.parent.isInAppsList(this._appButton.app.get_id())) {
@@ -2214,7 +2213,7 @@ ApplicationContextMenuItemExtended.prototype = {
             }
            } catch (e) {Main.notify("access", e.message);}
             break;
-         case "edit_place_name":
+         case "edit_name":
             try {
             if(this._appButton.app.isPlace) {
                if(!(this._appButton instanceof PlaceButtonExtended)&&(this._appButton instanceof PlaceButtonAccessibleExtended)&&(!this._appButton.nameEntry.visible))
@@ -2224,7 +2223,18 @@ ApplicationContextMenuItemExtended.prototype = {
             }
            } catch (e) {Main.notify("access", e.message);}
             break;
-         case "save_place_name":
+         case "default_name":
+            try {
+            if(this._appButton.app.isPlace) {
+               if(!(this._appButton instanceof PlaceButtonExtended)&&(this._appButton instanceof PlaceButtonAccessibleExtended)) {
+                  this._appButton.setDefaultText();
+               }
+            } else {
+
+            }
+           } catch (e) {Main.notify("access", e.message);}
+            break;
+         case "save_name":
             try {
             if(this._appButton.app.isPlace) {
                if(!(this._appButton instanceof PlaceButtonExtended)&&(this._appButton instanceof PlaceButtonAccessibleExtended)&&(this._appButton.nameEntry.visible)) {
@@ -2326,10 +2336,14 @@ GenericApplicationButtonExtended.prototype = {
             }
             if(!(this instanceof PlaceButtonExtended)&&(this instanceof PlaceButtonAccessibleExtended)) {
                if(this.nameEntry.visible) {
-                  menuItem = new ApplicationContextMenuItemExtended(this, _("Save place name"), "save_place_name");
+                  menuItem = new ApplicationContextMenuItemExtended(this, _("Save name"), "save_name");
                   this.menu.addMenuItem(menuItem);
                } else {
-                  menuItem = new ApplicationContextMenuItemExtended(this, _("Edit place name"), "edit_place_name");
+                  menuItem = new ApplicationContextMenuItemExtended(this, _("Edit name"), "edit_name");
+                  this.menu.addMenuItem(menuItem);
+               }
+               if((this.alterName)&&(this.alterName != "")) {
+                  menuItem = new ApplicationContextMenuItemExtended(this, _("Default name"), "default_name");
                   this.menu.addMenuItem(menuItem);
                }
             }
@@ -3846,22 +3860,27 @@ ApplicationButtonExtended.prototype = {
     }
 };
 
-function PlaceButtonAccessibleExtended(parent, parentScroll, place, vertical, iconSize, appWidth, appDesc) {
-   this._init(parent, parentScroll, place, vertical, iconSize, appWidth, appDesc);
+function PlaceButtonAccessibleExtended(parent, parentScroll, place, alterName, vertical, iconSize, appWidth, appDesc) {
+   this._init(parent, parentScroll, place, alterName, vertical, iconSize, appWidth, appDesc);
 }
 
 PlaceButtonAccessibleExtended.prototype = {
    __proto__: GenericApplicationButtonExtended.prototype,
 
-   _init: function(parent, parentScroll, place, vertical, iconSize, appWidth, appDesc) {
-      GenericApplicationButtonExtended.prototype._init.call(this, parent, parentScroll, this._createAppWrapper(place), (parent._listDevices().indexOf(place) == -1));
+   _init: function(parent, parentScroll, place, alterName, vertical, iconSize, appWidth, appDesc) {
+      GenericApplicationButtonExtended.prototype._init.call(this, parent, parentScroll, this._createAppWrapper(place, alterName),
+                                                           (parent._listDevices().indexOf(place) == -1));
       this.iconSize = iconSize;
       this.parent = parent;
       this.place = place;
+      this.alterName = alterName;
 
       this.actor.set_style_class_name('menu-application-button');
       this.nameEntry = new St.Entry({ name: 'menu-name-entry', hint_text: _("Type the new name..."), track_hover: true, can_focus: true });
-      this.labelName = new St.Label({ text: this.place.name, style_class: 'menu-application-button-label' });
+      if((this.alterName)&&(this.alterName != ""))
+         this.labelName = new St.Label({ text: this.alterName, style_class: 'menu-application-button-label' });
+      else
+         this.labelName = new St.Label({ text: this.place.name, style_class: 'menu-application-button-label' });
       this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
       this.nameEntry.visible = false;
       this.labelDesc.visible = false;
@@ -3887,8 +3906,24 @@ PlaceButtonAccessibleExtended.prototype = {
       this.isDraggableApp = true;
    },
 
+   _onButtonReleaseEvent: function (actor, event) {
+      if(event.get_button()==1) {
+         this.activate(event);
+      }
+      if(event.get_button()==3) {
+         if((this.withMenu) && (!this.menu.isOpen)) {
+            this.parent.closeApplicationsContextMenus(this.app, true);
+         } else {
+            this.editText(false);
+         }
+         this.toggleMenu();
+      }  
+      return true;
+   },
+
    editText: function(edit) {
-      if(edit) {
+      if((edit)&&(!this.nameEntry.visible)) {
+         this.nameEntry.set_text(this.labelName.get_text());
          this.nameEntry.visible = true;
          global.stage.set_key_focus(this.nameEntry);
          this.labelName.visible = false;
@@ -3897,14 +3932,28 @@ PlaceButtonAccessibleExtended.prototype = {
       else {
          if(this.nameEntry.get_text() != "") {
             global.stage.set_key_focus(this.parent.searchEntry);
-            this.place.name = this.nameEntry.get_text();
             this.labelName.set_text(this.nameEntry.get_text());
-            this.parent.changePlaceName(this.place.id, this.place.name);
-         }
-         this.nameEntry.visible = false;
+            this.alterName = this.nameEntry.get_text();
+            this.nameEntry.set_text("");
+            this.parent.changePlaceName(this.place.id, this.alterName);
+         } else
+            global.stage.set_key_focus(this.actor);
+
          this.labelName.visible = true;
          this.labelDesc.visible = this.haveDesc;
+         this.nameEntry.visible = false;
       }
+   },
+
+   setDefaultText: function() {
+      global.stage.set_key_focus(this.parent.searchEntry);
+      this.labelName.set_text(this.place.name);
+      this.alterName = "";
+      this.nameEntry.set_text("");
+      this.parent.changePlaceName(this.place.id, this.alterName);
+      this.labelName.visible = true;
+      this.labelDesc.visible = this.haveDesc;
+      this.nameEntry.visible = false;
    },
 
    setIconVisible: function(visible) {
@@ -3946,6 +3995,8 @@ PlaceButtonAccessibleExtended.prototype = {
       if(parentL) parentL.remove_actor(this.labelName);
       parentL = this.labelDesc.get_parent();
       if(parentL) parentL.remove_actor(this.labelDesc);
+      parentL = this.nameEntry.get_parent();
+      if(parentL) parentL.remove_actor(this.nameEntry);
       this.setTextMaxWidth(this.textWidth);
       if(vertical) {
          this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
@@ -3988,7 +4039,7 @@ PlaceButtonAccessibleExtended.prototype = {
       return false;
    },
 
-   _createAppWrapper: function(place) {
+   _createAppWrapper: function(place, alterName) {
       // We need this fake app to help standar works.
       this.app = {
          isPlace: {
@@ -3997,8 +4048,8 @@ PlaceButtonAccessibleExtended.prototype = {
             this.appInfo = {
                get_filename: function() {
                   if(place.id.indexOf("bookmark:") == -1)
-                     return toAscciiFromHex(place.id.slice(6));
-                  return toAscciiFromHex(place.id.slice(9));
+                     return toAscciiFromHex(place.id.slice(13));
+                  return toAscciiFromHex(place.id.slice(16));
                }
             };
             return this.appInfo;
@@ -4018,6 +4069,8 @@ PlaceButtonAccessibleExtended.prototype = {
             return toAscciiFromHex(place.id.slice(16));
          },
          get_name: function() {
+            if((alterName)&&(alterName != ""))
+               return toAscciiFromHex(alterName);
             return toAscciiFromHex(place.name);
          },
          create_icon_texture: function(appIconSize) {
@@ -4053,8 +4106,8 @@ PlaceButtonAccessibleExtended.prototype = {
             return "folder";
          },
          make_desktop_file: function() {
-            let name = toUTF8FromAssccii(this.get_name());
-            let path = toUTF8FromAssccii(this.get_app_info().get_filename());
+            let name = toUTF8FromAscii(this.get_name());
+            let path = toUTF8FromAscii(this.get_app_info().get_filename());
             let raw_file = "[Desktop Entry]\n" + "Name=" + name + "\n" + "Comment=" + path + "\n" +
                            "Exec=xdg-open \"" + path + "\"\n" + "Icon=" + this.get_icon_name() +
                            "\n" + "Terminal=false\n" + "StartupNotify=true\n" + "Type=Application\n" +
@@ -4078,7 +4131,7 @@ PlaceButtonExtended.prototype = {
    __proto__: PlaceButtonAccessibleExtended.prototype,
 
    _init: function(parent, parentScroll, place, vertical, iconSize, appWidth, appDesc) {
-      PlaceButtonAccessibleExtended.prototype._init.call(this, parent, parentScroll, place, vertical, iconSize, appWidth, appDesc);
+      PlaceButtonAccessibleExtended.prototype._init.call(this, parent, parentScroll, place, "", vertical, iconSize, appWidth, appDesc);
       this.actor._delegate = this;
    },
 
@@ -5139,9 +5192,9 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-box-pointer", "showBoxPointer", this._setVisibleBoxPointer, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "fix-menu-corner", "fixMenuCorner", this._setFixMenuCorner, null);
 //Config//
-         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "list-places", "stringPlaces", this._onAccessiblePlacesChanged, null);
-         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "list-places-names", "stringPlacesNames", this._onAccessiblePlacesNamesChanged, null);
-         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "list-apps", "stringApps", this._onAccessibleAppsChanged, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "list-places", "stringPlaces", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "list-places-names", "stringPlacesNames", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "list-apps", "stringApps", null, null);
 
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "classic", "stringClassic", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "gnomenuLeft", "stringGnoMenuLeft", null, null);
@@ -5251,10 +5304,54 @@ MyApplet.prototype = {
    },
 //Config//
    _updateConfig: function() {
-      this._onAccessiblePlacesChanged();
-      this._onAccessiblePlacesNamesChanged();
-      this._onAccessibleAppsChanged();
+      this._readAccessiblePlaces();
+      this._readAccessiblePlacesNames();
+      this._readAccessibleApps();
       this._createArrayOfThemes();
+      this._updateValues();
+   },
+
+   _updateValues: function() {
+       let newSettingsThemes = this._readDefaultSettings();
+       let newThemeConfig, oldPropTheme, settingPropTheme;
+       for(theme in this.themes) {
+           settingPropTheme = this._getThemeProperties(newSettingsThemes[theme]);
+           oldPropTheme = this._getThemeProperties(this.themes[theme]);
+           for(let keyPorpSetting in settingPropTheme) {
+              if(!oldPropTheme[keyPorpSetting]) {
+                 oldPropTheme[keyPorpSetting] = settingPropTheme[keyPorpNew];
+              }
+           }
+           let newPropTheme = new Array();
+           for(let keyPorpOld in oldPropTheme) {
+              if(settingPropTheme[keyPorpOld]) {
+                 newPropTheme[keyPorpOld] = oldPropTheme[keyPorpOld];
+              }
+           }
+           newThemeConfig = this._makeThemeConvertion(newPropTheme);
+           this.setThemeConfig(theme, newThemeConfig);
+       }
+   },
+
+   _readDefaultSettings: function() {
+      let newSettings = new Array();
+      let new_json;
+      try {
+         let orig_file_path = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + this.uuid + "/settings-schema.json";
+         let init_file_contents = Cinnamon.get_file_contents_utf8_sync(orig_file_path);
+         new_json = JSON.parse(init_file_contents);
+         for(let key in new_json) {
+            if(new_json[key]["type"] == "generic") {
+               if((new_json[key] != "list-places")&&(new_json[key] != "list-apps")&&(new_json[key] != "list-places-names")) {
+                  newSettings[key] = new_json[key]["default"];
+               }
+            }
+         }
+      } catch (e) {
+         global.logError("Problem parsing " + orig_file.get_path() + " while preparing to perform an upgrade.");
+         global.logError("Skipping upgrade for now - something may be wrong with the new settings schema file.");
+      }
+      return newSettings;
    },
 
    _createArrayOfThemes: function() {
@@ -5326,7 +5423,7 @@ MyApplet.prototype = {
       }
    },
 
-   _onAccessiblePlacesChanged: function() {
+   _readAccessiblePlaces: function() {
       this.places = this.stringPlaces.split(";;");
       let pos = 0;
       while(pos < this.places.length) {
@@ -5335,22 +5432,20 @@ MyApplet.prototype = {
          else
             pos++;
       }
-      this._onChangeAccessible();
    },
 
-   _onAccessiblePlacesNamesChanged: function() {
-      this.placesNamesList = this.stringPlacesNames.split(";;");
+   _readAccessiblePlacesNames: function() {
+      let placesNamesList = this.stringPlacesNames.split(";;");
       this.placesNames = new Array();
-      for(let i = 0; i < this.placesNamesList.length; i++) {
-         property = this.placesNamesList[i].split("::");
+      for(let i = 0; i < placesNamesList.length; i++) {
+         property = placesNamesList[i].split("::");
          if((property[0] != "")&&(property[1] != "")) {
             this.placesNames[property[0]] = property[1];
          }
       }
-      this._onChangeAccessible();
    },
 
-   _onAccessibleAppsChanged: function() {
+   _readAccessibleApps: function() {
       this.apps = this.stringApps.split(";;");
       let appSys = Cinnamon.AppSystem.get_default();
       let pos = 0;
@@ -5360,7 +5455,6 @@ MyApplet.prototype = {
          else
             pos++;
       }
-      this._onChangeAccessible();
    },
 
    _isBookmarks: function(bookmark) {
@@ -5382,16 +5476,20 @@ MyApplet.prototype = {
       let result = "";
       this.places = new Array();
       for(let i = 0; i < listPlaces.length - 1; i++) {
-         if((listPlaces[i] != "")&&(this._isBookmarks(listPlaces[i]))) {
+         if((listPlaces[i] != "")&&(this._isBookmarks(listPlaces[i]))&&(this.places.indexOf(listPlaces[i]) == -1)) {
             this.places.push(listPlaces[i]);
             result += listPlaces[i] + ";;";
          }
       }
-      if((listPlaces.length > 0)&&(listPlaces[listPlaces.length-1] != "")&&(this._isBookmarks(listPlaces[listPlaces.length-1]))) {
-         this.places.push(listPlaces[listPlaces.length-1]);
-         result += listPlaces[listPlaces.length-1];
+      if(listPlaces.length > 0) {
+         let last = listPlaces[listPlaces.length-1];
+         if((last != "")&&(this._isBookmarks(last))&&(this.places.indexOf(last) == -1)) {
+            this.places.push(last);
+            result += listPlaces[last];
+         }
       }
       this.stringPlaces = result;//commit
+      this._onChangeAccessible();
    },
 
    isInPlacesList: function(placeId) {
@@ -5412,15 +5510,22 @@ MyApplet.prototype = {
          }
       }
       this.stringPlacesNames = result.substring(0, result.length - 2);//commit
+      this._onChangeAccessible();
    },
 
    changePlaceName: function(placeId, newName) {
-      if(newName != "") {
-         let index = this.places.indexOf(placeId);
-         if(index != -1) {
+      if(this.places.indexOf(placeId) != -1) {
+         if(newName != "") {
             this.placesNames[placeId] = newName;
             this.setPlacesNamesList(this.placesNames);
-            this.closeApplicationsContextMenus(null, false);
+         }
+         else {
+            let newplaces = new Array();
+            for(id in this.placesNames) {
+               if(id != placeId)
+                 newplaces[id] = this.placesNames[id];
+            }
+            this.setPlacesNamesList(newplaces);
          }
       }
    },
@@ -5443,14 +5548,19 @@ MyApplet.prototype = {
          this.apps.push(listApps[listApps.length-1]);
       }
       this.stringApps = result;//commit
+      this._onChangeAccessible();
    },
 
    isInAppsList: function(appId) {
       return (this.apps.indexOf(appId) != -1);
    },
 
-   getThemeConfig: function(theme) {
-      let themeString = this.themes[theme];
+   getThemeConfig: function(themeString) {
+      let themeProperties = this._getThemeProperties(themeString)
+      return this._makeThemeConvertion(themeProperties);
+   },
+
+   _getThemeProperties: function(themeString) {
       let themeList = themeString.split(";;");
       let themeProperties = new Array();
       let property;
@@ -5458,7 +5568,10 @@ MyApplet.prototype = {
          property = themeList[i].split("::");
          themeProperties[property[0]] = property[1];
       }
-      //make convertion
+      return themeProperties;
+   },
+
+   _makeThemeConvertion: function(themeProperties) {
       themeProperties["show-recent"] = (themeProperties["show-recent"] === 'true');
       themeProperties["show-places"] = (themeProperties["show-places"] === 'true');
       themeProperties["search-filesystem"] = (themeProperties["search-filesystem"] === 'true');
@@ -6413,7 +6526,7 @@ Main.notify("errorTheme", e.message);
    },
 
    _loadConfigTheme: function() {
-      let confTheme = this.getThemeConfig(this.theme);
+      let confTheme = this.getThemeConfig(this.themes[theme]);
       this.powerTheme = confTheme["power-theme"];
       this.gnoMenuButtonsTheme = confTheme["gnomenu-buttons-theme"];
       this.showRecent = confTheme["show-recent"];
@@ -8196,10 +8309,8 @@ Main.notify("errorTheme", e.message);
             this._addEnterEvent(button, Lang.bind(this, function() {
                this._clearPrevAppSelection(button.actor);
                button.actor.style_class = "menu-application-button-selected";
-               if(this._listDevices().indexOf(button.place) != -1)
-                  this.selectedAppBox.setSelectedText(button.place.name, button.place.id.slice(13));
-               else
-                  this.selectedAppBox.setSelectedText(button.place.name, button.place.id.slice(16));
+               
+               this.selectedAppBox.setSelectedText(button.app.get_name(), button.app.get_description());
                this.hover.refreshPlace(button.place);
             }));
             button.actor.connect('leave-event', Lang.bind(this, function() {
