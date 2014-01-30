@@ -4086,7 +4086,7 @@ PlaceButtonAccessibleExtended.prototype = {
             return false;
          },
          get_id: function() {
-            return toAscciiFromHex(place.id);
+            return place.id;
          },
          get_description: function() {
             if(place.id.indexOf("bookmark:") == -1)

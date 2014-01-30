@@ -57,7 +57,11 @@ Some features:
 
 17.	You can have a different configuration for each layout.
 
-18.	And much more coming...
+18.	The removable drives are now show in accessible panel and also can be removed directly.
+
+19.	Now you can rename the apps on the accessible panel.
+
+20.	And much more coming...
 
 
 This program is free software:
@@ -165,6 +169,7 @@ Change Log:
    - Removed the hover icon borders, due to allow more compatibility with cinnamon themes.
    - The new layouts of Vampire, Garibaldo, GnoMenu Left, GnoMenu Right GnoMenu Top and GnoMenu Bottom was added.
    - Several visually improvement in different layouts, especially the horizontal.
+   - Now you can rename the apps on the accessible panel.
 
 0.8-Beta
    - The Accessible panel is now configurable and has two drag and drop areas (Places and Apps).
