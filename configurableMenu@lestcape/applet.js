@@ -7088,27 +7088,29 @@ Main.notify("errorTheme", e.message);
    },
 
    _onButtonReleaseEvent: function(actor, event) {
-      if((!this.activateOnPress)&&(!global.settings.get_boolean("panel-edit-mode")))
+      if((this._draggable)&&(!this._draggable.inhibit))
+         return false;
+      if(!this.activateOnPress)
          this._menuEventClicked(actor, event);
       return true;
    },
 
    _onButtonPressEvent: function(actor, event) {
-      if((this.activateOnPress)&&(!global.settings.get_boolean("panel-edit-mode")))
+      if((this._draggable)&&(!this._draggable.inhibit))
+         return false;
+      if(this.activateOnPress)
          this._menuEventClicked(actor, event);
       return true;
    },
 
    _menuEventClicked: function(actor, event) {
-      if((this._draggable)&&(!this._draggable.inhibit))
-         return false;
-      if(event.get_button()==1){
+      if(event.get_button() == 1) {
          if(this._applet_context_menu.isOpen) {
             this._applet_context_menu.toggle(); 
          }
          this.on_applet_clicked(event);            
       }
-      if(event.get_button()==3){            
+      if(event.get_button() == 3) {            
          if(this._applet_context_menu._getMenuItems().length > 0) {
             this._applet_context_menu.toggle();			
          }

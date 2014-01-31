@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-01-30 00:47-0600\n"
+"PO-Revision-Date: 2014-01-31 10:36-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -466,7 +466,7 @@ msgstr ""
 #. configurableMenu@lestcape->settings-schema.json->app-button-
 #. width->description
 msgid "Maximum width of the application entry text:"
-msgstr "Ancho máximo de las aplicaciones "
+msgstr "Ancho máximo del texto de las aplicaciones:"
 
 #. configurableMenu@lestcape->settings-schema.json->app-button-width->tooltip
 msgid "Set the maximum width of the application entry text."
