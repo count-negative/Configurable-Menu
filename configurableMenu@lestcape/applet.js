@@ -1899,21 +1899,21 @@ ControlBox.prototype = {
       this.resizeBox = new St.BoxLayout({ vertical: false });
       //new ControlButtonExtended(parent, _("Full Screen"), _("Active or not the full screen mode"),
       //                               "zoom-fit-best", this.iconSize, Lang.bind(this, this._onClickedChangeFullScreen)).actor;
-      this.bttFullScreen = this._createSymbolicButton('zoom-fit-best');
+      this.bttFullScreen = this._createButton('view-fullscreen');
       this.bttFullScreen.connect('button-press-event', Lang.bind(this, function() {
          this.bttFullScreen.add_style_pseudo_class('pressed');
       }));
       this.bttFullScreen.connect('button-release-event', Lang.bind(this, this._onClickedChangeFullScreen));
       //this.bttFullScreen.connect('clicked', Lang.bind(this, this._onClickedChangeFullScreen));
       this.resizeBox.add(this.bttFullScreen, { x_fill: false, expand: false });
-      this.bttResize = this._createSymbolicButton('changes-prevent');
+      this.bttResize = this._createButton('changes-prevent');
       this.bttResize.connect('button-press-event', Lang.bind(this, function() {
          this.bttResize.add_style_pseudo_class('pressed');
       }));
       this.bttResize.connect('button-release-event', Lang.bind(this, this._onClickedChangeResize));
       //this.bttResize.connect('clicked', Lang.bind(this, this._onClickedChangeResize));
       this.resizeBox.add(this.bttResize, { x_fill: false, expand: false });
-      this.bttSettings = this._createSymbolicButton('preferences-system');
+      this.bttSettings = this._createButton('preferences-system');
       this.bttSettings.connect('button-press-event', Lang.bind(this, function() {
          this.bttSettings.add_style_pseudo_class('pressed');
       }));
@@ -1923,14 +1923,14 @@ ControlBox.prototype = {
       this.actor.add(this.resizeBox, { x_fill: true, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
 
       this.viewBox = new St.BoxLayout({ vertical: false });
-      this.bttViewList = this._createSymbolicButton('view-list-symbolic');
+      this.bttViewList = this._createButton('view-list-symbolic');
       this.bttViewList.connect('button-press-event', Lang.bind(this, function() {
          this.bttViewList.add_style_pseudo_class('pressed');
       }));
       this.bttViewList.connect('button-release-event', Lang.bind(this, this._onClickedChangeView));
       //this.bttViewList.connect('clicked', Lang.bind(this, this._onClickedChangeView));
       this.viewBox.add(this.bttViewList, { x_fill: false, expand: false });
-      this.bttViewGrid = this._createSymbolicButton('view-grid-symbolic');
+      this.bttViewGrid = this._createButton('view-grid-symbolic');
       this.bttViewGrid.connect('button-press-event', Lang.bind(this, function() {
          this.bttViewGrid.add_style_pseudo_class('pressed');
       }));
@@ -1953,6 +1953,22 @@ ControlBox.prototype = {
       else {
          this.resizeBox.set_style_class_name('');
          this.viewBox.set_style_class_name('');
+      }
+   },
+
+   setIconSymbolic: function(iconSymbolic) {
+      let iconType;
+      if(iconSymbolic)
+         iconType = St.IconType.SYMBOLIC;
+      else
+         iconType = St.IconType.FULLCOLOR;
+      let childBox = this.actor.get_children();
+      let childBtt;
+      for(let i = 0; i < childBox.length; i++) {
+         childBtt = childBox[i].get_children();
+         for(let j = 0; j < childBtt.length; j++) {
+            childBtt[j].get_children()[0].set_icon_type(iconType);
+         }
       }
    },
 
@@ -1997,7 +2013,7 @@ ControlBox.prototype = {
       }
       else {
          this.bttResize.remove_style_pseudo_class('open');
-         this.bttResize.get_children()[0].set_icon_name('view-fullscreen');
+         this.bttResize.get_children()[0].set_icon_name('changes-allow');
          this.parent.menu.setResizeArea(0);
       }
    },
@@ -2017,11 +2033,11 @@ ControlBox.prototype = {
    changeFullScreen: function(fullScreen) {
       if(fullScreen) {
          this.bttFullScreen.add_style_pseudo_class('open');
-         this.bttFullScreen.get_children()[0].set_icon_name('window-minimize');
+         this.bttFullScreen.get_children()[0].set_icon_name('view-restore');
       }
       else {
          this.bttFullScreen.remove_style_pseudo_class('open')
-         this.bttFullScreen.get_children()[0].set_icon_name('zoom-fit-best');
+         this.bttFullScreen.get_children()[0].set_icon_name('view-fullscreen');
          //this.bttFullScreen.get_children()[0].set_icon_name('window-maximize');
       }
    },
@@ -2037,8 +2053,8 @@ ControlBox.prototype = {
       }
    },
 
-   _createSymbolicButton: function(icon) {
-      let bttIcon = new St.Icon({icon_name: icon, icon_type: St.IconType.SYMBOLIC,
+   _createButton: function(icon) {
+      let bttIcon = new St.Icon({icon_name: icon, icon_type: St.IconType.FULLCOLOR,
 	                         style_class: 'popup-menu-icon', icon_size: this.iconSize});
       let btt = new St.Button({ child: bttIcon, style_class: 'menu-category-button' });
       btt.add_style_class_name('menu-control-button');
@@ -5208,6 +5224,8 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "power-theme", "powerTheme", this._onThemePowerChange, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "gnomenu-buttons-theme", "gnoMenuButtonsTheme", this._onThemeGnoMenuButtonsChange, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-view-item", "showView", this._setVisibleViewControl, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "control-symbolic", "controlSymbolic", this._setControlButtonsSymbolic, null);
+
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "view-item", "iconView", this._changeView, null);
 
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "activate-on-press", "activateOnPress", null, null);
@@ -5392,15 +5410,15 @@ MyApplet.prototype = {
        for(theme in this.themes) {
            settingPropTheme = this._getThemeProperties(newSettingsThemes[theme]);
            oldPropTheme = this._getThemeProperties(this.themes[theme]);
-           for(let keyPorpSetting in settingPropTheme) {
-              if(!oldPropTheme[keyPorpSetting]) {
-                 oldPropTheme[keyPorpSetting] = settingPropTheme[keyPorpNew];
+           for(let keyPropSetting in settingPropTheme) {
+              if(!oldPropTheme[keyPropSetting]) {
+                 oldPropTheme[keyPropSetting] = settingPropTheme[keyPropSetting];
               }
            }
            let newPropTheme = new Array();
-           for(let keyPorpOld in oldPropTheme) {
-              if(settingPropTheme[keyPorpOld]) {
-                 newPropTheme[keyPorpOld] = oldPropTheme[keyPorpOld];
+           for(let keyPropOld in oldPropTheme) {
+              if(settingPropTheme[keyPropOld]) {
+                 newPropTheme[keyPropOld] = oldPropTheme[keyPropOld];
               }
            }
            newThemeConfig = this._makeThemeConvertion(newPropTheme);
@@ -5702,6 +5720,7 @@ MyApplet.prototype = {
       themeProperties["hover-delay"] = parseInt(themeProperties["hover-delay"]);
       themeProperties["enable-autoscroll"] = (themeProperties["enable-autoscroll"] === 'true');
       themeProperties["show-view-item"] = (themeProperties["show-view-item"] === 'true');
+      themeProperties["control-symbolic"] = (themeProperties["control-symbolic"] === 'true');
       themeProperties["view-item"] = (themeProperties["view-item"] === 'true');
       themeProperties["hover-box"] = (themeProperties["hover-box"] === 'true');
       themeProperties["control-box"] = (themeProperties["control-box"] === 'true');
@@ -6517,6 +6536,12 @@ MyApplet.prototype = {
       }
    },
 
+   _setControlButtonsSymbolic: function() {
+      if(this.controlView) {
+         this.controlView.setIconSymbolic(this.controlSymbolic);
+      }
+   },
+
    _changeView: function() {
 try {
       if(this.controlView) {
@@ -6599,6 +6624,7 @@ Main.notify("Erp" + e.message);
          this.spacerTop.setLineVisible(this.showSpacerLine);
       if(this.spacerBottom)
          this.spacerBottom.setLineVisible(this.showSpacerLine);
+      this._updateSize();
    },
 
    _updateSpacerSize: function() {
@@ -6611,6 +6637,7 @@ Main.notify("Erp" + e.message);
          this.spacerTop.setSpace(this.spacerSize);
       if(this.spacerBottom)
          this.spacerBottom.setSpace(this.spacerSize);
+      this._updateSize();
    },
 
    _setVisibleBoxPointer: function() {
@@ -6666,8 +6693,8 @@ Main.notify("errorTheme", e.message);
       this.searchFilesystem = confTheme["search-filesystem"];
       this.hover_delay_ms = confTheme["hover-delay"];
       this.autoscroll_enabled = confTheme["enable-autoscroll"];
-
       this.showView = confTheme["show-view-item"];
+      this.controlSymbolic = confTheme["control-symbolic"];
       this.iconView = confTheme["view-item"];
       this.activateOnPress = confTheme["activate-on-press"];
       this.showHoverIconBox = confTheme["hover-box"];
@@ -6729,6 +6756,7 @@ Main.notify("errorTheme", e.message);
       confTheme["enable-autoscroll"] = this.autoscroll_enabled;
 
       confTheme["show-view-item"] = this.showView;
+      confTheme["control-symbolic"] = this.controlSymbolic;
       confTheme["view-item"] = this.iconView;
       confTheme["activate-on-press"] = this.activateOnPress;
       confTheme["hover-box"] = this.showHoverIconBox;
@@ -6805,17 +6833,24 @@ Main.notify("errorTheme", e.message);
       this._setVisibleBoxPointer();
       this._setFixMenuCorner();
       this._display();
-      this._setVisibleViewControl();
       this._setVisibleTimeDate();
       this._setVisibleScrollFav();
       this._setVisibleScrollCat();
       this._setVisibleScrollApp();
       this._setVisibleScrollAccess();
       this._setVisibleScrollGnoMenu();
-      this._setVisibleSpacerLine();
-      this._updateSpacerSize();
-      if(this.gnoMenuBox)
-         this.gnoMenuBox.showFavorites(this.showFavorites);
+      if(this.spacerApp) {
+         this.spacerApp.setLineVisible(this.showSpacerLine);
+         this.spacerApp.setSpace(this.spacerSize);
+      }
+      if(this.spacerTop) {
+         this.spacerTop.setLineVisible(this.showSpacerLine);
+         this.spacerTop.setSpace(this.spacerSize);
+      }
+      if(this.spacerBottom) {
+         this.spacerBottom.setLineVisible(this.showSpacerLine);
+         this.spacerBottom.setSpace(this.spacerSize);
+      }
       this.favoritesScrollBox.actor.visible = this.showFavorites;
       this.selectedAppBox.setTitleVisible(this.showAppTitle);
       this.selectedAppBox.setDescriptionVisible(this.showAppDescription);
@@ -6835,22 +6870,29 @@ Main.notify("errorTheme", e.message);
          this.hover.setSpecialColor(this.showHoverIconBox);
       }
       if(this.accessibleBox) {
+         this.accessibleBox.setSeparatorLine(this.showSpacerLine);
+         this.accessibleBox.setSeparatorSpace(this.spacerSize);
          this.accessibleBox.setIconSize(this.iconAccessibleSize);
          this.accessibleBox.setSpecialColor(this.showAccessibleBox);
          this.accessibleBox.showRemovableDrives(this.showRemovable);
          this.accessibleBox.setIconsVisible(this.showAccessibleIcons);
       }
       if(this.gnoMenuBox) {
+         this.gnoMenuBox.showFavorites(this.showFavorites);
          this.gnoMenuBox.setIconSize(this.iconGnoMenuSize);
          this.gnoMenuBox.setTheme(this.gnoMenuButtonsTheme);
          this.gnoMenuBox.setSpecialColor(this.showGnoMenuBox);
       }
       if(this.controlView) {
+         this.controlView.actor.visible = this.showView;
          this.controlView.setIconSize(this.iconControlSize);
          this.controlView.setSpecialColor(this.showControlBox);
          this.controlView.changeViewSelected(this.iconView);
+         this.controlView.setIconSymbolic(this.controlSymbolic);
       }
       if(this.powerBox) {
+         this.powerBox.setSeparatorLine(this.showSpacerLine);
+         this.powerBox.setSeparatorSpace(this.spacerSize);
          this.powerBox.setIconSize(this.iconPowerSize);
          this.powerBox.actor.visible = this.showPowerButtons;
          this.powerBox.setTheme(this.powerTheme);
