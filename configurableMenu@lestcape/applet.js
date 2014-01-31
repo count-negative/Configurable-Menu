@@ -381,17 +381,66 @@ ScrollItemsBox.prototype = {
    }
 };
 
-function DriveMenuItem(parent, place, iconSize, iconVisible) {
+function DriveMenu(parent, selectedAppBox, hover, place, iconSize, iconVisible) {
+   this._init(parent, selectedAppBox, hover, place, iconSize, iconVisible);
+}
+
+DriveMenu.prototype = {
+   _init: function(parent, selectedAppBox, hover, place, iconSize, iconVisible) {
+      this.drive = new DriveMenuItems(parent, place, iconSize, iconVisible);
+      this.app = this.drive.app;
+      this.selectedAppBox = selectedAppBox;
+      this.hover = hover;
+      this.actor = new St.BoxLayout({ style_class: 'menu-application-button', vertical: false, reactive: true, track_hover: true });
+      this.actor.connect('enter-event', Lang.bind(this, this._onKeyFocusIn));
+      this.actor.connect('leave-event', Lang.bind(this, this._onKeyFocusOut));
+      this.actor.connect('key-focus-in', Lang.bind(this, this._onKeyFocusIn));
+      this.actor.connect('key-focus-out', Lang.bind(this, this._onKeyFocusOut));
+      this.actor.add(this.drive.actor, { x_align: St.Align.START, y_align: St.Align.MIDDLE, x_fill: true, y_fill: false, expand: true });
+      this.actor.add(this.drive.ejectButton, { x_align: St.Align.END, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+   },
+
+   _onKeyFocusIn: function(actor) {
+      this.setActive(true);
+   },
+
+   _onKeyFocusOut: function(actor) {
+      this.setActive(false);
+   },
+
+   setActive: function(active) {
+      if(active) {
+         this.actor.set_style_class_name('menu-application-button-selected');
+         this.selectedAppBox.setSelectedText(this.drive.app.get_name(), this.drive.app.get_description().split("\n")[0]);
+         this.hover.refreshApp(this.app);
+      }
+      else {
+         this.actor.set_style_class_name('menu-application-button');
+         this.selectedAppBox.setSelectedText("", "");
+         this.hover.refreshFace();
+      }
+   },
+
+   setIconVisible: function(iconVisible) {
+      this.drive.setIconVisible(iconVisible);
+   },
+
+   setIconSize: function(iconSize) {
+      this.drive.setIconSize(iconSize);
+   }
+};
+
+function DriveMenuItems(parent, place, iconSize, iconVisible) {
    this._init(parent, place, iconSize, iconVisible);
 }
 
-DriveMenuItem.prototype = {
+DriveMenuItems.prototype = {
    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
 
    _init: function(parent, place, iconSize, iconVisible) {
-      PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
+      PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false, sensitive: false, focusOnHover: false});
 
-      this.actor.set_style_class_name('menu-application-button');
+      this.actor.set_style_class_name('');
       this.place = place;
       this.iconSize = iconSize;
       this.parent = parent;
@@ -404,34 +453,27 @@ DriveMenuItem.prototype = {
       this.container.add(this.icon, { x_align: St.Align.START, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
 
       this.label = new St.Label({ text: place.name });
-      this.label.set_style("padding-left: 6px;");
       this.container.add(this.label, { x_align: St.Align.START, y_align: St.Align.MIDDLE, x_fill: true, y_fill: false, expand: true });
-      //this.container.add_actor(this.label);
 
-      ejectIcon = new St.Icon({ icon_name: 'media-eject', icon_type: St.IconType.SYMBOLIC, style_class: 'popup-menu-icon' });
-      let ejectButton = new St.Button({ child: ejectIcon });
-      ejectButton.connect('clicked', Lang.bind(this, this._eject));
-      this.container.add(ejectButton, { x_align: St.Align.END, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      let ejectIcon = new St.Icon({ icon_name: 'media-eject', icon_type: St.IconType.SYMBOLIC, style_class: 'popup-menu-icon' });
+      this.ejectButton = new St.Button({ style_class: 'menu-eject-button', child: ejectIcon });
+      this.ejectButton.connect('clicked', Lang.bind(this, this._eject));
+      this.ejectButton.connect('enter-event', Lang.bind(this, this._ejectEnterEvent));
+      this.ejectButton.connect('leave-event', Lang.bind(this, this._ejectLeaveEvent));
       this.addActor(this.container);
-      this.actor.connect('enter-event', Lang.bind(this, this._enterEvent));
-      this.actor.connect('leave-event', Lang.bind(this, this._leaveEvent));
       this.setIconVisible(iconVisible);
       this.actor._delegate = this;
+
    },
 
-   _enterEvent: function() {
-      this.setActive(true);
+   _ejectEnterEvent: function(actor, event) {
+      global.set_cursor(Cinnamon.Cursor.POINTING_HAND);
+      actor.add_style_pseudo_class('hover');
    },
 
-   _leaveEvent: function() {
-      this.setActive(false);
-   },
-
-   setActive: function(active) {
-      if(active)
-         this.actor.set_style_class_name('menu-application-button-selected');
-      else
-         this.actor.set_style_class_name('menu-application-button');
+   _ejectLeaveEvent: function(actor, event) {
+      actor.remove_style_pseudo_class('hover');
+      global.unset_cursor();
    },
 
    setIconSize: function(iconSize) {
@@ -890,8 +932,8 @@ AccessibleBox.prototype = {
             let drive;
             for(let i = 0; i < mounts.length; i++) {
                if(mounts[i].isRemovable()) {
-                  drive = new DriveMenuItem(this.parent, mounts[i], this.iconSize, this.iconsVisible);
-                  drive.container.set_width(this.actor.get_width()-40);
+                  drive = new DriveMenu(this.parent, this.selectedAppBox, this.hover, mounts[i], this.iconSize, this.iconsVisible);
+                  //drive.container.set_width(this.actor.get_width()-40);
                   this.itemsDevices.add_actor(drive.actor);
                   this._staticButtons.push(drive);
                   any = true;
