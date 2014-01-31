@@ -26,7 +26,10 @@
 }
 
 .menu-eject-button{
-        padding: 7px;
+        padding-top: 2px;
+        padding-left: 4px;
+        padding-right: 4px;
+        padding-bottom: 2px;
 }
 
 #menu-name-entry {

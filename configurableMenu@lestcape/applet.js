@@ -452,7 +452,7 @@ DriveMenuItems.prototype = {
       this.icon = this.place.iconFactory(this.iconSize);
       this.container.add(this.icon, { x_align: St.Align.START, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
 
-      this.label = new St.Label({ text: place.name });
+      this.label = new St.Label({ style_class: 'menu-application-button-label', text: place.name });
       this.container.add(this.label, { x_align: St.Align.START, y_align: St.Align.MIDDLE, x_fill: true, y_fill: false, expand: true });
 
       let ejectIcon = new St.Icon({ icon_name: 'media-eject', icon_type: St.IconType.SYMBOLIC, style_class: 'popup-menu-icon' });
