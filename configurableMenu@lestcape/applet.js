@@ -1040,6 +1040,7 @@ AccessibleBox.prototype = {
       }
       this.initItemsSystem();
       this.setIconsVisible(this.iconsVisible);
+      this.parent._updateSize();
    },
 
    initItemsPlaces: function() {
@@ -6654,7 +6655,7 @@ Main.notify("errorTheme", e.message);
    },
 
    _loadConfigTheme: function() {
-      let confTheme = this.getThemeConfig(this.themes[theme]);
+      let confTheme = this.getThemeConfig(this.themes[this.theme]);
       this.powerTheme = confTheme["power-theme"];
       this.gnoMenuButtonsTheme = confTheme["gnomenu-buttons-theme"];
       this.showRecent = confTheme["show-recent"];
