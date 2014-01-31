@@ -2219,15 +2219,17 @@ ApplicationContextMenuItemExtended.prototype = {
             try {
             if(this._appButton.app.isPlace) {
                if(this._appButton.parent.isInPlacesList(this._appButton.app.get_id())) {
-                  let placesList = this._appButton.parent.getPlacesList();
-                  placesList.splice(placesList.indexOf(this._appButton.app.get_id()), 1);
-                  this._appButton.parent.setPlacesList(placesList);
+                  let parentBtt = this._appButton.parent;
+                  let placesList = parentBtt.getPlacesList();
+                  placesList.splice(placesList.indexOf(this._appButton.place.id), 1);
+                  parentBtt.setPlacesList(placesList);
                }
             } else {
                if(this._appButton.parent.isInAppsList(this._appButton.app.get_id())) {
-                  let appsList = this._appButton.parent.getAppsList();
+                  let parentBtt = this._appButton.parent;
+                  let appsList = parentBtt.getAppsList();
                   appsList.splice(appsList.indexOf(this._appButton.app.get_id()), 1);
-                  this._appButton.parent.setAppsList(appsList);
+                  parentBtt.setAppsList(appsList);
                }
             }
            } catch (e) {Main.notify("access", e.message);}
@@ -5534,7 +5536,7 @@ MyApplet.prototype = {
       let property;
       for(let i = 0; i < placesNamesList.length; i++) {
          property = placesNamesList[i].split("::");
-         if((property[0] != "")&&(property[1] != "")) {
+         if((property[0] != "")&&(property[1] != "")&&(this.places.indexOf(property[0]) != -1)) {
             this.placesNames[property[0]] = property[1];
          }
       }
@@ -5558,7 +5560,7 @@ MyApplet.prototype = {
       let property;
       for(let i = 0; i < appsNamesList.length; i++) {
          property = appsNamesList[i].split("::");
-         if((property[0] != "")&&(property[1] != "")) {
+         if((property[0] != "")&&(property[1] != "")&&(this.apps.indexOf(property[0]) != -1)) {
             this.appsNames[property[0]] = property[1];
          }
       }
@@ -5574,8 +5576,6 @@ MyApplet.prototype = {
    },
 
    getPlacesList: function() {
-      if(!this.places)
-         Main.notify("error");
       return this.places;
    },
 
@@ -5592,11 +5592,11 @@ MyApplet.prototype = {
          let last = listPlaces[listPlaces.length-1];
          if((last != "")&&(this._isBookmarks(last))&&(this.places.indexOf(last) == -1)) {
             this.places.push(last);
-            result += listPlaces[last];
+            result += last;
          }
       }
       this.stringPlaces = result;//commit
-      this._onChangeAccessible();
+      this.setPlacesNamesList(this.getPlacesNamesList());
    },
 
    isInPlacesList: function(placeId) {
@@ -5604,15 +5604,20 @@ MyApplet.prototype = {
    },
 
    getPlacesNamesList: function() {
-      return this.placesNames;
+      let newPlacesNames = new Array();
+      for(id in this.placesNames) {
+         if(this.places.indexOf(id) != -1)
+            newPlacesNames[id] = this.placesNames[id];
+      }
+      return newPlacesNames;
    },
 
    setPlacesNamesList: function(listPlacesNames) {
       let result = "";
       this.placesNames = new Array();
       for(let id in listPlacesNames) {
-         if((id != "")&&(listPlacesNames[id].toString() != "")) {
-            this.placesNames[id] = listPlacesNames[id].toString();
+         if((id != "")&&(listPlacesNames[id].toString() != "")&&(this.places.indexOf(id) != -1)) {
+            this.placesNames[id] = listPlacesNames[id];
             result += id+"::"+listPlacesNames[id].toString() + ";;";
          }
       }
@@ -5638,14 +5643,19 @@ MyApplet.prototype = {
    },
 
    getAppsNamesList: function() {
-      return this.appsNames;
+      let newAppsNames = new Array();
+      for(id in this.appsNames) {
+         if(this.apps.indexOf(id) != -1)
+            newAppsNames[id] = this.appsNames[id];
+      }
+      return newAppsNames;
    },
 
    setAppsNamesList: function(listAppsNames) {
       let result = "";
       this.appsNames = new Array();
       for(let id in listAppsNames) {
-         if((id != "")&&(listAppsNames[id].toString() != "")) {
+         if((id != "")&&(listAppsNames[id].toString() != "")&&(this.apps.indexOf(id) != -1)) {
             this.appsNames[id] = listAppsNames[id].toString();
             result += id+"::"+listAppsNames[id].toString() + ";;";
          }
@@ -5689,7 +5699,7 @@ MyApplet.prototype = {
          this.apps.push(listApps[listApps.length-1]);
       }
       this.stringApps = result;//commit
-      this._onChangeAccessible();
+      this.setAppsNamesList(this.getAppsNamesList());
    },
 
    isInAppsList: function(appId) {

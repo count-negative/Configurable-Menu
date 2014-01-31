@@ -38,7 +38,7 @@
         "callback": "_saveConfigTheme",
         "tooltip": "Press this button to save the layout configuration."
     },
-   "separator-menu-top": {
+    "separator-menu-top": {
        "type": "separator"
     },
     "header-menu": {
@@ -412,7 +412,7 @@
     },
     "icon-control-size": {
         "type": "spinbutton",
-        "default": 32,
+        "default": 22,
         "min": 10,
         "max": 100,
         "step": 1,
