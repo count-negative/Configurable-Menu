@@ -172,6 +172,7 @@ Change Log:
    - The new layouts of Vampire, Garibaldo, GnoMenu Left, GnoMenu Right GnoMenu Top and GnoMenu Bottom was added.
    - Several visually improvement in different layouts, especially the horizontal.
    - Now you can rename the apps on the accessible panel.
+   - Changed the control buttons icons and was added the option to be symbolic or full color.
 
 A complete change log can be found here: https://github.com/lestcape/Configurable-Menu/wiki/Change-Log
 
