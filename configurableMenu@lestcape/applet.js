@@ -882,25 +882,34 @@ AccessibleBox.prototype = {
    },
 
    initItemsRemovables: function() {
-      try {
-         let mounts = Main.placesManager.getMounts();
-         let any = false;
-         let drive;
-         for(let i = 0; i < mounts.length; i++) {
-            if(mounts[i].isRemovable()) {
-               drive = new DriveMenuItem(this.parent, mounts[i], this.iconSize, this.iconsVisible);
-               drive.container.set_width(this.actor.get_width()-40);
-               this.itemsDevices.add_actor(drive.actor);
-               this._staticButtons.push(drive);
-               any = true;
-            }
-         }
+      let any = false;
+      if(this.showRemovable) {
+         try {
+            let mounts = Main.placesManager.getMounts();
 
-         this.itemsDevices.visible = any;
-      } catch(e) {
-         global.logError(e);
-         Main.notify("ErrorDevice:", e.message);
+            let drive;
+            for(let i = 0; i < mounts.length; i++) {
+               if(mounts[i].isRemovable()) {
+                  drive = new DriveMenuItem(this.parent, mounts[i], this.iconSize, this.iconsVisible);
+                  drive.container.set_width(this.actor.get_width()-40);
+                  this.itemsDevices.add_actor(drive.actor);
+                  this._staticButtons.push(drive);
+                  any = true;
+               }
+            }
+         } catch(e) {
+            global.logError(e);
+            Main.notify("ErrorDevice:", e.message);
+         }
+         if(this.idSignalRemovable == 0)
+            this.idSignalRemovable = Main.placesManager.connect('mounts-updated', Lang.bind(this, this.refreshAccessibleItems));
+      } else {
+         if(this.idSignalRemovable > 0) {
+            Main.placesManager.disconnect(this.idSignalRemovable);
+            this.idSignalRemovable = 0;
+         }
       }
+      this.itemsDevices.visible = any;
    },
 
    showRemovableDrives: function(showRemovable) {
@@ -1028,16 +1037,7 @@ AccessibleBox.prototype = {
       }
       this._staticButtons = new Array();
       this.initItemsPlaces();
-      if(this.showRemovable) {
-         this.initItemsRemovables();
-         if(this.idSignalRemovable == 0)
-            this.idSignalRemovable = Main.placesManager.connect('mounts-updated', Lang.bind(this, this.refreshAccessibleItems));
-      } else {
-         if(this.idSignalRemovable > 0) {
-            Main.placesManager.disconnect(this.idSignalRemovable);
-            this.idSignalRemovable = 0;
-         }
-      }
+      this.initItemsRemovables();
       this.initItemsSystem();
       this.setIconsVisible(this.iconsVisible);
       this.parent._updateSize();
