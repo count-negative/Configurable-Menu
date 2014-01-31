@@ -164,32 +164,6 @@
         "description": "Open the menu when I press my mouse over it",
         "tooltip": "Enable opening the menu when the mouse press over the applet."
     },
-    "separator-separators-top": {
-       "type": "separator"
-    },
-    "header-separators": {
-        "type": "header",
-        "description": "Separators:"
-    },
-    "separator-separators-bottom": {
-       "type": "separator"
-    },
-    "spacer-line": {
-        "type": "checkbox",
-        "default": true,
-        "description": "Show separator line",
-        "tooltip": "Choose whether or not to show a line on separator."
-    },
-    "spacer-size": {
-        "type": "spinbutton",
-        "default": 10,
-        "min": 0,
-        "max": 50,
-        "step": 1,
-        "units": "pixels",
-        "description": "Separator size:",
-        "tooltip": "Choose the size of separator."
-    },
     "separator-categories-top": {
        "type": "separator"
     },
@@ -320,6 +294,38 @@
         "description": "Show scrolling area of favorites",
         "tooltip": "Choose whether or not to show the scrolling area of favorites."
     },
+    "separator-hover-top": {
+       "type": "separator"
+    },
+    "header-hover": {
+        "type": "header",
+        "description": "Hover Icon:"
+    },
+    "separator-hover-bottom": {
+       "type": "separator"
+    },
+    "show-hover-icon": {
+        "type": "checkbox",
+        "default": true,
+        "description": "Show hover icon",
+        "tooltip": "Choose whether or not to show hover icon on the menu."
+    },
+    "hover-box": {
+        "type": "checkbox",
+        "default": false,
+        "description": "Hover icon have a box",
+        "tooltip": "Choose whether or not to have a box on the hover icon."
+    },
+    "icon-hover-size": {
+        "type": "spinbutton",
+        "default": 68,
+        "min": 10,
+        "max": 100,
+        "step": 1,
+        "units": "pixels",
+        "description": "Hover icon size:",
+        "tooltip": "Set the hover icon size."
+    },
     "separator-system-top": {
        "type": "separator"
     },
@@ -370,38 +376,6 @@
         "description": "System icons size:",
         "tooltip": "Set the system icons size."
     },
-    "separator-hover-top": {
-       "type": "separator"
-    },
-    "header-hover": {
-        "type": "header",
-        "description": "Hover Icon:"
-    },
-    "separator-hover-bottom": {
-       "type": "separator"
-    },
-    "show-hover-icon": {
-        "type": "checkbox",
-        "default": true,
-        "description": "Show hover icon",
-        "tooltip": "Choose whether or not to show hover icon on the menu."
-    },
-    "hover-box": {
-        "type": "checkbox",
-        "default": false,
-        "description": "Hover icon have a box",
-        "tooltip": "Choose whether or not to have a box on the hover icon."
-    },
-    "icon-hover-size": {
-        "type": "spinbutton",
-        "default": 68,
-        "min": 10,
-        "max": 100,
-        "step": 1,
-        "units": "pixels",
-        "description": "Hover icon size:",
-        "tooltip": "Set the hover icon size."
-    },
     "separator-control-top": {
        "type": "separator"
     },
@@ -445,6 +419,32 @@
         "units": "pixels",
         "description": "Control icon size:",
         "tooltip": "Set the control icon size."
+    },
+    "separator-separators-top": {
+       "type": "separator"
+    },
+    "header-separators": {
+        "type": "header",
+        "description": "Separators:"
+    },
+    "separator-separators-bottom": {
+       "type": "separator"
+    },
+    "spacer-line": {
+        "type": "checkbox",
+        "default": true,
+        "description": "Show separator line",
+        "tooltip": "Choose whether or not to show a line on separator."
+    },
+    "spacer-size": {
+        "type": "spinbutton",
+        "default": 10,
+        "min": 0,
+        "max": 50,
+        "step": 1,
+        "units": "pixels",
+        "description": "Separator size:",
+        "tooltip": "Choose the size of separator."
     },
     "separator-information-top": {
        "type": "separator"
