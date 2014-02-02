@@ -1,5 +1,5 @@
 //Cinnamon Applet: Configurable Menu version v0.9-Beta
-//Release Date: 30 january 2014
+//Release Date: 01 February 2014
 //
 //Authors: Lester Carballo Pérez(https://github.com/lestcape) and Garibaldo(https://github.com/Garibaldo).
 //
@@ -5254,17 +5254,18 @@ MyApplet.prototype = {
 
          this.settings = new Settings.AppletSettings(this, this.uuid, instance_id);
 
+         this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this._onSelectedThemeChange, null);
+
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-recent", "showRecent", this._refreshPlacesAndRecent, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-places", "showPlaces", this._refreshPlacesAndRecent, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "activate-on-hover", "activateOnHover",this._updateActivateOnHover, null);                        
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "menu-icon", "menuIcon", this._updateIconAndLabel, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "menu-label", "menuLabel", this._updateIconAndLabel, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "search-filesystem", "searchFilesystem", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "swap-panels", "swapPanels", this._onSwapPanel, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "hover-delay", "hover_delay_ms", this._update_hover_delay, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "enable-autoscroll", "autoscroll_enabled", this._update_autoscroll, null);
 
-//My Setting
-         this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this._onSelectedThemeChange, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "power-theme", "powerTheme", this._onThemePowerChange, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "gnomenu-buttons-theme", "gnoMenuButtonsTheme", this._onThemeGnoMenuButtonsChange, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-view-item", "showView", this._setVisibleViewControl, null);
@@ -5369,7 +5370,7 @@ MyApplet.prototype = {
             }
          }));
          Main.placesManager.connect('places-updated', Lang.bind(this, this._refreshPlacesAndRecent));
-         Main.themeManager.connect('theme-set', Lang.bind(this, this._onThemeChange));
+         Main.themeManager.connect('theme-set', Lang.bind(this, this._updateSize));
          St.TextureCache.get_default().connect("icon-theme-changed", Lang.bind(this, this._onThemeChange));
          this.RecentManager.connect('changed', Lang.bind(this, this._refreshPlacesAndRecent));
 
@@ -5768,6 +5769,7 @@ MyApplet.prototype = {
       themeProperties["show-recent"] = (themeProperties["show-recent"] === 'true');
       themeProperties["show-places"] = (themeProperties["show-places"] === 'true');
       themeProperties["search-filesystem"] = (themeProperties["search-filesystem"] === 'true');
+      themeProperties["swap-panels"] = (themeProperties["swap-panels"] === 'true');
       themeProperties["activate-on-hover"] = (themeProperties["activate-on-hover"] === 'true');
       themeProperties["hover-delay"] = parseInt(themeProperties["hover-delay"]);
       themeProperties["enable-autoscroll"] = (themeProperties["enable-autoscroll"] === 'true');
@@ -6594,21 +6596,43 @@ MyApplet.prototype = {
       }
    },
 
-   _changeView: function() {
-try {
-      if(this.controlView) {
-         this.controlView.changeViewSelected(this.iconView);
-       this._clearAppSize();
-       this._updateAppButtonDesc();
-       this._updateTextButtonWidth();
-       this._setAppIconDirection();
-       this._updateAppSize();
-       this._refreshFavs();
-       this._updateSize();
+   _onSwapPanel: function() {
+      try {
+         if((this.bottomBoxSwaper)&&(this.topBoxSwaper)) {
+            let parent = this.topBoxSwaper.get_parent();
+            if(parent) parent.remove_actor(this.topBoxSwaper);
+            parent = this.bottomBoxSwaper.get_parent();
+            if(parent) parent.remove_actor(this.bottomBoxSwaper);
+
+            if(this.swapPanels) {
+               this.beginBox.add_actor(this.bottomBoxSwaper);
+               this.endBox.add_actor(this.topBoxSwaper);
+            }
+            else {
+               this.beginBox.add_actor(this.topBoxSwaper);
+               this.endBox.add_actor(this.bottomBoxSwaper);
+            }
+         }
+      } catch(e) {
+         Main.notify("errorTheme", e.message);
       }
-} catch(e) {
-Main.notify("Erp" + e.message);
-}
+   },
+
+   _changeView: function() {
+      try {
+         if(this.controlView) {
+            this.controlView.changeViewSelected(this.iconView);
+         this._clearAppSize();
+         this._updateAppButtonDesc();
+         this._updateTextButtonWidth();
+         this._setAppIconDirection();
+         this._updateAppSize();
+         this._refreshFavs();
+         this._updateSize();
+      }
+      } catch(e) {
+         Main.notify("Erp" + e.message);
+      }
    },
 
    _setVisibleFavorites: function() {
@@ -6725,12 +6749,20 @@ Main.notify("Erp" + e.message);
    },
 
    _onSelectedThemeChange: function() {
-try {
-      this._loadConfigTheme();
-      this._onThemeChange();
-} catch(e) {
-Main.notify("errorTheme", e.message);
-}
+      this._timeOutSettings = Mainloop.timeout_add(400, Lang.bind(this, this._updateSelectedTheme));
+   },
+
+   _updateSelectedTheme: function() {
+      if(this._timeOutSettings > 0) {
+         Mainloop.source_remove(this._timeOutSettings);
+         this._timeOutSettings = 0;
+         try {
+            this._loadConfigTheme();
+            this._onThemeChange();
+         } catch(e) {
+            Main.notify("errorTheme", e.message);
+         }
+      }
    },
 
    _loadConfigTheme: function() {
@@ -6743,6 +6775,7 @@ Main.notify("errorTheme", e.message);
       this.menuIcon = confTheme["menu-icon"];
       this.menuLabel = confTheme["menu-label"];
       this.searchFilesystem = confTheme["search-filesystem"];
+      this.swapPanels = confTheme["swap-panels"];
       this.hover_delay_ms = confTheme["hover-delay"];
       this.autoscroll_enabled = confTheme["enable-autoscroll"];
       this.showView = confTheme["show-view-item"];
@@ -6804,6 +6837,7 @@ Main.notify("errorTheme", e.message);
       confTheme["menu-icon"] = this.menuIcon;
       confTheme["menu-label"] = this.menuLabel;
       confTheme["search-filesystem"] = this.searchFilesystem;
+      confTheme["swap-panels"] = this.swapPanels;
       confTheme["hover-delay"] = this.hover_delay_ms;
       confTheme["enable-autoscroll"] = this.autoscroll_enabled;
 
@@ -6881,6 +6915,7 @@ Main.notify("errorTheme", e.message);
       }
       if(this.bttChanger)
          this.bttChanger.actor.destroy();
+      this._onSwapPanel();
       this._updateMenuSection();
       this._setVisibleBoxPointer();
       this._setFixMenuCorner();
@@ -6964,7 +6999,7 @@ Main.notify("errorTheme", e.message);
          }
          this.menu._boxPointer.setArrow(false);
          this.menu.fixToCorner(true);
-      } 
+      }
    },
 
    _setAutomaticSize: function() {
@@ -7103,17 +7138,6 @@ Main.notify("errorTheme", e.message);
    _minimalWidth: function() {
       let width = this.extendedBox.get_width();
       let interWidth = 0;
-      if(this.theme == "mint") {
-         let operPanelVisible = this.operativePanel.visible;
-         this.operativePanel.visible = !operPanelVisible;
-         this.favoritesScrollBox.actor.visible = operPanelVisible;
-         interWidth = this.extendedBox.get_width();
-         this.operativePanel.visible = operPanelVisible;
-         this.favoritesScrollBox.actor.visible = !operPanelVisible;
-      }
-      if(interWidth > width)
-         width = interWidth;
-      
       if(!this.categoriesBox.get_vertical()) {
          interWidth = this.controlBox.get_width();
          if(this.hover.actor.visible)
@@ -7343,12 +7367,24 @@ Main.notify("errorTheme", e.message);
 
          this.standardBox = new St.BoxLayout({ vertical:false });
 
-         this.rightPane = new St.BoxLayout({ vertical: true });        
+         this.rightPane = new St.BoxLayout({ vertical: true });
+         this.beginBox = new St.BoxLayout({ vertical: true });
+         this.endBox = new St.BoxLayout({ vertical: true });
+         this.rightPane.add_actor(this.beginBox);      
 //search
+         this.topBoxSwaper = new St.BoxLayout({ vertical: false });
+         this.bottomBoxSwaper = new St.BoxLayout({ vertical: false });
          this.controlSearchBox = new St.BoxLayout({ vertical: false });
          this.controlBox = new St.BoxLayout({ vertical: true });
-         this.rightPane.add_actor(this.controlSearchBox);
-
+         this.topBoxSwaper.add(this.controlSearchBox, { x_fill: true, y_fill: true, expand: true });
+         if(this.swapPanels) {
+            this.beginBox.add_actor(this.bottomBoxSwaper);
+            this.endBox.add_actor(this.topBoxSwaper);//, { x_fill: true, y_fill: true, expand: true });
+         }
+         else {
+            this.beginBox.add_actor(this.topBoxSwaper);
+            this.endBox.add_actor(this.bottomBoxSwaper);//, { x_fill: true, y_fill: true, expand: true });
+         }
 
          this.searchBox = new St.BoxLayout({ style_class: 'menu-search-box' });
          this.searchBox.set_style("padding-right: 0px; padding-left: 0px");
@@ -7398,7 +7434,7 @@ Main.notify("errorTheme", e.message);
          this.a11y_settings.connect("changed::screen-magnifier-enabled", Lang.bind(this, this._updateVFade));
          this._updateVFade();
 
-         this.endBox = new St.BoxLayout({ vertical: true });
+         this.endVerticalBox = new St.BoxLayout({ vertical: true });
          this.endHorizontalBox = new St.BoxLayout({ vertical: false });
 
          this.selectedAppBox = new SelectedAppBox(this, this.showTimeDate);
@@ -7515,10 +7551,11 @@ Main.notify("errorTheme", e.message);
       this.rightPane.add_actor(this.spacerTop.actor);
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
-      this.endBox.add_actor(this.spacerApp.actor);
-      this.endBox.add_actor(this.endHorizontalBox);
+      this.endVerticalBox.add_actor(this.spacerApp.actor);
+      this.endVerticalBox.add_actor(this.endBox);
+      this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.controlBox.set_style('padding-left: 20px;');
       this.searchBox.set_style('padding-left: 0px; padding-top: 10px;');
       this.operativePanel.add_style_class_name('menu-operative-box');
@@ -7544,9 +7581,10 @@ Main.notify("errorTheme", e.message);
       this.rightPane.add_actor(this.spacerTop.actor);
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
-      this.endBox.add_actor(this.spacerApp.actor);
-      this.endBox.add_actor(this.endHorizontalBox);
+      this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.endVerticalBox.add_actor(this.spacerApp.actor, { x_fill: true, y_fill: true, expand: true });
+      this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.operativePanel.add_style_class_name('menu-operative-box');
       this.controlSearchBox.style_class = 'menu-top-box';
       this.endHorizontalBox.style_class = 'menu-bottom-box';
@@ -7569,9 +7607,10 @@ Main.notify("errorTheme", e.message);
       this.rightPane.add_actor(this.spacerTop.actor);
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
-      this.endBox.add_actor(this.spacerApp.actor);
-      this.endBox.add_actor(this.endHorizontalBox);
+      this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.endVerticalBox.add_actor(this.spacerApp.actor);
+      this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.operativePanel.add_style_class_name('menu-operative-box');
       this.controlSearchBox.style_class = 'menu-top-box';
       this.endHorizontalBox.style_class = 'menu-bottom-box';
@@ -7591,12 +7630,13 @@ Main.notify("errorTheme", e.message);
       this.rightPane.add_actor(this.spacerTop.actor);
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
-      this.endBox.add_actor(this.spacerApp.actor);
-      this.endBox.add_actor(this.endHorizontalBox);
+      this.endVerticalBox.add_actor(this.spacerApp.actor);
+      this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.controlBox.set_style('padding-left: 20px;');
       this.searchBox.set_style('padding-left: 0px; padding-top: 10px;');
       this.operativePanel.add_style_class_name('menu-operative-box');
@@ -7621,13 +7661,14 @@ Main.notify("errorTheme", e.message);
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.END, y_fill: true, expand: false });
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endHorizontalBox.add(this.searchBox, { x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
       this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
-      this.endBox.add_actor(this.spacerApp.actor);
-      this.endBox.add_actor(this.endHorizontalBox);
+      this.endVerticalBox.add_actor(this.spacerApp.actor);
+      this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.searchBox.set_style('');
       this.operativePanel.add_style_class_name('menu-operative-box');
       this.controlSearchBox.style_class = 'menu-top-box';
@@ -7651,13 +7692,14 @@ Main.notify("errorTheme", e.message);
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.END, y_fill: true, expand: false });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endHorizontalBox.add(this.searchBox, { x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
       this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
-      this.endBox.add_actor(this.spacerApp.actor);
-      this.endBox.add_actor(this.endHorizontalBox);
+      this.endVerticalBox.add_actor(this.spacerApp.actor);
+      this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.operativePanel.add_style_class_name('menu-operative-box');
       this.controlSearchBox.style_class = 'menu-top-box';
       this.endHorizontalBox.style_class = 'menu-bottom-box';
@@ -7681,14 +7723,15 @@ Main.notify("errorTheme", e.message);
       this.rightPane.add_actor(this.spacerTop.actor);
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.operativePanel.add_actor(this.spacerApp.actor);
-      this.endBox.add(this.favBoxWrapper, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: true });
+      this.endVerticalBox.add(this.favBoxWrapper, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: true, y_align: St.Align.END, expand: true });
+      this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: true, y_align: St.Align.END, expand: true });
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.endHorizontalBox.add(this.controlView.actor, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: false });
       this.endHorizontalBox.add(this.searchBox, { x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, expand: true });
       this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: false });
-      this.endBox.add_actor(this.endHorizontalBox);
+      this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.favoritesBox.style_class = '';
       this.favBoxWrapper.style_class = 'menu-favorites-box';
       this.operativePanel.add_style_class_name('menu-operative-box');
@@ -7712,10 +7755,11 @@ Main.notify("errorTheme", e.message);
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
       this.mainBox.add(this.accessibleBox.actor, { y_fill: true, expand: false });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
-      this.endBox.add_actor(this.spacerApp.actor);
-      this.endBox.add_actor(this.endHorizontalBox);
+      this.endVerticalBox.add_actor(this.spacerApp.actor);
+      this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.searchBox.set_style('');
       this.operativePanel.add_style_class_name('menu-operative-box');
       this.controlSearchBox.style_class = 'menu-top-box';
@@ -7738,10 +7782,11 @@ Main.notify("errorTheme", e.message);
       this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.accessibleBox.actor, { y_fill: true });
-      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
-      this.endBox.add_actor(this.spacerApp.actor);
-      this.endBox.add_actor(this.endHorizontalBox);
+      this.endVerticalBox.add_actor(this.spacerApp.actor);
+      this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.operativePanel.add_style_class_name('menu-operative-box');
       this.controlSearchBox.style_class = 'menu-top-box';
       this.endHorizontalBox.style_class = 'menu-bottom-box';
@@ -7756,7 +7801,6 @@ Main.notify("errorTheme", e.message);
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
-      this.rightPane.add_actor(this.spacerTop.actor);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
@@ -7764,25 +7808,27 @@ Main.notify("errorTheme", e.message);
       this.accessibleBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.standardBox.add(this.rightPane, { x_fill: true, y_fill: true, expand: true });
       this.betterPanel.set_vertical(true);
+      this.betterPanel.add_actor(this.spacerTop.actor);
       this.betterPanel.add(this.favBoxWrapper, { x_fill: true, y_fill: true, y_align: St.Align.MIDDLE, expand: true });
+      this.betterPanel.add_actor(this.spacerApp.actor);
       this.favBoxWrapper.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.operativePanel.visible = false;
       this.mainBox.add(this.accessibleBox.actor, { y_fill: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.endBox.add_actor(this.endHorizontalBox);
-      this.extendedBox.add_actor(this.spacerApp.actor);
-      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
+      this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.endHorizontalBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.accessibleBox.setNamesVisible(true);
       this.searchName.visible = true;
       this.panelAppsName.visible = true;
       this.favoritesBox.style_class = '';
-      this.betterPanel.style_class = 'menu-favorites-box';
-      this.betterPanel.add_style_class_name('menu-operative-mint-box');
+      this.favBoxWrapper.style_class = 'menu-favorites-box';
+      this.favBoxWrapper.add_style_class_name('menu-operative-mint-box');
       this.selectedAppBox.actor.set_style('padding-right: 0px; padding-left: 4px; text-align: right');
       this.controlSearchBox.style_class = 'menu-top-mint-box';
-      this.endBox.style_class = 'menu-bottom-mint-box';
+      this.endHorizontalBox.style_class = 'menu-bottom-mint-box';
    },
 
    loadWindows: function() {
@@ -7792,31 +7838,31 @@ Main.notify("errorTheme", e.message);
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
-      this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: true, y_align: St.Align.MIDDLE, expand: true });
+      this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.accessibleBox = new AccessibleBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize, this.showRemovable);
       this.accessibleBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
-      this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.controlBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.standardBox.add(this.rightPane, { x_fill: true, y_fill: true, expand: true });
       this.betterPanel.set_vertical(true);
-      this.betterPanel.add_actor(this.endHorizontalBox);
       this.betterPanel.add_actor(this.spacerApp.actor);
       this.betterPanel.add(this.favBoxWrapper, { x_fill: true, y_fill: true, y_align: St.Align.MIDDLE, expand: true });
       this.betterPanel.add_actor(this.spacerTop.actor);
       this.favBoxWrapper.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.endBox.add(this.bttChanger.actor, { x_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: false });
-      this.endBox.add(this.searchBox, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.END, expand: false });
+      this.endVerticalBox.add(this.bttChanger.actor, { x_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: false });
+      this.endVerticalBox.add(this.searchBox, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.END, expand: false });
       this.betterPanel.add(this.endBox, { x_fill: true, y_fill: true, y_align: St.Align.END, expand: false });
+      this.endHorizontalBox.add(this.endVerticalBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.operativePanel.visible = false;
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.accessibleBox.actor, { y_fill: true });
       this.favoritesBox.style_class = '';
-      this.betterPanel.style_class = 'menu-favorites-box';
-      this.betterPanel.add_style_class_name('menu-operative-windows-box');
-      this.endHorizontalBox.set_style("padding-right: 0px;");
-      this.endHorizontalBox.style_class = 'menu-top-windows-box';
-      this.endBox.style_class = 'menu-bottom-windows-box';
+      this.rightPane.style_class = 'menu-favorites-box';
+      this.favBoxWrapper.add_style_class_name('menu-operative-windows-box');
+      this.controlSearchBox.style_class = 'menu-top-mint-box';
+      this.endHorizontalBox.style_class = 'menu-bottom-windows-box';
    },
 
  loadGnoMenuLeft: function() {
@@ -7838,13 +7884,14 @@ Main.notify("errorTheme", e.message);
       this.styleGnoMenuPanel.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.betterPanel.add(this.styleGnoMenuPanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.extendedBox.add_actor(this.spacerApp.actor);
       this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.gnoMenuBox = new GnoMenuBox(this, this.hover, this.selectedAppBox, this.powerBox, true, this.iconAccessibleSize, Lang.bind(this, this._onPanelGnoMenuChange));
       this.gnoMenuBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.favBoxWrapper.add(this.gnoMenuBox.actor, { y_fill: true, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
-      this.endBox.add_actor(this.spacerApp.actor);
-      this.endBox.add_actor(this.searchBox);
-      this.endBox.add_actor(this.endHorizontalBox);
+      this.endVerticalBox.add_actor(this.searchBox);
+      this.endVerticalBox.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add(this.endVerticalBox, { x_fill: true, y_fill: true, expand: true });
       this.selectedAppBox.setAlign(St.Align.START);
       this.operativePanel.visible = false;
       this.favoritesBox.style_class = 'menu-applications-box';
@@ -7872,13 +7919,14 @@ Main.notify("errorTheme", e.message);
       this.betterPanel.add(this.styleGnoMenuPanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, y_fill: true, expand: false });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.extendedBox.add_actor(this.spacerApp.actor);
       this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.gnoMenuBox = new GnoMenuBox(this, this.hover, this.selectedAppBox, this.powerBox, true, this.iconAccessibleSize, Lang.bind(this, this._onPanelGnoMenuChange));
       this.gnoMenuBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.favBoxWrapper.add(this.gnoMenuBox.actor, { y_fill: true, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
-      this.endBox.add_actor(this.spacerApp.actor);
-      this.endBox.add_actor(this.searchBox);
-      this.endBox.add_actor(this.endHorizontalBox);
+      this.endVerticalBox.add_actor(this.searchBox);
+      this.endVerticalBox.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add(this.endVerticalBox, { x_fill: true, y_fill: true, expand: true });
       this.selectedAppBox.setAlign(St.Align.START);
       this.operativePanel.visible = false;
       this.favoritesBox.style_class = 'menu-applications-box';
@@ -7908,13 +7956,12 @@ Main.notify("errorTheme", e.message);
       this.rightPane.add_actor(this.spacerTop.actor);
       this.rightPane.add_actor(this.gnoMenuBox.actor);
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.extendedBox.add_actor(this.spacerApp.actor);
       this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
-      //this.endBox.add_actor(this.spacerApp.actor);
-      //this.endBox.add_actor(this.gnoMenuBox.actor);
-      this.endBox.add_actor(this.spacerBottom.actor);
       this.endHorizontalBox.add_actor(this.searchBox);
       this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      this.endBox.add_actor(this.endHorizontalBox);
+      this.endVerticalBox.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add(this.endVerticalBox, { x_fill: true, y_fill: true, expand: true });
       this.selectedAppBox.setAlign(St.Align.START);
       this.operativePanel.visible = false;
       this.favoritesBox.style_class = 'menu-applications-box';
@@ -7934,21 +7981,21 @@ Main.notify("errorTheme", e.message);
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, y_fill: true, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
-      this.rightPane.add_actor(this.spacerTop.actor);
       this.styleGnoMenuPanel = new St.BoxLayout({ style_class: 'menu-gno-operative-box-bottom', vertical: true });
       this.styleGnoMenuPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.styleGnoMenuPanel.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
-      this.betterPanel.add(this.styleGnoMenuPanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
-      //this.endBox.add_actor(this.spacerApp.actor);
       this.gnoMenuBox = new GnoMenuBox(this, this.hover, this.selectedAppBox, this.powerBox, false, this.iconAccessibleSize, Lang.bind(this, this._onPanelGnoMenuChange));
       this.gnoMenuBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
-      this.endBox.add_actor(this.gnoMenuBox.actor);
-      this.endBox.add_actor(this.spacerBottom.actor);
+      this.rightPane.add_actor(this.spacerTop.actor);
+      this.rightPane.add(this.styleGnoMenuPanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.extendedBox.add_actor(this.gnoMenuBox.actor);
+      this.extendedBox.add_actor(this.spacerApp.actor);
+      this.extendedBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endHorizontalBox.add_actor(this.searchBox);
       this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      this.endBox.add_actor(this.endHorizontalBox);
+      this.endVerticalBox.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add(this.endVerticalBox, { x_fill: true, y_fill: true, expand: true });
       this.selectedAppBox.setAlign(St.Align.START);
       this.operativePanel.visible = false;
       this.favoritesBox.style_class = 'menu-applications-box';

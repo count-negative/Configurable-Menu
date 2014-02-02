@@ -1,7 +1,7 @@
 Cinnamon Applet: Configurable Menu version v0.9-Beta
 ==============
 
-Release Date: 30 january 2014
+Release Date: 01 February 2014
 
 Authors: Lester Carballo Pérez(https://github.com/lestcape) and Garibaldo(https://github.com/Garibaldo).
 
@@ -59,7 +59,9 @@ Some features:
 
 19.	Now you can rename the apps on the accessible panel.
 
-20.	And much more coming...
+20.	You can swap top and bottom menu panels.
+
+21.	And much more coming...
 
 
 This program is free software:
@@ -173,6 +175,7 @@ Change Log:
    - Several visually improvement in different layouts, especially the horizontal.
    - Now you can rename the apps on the accessible panel.
    - Changed the control buttons icons and was added the option to be symbolic or full color.
+   - You can swap top and bottom menu panels.
 
 A complete change log can be found here: https://github.com/lestcape/Configurable-Menu/wiki/Change-Log
 
