@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-01-30 00:47-0600\n"
+"PO-Revision-Date: 2014-02-03 15:08-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -93,6 +93,62 @@ msgstr "Filter:"
 #: applet.js:5817 applet.js:6100 applet.js:6131 applet.js:6165
 msgid "Favorites"
 msgstr "Favorites"
+
+#. configurableMenu@lestcape->settings-schema.json->header-layouts->description
+msgid "Layouts:"
+msgstr "Layouts:"
+
+#. configurableMenu@lestcape->settings-schema.json->header-menu->description
+msgid "Menu:"
+msgstr "Menu:"
+
+#. configurableMenu@lestcape->settings-schema.json->header-size->description
+msgid "Menu Size:"
+msgstr "Menu Size:"
+
+#. configurableMenu@lestcape->settings-schema.json->header-reaction->description
+msgid "Menu Reaction:"
+msgstr "Menu Reaction:"
+
+#. configurableMenu@lestcape->settings-schema.json->header-categories->description
+msgid "Categories:"
+msgstr "Categories:"
+
+#. configurableMenu@lestcape->settings-schema.json->header-apps->description
+msgid "Applications:"
+msgstr "Applications:"
+
+#. configurableMenu@lestcape->settings-schema.json->header-favorites->description
+msgid "Favorites:"
+msgstr "Favorites:"
+
+#. configurableMenu@lestcape->settings-schema.json->header-hover->description
+msgid "Hover Icon:"
+msgstr "Hover Icon:"
+
+#. configurableMenu@lestcape->settings-schema.json->header-system->description
+msgid "System Buttons:"
+msgstr "System Buttons:"
+
+#. configurableMenu@lestcape->settings-schema.json->header-control->description
+msgid "Control Buttons:"
+msgstr "Control Buttons:"
+
+#. configurableMenu@lestcape->settings-schema.json->header-separators->description
+msgid "Separators:"
+msgstr "Separators:"
+
+#. configurableMenu@lestcape->settings-schema.json->header-information->description
+msgid "Information Panel:"
+msgstr "Information Panel:"
+
+#. configurableMenu@lestcape->settings-schema.json->header-accessible->description
+msgid "Accessible Panel:"
+msgstr "Accessible Panel:"
+
+#. configurableMenu@lestcape->settings-schema.json->header-gnomenu->description
+msgid "GnoMenu Panel:"
+msgstr "GnoMenu Panel:"
 
 #. configurableMenu@lestcape->settings-schema.json->app-title-
 #. size->description

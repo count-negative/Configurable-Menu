@@ -199,6 +199,62 @@ msgstr ""
 msgid "Trash"
 msgstr ""
 
+#. configurableMenu@lestcape->settings-schema.json->header-layouts->description
+msgid "Layouts:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->header-menu->description
+msgid "Menu:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->header-size->description
+msgid "Menu Size:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->header-reaction->description
+msgid "Menu Reaction:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->header-categories->description
+msgid "Categories:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->header-apps->description
+msgid "Applications:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->header-favorites->description
+msgid "Favorites:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->header-hover->description
+msgid "Hover Icon:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->header-system->description
+msgid "System Buttons:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->header-control->description
+msgid "Control Buttons:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->header-separators->description
+msgid "Separators:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->header-information->description
+msgid "Information Panel:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->header-accessible->description
+msgid "Accessible Panel:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->header-gnomenu->description
+msgid "GnoMenu Panel:"
+msgstr ""
+
 #. configurableMenu@lestcape->settings-schema.json->app-title-
 #. size->description
 msgid "Font size of the selected application name:"

@@ -392,6 +392,7 @@ DriveMenu.prototype = {
       this.selectedAppBox = selectedAppBox;
       this.hover = hover;
       this.actor = new St.BoxLayout({ style_class: 'menu-application-button', vertical: false, reactive: true, track_hover: true });
+      this.actor.add_style_class_name('menu-removable-button');
       this.actor.connect('enter-event', Lang.bind(this, this._onKeyFocusIn));
       this.actor.connect('leave-event', Lang.bind(this, this._onKeyFocusOut));
       this.actor.connect('key-focus-in', Lang.bind(this, this._onKeyFocusIn));
@@ -411,11 +412,13 @@ DriveMenu.prototype = {
    setActive: function(active) {
       if(active) {
          this.actor.set_style_class_name('menu-application-button-selected');
+         this.actor.add_style_class_name('menu-removable-button-selected');
          this.selectedAppBox.setSelectedText(this.drive.app.get_name(), this.drive.app.get_description().split("\n")[0]);
          this.hover.refreshApp(this.app);
       }
       else {
          this.actor.set_style_class_name('menu-application-button');
+         this.actor.add_style_class_name('menu-removable-button');
          this.selectedAppBox.setSelectedText("", "");
          this.hover.refreshFace();
       }
@@ -1385,9 +1388,11 @@ ButtonChangerBox.prototype = {
         if(this.label.get_parent() == this.actor)
            this.removeActor(this.label);
         this.label.set_style_class_name('menu-selected-app-title');
-        if(this._triangle.get_parent() == this.actor)
-           this.removeActor(this._triangle);
-        this._triangle = new St.Label();
+        
+        let parentT = this._triangle.get_parent();
+        if(parentT == this.actor) this.removeActor(this._triangle);
+        else if(parentT != null) parentT.remove_actor(this._triangle);
+        //this._triangle = new St.Label();
         
         this.icon = new St.Icon({
             style_class: 'popup-menu-icon',
@@ -1490,8 +1495,7 @@ PowerBox.prototype = {
       this.selectedAppBox = selectedAppBox;
       this.hover = hover;
       this.powerSelected = 0;
-
-      this.actor = new St.BoxLayout({ style_class: 'menu-favorites-box' });
+      this.actor = new St.BoxLayout();
       //this.actor.style = "padding-left: "+(10)+"px;padding-right: "+(10)+"px;margin:auto;";
       this._powerButtons = new Array();
       this.actor.connect('key-focus-in', Lang.bind(this, function(actor, event) {        
@@ -1631,8 +1635,10 @@ PowerBox.prototype = {
    },
 
    setSpecialColor: function(specialColor) {
-      if(specialColor)
+      if(specialColor) {
          this.actor.set_style_class_name('menu-favorites-box');
+         this.actor.add_style_class_name('menu-system-box');
+      }
       else
          this.actor.set_style_class_name('');
    },
@@ -7860,8 +7866,9 @@ MyApplet.prototype = {
       this.mainBox.add(this.accessibleBox.actor, { y_fill: true });
       this.favoritesBox.style_class = '';
       this.rightPane.style_class = 'menu-favorites-box';
-      this.favBoxWrapper.add_style_class_name('menu-operative-windows-box');
-      this.controlSearchBox.style_class = 'menu-top-mint-box';
+      this.rightPane.add_style_class_name('menu-swap-windows-box');
+      this.favBoxWrapper.style_class = 'menu-operative-windows-box';
+      this.controlSearchBox.style_class = 'menu-top-windows-box';
       this.endHorizontalBox.style_class = 'menu-bottom-windows-box';
    },
 
@@ -8059,8 +8066,14 @@ MyApplet.prototype = {
       global.stage.set_key_focus(this.searchEntry);
       let operPanelVisible = false;
       let titleAppBar = _("All Applications");
-      if(titleAppBar == selected)
+      if(titleAppBar == selected) {
+         this.accessibleBox.takeHover(true);
          operPanelVisible = true;
+      }
+      else {
+         this.accessibleBox.takeHover(false);
+         this.controlSearchBox.add_actor(this.hover.container);
+      }
       this._clearView();
       this.powerBox.actor.visible = operPanelVisible;
       this.hover.actor.visible = operPanelVisible;
