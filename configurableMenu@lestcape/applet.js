@@ -453,7 +453,10 @@ DriveMenuItems.prototype = {
       this.container = new St.BoxLayout({ vertical: false });
 
       this.icon = this.place.iconFactory(this.iconSize);
-      this.container.add(this.icon, { x_align: St.Align.START, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      if(this.icon) { 
+         this.container.add(this.icon, { x_align: St.Align.START, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+         this.icon.realize();
+      }
 
       this.label = new St.Label({ style_class: 'menu-application-button-label', text: place.name });
       this.container.add(this.label, { x_align: St.Align.START, y_align: St.Align.MIDDLE, x_fill: true, y_fill: false, expand: true });
@@ -465,6 +468,7 @@ DriveMenuItems.prototype = {
       this.ejectButton.connect('leave-event', Lang.bind(this, this._ejectLeaveEvent));
       this.addActor(this.container);
       this.setIconVisible(iconVisible);
+      this.label.realize();
       this.actor._delegate = this;
 
    },
@@ -492,7 +496,8 @@ DriveMenuItems.prototype = {
    },
 
    setIconVisible: function(iconVisible) {
-      this.icon.visible = iconVisible;
+      if(this.icon)
+         this.icon.visible = iconVisible;
    },
 
    _eject: function() {
@@ -1394,16 +1399,13 @@ ButtonChangerBox.prototype = {
         else if(parentT != null) parentT.remove_actor(this._triangle);
         //this._triangle = new St.Label();
         
-        this.icon = new St.Icon({
-            style_class: 'popup-menu-icon',
-            icon_type: St.IconType.FULLCOLOR,
-            icon_name: icon,
-            icon_size: iconSize
-        });
-        this.icon.realize();
+        this.icon = new St.Icon({ style_class: 'popup-menu-icon', icon_type: St.IconType.FULLCOLOR, icon_name: icon, icon_size: iconSize });
         this.label.realize();
 	this.box.add(this.label, {x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE });
-	this.box.add(this.icon, {x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE });
+        if(this.icon) {
+	   this.box.add(this.icon, {x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE });
+           this.icon.realize();
+        }
         this.addActor(this.box);
         this.box.connect('enter-event', Lang.bind(this, function() {
            this.setActive(true);
@@ -1414,7 +1416,8 @@ ButtonChangerBox.prototype = {
     },
 
     setIconSize: function(iconSize) {
-       this.icon.set_icon_size(iconSize);
+      if(this.icon)
+         this.icon.set_icon_size(iconSize);
     },
 
     setTextVisible: function(visible) {
@@ -1907,10 +1910,11 @@ ControlButtonExtended.prototype = {
       
       this.container = new St.BoxLayout();
       this.iconObj = new St.Icon({icon_name: this.iconName, icon_type: St.IconType.SYMBOLIC, style_class: 'popup-menu-icon', icon_size: this.iconSize});
-      this.container.add(this.iconObj, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-
+      if(this.iconObj) {
+         this.container.add(this.iconObj, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+         this.iconObj.realize();
+      }
       this.addActor(this.container);
-      this.iconObj.realize();
    },
 
    setActive: function(active) {
@@ -2832,31 +2836,41 @@ HoverIcon.prototype = {
 
    refresh: function (icon) {
       this._removeIcon();
-      this.addActor(this.icon, 0);
-      this.icon.set_icon_name(icon);
+      if(this.icon) {
+         this.addActor(this.icon, 0);
+         this.icon.set_icon_name(icon);
+      }
    },
 
    refreshApp: function (app) {
       this._removeIcon();
       this.lastApp = app.create_icon_texture(this.iconSize);
-      this.addActor(this.lastApp, 0);
+      if(this.lastApp) {
+         this.addActor(this.lastApp, 0);
+      }
    },
 
    refreshPlace: function (place) {
       this._removeIcon();
       this.lastApp = place.iconFactory(this.iconSize);
-      this.addActor(this.lastApp, 0);
+      if(this.lastApp) {
+         this.addActor(this.lastApp, 0);
+      }
    },
 
    refreshFile: function (file) {
       this._removeIcon();
       this.lastApp = file.createIcon(this.iconSize);
-      this.addActor(this.lastApp, 0);
+      if(this.lastApp) {
+         this.addActor(this.lastApp, 0);
+      }
    },
 
    refreshFace: function () {
       this._removeIcon();
-      this.addActor(this._userIcon, 0);
+      if(this._userIcon) {
+         this.addActor(this._userIcon, 0);
+      }
    },
 
    _removeIcon: function () {
@@ -2865,9 +2879,9 @@ HoverIcon.prototype = {
          this.lastApp.destroy();
          this.lastApp = null;
       }
-      if(this.icon.get_parent() == this.actor)
+      if((this.icon)&&(this.icon.get_parent() == this.actor))
          this.removeActor(this.icon);
-      if(this._userIcon.get_parent() == this.actor)
+      if((this._userIcon)&&(this._userIcon.get_parent() == this.actor))
          this.removeActor(this._userIcon);
    }
 };
@@ -3572,10 +3586,13 @@ TransientButtonExtended.prototype = {
       this.setVertical(vertical);
 
       this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-      this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      if(this.icon) {
+         this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+         this.icon.realize();
+      }
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
       this.addActor(this.container);
-      this.icon.realize();
+
       this.labelName.realize();
       this.labelDesc.realize();
       this.isDraggableApp = false;
@@ -3801,7 +3818,10 @@ SystemPopupButtom.prototype = {
       
       this.container = new St.BoxLayout();
       this.iconObj = new St.Icon({icon_name: icon, icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR });
-      this.container.add(this.iconObj, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      if(this.iconObj) {
+         this.container.add(this.iconObj, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+         this.iconObj.realize();
+      }
 
       this.label = new St.Label({ text: this.title, style_class: 'menu-application-button-label' });
       this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
@@ -3815,11 +3835,13 @@ SystemPopupButtom.prototype = {
 
       this.addActor(this.container);
       this.label.realize();
-      this.iconObj.realize();
+
    },
 
    setIconVisible: function(haveIcon) {
-      this.iconObj.visible = haveIcon;
+      if(this.iconObj) {
+         this.iconObj.visible = haveIcon;
+      }
    },
 
    setTextVisible: function(haveText) {
@@ -3832,7 +3854,7 @@ SystemPopupButtom.prototype = {
 
    setIconSize: function(iconSize) {
       this.iconSize = iconSize;
-      if(this.icon) {
+      if((this.icon)&&(this.iconObj)) {
          this.iconObj.set_icon_size(this.iconSize);
          this.iconObj.realize();
       }
@@ -3867,10 +3889,13 @@ ApplicationButtonExtended.prototype = {
       this.setTextMaxWidth(appWidth);
       this.setAppDescriptionVisible(appDesc);
       this.setVertical(vertical);
-      this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      if(this.icon) {
+         this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+         this.icon.realize();
+      }
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
       this.addActor(this.container);
-      this.icon.realize();
+
       this.labelName.realize();
       this.labelDesc.realize();
 
@@ -4002,11 +4027,13 @@ PlaceButtonAccessibleExtended.prototype = {
       this.icon = this.place.iconFactory(this.iconSize);
       if(!this.icon)
          this.icon = new St.Icon({icon_name: "folder", icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR});
-      if(this.icon)
+      if(this.icon) {
          this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+         this.icon.realize();
+      }
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
       this.addActor(this.container);
-      this.icon.realize();
+
       this.labelName.realize();
       this.labelDesc.realize();
 
@@ -4287,11 +4314,13 @@ RecentButtonExtended.prototype = {
       this.setVertical(vertical);
 
       this.icon = file.createIcon(this.iconSize);
-      this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      if(this.icon) {
+         this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+         this.icon.realize();
+      }
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-
       this.addActor(this.container);
-      this.icon.realize();
+
       this.labelName.realize();
       this.labelDesc.realize();
    },
@@ -4462,7 +4491,10 @@ FavoritesButtonExtended.prototype = {
       
       if(this.allowName) {
          this.container.set_width(maxWidth);
-         this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+         if(this.icon) {
+            this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+            this.icon.realize();
+         }
          this.nameEntry = new St.Entry({ name: 'menu-name-entry', hint_text: _("Type the new name..."), track_hover: true, can_focus: true });
          if((this.alterName)&&(this.alterName != ""))
             this.labelName = new St.Label({ text: this.alterName, style_class: 'menu-application-button-label' });
@@ -4479,10 +4511,12 @@ FavoritesButtonExtended.prototype = {
          this.setVertical(vertical);
          this.labelName.realize();
          this.labelDesc.realize();
-      } else
+      } else if(this.icon) {
          this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+         this.icon.realize();
+      }
       this.addActor(this.container);
-      this.icon.realize();
+
       this._draggable = DND.makeDraggable(this.actor);
       this._draggable.connect('drag-end', Lang.bind(this, this._onDragEnd));  
       this.isDraggableApp = true;
@@ -4658,8 +4692,10 @@ CategoryButtonExtended.prototype = {
       this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       if(category && this.icon_name) {
          this.icon = St.TextureCache.get_default().load_gicon(null, icon, this.iconSize);
-         this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-         this.icon.realize();
+         if(this.icon) {
+            this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+            this.icon.realize();
+         }
       }
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
 
@@ -4715,7 +4751,10 @@ PlaceCategoryButtonExtended.prototype = {
 
       this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       this.icon = new St.Icon({icon_name: "folder", icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR});
-      this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      if(this.icon) {
+         this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+         this.icon.realize();
+      }
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
 
       this.addActor(this.container);
@@ -4771,11 +4810,14 @@ RecentCategoryButtonExtended.prototype = {
 
       this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       this.icon = new St.Icon({icon_name: "folder-recent", icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR});
-      this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      if(this.icon) {
+         this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+         this.icon.realize();
+      }
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
 
       this.addActor(this.container);
-      this.icon.realize();
+
       this.label.realize();
       this.setIconVisible(iconVisible);
    },
