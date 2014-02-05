@@ -1559,7 +1559,7 @@ PowerBox.prototype = {
    setTheme: function(theme) {
       this.theme = theme;
       this._removeButtons();
-      switch(theme) {
+      switch(this.theme) {
          case "vertical":
             this.actor.set_vertical(true);
             this._setVerticalButtons(true);
@@ -1661,8 +1661,10 @@ PowerBox.prototype = {
    _insertNormalButtons: function(aling) {
       if((this.theme != "horizontal")&&(this.theme != "horizontal-list")&&(this.theme != "horizontal-grid")&&(this.theme != "horizontal-text"))
          this.actor.add_actor(this.spacerPower.actor);
-      for(let i = 0; i < this._powerButtons.length; i++)
-            this.actor.add(this._powerButtons[i].actor, { x_fill: true, x_align: aling, expand: true });
+      for(let i = 0; i < this._powerButtons.length; i++) {
+         this.actor.add(this._powerButtons[i].actor, { x_fill: true, x_align: aling, expand: true });
+         this._powerButtons[i].setTheme(this.theme);
+      }
    },
 
   _insertRetractableButtons: function(aling) {
@@ -1680,6 +1682,9 @@ PowerBox.prototype = {
       this.actor.add(this.spacer, { x_fill: false, x_align: aling, y_align: aling, expand: true });
       this._powerButtons[0].actor.visible = false;
       this._powerButtons[1].actor.visible = false;
+      this._powerButtons[0].setTheme(this.theme);
+      this._powerButtons[1].setTheme(this.theme);
+      this._powerButtons[2].setTheme(this.theme);
       Mainloop.idle_add(Lang.bind(this, function() {
          this._adjustSize(this._powerButtons[2].actor);
          this._adjustSize(this._powerButtons[1].actor);
@@ -3715,12 +3720,18 @@ SystemButton.prototype = {
       this.hoverIcon = hoverIcon;
       this.actor = new St.BoxLayout({ style_class:'menu-category-button', reactive: true, track_hover: true });
       this.popupButton = new SystemPopupButtom(parent, parentScroll, icon, title, description, iconSize, haveText);
-      this.popupButton.actor.style = "padding-top: "+(0)+"px;padding-bottom: "+(0)+"px;padding-left: "+(0)+"px;padding-right: "+(0)+"px;margin:auto;";
+      //this.popupButton.actor.style = "padding-top: "+(0)+"px;padding-bottom: "+(0)+"px;padding-left: "+(0)+"px;padding-right: "+(0)+"px;margin:auto;";
       this.actor.add(this.popupButton.actor, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
    },
 
    setIconVisible: function(haveIcon) {
       this.popupButton.setIconVisible(haveIcon);
+   },
+
+   setTheme: function(theme) {
+      this.theme = theme;
+      this.actor.set_style_class_name('menu-category-button');
+      this.actor.add_style_class_name('menu-system-button-' + this.theme);
    },
 
    setTextVisible: function(haveText) {
@@ -3757,11 +3768,15 @@ SystemButton.prototype = {
       this.active = active;
       if(this.active) {
          this.actor.set_style_class_name('menu-category-button-selected');
+         if(this.theme)
+            this.actor.add_style_class_name('menu-system-button-' + this.theme + '-selected');
          this.hoverIcon.refresh(this.popupButton.icon);
          this.actor.add_style_pseudo_class('active');
       }
       else {
          this.actor.set_style_class_name('menu-category-button');
+         if(this.theme)
+            this.actor.add_style_class_name('menu-system-button-' + this.theme);
          this.hoverIcon.refreshFace();
          this.actor.remove_style_pseudo_class('active');
       }
@@ -3777,6 +3792,7 @@ SystemPopupButtom.prototype = {
 
    _init: function(parent, parentScroll, icon, title, description, iconSize, haveText) {
       GenericApplicationButtonExtended.prototype._init.call(this, parent, parentScroll);
+      this.actor.set_style_class_name('');
       this.iconSize = iconSize;
       this.icon = icon;
       this.title = title;
@@ -7564,7 +7580,7 @@ MyApplet.prototype = {
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.controlBox.set_style('padding-left: 20px;');
       this.searchBox.set_style('padding-left: 0px; padding-top: 10px;');
-      this.operativePanel.add_style_class_name('menu-operative-box');
+      this.operativePanel.set_style_class_name('menu-operative-box');
       this.controlSearchBox.style_class = 'menu-top-box';
       this.endHorizontalBox.style_class = 'menu-bottom-box';
    },
@@ -7591,7 +7607,7 @@ MyApplet.prototype = {
       this.endVerticalBox.add_actor(this.spacerApp.actor, { x_fill: true, y_fill: true, expand: true });
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
-      this.operativePanel.add_style_class_name('menu-operative-box');
+      this.operativePanel.set_style_class_name('menu-operative-box');
       this.controlSearchBox.style_class = 'menu-top-box';
       this.endHorizontalBox.style_class = 'menu-bottom-box';
    },
@@ -7617,7 +7633,7 @@ MyApplet.prototype = {
       this.endVerticalBox.add_actor(this.spacerApp.actor);
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
-      this.operativePanel.add_style_class_name('menu-operative-box');
+      this.operativePanel.set_style_class_name('menu-operative-box');
       this.controlSearchBox.style_class = 'menu-top-box';
       this.endHorizontalBox.style_class = 'menu-bottom-box';
    },
@@ -7645,7 +7661,7 @@ MyApplet.prototype = {
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.controlBox.set_style('padding-left: 20px;');
       this.searchBox.set_style('padding-left: 0px; padding-top: 10px;');
-      this.operativePanel.add_style_class_name('menu-operative-box');
+      this.operativePanel.set_style_class_name('menu-operative-box');
       this.controlSearchBox.style_class = 'menu-top-box';
       this.endHorizontalBox.style_class = 'menu-bottom-box';
    },
@@ -7676,7 +7692,7 @@ MyApplet.prototype = {
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.searchBox.set_style('');
-      this.operativePanel.add_style_class_name('menu-operative-box');
+      this.operativePanel.set_style_class_name('menu-operative-box');
       this.controlSearchBox.style_class = 'menu-top-box';
       this.endHorizontalBox.style_class = 'menu-bottom-box';
    },
@@ -7706,7 +7722,7 @@ MyApplet.prototype = {
       this.endVerticalBox.add_actor(this.spacerApp.actor);
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
-      this.operativePanel.add_style_class_name('menu-operative-box');
+      this.operativePanel.set_style_class_name('menu-operative-box');
       this.controlSearchBox.style_class = 'menu-top-box';
       this.endHorizontalBox.style_class = 'menu-bottom-box';
    },
@@ -7740,7 +7756,7 @@ MyApplet.prototype = {
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.favoritesBox.style_class = '';
       this.favBoxWrapper.style_class = 'menu-favorites-box';
-      this.operativePanel.add_style_class_name('menu-operative-box');
+      this.operativePanel.set_style_class_name('menu-operative-box');
       this.controlSearchBox.style_class = 'menu-top-box';
       this.endHorizontalBox.style_class = 'menu-bottom-box';
    },
@@ -7767,7 +7783,7 @@ MyApplet.prototype = {
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.searchBox.set_style('');
-      this.operativePanel.add_style_class_name('menu-operative-box');
+      this.operativePanel.set_style_class_name('menu-operative-box');
       this.controlSearchBox.style_class = 'menu-top-box';
       this.endHorizontalBox.style_class = 'menu-bottom-box';
    },
@@ -7793,7 +7809,7 @@ MyApplet.prototype = {
       this.endVerticalBox.add_actor(this.spacerApp.actor);
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
-      this.operativePanel.add_style_class_name('menu-operative-box');
+      this.operativePanel.set_style_class_name('menu-operative-box');
       this.controlSearchBox.style_class = 'menu-top-box';
       this.endHorizontalBox.style_class = 'menu-bottom-box';
    },
@@ -7831,7 +7847,7 @@ MyApplet.prototype = {
       this.panelAppsName.visible = true;
       this.favoritesBox.style_class = '';
       this.favBoxWrapper.style_class = 'menu-favorites-box';
-      this.favBoxWrapper.add_style_class_name('menu-operative-mint-box');
+      this.favBoxWrapper.set_style_class_name('menu-operative-mint-box');
       this.selectedAppBox.actor.set_style('padding-right: 0px; padding-left: 4px; text-align: right');
       this.controlSearchBox.style_class = 'menu-top-mint-box';
       this.endHorizontalBox.style_class = 'menu-bottom-mint-box';
@@ -7866,7 +7882,7 @@ MyApplet.prototype = {
       this.mainBox.add(this.accessibleBox.actor, { y_fill: true });
       this.favoritesBox.style_class = '';
       this.rightPane.style_class = 'menu-favorites-box';
-      this.rightPane.add_style_class_name('menu-swap-windows-box');
+      this.rightPane.set_style_class_name('menu-swap-windows-box');
       this.favBoxWrapper.style_class = 'menu-operative-windows-box';
       this.controlSearchBox.style_class = 'menu-top-windows-box';
       this.endHorizontalBox.style_class = 'menu-bottom-windows-box';
