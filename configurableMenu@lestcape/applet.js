@@ -788,16 +788,16 @@ GnoMenuBox.prototype = {
       if((take)&&(this.powerBox.get_children().indexOf(this.powerPanel.actor) == -1)) {
          switch(this.parent.styleGnoMenuPanel.style_class) {
             case 'menu-gno-operative-box-left':
-                   this.powerBox.set_style_class_name('menu-gno-power-left');
+                   this.powerBox.set_style_class_name('menu-gno-system-left');
                    break;
             case 'menu-gno-operative-box-right':
-                   this.powerBox.set_style_class_name('menu-gno-power-right');
+                   this.powerBox.set_style_class_name('menu-gno-system-right');
                    break;
             case 'menu-gno-operative-box-top':
-                   this.powerBox.set_style_class_name('menu-gno-power-top');
+                   this.powerBox.set_style_class_name('menu-gno-system-top');
                    break;
             case 'menu-gno-operative-box-bottom':
-                   this.powerBox.set_style_class_name('menu-gno-power-bottom');
+                   this.powerBox.set_style_class_name('menu-gno-system-bottom');
                    break;
          }
          if(this.powerBox.get_vertical())
@@ -7924,7 +7924,7 @@ MyApplet.prototype = {
       this.mainBox.add(this.accessibleBox.actor, { y_fill: true });
       this.favoritesBox.style_class = '';
       this.rightPane.style_class = 'menu-favorites-box';
-      this.rightPane.set_style_class_name('menu-swap-windows-box');
+      this.rightPane.add_style_class_name('menu-swap-windows-box');
       this.favBoxWrapper.style_class = 'menu-operative-windows-box';
       this.controlSearchBox.style_class = 'menu-top-windows-box';
       this.endHorizontalBox.style_class = 'menu-bottom-windows-box';
