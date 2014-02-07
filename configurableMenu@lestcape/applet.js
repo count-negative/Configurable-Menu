@@ -6232,6 +6232,8 @@ MyApplet.prototype = {
             }
          }
       }
+      this._selectedItemIndex = index;
+      return item_actor;
    },
 
    _navegateFavBox: function(symbol, actor) {
