@@ -17,6 +17,10 @@
         -remove-separator: 1px;
 }
 
+.menu-separator-center-gnomenuTop {
+        -remove-separator: 1px;
+}
+
 .menu-control-button {
         border: 1px;
         border-color: rgba(255,255,255,0);

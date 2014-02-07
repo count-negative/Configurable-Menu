@@ -4680,6 +4680,7 @@ CategoryButtonExtended.prototype = {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
       this.iconSize = iconSize;
       this.actor.set_style_class_name('menu-category-button');
+      this.actor.add_style_class_name('menu-category-button-' + this.theme);
       var label;
       let icon = null;
       if(category) {
@@ -4752,6 +4753,7 @@ PlaceCategoryButtonExtended.prototype = {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
       this.iconSize = iconSize;
       this.actor.set_style_class_name('menu-category-button');
+      this.actor.add_style_class_name('menu-category-button-' + this.theme);
       this.actor._delegate = this;
       this.label = new St.Label({ text: _("Places"), style_class: 'menu-category-button-label' });
       this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
@@ -4811,6 +4813,7 @@ RecentCategoryButtonExtended.prototype = {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
       this.iconSize = iconSize;
       this.actor.set_style_class_name('menu-category-button');
+      this.actor.add_style_class_name('menu-category-button-' + this.theme);
       this.actor._delegate = this;
       this.label = new St.Label({ text: _("Recent Files"), style_class: 'menu-category-button-label' });
       this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
@@ -6231,9 +6234,9 @@ MyApplet.prototype = {
                index = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
             }
          }
+         this._selectedItemIndex = index;
+         return item_actor;
       }
-      this._selectedItemIndex = index;
-      return item_actor;
    },
 
    _navegateFavBox: function(symbol, actor) {
@@ -6335,17 +6338,28 @@ MyApplet.prototype = {
    },
 
    _gnoMenuNavegationKey: function() {
-      if(this.gnoMenuBox.actor.get_vertical()) {
+      switch(this.styleGnoMenuPanel.style_class) {
+            case 'menu-gno-operative-box-left':
+                   return Clutter.KEY_Right;
+            case 'menu-gno-operative-box-right':
+                   return Clutter.KEY_Left;
+            case 'menu-gno-operative-box-top':
+                   return Clutter.KEY_Down;
+            case 'menu-gno-operative-box-bottom':
+                   return Clutter.KEY_Up;
+      }
+      return Clutter.KEY_Up;
+/*      if(this.gnoMenuBox.actor.get_vertical()) {
           if(this.gnoMenuBox.actor.get_parent().get_children().indexOf(this.gnoMenuBox.actor) == 0)
-             return Clutter.KEY_Right;
-          else
              return Clutter.KEY_Left;
+          else
+             return Clutter.KEY_Right;
       } else {
           if(this.gnoMenuBox.actor.get_parent().get_children().indexOf(this.gnoMenuBox.actor) == 0)
              return Clutter.KEY_Down;
           else
              return Clutter.KEY_Up;
-      }
+      }*/
    },
 
    _gnoMenuNavegationInvertedKey: function() {
@@ -7512,7 +7526,7 @@ MyApplet.prototype = {
          this.categoriesBox = new St.BoxLayout({ style_class: 'menu-categories-box', vertical: true });
          this.categoriesBox.add_style_class_name('menu-categories-box-' + this.theme);
          this.applicationsBox = new St.BoxLayout({ style_class: 'menu-applications-box', vertical: false });
-         this.applicationsBox.add_style_class_name('menu-applications-box' + this.theme);
+         this.applicationsBox.add_style_class_name('menu-applications-box-' + this.theme);
          this.favBoxWrapper = new St.BoxLayout({ vertical: true });
          this.favoritesBox = new St.BoxLayout({ style_class: 'menu-favorites-box', vertical: true });
          this.favoritesBox.add_style_class_name('menu-favorites-box-' + this.theme);
@@ -8213,7 +8227,8 @@ MyApplet.prototype = {
        }
        for(let i = 0; i < this._categoryButtons.length; i++){
           let actor = this._categoryButtons[i].actor;
-          actor.style_class = "menu-category-button";
+          actor.set_style_class_name('menu-category-button');
+          actor.add_style_class_name('menu-category-button-' + this.theme);
           actor.show();
        }
     },
@@ -8223,9 +8238,11 @@ MyApplet.prototype = {
           for(let i = 0; i < this._categoryButtons.length; i++) {
              let button = this._categoryButtons[i].actor;
              if(active) {
-                button.set_style_class_name("menu-category-button");
+                button.set_style_class_name('menu-category-button');
+                button.add_style_class_name('menu-category-button-' + this.theme);
              } else {
-                button.set_style_class_name("menu-category-button-greyed");
+                button.set_style_class_name('menu-category-button-greyed');
+                button.add_style_class_name('menu-category-button-greyed-' + this.theme);
              }
           }
        } catch (e) {
@@ -8235,7 +8252,8 @@ MyApplet.prototype = {
 
    _clearPrevCatSelection: function(actor) {
       if(this._previousTreeSelectedActor && this._previousTreeSelectedActor != actor) {
-         this._previousTreeSelectedActor.style_class = "menu-category-button";
+         this._previousTreeSelectedActor.set_style_class_name('menu-category-button');
+         this._previousTreeSelectedActor.add_style_class_name('menu-category-button-' + this.theme);
          if(this._previousTreeSelectedActor._delegate) {
             this._previousTreeSelectedActor._delegate.emit('leave-event');
          }
@@ -8246,7 +8264,8 @@ MyApplet.prototype = {
          }
       } else {
          for(let i = 0; i < this._categoryButtons.length; i++) {
-            this._categoryButtons[i].actor.style_class = "menu-category-button";
+            this._categoryButtons[i].actor.set_style_class_name('menu-category-button');
+            this._categoryButtons[i].actor.add_style_class_name('menu-category-button-' + this.theme);
          }
       }
    },
@@ -8500,16 +8519,19 @@ MyApplet.prototype = {
                   time: this.hover_delay, onComplete: function () {
                      if(this._allAppsCategoryButton.isHovered) {
                         this._clearPrevCatSelection(this._allAppsCategoryButton.actor);
-                        this._allAppsCategoryButton.actor.style_class = "menu-category-button-selected";
+                        this._allAppsCategoryButton.actor.set_style_class_name('menu-category-button-selected');
+                        this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
                         this._select_category(null, this._allAppsCategoryButton);
                      } else {
-                        this._allAppsCategoryButton.actor.style_class = "menu-category-button";
+                        this._allAppsCategoryButton.actor.set_style_class_name('menu-category-button-selected');
+                        this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
                      }
                   }
                });
             } else {
                this._clearPrevCatSelection(this._allAppsCategoryButton.actor);
-               this._allAppsCategoryButton.actor.style_class = "menu-category-button-selected";
+               this._allAppsCategoryButton.actor.set_style_class_name('menu-category-button-selected');
+               this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
                this._select_category(null, this._allAppsCategoryButton);
             }
             this.makeVectorBox(this._allAppsCategoryButton.actor);
@@ -8545,16 +8567,19 @@ MyApplet.prototype = {
                               time: this.hover_delay, onComplete: function () {
                                  if(categoryButton.isHovered) {
                                     this._clearPrevCatSelection(categoryButton.actor);
-                                    categoryButton.actor.style_class = "menu-category-button-selected";
+                                    categoryButton.actor.set_style_class_name('menu-category-button-selected');
+                                    categoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
                                     this._select_category(dir, categoryButton);
                                  } else {
-                                    categoryButton.actor.style_class = "menu-category-button";
+                                    categoryButton.actor.set_style_class_name('menu-category-button');
+                                    categoryButton.actor.add_style_class_name('menu-category-button-' + this.theme);
                                  }
                               }
                            });
                         } else {
                            this._clearPrevCatSelection(categoryButton.actor);
-                           categoryButton.actor.style_class = "menu-category-button-selected";
+                           categoryButton.actor.set_style_class_name('menu-category-button-selected');
+                           categoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
                            this._select_category(dir, categoryButton);
                         }
                         this.makeVectorBox(categoryButton.actor);
@@ -8597,7 +8622,8 @@ MyApplet.prototype = {
          //Main.notify("Fueron:" + viewBox.get_children().length);
 
          this._clearPrevCatSelection(this._allAppsCategoryButton.actor);
-         this._allAppsCategoryButton.actor.style_class = "menu-category-button-selected";
+         this._allAppsCategoryButton.actor.set_style_class_name('menu-category-button-selected');
+         this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
          this._select_category(null, this._allAppsCategoryButton);
       } catch(e) {Main.notify("errr", e.message);}
      // }));
@@ -8645,14 +8671,16 @@ MyApplet.prototype = {
                      time: this.hover_delay, onComplete: function () {
                         if(this.placesButton.isHovered) {
                            this._clearPrevCatSelection(this.placesButton.actor);
-                           this.placesButton.actor.style_class = "menu-category-button-selected";
+                           this.placesButton.actor.set_style_class_name('menu-category-button-selected');
+                           this.placesButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
                            this._displayButtons(null, -1);
                         }
                      }
                   });
                } else {
                   this._clearPrevCatSelection(this.placesButton.actor);
-                  this.placesButton.actor.style_class = "menu-category-button-selected";
+                  this.placesButton.actor.set_style_class_name('menu-category-button-selected');
+                  this.placesButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
                   this._displayButtons(null, -1);
                }
                this.makeVectorBox(this.placesButton.actor);
@@ -8713,14 +8741,16 @@ MyApplet.prototype = {
                      time: this.hover_delay, onComplete: function () {
                         if(this.recentButton.isHovered) {
                            this._clearPrevCatSelection(this.recentButton.actor);
-                           this.recentButton.actor.style_class = "menu-category-button-selected";
+                           this.recentButton.actor.set_style_class_name('menu-category-button-selected');
+                           this.recentButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
                            this._displayButtons(null, null, -1);
                         }
                      }
                   });
                } else {
                   this._clearPrevCatSelection(this.recentButton.actor);
-                  this.recentButton.actor.style_class = "menu-category-button-selected";
+                  this.recentButton.actor.set_style_class_name('menu-category-button-selected');
+                  this.recentButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
                   this._displayButtons(null, null, -1);
                }
                this.makeVectorBox(this.recentButton.actor);
@@ -8817,7 +8847,8 @@ MyApplet.prototype = {
             }
             if(this._previousTreeSelectedActor && this._activeContainer !== this.categoriesBox &&
                parent !== this._activeContainer && button !== this._previousTreeSelectedActor) {
-               this._previousTreeSelectedActor.style_class = "menu-category-button";
+               this._previousTreeSelectedActor.set_style_class_name('menu-category-button');
+               this._previousTreeSelectedActor.add_style_class_name('menu-category-button-' + this.theme);
             }
             if((parent)&&(parent != this._activeContainer)) {
                 parent._vis_iter.reloadVisible();
@@ -8925,7 +8956,8 @@ MyApplet.prototype = {
          this._activeContainer = null;
          this._activeActor = null;
          this._initialDisplay();
-         this._allAppsCategoryButton.actor.style_class = "menu-category-button-selected";
+         this._allAppsCategoryButton.actor.set_style_class_name('menu-category-selected');
+         this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
          this.selectedAppBox.setDateTimeVisible(this.showTimeDate);
       }
       else {
