@@ -5,6 +5,18 @@
         padding-bottom: 0px;
 }
 
+.menu-separator-top-gnomenuBottom {
+        -remove-separator: 1px;
+}
+
+.menu-separator-bottom-gnomenuBottom {
+        -remove-separator: 1px;
+}
+
+.menu-separator-center-gnomenuBottom {
+        -remove-separator: 1px;
+}
+
 .menu-control-button {
         border: 1px;
         border-color: rgba(255,255,255,0);
@@ -25,11 +37,16 @@
         border-color: rgba(255,255,255,1);
 }
 
-.menu-eject-button{
+.menu-eject-button {
         padding-top: 2px;
         padding-left: 4px;
         padding-right: 4px;
         padding-bottom: 2px;
+}
+
+.menu-accessible-panel {
+        padding-left: 10px;
+        padding-right: 10px;
 }
 
 #menu-name-entry {
