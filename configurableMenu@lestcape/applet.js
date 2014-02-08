@@ -7524,6 +7524,8 @@ MyApplet.prototype = {
          this.categoriesApplicationsBox = new CategoriesApplicationsBoxExtended();
 
          this.categoriesBox = new St.BoxLayout({ style_class: 'menu-categories-box', vertical: true });
+         this.categoriesSpaceUp = new St.BoxLayout({ style_class: 'menu-categories-space-' + this.theme });
+         this.categoriesSpaceDown = new St.BoxLayout({ style_class: 'menu-categories-space-' + this.theme });
          this.categoriesBox.add_style_class_name('menu-categories-box-' + this.theme);
          this.applicationsBox = new St.BoxLayout({ style_class: 'menu-applications-box', vertical: false });
          this.applicationsBox.add_style_class_name('menu-applications-box-' + this.theme);
@@ -7543,6 +7545,7 @@ MyApplet.prototype = {
 
          this.betterPanel = new St.BoxLayout({ vertical: false });
          this.operativePanel = new St.BoxLayout({ vertical: false });
+         this.operativePanelExpanded = new St.BoxLayout({ vertical: true});
          this.categoriesWrapper = new St.BoxLayout({ vertical: true });
          this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
 
@@ -7677,12 +7680,13 @@ MyApplet.prototype = {
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
+      this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "vertical", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.favBoxWrapper.add(this.powerBox.actor, { y_align: St.Align.END, y_fill: false, expand: false });
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.END, y_fill: true, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.rightPane.add_actor(this.spacerTop.actor);
-      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
+      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
@@ -7702,6 +7706,7 @@ MyApplet.prototype = {
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
+      this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.selectedAppBox.setAlign(St.Align.START);
       this.endHorizontalBox.add(this.hover.container, { x_fill: false, x_align: St.Align.END, expand: false });
@@ -7710,7 +7715,7 @@ MyApplet.prototype = {
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.rightPane.add_actor(this.spacerTop.actor);
-      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
+      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endVerticalBox.add_actor(this.spacerBottom.actor, { x_fill: true, y_fill: true, expand: true });
@@ -7727,6 +7732,7 @@ MyApplet.prototype = {
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
+      this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.favBoxWrapper.add(this.powerBox.actor, { y_align: St.Align.END, y_fill: false, expand: false });
       this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
@@ -7734,7 +7740,7 @@ MyApplet.prototype = {
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.rightPane.add_actor(this.spacerTop.actor);
-      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
+      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endVerticalBox.add_actor(this.spacerBottom.actor);
@@ -7752,10 +7758,11 @@ MyApplet.prototype = {
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
+      this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.standardBox.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.rightPane.add_actor(this.spacerTop.actor);
-      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
+      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
@@ -7770,21 +7777,24 @@ MyApplet.prototype = {
    },
 
    loadDragon: function() {
+      this.operativePanel.set_vertical(true);
+      this.categoriesBox.set_vertical(false);
+      this.categoriesWrapper.set_vertical(false);
       this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: true });
       this.controlSearchBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
-      this.operativePanel.set_vertical(true);
       this.operativePanel.add(this.spacerMiddle.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
-      this.categoriesBox.set_vertical(false);
-      this.categoriesWrapper.set_vertical(false);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, false);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.START, expand: true });
+      this.categoriesWrapper.add(this.categoriesSpaceUp, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: false, y_fill: true, y_align: St.Align.MIDDLE, expand: true});
+      this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.rightPane.add_actor(this.spacerTop.actor);
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.END, y_fill: true, expand: false });
-      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
+      this.betterPanel.add(this.operativePanelExpanded, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.operativePanelExpanded.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endHorizontalBox.add(this.searchBox, { x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
@@ -7795,24 +7805,27 @@ MyApplet.prototype = {
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.searchBox.set_style('');
-      this.operativePanel.set_style_class_name('menu-operative-box');
+      this.operativePanelExpanded.set_style_class_name('menu-operative-box');
    },
 
    loadDragonInverted: function() {
+      this.operativePanel.set_vertical(true);
+      this.categoriesBox.set_vertical(false);
+      this.categoriesWrapper.set_vertical(false);
       this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
       this.controlBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
-      this.operativePanel.set_vertical(true);
       this.operativePanel.add(this.spacerMiddle.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
-      this.categoriesBox.set_vertical(false);
-      this.categoriesWrapper.set_vertical(false);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, false);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.START, expand: true });
+      this.categoriesWrapper.add(this.categoriesSpaceUp, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
+      this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.rightPane.add_actor(this.spacerTop.actor);
-      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
+      this.operativePanelExpanded.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
+      this.betterPanel.add(this.operativePanelExpanded, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.END, y_fill: true, expand: false });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
@@ -7823,12 +7836,11 @@ MyApplet.prototype = {
       this.endVerticalBox.add_actor(this.spacerBottom.actor);
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
-      this.operativePanel.set_style_class_name('menu-operative-box');
+      this.operativePanelExpanded.set_style_class_name('menu-operative-box');
    },
 
    loadHorizontal: function() {
       this.selectedAppBox.setAlign(St.Align.START);
-      this.betterPanel.set_vertical(true);
       this.operativePanel.set_vertical(true);
       this.categoriesBox.set_vertical(false);
       this.categoriesWrapper.set_vertical(false);
@@ -7839,15 +7851,18 @@ MyApplet.prototype = {
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, false);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, false);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: false, x_align: St.Align.MIDDLE, expand: true });
+      this.categoriesWrapper.add(this.categoriesSpaceUp, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: false, y_fill: true, y_align: St.Align.MIDDLE, expand: true});
+      this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.rightPane.add_actor(this.spacerTop.actor);
-      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
+      this.operativePanelExpanded.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
+      this.betterPanel.add(this.operativePanelExpanded, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.operativePanel.add_actor(this.spacerMiddle.actor);
       this.endVerticalBox.add(this.favBoxWrapper, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: true });
       this.endVerticalBox.add(this.spacerBottom.actor);
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: true, y_align: St.Align.END, expand: true });
+      this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.endHorizontalBox.add(this.controlView.actor, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: false });
       this.endHorizontalBox.add(this.searchBox, { x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, expand: true });
@@ -7857,7 +7872,7 @@ MyApplet.prototype = {
       this.favoritesBox.style_class = '';
       this.favBoxWrapper.set_style_class_name('menu-favorites-box');
       this.favBoxWrapper.add_style_class_name('menu-favorites-box-' + this.theme);
-      this.operativePanel.set_style_class_name('menu-operative-box');
+      this.operativePanelExpanded.set_style_class_name('menu-operative-box');
    },
 
    loadAccessible: function() {
@@ -7867,6 +7882,7 @@ MyApplet.prototype = {
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
+      this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.accessibleBox = new AccessibleBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize, this.showRemovable);
       this.accessibleBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
@@ -7892,13 +7908,14 @@ MyApplet.prototype = {
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { y_fill: false, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
+      this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.accessibleBox = new AccessibleBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize, this.showRemovable);
       this.accessibleBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.rightPane.add_actor(this.spacerTop.actor);
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
-      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: false, y_align: St.Align.START, expand: true });
+      this.betterPanel.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.mainBox.add(this.accessibleBox.actor, { y_fill: true });
       this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
@@ -7920,6 +7937,7 @@ MyApplet.prototype = {
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
+      this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.accessibleBox = new AccessibleBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize, this.showRemovable);
       this.accessibleBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
@@ -7956,6 +7974,7 @@ MyApplet.prototype = {
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
+      this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.accessibleBox = new AccessibleBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize, this.showRemovable);
       this.accessibleBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
