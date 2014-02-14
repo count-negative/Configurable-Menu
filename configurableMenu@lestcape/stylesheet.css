@@ -4,7 +4,7 @@
         padding-right: 10px;
         padding-bottom: 0px;
 }
-
+/*
 .menu-separator-top-gnomenuBottom {
         -remove-separator: 1px;
 }
@@ -20,7 +20,7 @@
 .menu-separator-center-gnomenuTop {
         -remove-separator: 1px;
 }
-
+*/
 .menu-control-button {
         border: 1px;
         border-color: rgba(255,255,255,0);
