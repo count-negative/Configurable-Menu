@@ -211,6 +211,7 @@ ScrollItemsBox.prototype = {
    _init: function(parent, panelToScroll, vertical) {
       this.parent = parent;
       this.idSignalAlloc = 0;
+      this._timeOutScroll = 0;
       this.panelToScroll = panelToScroll;
       this.vertical = vertical;
       this.actor = new St.BoxLayout({ vertical: this.vertical });
@@ -296,6 +297,9 @@ ScrollItemsBox.prototype = {
    },
 
    _doHorizontalScroll: function() {
+      if(this._timeOutScroll > 0)
+         Mainloop.source_remove(this._timeOutScroll);
+      this._timeOutScroll = 0;
       if((this.hScrollSignals)&&(this.hScrollSignals[this.hScroll] > 0)) {
          let dMin = 10;
          let dMax = 50;
@@ -309,14 +313,14 @@ ScrollItemsBox.prototype = {
                   speed = 20*speed*(ax - mx)/dMax;
                let val = this.hScroll.get_hscroll_bar().get_adjustment().get_value();
                this.hScroll.get_hscroll_bar().get_adjustment().set_value(val - speed);
-               Mainloop.timeout_add(100, Lang.bind(this, this._doHorizontalScroll));
+               this._timeOutScroll = Mainloop.timeout_add(100, Lang.bind(this, this._doHorizontalScroll));
             }
             else if((mx > ax + aw - dMin)&&(mx < ax + aw + dMax)) {
                if(ax + aw < mx)
                   speed = 20*speed*(mx - ax - aw)/dMax;
                let val = this.hScroll.get_hscroll_bar().get_adjustment().get_value();
                this.hScroll.get_hscroll_bar().get_adjustment().set_value(val + speed);
-               Mainloop.timeout_add(100, Lang.bind(this, this._doHorizontalScroll));
+               this._timeOutScroll = Mainloop.timeout_add(100, Lang.bind(this, this._doHorizontalScroll));
             }
          }
       }
@@ -1293,7 +1297,7 @@ SelectedAppBox.prototype = {
       this.timeFormat = "%H:%M";
       this.appDescriptionSize = 6;
       this.appTitleSize = 15;
-      this.timeout = 0;
+      this.timeOutDateTime = 0;
       this.actor = new St.BoxLayout({ style_class: 'menu-selected-app-box', vertical: true });
       this.appTitle = new St.Label({ style_class: 'menu-selected-app-title', text: "" });
       this.appDescription = new St.Label({ style_class: 'menu-selected-app-description', text: "" });
@@ -1350,12 +1354,11 @@ SelectedAppBox.prototype = {
       this.activeDateTime = visible;
       this.appTitle.set_text("");
       this.appDescription.set_text("");
-      if((!this.activeDateTime)&&(this.timeout > 0)) {
-         Mainloop.source_remove(this.timeout);
-         this.timeout = 0;
+      if((!this.activeDateTime)&&(this.timeOutDateTime > 0)) {
+         Mainloop.source_remove(this.timeOutDateTime);
+         this.timeOutDateTime = 0;
       }
-      else if((this.activeDateTime)&&(this.timeout == 0)&&(this.appTitle.get_text() == "")&&(this.appDescription.get_text() == "")) {
-         this.timeout = 1;
+      else if((this.activeDateTime)&&(this.timeOutDateTime == 0)&&(this.appTitle.get_text() == "")&&(this.appDescription.get_text() == "")) {
          this._refrech();
       }
       } catch(e) {Main.notify("listo", e.message);}
@@ -1364,24 +1367,23 @@ SelectedAppBox.prototype = {
    setSelectedText: function(title, description) {
       this.appTitle.set_text(title);
       this.appDescription.set_text(description);
-      if((this.activeDateTime)&&(this.timeout == 0)&&(title == "")&&(description == "")) {
-         this.timeout = 1;
+      if((this.activeDateTime)&&(this.timeOutDateTime == 0)&&(title == "")&&(description == "")) {
          this._refrech();
       }
       else {
-         if(this.timeout > 0) {
-            Mainloop.source_remove(this.timeout);
-            this.timeout = 0;
+         if(this.timeOutDateTime > 0) {
+            Mainloop.source_remove(this.timeOutDateTime);
+            this.timeOutDateTime = 0;
          }
       }
    },
 
    _refrech: function() {
-      if(this.timeout > 0) {
+      if(this.timeOutDateTime == 0) {
          let displayDate = new Date();
          this.appTitle.set_text(displayDate.toLocaleFormat(this.timeFormat));
          this.appDescription.set_text(displayDate.toLocaleFormat(this.dateFormat));
-         this.timeout = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._refrech));
+         this.timeOutDateTime = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._refrech));
       }
    }
 };
@@ -1463,13 +1465,13 @@ ButtonChangerBox.prototype = {
           Mainloop.idle_add(Lang.bind(this, function() {
              let [mx, my] = event.get_coords();
              let [ax, ay] = actor.get_transformed_position();
-             aw = actor.get_width();
-             ah = actor.get_height();
+             let aw = actor.get_width();
+             let ah = actor.get_height();
              if((mx > ax)&&(mx < ax + aw)&&(my > ay)&&(my < ay + ah))
                 this.setActive(true);
           }));
         }
-        PopupMenu.PopupSubMenuMenuItem.prototype._onButtonReleaseEvent.call(actor, event);
+        //PopupMenu.PopupSubMenuMenuItem.prototype._onButtonReleaseEvent.call(actor, event);
     },
 
     activateNext: function() {
@@ -1698,8 +1700,6 @@ PowerBox.prototype = {
       this.separator.add(this._powerButtons[0].actor, { x_fill: true, x_align: aling, y_align: aling });
       this.separator.add(this._powerButtons[1].actor, { x_fill: true, x_align: aling, y_align: aling });
       this.actor.add(this.separator, { x_fill: false, x_align: aling, y_align: aling, expand: true });
-      this._powerButtons[0].actor.visible = false;
-      this._powerButtons[1].actor.visible = false;
       this._powerButtons[0].setTheme(this.theme);
       this._powerButtons[1].setTheme(this.theme);
       this._powerButtons[2].setTheme(this.theme);
@@ -1707,6 +1707,8 @@ PowerBox.prototype = {
          this._adjustSize(this._powerButtons[2].actor);
          this._adjustSize(this._powerButtons[1].actor);
          this._adjustSize(this._powerButtons[0].actor);
+         this._powerButtons[0].actor.visible = false;
+         this._powerButtons[1].actor.visible = false;
       }));
    },
 
@@ -2691,7 +2693,7 @@ HoverIcon.prototype = {
 
          let menuItem;
          let userBox = new St.BoxLayout({ style_class: 'user-box', vertical: false });
-         this.userLabel = new St.Label(({ /*style_class: 'user-label'*/}));
+         this.userLabel = new St.Label();//{ style_class: 'user-label' });
          userBox.add(this.userLabel, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
          this.menu.addActor(userBox);
 
@@ -4502,7 +4504,7 @@ FavoritesButtonExtended.prototype = {
       this.container = new St.BoxLayout();
       let icon_size = this.iconSize;
       if(!this.allowName) {
-         let monitor = Main.layoutManager.findMonitorForActor(this.actor);
+         let monitor = Main.layoutManager.primaryMonitor;
          let monitorHeight;
          if(this.displayVertical)
             monitorHeight = monitor.height;
@@ -5328,6 +5330,7 @@ MyApplet.prototype = {
          this.controlingSize = false;
          this.minimalWidth = -1;
          this.minimalHeight = -1;
+         this._timeOutSettings = 0;
 
          this.execInstallLanguage();
          //_ = Gettext.domain(this.uuid).gettext;
@@ -5471,7 +5474,8 @@ MyApplet.prototype = {
          }));
          Main.placesManager.connect('places-updated', Lang.bind(this, this._refreshPlacesAndRecent));
          Main.themeManager.connect('theme-set', Lang.bind(this, this._onChangeCinnamonTheme));
-         St.TextureCache.get_default().connect("icon-theme-changed", Lang.bind(this, this._onThemeChange));
+         //St.TextureCache.get_default().connect("icon-theme-changed", Lang.bind(this, this._onThemeChange));
+         St.TextureCache.get_default().connect("icon-theme-changed", Lang.bind(this, this._updateSize));
          this.RecentManager.connect('changed', Lang.bind(this, this._refreshPlacesAndRecent));
 
          this._fileFolderAccessActive = false;
@@ -5950,7 +5954,9 @@ MyApplet.prototype = {
 
    on_orientation_changed: function(orientation) {
       this.orientation = orientation;
-      this._updateComplete();   
+      this._updateMenuSection();
+      this._updateComplete();
+      return true;
    },
 
    _onChangeCinnamonTheme: function() {
@@ -6610,30 +6616,36 @@ MyApplet.prototype = {
    },
 
    _updateSeparators: function() {
-      this.separatorTop.separatorLine.actor.connect('style_changed', Lang.bind(this, function() {
-         Mainloop.idle_add(Lang.bind(this, function() {
-            if(this.menu.isOpen) {
-               let sourceNode = this.separatorTop.separatorLine.actor.get_theme_node();
-               this.separatorTop.actor.visible = (sourceNode.get_length('-remove-separator') == 0);
-            }
+      if(this.separatorTop.actor.get_parent() != null) {
+         this.separatorTop.separatorLine.actor.connect('style_changed', Lang.bind(this, function() {
+            Mainloop.idle_add(Lang.bind(this, function() {
+               if(this.menu.isOpen) {
+                  let sourceNode = this.separatorTop.separatorLine.actor.get_theme_node();
+                  this.separatorTop.actor.visible = (sourceNode.get_length('-remove-separator') == 0);
+               }
+            }));
          }));
-      }));
-      this.separatorMiddle.separatorLine.actor.connect('style_changed', Lang.bind(this, function() {
-         Mainloop.idle_add(Lang.bind(this, function() {
-            if(this.menu.isOpen) {
-               let sourceNode = this.separatorMiddle.separatorLine.actor.get_theme_node();
-               this.separatorMiddle.actor.visible = (sourceNode.get_length('-remove-separator') == 0);
-            }
-         }));  
-      }));
-      this.separatorBottom.separatorLine.actor.connect('style_changed', Lang.bind(this, function() {
-         Mainloop.idle_add(Lang.bind(this, function() {
-            if(this.menu.isOpen) {
-               let sourceNode = this.separatorBottom.separatorLine.actor.get_theme_node();
-               this.separatorBottom.actor.visible = (sourceNode.get_length('-remove-separator') == 0);
-            }
+      }
+      if(this.separatorMiddle.actor.get_parent() != null) {
+         this.separatorMiddle.separatorLine.actor.connect('style_changed', Lang.bind(this, function() {
+            Mainloop.idle_add(Lang.bind(this, function() {
+               if(this.menu.isOpen) {
+                  let sourceNode = this.separatorMiddle.separatorLine.actor.get_theme_node();
+                  this.separatorMiddle.actor.visible = (sourceNode.get_length('-remove-separator') == 0);
+               }
+            }));  
          }));
-      }));
+      }
+      if(this.separatorBottom.actor.get_parent() != null) {
+         this.separatorBottom.separatorLine.actor.connect('style_changed', Lang.bind(this, function() {
+            Mainloop.idle_add(Lang.bind(this, function() {
+               if(this.menu.isOpen) {
+                  let sourceNode = this.separatorBottom.separatorLine.actor.get_theme_node();
+                  this.separatorBottom.actor.visible = (sourceNode.get_length('-remove-separator') == 0);
+               }
+            }));
+         }));
+      }
    },
 
    _setIconMaxFavSize: function() {
@@ -6901,7 +6913,8 @@ MyApplet.prototype = {
    },
 
    _onSelectedThemeChange: function() {
-      this._timeOutSettings = Mainloop.timeout_add(400, Lang.bind(this, this._updateSelectedTheme));
+      if(this._timeOutSettings == 0)
+         this._timeOutSettings = Mainloop.timeout_add(400, Lang.bind(this, this._updateSelectedTheme));
    },
 
    _updateSelectedTheme: function() {
@@ -7072,7 +7085,7 @@ MyApplet.prototype = {
       if(this.bttChanger)
          this.bttChanger.actor.destroy();
       this._onSwapPanel();
-      this._updateMenuSection();
+
       this._setVisibleBoxPointer();
       this._setFixMenuCorner();
       this._display();
@@ -7344,6 +7357,7 @@ MyApplet.prototype = {
    _updateMenuSection: function() {
       if(this.menu) {
          this.menu.close();
+         this.menuManager.removeMenu(this.menu);
          this.menu.destroy();
          this.menu = new ConfigurableMenu(this, this.orientation);
          this.menu.actor.connect('motion-event', Lang.bind(this, this._onResizeMotionEvent));
@@ -7442,10 +7456,14 @@ MyApplet.prototype = {
    },
 
    _doResize: function() {
+      if(this._timeOutResize > 0) {
+         Mainloop.source_remove(this._timeOutResize);
+      }
+      this._timeOutResize = 0;
       if(this.actorResize) {
          this._updatePosResize();
          this._updateSize();
-         Mainloop.timeout_add(300, Lang.bind(this, this._doResize));
+         this._timeOutResize = Mainloop.timeout_add(300, Lang.bind(this, this._doResize));
       }
    },
 
@@ -7479,26 +7497,6 @@ MyApplet.prototype = {
 
    _processPanelSize: function(bottomPosition) {
       let panelHeight;
-     /* let panelResizable = global.settings.get_boolean("panel-resizable");
-      if(panelResizable) {
-         if(bottomPosition) {
-            panelHeight = global.settings.get_int("panel-bottom-height");
-         }
-         else {
-            panelHeight = global.settings.get_int("panel-top-height");
-         }
-      }
-      else {
-         let themeNode = this.actor.get_theme_node();
-         panelHeight = themeNode.get_length("height");
-         if(!panelHeight || panelHeight == 0) {
-            panelHeight = 25;
-         }
-      }
-      if((!Main.panel2)&&(((this.orientation == St.Side.TOP)&&(bottomPosition))||
-         ((this.orientation == St.Side.BOTTOM)&&(!bottomPosition)))) {
-         panelHeight = 0;
-      }*/
       if(bottomPosition) {
          if(!Main.panel2) {
             if(this.orientation == St.Side.BOTTOM)
@@ -7536,6 +7534,7 @@ MyApplet.prototype = {
          this.actor_motion_id = 0;
          this.vector_update_loop = null;
          this.current_motion_actor = null;
+         this.menu.removeAll();
          let section = new PopupMenu.PopupMenuSection();
          this.menu.addMenuItem(section);     
 
@@ -7641,7 +7640,6 @@ MyApplet.prototype = {
          this.separatorTop.separatorLine.actor.add_style_class_name('menu-separator-top-' + this.theme);
          this.separatorMiddle.separatorLine.actor.add_style_class_name('menu-separator-center-' + this.theme);
          this.separatorBottom.separatorLine.actor.add_style_class_name('menu-separator-bottom-' + this.theme);
-         this._updateSeparators();
 
          switch(this.theme) {
             case "classic"        :
@@ -7693,6 +7691,7 @@ MyApplet.prototype = {
                           this.loadClassic(); 
                           break;
          }
+         this._updateSeparators();
 
          this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
          this.rightPane.add(this.categoriesApplicationsBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
