@@ -4,6 +4,7 @@
         padding-right: 10px;
         padding-bottom: 0px;
 }
+
 /*
 .menu-separator-top-gnomenuBottom {
         -remove-separator: 1px;
@@ -51,6 +52,22 @@
 .menu-accessible-panel {
         padding-left: 10px;
         padding-right: 10px;
+}
+
+.menu-top-box-classic {
+        padding-left: 20px;
+}
+
+.menu-top-box-stylized {
+        padding-left: 20px;
+}
+
+.menu-search-box-classic {
+        padding-top: 10px;
+}
+
+.menu-search-box-stylized {
+        padding-top: 10px;
 }
 
 #menu-name-entry {

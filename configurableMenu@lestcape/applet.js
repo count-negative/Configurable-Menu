@@ -584,7 +584,7 @@ GnoMenuBox.prototype = {
    
    _createActionButtons: function() {
       this._actionButtons = new Array();
-      let button = new SystemButton(this.parent, null, "emblem-favorite", _("Favorites"), _("Favorites"), this.hover, this.iconSize, true);
+      let button = new SystemButton(this.parent, null, "emblem-favorite", _("Favorites"), _("Favorites"), this.hover, this.selectedAppBox, this.iconSize, true);
       button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent));
       //button.setAction(Lang.bind(this, this._changeSelectedButton));
@@ -592,7 +592,7 @@ GnoMenuBox.prototype = {
       this._actionButtons.push(button);
         
       //Logout button  //preferences-other  //emblem-package
-      button = new SystemButton(this.parent, null, "preferences-other", _("All Applications"), _("All Applications"), this.hover, this.iconSize, true);
+      button = new SystemButton(this.parent, null, "preferences-other", _("All Applications"), _("All Applications"), this.hover, this.selectedAppBox,  this.iconSize, true);
       button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent));
       //button.setAction(Lang.bind(this, this._changeSelectedButton));
@@ -600,7 +600,7 @@ GnoMenuBox.prototype = {
       this._actionButtons.push(button);
 
       //Shutdown button
-      button = new SystemButton(this.parent, null, "folder", _("Places"), _("Places"), this.hover, this.iconSize, true);
+      button = new SystemButton(this.parent, null, "folder", _("Places"), _("Places"), this.hover, this.selectedAppBox,  this.iconSize, true);
       button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent)); 
       //button.setAction(Lang.bind(this, this._changeSelectedButton));
@@ -608,7 +608,7 @@ GnoMenuBox.prototype = {
       this._actionButtons.push(button);
 
       //Shutdown button
-      button = new SystemButton(this.parent, null, "folder-recent", _("Recent Files"), _("Recent Files"), this.hover, this.iconSize, false);       
+      button = new SystemButton(this.parent, null, "folder-recent", _("Recent Files"), _("Recent Files"), this.hover, this.selectedAppBox,  this.iconSize, false);       
       button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent)); 
       //button.setAction(Lang.bind(this, this._changeSelectedButton));
@@ -1397,7 +1397,7 @@ ButtonChangerBox.prototype = {
 
     _init: function (parent, icon, iconSize, labels, selected, callBackOnSelectedChange) {
         PopupMenu.PopupSubMenuMenuItem.prototype._init.call(this, labels[selected]);
-
+        this.theme = "";
         this.visible = true;
         this.actor.set_style_class_name('');
         this.actor.reactive = true;
@@ -1441,6 +1441,12 @@ ButtonChangerBox.prototype = {
        this.label.visible = visible;
     },
 
+    setTheme: function(theme) {
+       this.theme = '-' + theme;
+       this.box.set_style_class_name('menu-category-button');
+       this.box.add_style_class_name('menu-swap-button-' + this.theme);
+    },
+
     setActive: function(active) {
        if(this.active != active) {
           this.active = active;
@@ -1448,10 +1454,12 @@ ButtonChangerBox.prototype = {
              if(active) {
                 global.set_cursor(Cinnamon.Cursor.POINTING_HAND);
                 this.box.set_style_class_name('menu-category-button-selected');
+                this.box.add_style_class_name('menu-swap-button' + this.theme + '-selected');
              }
              else {
                 global.unset_cursor();
                 this.box.set_style_class_name('menu-category-button');
+                this.box.add_style_class_name('menu-swap-button' + this.theme);
              }
           }
           this.emit('active-changed', active);
@@ -1539,7 +1547,7 @@ PowerBox.prototype = {
       }));
       this.separatorPower = new SeparatorBox(false, 0);
       //Lock screen
-      let button = new SystemButton(this.parent, null, "gnome-lockscreen", _("Lock screen"), _("Lock the screen"), this.hover, this.iconSize, false);
+      let button = new SystemButton(this.parent, null, "gnome-lockscreen", _("Lock screen"), _("Lock the screen"), this.hover, this.selectedAppBox,  this.iconSize, false);
       button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent));
       button.setAction(Lang.bind(this, this._onLockScreenAction));
@@ -1547,7 +1555,7 @@ PowerBox.prototype = {
       this._powerButtons.push(button);
         
       //Logout button
-      button = new SystemButton(this.parent, null, "gnome-logout", _("Logout"), _("Leave the session"), this.hover, this.iconSize, false);        
+      button = new SystemButton(this.parent, null, "gnome-logout", _("Logout"), _("Leave the session"), this.hover, this.selectedAppBox,  this.iconSize, false);        
       button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent));
       button.setAction(Lang.bind(this, this._onLogoutAction));
@@ -1555,7 +1563,7 @@ PowerBox.prototype = {
       this._powerButtons.push(button);
 
       //Shutdown button
-      button = new SystemButton(this.parent, null, "gnome-shutdown", _("Quit"), _("Shutdown the computer"), this.hover, this.iconSize, false);        
+      button = new SystemButton(this.parent, null, "gnome-shutdown", _("Quit"), _("Shutdown the computer"), this.hover, this.selectedAppBox, this.iconSize, false);        
       button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent)); 
       button.setAction(Lang.bind(this, this._onShutdownAction));
@@ -1657,10 +1665,11 @@ PowerBox.prototype = {
    setSpecialColor: function(specialColor) {
       if(specialColor) {
          this.actor.set_style_class_name('menu-favorites-box');
-         this.actor.add_style_class_name('menu-system-box');
+         this.actor.add_style_class_name('menu-system-with-box-' + this.parent.theme);
       }
-      else
-         this.actor.set_style_class_name('');
+      else {
+         this.actor.set_style_class_name('menu-system-box-' + this.parent.theme);
+      }
    },
 
    _removeButtons: function() {
@@ -1811,13 +1820,9 @@ PowerBox.prototype = {
       //this.parent.favoritesScrollBox.setAutoScrolling(this.autoscroll_enabled);
       this.powerSelected = this.indexOf(actor);
       this._powerButtons[this.powerSelected].setActive(true);
-      this.selectedAppBox.setSelectedText(this._powerButtons[this.powerSelected].title, this._powerButtons[this.powerSelected].description);
-      this.hover.refresh(this._powerButtons[this.powerSelected].icon);
    },
 
    _onLeaveEvent: function(actor, event) {
-      this.selectedAppBox.setSelectedText("", "");
-      this.hover.refreshFace();
       if(this.powerSelected != -1) {
          this._powerButtons[this.powerSelected].setActive(false);
          this.powerSelected = -1;
@@ -1906,7 +1911,7 @@ PowerBox.prototype = {
       return true;
    }
 };
-
+/*
 function ControlButtonExtended(parent, title, description, iconName, iconSize, callBackExecution) {
    this._init(parent, title, description, iconName, iconSize, callBackExecution);
 }
@@ -1954,11 +1959,11 @@ ControlButtonExtended.prototype = {
          this.callBackExecution(actor, event);
    }
     
-/*   activate: function(event) {
-      this.parent.menu.close();
-   }*/
+   //activate: function(event) {
+   //   this.parent.menu.close();
+   //}
 };
-
+*/
 function ControlBox(parent, iconSize) {
    this._init(parent, iconSize);
 }
@@ -2181,17 +2186,18 @@ ControlBox.prototype = {
    },
 
    setActive: function (actor, active) {
-        let activeChanged = active != this.active;
-        if (activeChanged) {
-            this.active = active;
-            if (active) {
-                actor.add_style_pseudo_class('active');
-                if (this.focusOnHover) this.actor.grab_key_focus();
-            } else
-                actor.remove_style_pseudo_class('active');
-            //this.emit('active-changed', active);
-        }
-    },
+      let activeChanged = active != this.active;
+      if(activeChanged) {
+         this.active = active;
+         if(active) {
+            actor.add_style_pseudo_class('active');
+            if(this.focusOnHover) this.actor.grab_key_focus();
+         } else {
+            actor.remove_style_pseudo_class('active');
+         }
+         //this.emit('active-changed', active);
+      }
+   },
 
    navegateControlBox: function(symbol, actor) {
    },
@@ -2854,8 +2860,8 @@ HoverIcon.prototype = {
    refresh: function (icon) {
       if((icon)&&(this.icon)) {
          this._removeIcon();
-         this.addActor(this.icon, 0);
          this.icon.set_icon_name(icon);
+         this.addActor(this.icon, 0);
       } else
          this.refreshFace();
    },
@@ -3750,15 +3756,16 @@ TransientButtonExtended.prototype = {
 };
 
 
-function SystemButton(parent, parentScroll, icon, title, description, hoverIcon, iconSize, haveText) {
-   this._init(parent, parentScroll, icon, title, description, hoverIcon, iconSize, haveText);
+function SystemButton(parent, parentScroll, icon, title, description, hoverIcon, selectedAppBox, iconSize, haveText) {
+   this._init(parent, parentScroll, icon, title, description, hoverIcon, selectedAppBox, iconSize, haveText);
 }
 
 SystemButton.prototype = {
-   _init: function(parent, parentScroll, icon, title, description, hoverIcon, iconSize, haveText) {
+   _init: function(parent, parentScroll, icon, title, description, hoverIcon, selectedAppBox, iconSize, haveText) {
       this.title = title;
       this.description = description;
       this.hoverIcon = hoverIcon;
+      this.selectedAppBox = selectedAppBox;
       this.actor = new St.BoxLayout({ style_class:'menu-category-button', reactive: true, track_hover: true });
       this.popupButton = new SystemPopupButtom(parent, parentScroll, icon, title, description, iconSize, haveText);
       //this.popupButton.actor.style = "padding-top: "+(0)+"px;padding-bottom: "+(0)+"px;padding-left: "+(0)+"px;padding-right: "+(0)+"px;margin:auto;";
@@ -3814,6 +3821,7 @@ SystemButton.prototype = {
          if(this.theme)
             this.actor.add_style_class_name('menu-system-button-' + this.theme + '-selected');
          this.hoverIcon.refresh(this.popupButton.icon);
+         this.selectedAppBox.setSelectedText(this.title, this.description);
          this.actor.add_style_pseudo_class('active');
       }
       else {
@@ -3821,6 +3829,7 @@ SystemButton.prototype = {
          if(this.theme)
             this.actor.add_style_class_name('menu-system-button-' + this.theme);
          this.hoverIcon.refreshFace();
+         this.selectedAppBox.setSelectedText("", "");
          this.actor.remove_style_pseudo_class('active');
       }
    }
@@ -6768,8 +6777,12 @@ MyApplet.prototype = {
             if(this.swapPanels) {
                this.beginBox.add_actor(this.bottomBoxSwaper);
                this.endBox.add_actor(this.topBoxSwaper);
+               this.topBoxSwaper.set_style_class_name('menu-top-box-swap-' + this.theme);
+               this.bottomBoxSwaper.set_style_class_name('menu-bottom-box-swap-' + this.theme);
             }
             else {
+               this.topBoxSwaper.set_style_class_name('menu-top-box-' + this.theme);
+               this.bottomBoxSwaper.set_style_class_name('menu-bottom-box-' + this.theme);
                this.beginBox.add_actor(this.topBoxSwaper);
                this.endBox.add_actor(this.bottomBoxSwaper);
             }
@@ -7548,22 +7561,27 @@ MyApplet.prototype = {
          this.endBox = new St.BoxLayout({ vertical: true });
          this.rightPane.add_actor(this.beginBox);      
 //search
-         this.topBoxSwaper = new St.BoxLayout({ style_class: 'menu-top-box', vertical: false });
-         this.bottomBoxSwaper = new St.BoxLayout({ style_class: 'menu-bottom-box', vertical: false });
+         this.topBoxSwaper = new St.BoxLayout({ vertical: false });
+         this.bottomBoxSwaper = new St.BoxLayout({ vertical: false });
+
          this.controlSearchBox = new St.BoxLayout({ vertical: false });
          this.controlBox = new St.BoxLayout({ vertical: true });
          this.topBoxSwaper.add(this.controlSearchBox, { x_fill: true, y_fill: true, expand: true });
          if(this.swapPanels) {
             this.beginBox.add_actor(this.bottomBoxSwaper);
             this.endBox.add_actor(this.topBoxSwaper);//, { x_fill: true, y_fill: true, expand: true });
+            this.topBoxSwaper.set_style_class_name('menu-top-box-swap-' + this.theme);
+            this.bottomBoxSwaper.set_style_class_name('menu-bottom-box-swap-' + this.theme);
          }
          else {
             this.beginBox.add_actor(this.topBoxSwaper);
             this.endBox.add_actor(this.bottomBoxSwaper);//, { x_fill: true, y_fill: true, expand: true });
+            this.topBoxSwaper.set_style_class_name('menu-top-box-' + this.theme);
+            this.bottomBoxSwaper.set_style_class_name('menu-bottom-box-' + this.theme);
          }
 
-         this.searchBox = new St.BoxLayout({ style_class: 'menu-search-box' });
-         this.searchBox.set_style("padding-right: 0px; padding-left: 0px");
+         this.searchBox = new St.BoxLayout();
+         this.searchBox.set_style_class_name('menu-search-box-' + this.theme);
 
          this.searchEntry = new St.Entry({ name: 'menu-search-entry',
                                            hint_text: _("Type to search..."),
@@ -7744,8 +7762,6 @@ MyApplet.prototype = {
       this.endVerticalBox.add_actor(this.separatorBottom.actor);
       this.endVerticalBox.add_actor(this.endBox);
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
-      this.controlBox.set_style('padding-left: 20px;');
-      this.searchBox.set_style('padding-left: 0px; padding-top: 10px;');
       this.operativePanel.set_style_class_name('menu-operative-box');
    },
 
@@ -7776,7 +7792,7 @@ MyApplet.prototype = {
    },
 
    loadGaribaldo: function() {
-      this.controlSearchBox.add(this.searchBox, {x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.controlBox.add(this.searchBox, {x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
       this.controlSearchBox.add(this.controlView.actor, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
@@ -7822,8 +7838,6 @@ MyApplet.prototype = {
       this.endVerticalBox.add_actor(this.separatorBottom.actor);
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
-      this.controlBox.set_style('padding-left: 20px;');
-      this.searchBox.set_style('padding-left: 0px; padding-top: 10px;');
       this.operativePanel.set_style_class_name('menu-operative-box');
    },
 
@@ -7855,7 +7869,6 @@ MyApplet.prototype = {
       this.endVerticalBox.add_actor(this.separatorBottom.actor);
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
-      this.searchBox.set_style('');
       this.operativePanelExpanded.set_style_class_name('menu-operative-box');
    },
 
@@ -7948,7 +7961,6 @@ MyApplet.prototype = {
       this.endVerticalBox.add_actor(this.separatorBottom.actor);
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
-      this.searchBox.set_style('');
       this.operativePanel.set_style_class_name('menu-operative-box');
    },
 
@@ -7981,6 +7993,7 @@ MyApplet.prototype = {
       this.allowFavName = true;
       this.controlBox.add(this.panelAppsName, {x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
       this.bttChanger = new ButtonChangerBox(this, "forward", 20, [_("All Applications"), _("Favorites")], 0, Lang.bind(this, this._onPanelMintChange));
+      this.bttChanger.setTheme(this.theme);
       this.bttChanger.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.controlSearchBox.add(this.bttChanger.actor, {x_fill: false, x_align: St.Align.END, y_align: St.Align.START, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
@@ -8019,6 +8032,7 @@ MyApplet.prototype = {
    loadWindows: function() {
       this.allowFavName = true;
       this.bttChanger = new ButtonChangerBox(this, "forward", 20, [_("All Applications"), _("Favorites")], 0, Lang.bind(this, this._onPanelWindowsChange));
+      this.bttChanger.setTheme(this.theme);
       this.bttChanger.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true);
@@ -8048,11 +8062,9 @@ MyApplet.prototype = {
       this.rightPane.set_style_class_name('menu-favorites-box');
       this.rightPane.add_style_class_name('menu-swap-windows-box');
       this.favBoxWrapper.set_style_class_name('menu-operative-windows-box');
-      this.topBoxSwaper.set_style_class_name('menu-top-windows-box');
-      this.bottomBoxSwaper.set_style_class_name('menu-bottom-windows-box');
    },
 
- loadGnoMenuLeft: function() {
+   loadGnoMenuLeft: function() {
       this.allowFavName = true;
       this.controlBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
       this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
