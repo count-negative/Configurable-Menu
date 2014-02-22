@@ -255,6 +255,14 @@ msgstr ""
 msgid "GnoMenu Panel:"
 msgstr ""
 
+#. configurableMenu@lestcape->settings-schema.json->swap-panels->description
+msgid "Swap the top and bottom panel"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->swap-panels->tooltip
+msgid "Choose whether or not to swap the top and bottom panel on the menu."
+msgstr ""
+
 #. configurableMenu@lestcape->settings-schema.json->app-title-
 #. size->description
 msgid "Font size of the selected application name:"
@@ -491,6 +499,14 @@ msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->full-screen->tooltip
 msgid "Choose whether or not to put the menu in full screen mode."
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->control-symbolic->description
+msgid "Show symbolic icons on the control buttons"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->control-symbolic->tooltip
+msgid "Enable this option to show symbolic icons, on the control buttons and disable to show full color."
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->show-view-

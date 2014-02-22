@@ -63,7 +63,7 @@
     "swap-panels": {
         "type": "checkbox",
         "default": false,
-        "description": "Swap the top and bottom panel on the menu",
+        "description": "Swap the top and bottom panel",
         "tooltip": "Choose whether or not to swap the top and bottom panel on the menu."
     },
     "search-filesystem": {
@@ -413,8 +413,8 @@
     "control-symbolic": {
         "type": "checkbox",
         "default": false,
-        "description": "Show synbolic icons on the control buttons",
-        "tooltip": "Enable show symbolic icons and disable show full color icons on the control buttons."
+        "description": "Show symbolic icons on the control buttons",
+        "tooltip": "Enable this option to show symbolic icons, on the control buttons and disable to show full color."
     },
     "icon-control-size": {
         "type": "spinbutton",

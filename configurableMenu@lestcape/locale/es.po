@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-02-03 15:08-0600\n"
+"PO-Revision-Date: 2014-02-22 12:45-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -149,6 +149,16 @@ msgstr "Panel Accessible:"
 #. configurableMenu@lestcape->settings-schema.json->header-gnomenu->description
 msgid "GnoMenu Panel:"
 msgstr "Panel GnoMenu:"
+
+#. configurableMenu@lestcape->settings-schema.json->swap-panels->description
+msgid "Swap the top and bottom panel"
+msgstr "Intercambiar el panel superior e inferior"
+
+#. configurableMenu@lestcape->settings-schema.json->swap-panels->tooltip
+msgid "Choose whether or not to swap the top and bottom panel on the menu."
+msgstr ""
+"Seleccione si desea o no intercambiar el panel superior e inferior en el "
+"menú."
 
 #. configurableMenu@lestcape->settings-schema.json->app-title-
 #. size->description
@@ -358,6 +368,18 @@ msgstr "Pantalla completa"
 #. configurableMenu@lestcape->settings-schema.json->full-screen->tooltip
 msgid "Choose whether or not to put the menu in full screen mode."
 msgstr "Seleccione si desea o no poner el menú en modo pantalla completa."
+
+#. configurableMenu@lestcape->settings-schema.json->control-symbolic->description
+msgid "Show symbolic icons on the control buttons"
+msgstr "Mostrar íconos simbólicos en los botones de control"
+
+#. configurableMenu@lestcape->settings-schema.json->control-symbolic->tooltip
+msgid ""
+"Enable this option to show symbolic icons, on the control buttons and "
+"disable to show full color."
+msgstr ""
+"Active esta opción para mostrar los íconos simbólicos en los botones de "
+"control y desactivela para mostrarlos a todo color."
 
 #. configurableMenu@lestcape->settings-schema.json->show-view-
 #. item->description
