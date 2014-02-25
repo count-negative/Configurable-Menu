@@ -9060,7 +9060,7 @@ MyApplet.prototype = {
          this._activeContainer = null;
          this._activeActor = null;
          this._initialDisplay();
-         this._allAppsCategoryButton.actor.set_style_class_name('menu-category-selected');
+         this._allAppsCategoryButton.actor.set_style_class_name('menu-category-button-selected');
          this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
          this.selectedAppBox.setDateTimeVisible(this.showTimeDate);
       }
