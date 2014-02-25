@@ -7612,7 +7612,7 @@ MyApplet.prototype = {
          this.panelAppsName.style="font-size: " + 10 + "pt";
 
          this.searchBox.add(this.searchName, {x_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, y_fill: false, expand: false });
-         this.searchBox.add_actor(this.searchEntry);
+         this.searchBox.add(this.searchEntry, {x_fill: true, x_align: St.Align.START, y_align: St.Align.MIDDLE, y_fill: false, expand: true });
 
          this.controlView = new ControlBox(this, this.iconControlSize);
 
@@ -7809,7 +7809,7 @@ MyApplet.prototype = {
    loadVampire: function() {
       this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
-      this.controlBox.add(this.controlView.actor, {x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.controlBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
       this.controlSearchBox.add(this.searchBox, {x_fill: false, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true, St.Align.START);
@@ -7839,7 +7839,7 @@ MyApplet.prototype = {
       this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
       this.controlBox.add(this.searchBox, {x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      this.controlSearchBox.add(this.controlView.actor, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.controlSearchBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true, St.Align.START);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true, St.Align.START);
@@ -8068,7 +8068,7 @@ MyApplet.prototype = {
       this.controlSearchBox.add(this.bttChanger.actor, {x_fill: false, x_align: St.Align.END, y_align: St.Align.START, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true, St.Align.START);
-      this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true, St.Align.START);
+      this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true, St.Align.MIDDLE);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
@@ -8109,7 +8109,7 @@ MyApplet.prototype = {
       this.bttChanger.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true, St.Align.START);
-      this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true, St.Align.START);
+      this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true, St.Align.MIDDLE);
       this.favBoxWrapper.add(this.favoritesScrollBox.actor, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
