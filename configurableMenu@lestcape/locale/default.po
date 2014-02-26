@@ -67,19 +67,19 @@ msgid "View the items in icon view mode"
 msgstr ""
 
 #: applet.js:1459
-msgid "Prevent resize"
+msgid "Prevent resizing"
 msgstr ""
 
 #: applet.js:1459
-msgid "Prevent resize the menu"
+msgid "Prevent resizing the menu"
 msgstr ""
 
 #: applet.js:1461
-msgid "Allow resize"
+msgid "Allow resizing"
 msgstr ""
 
 #: applet.js:1461
-msgid "Allow resize the menu"
+msgid "Allow resizing the menu"
 msgstr ""
 
 #: applet.js:1465
@@ -799,6 +799,10 @@ msgstr ""
 #. configurableMenu@lestcape->settings-schema.json->automatic-
 #. size->description
 msgid "Automatic size"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->allow-resizing->tooltip
+msgid "Choose whether or not to allow resizing the menu."
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->automatic-size->tooltip

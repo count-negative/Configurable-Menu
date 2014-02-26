@@ -2092,6 +2092,7 @@ ControlBox.prototype = {
          this.bttResize.get_children()[0].set_icon_name('changes-allow');
          this.parent.menu.setResizeArea(0);
       }
+      this.parent.allowResize.setToggleState(resizeActive);
    },
 
    changeViewSelected: function(iconView) {
@@ -2104,6 +2105,8 @@ ControlBox.prototype = {
          this.bttViewList.add_style_pseudo_class('open');
          this.bttViewGrid.remove_style_pseudo_class('open');
       }
+      this.parent.listView.setSensitive(iconView);
+      this.parent.gridView.setSensitive(!iconView);
    },
 
    changeFullScreen: function(fullScreen) {
@@ -2116,6 +2119,7 @@ ControlBox.prototype = {
          this.bttFullScreen.get_children()[0].set_icon_name('view-fullscreen');
          //this.bttFullScreen.get_children()[0].set_icon_name('window-maximize');
       }
+      this.parent.fullScreenMenu.setToggleState(fullScreen);
    },
 
    setIconSize: function(iconSize) {
@@ -2147,9 +2151,9 @@ ControlBox.prototype = {
                      break;
                   case this.bttResize:
                      if(this.bttResize.get_children()[0].get_icon_name() == 'changes-prevent')
-                        this.parent.selectedAppBox.setSelectedText(_("Prevent resize"), _("Prevent resize the menu"));
+                        this.parent.selectedAppBox.setSelectedText(_("Prevent resizing"), _("Prevent resizing the menu"));
                      else
-                        this.parent.selectedAppBox.setSelectedText(_("Allow resize"), _("Allow resize the menu"));
+                        this.parent.selectedAppBox.setSelectedText(_("Allow resizing"), _("Allow resizing the menu"));
                      break;
                   case this.bttFullScreen:
                      if(this.bttFullScreen.get_children()[0].get_icon_name() == 'window-minimize')
@@ -2789,8 +2793,6 @@ HoverIcon.prototype = {
    _onButtonReleaseEvent: function (actor, event) {
       if(event.get_button()==1) {
          this.activate(event);
-      }
-      if(event.get_button()==3) {
          this.toggleMenu();
          this.controlBox.visible = false;
          this.controlBox.visible = true;
@@ -5236,8 +5238,15 @@ ConfigurableMenu.prototype = {
       this.actor.reactive = true;
 
       Main.uiGroup.add_actor(this.actor);
-      this.actor.hide();     
+      this.actor.hide();
    },
+
+    _onKeyFocusOut: function (actor) {
+      if(this._popupMenu.isOpen)
+          return true;
+        this.setActive(false);
+      return false;
+    },
 
    setArrow: function(arrow) {
       this._boxPointer.setArrow(arrow);
@@ -5253,7 +5262,105 @@ ConfigurableMenu.prototype = {
 
    setResizeAreaColor: function(resizeColor) {
       this._boxPointer.setResizeAreaColor(resizeColor);
+   },
+
+   destroy: function() {
+      if(this._popupMenu) {
+         this._popupMenu.close();
+         this._menuManager.removeMenu(this._popupMenuu);
+         this._popupMenu.destroy();
+      }
+      Applet.AppletPopupMenu.prototype.destroy.call(this);
    }
+};
+
+function ConfigurablePopupMenu(parent, parentMenu, orientation) {
+   this._init(parent, parentMenu, orientation);
+};
+
+ConfigurablePopupMenu.prototype = {
+   __proto__: PopupMenu.PopupMenu.prototype,
+
+   _init: function(parent, parentMenu, orientation) {
+      PopupMenu.PopupMenu.prototype._init.call(this, parentMenu.actor, 0.0, orientation);
+      this.parent = parent;
+      this.parentMenu = parentMenu;
+      this.actor.add_style_class_name('menu-context-menu');
+      Main.uiGroup.add_actor(this.actor);
+      this.actor.hide();
+      this.actor.grab_key_focus();
+   },
+
+   reparentMenu: function(parentMenu, orientation) {
+      this.parentMenu = parentMenu;
+      this.sourceActor = this.parentMenu.actor;
+      this.setArrowSide(orientation);
+   },
+
+   open: function(animate) {
+      if((this.parentMenu != this.parent)&&(!this.parentMenu.isOpen))
+         return;
+      //(Dalcde idea)Temporarily change source actor to Main.uiGroup to "trick"
+      // the menu manager to think that right click submenus are part of it.
+      this.parentMenu.sourceActor = Main.uiGroup;
+      PopupMenu.PopupMenu.prototype.open.call(this, animate);
+   },
+
+   close: function(animate) {
+      this.parentMenu.sourceActor = this.parent.actor;
+      PopupMenu.PopupMenu.prototype.close.call(this, animate);
+      this.parent.searchEntry.grab_key_focus();
+   }
+};
+
+function ConfigurablePopupSwitchMenuItem() {
+    this._init.apply(this, arguments);
+}
+
+ConfigurablePopupSwitchMenuItem.prototype = {
+    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
+
+    _init: function(text, imageOn, imageOff, active, params) {
+        PopupMenu.PopupBaseMenuItem.prototype._init.call(this, params);
+
+        this._imageOn = imageOn;
+        this._imageOff = imageOff;
+
+        let table = new St.Table({ homogeneous: false, reactive: true });
+
+        this.label = new St.Label({ text: text });
+        this.label.set_margin_left(6.0);
+
+        this._switch = new PopupMenu.Switch(active);
+
+        if(active)
+           this.icon = new St.Icon({ icon_name: this._imageOn, icon_type: St.IconType.FULLCOLOR, style_class: 'popup-menu-icon' });
+        else
+           this.icon = new St.Icon({ icon_name: this._imageOff, icon_type: St.IconType.FULLCOLOR, style_class: 'popup-menu-icon' });
+
+        this._statusBin = new St.Bin({ x_align: St.Align.END });
+        this._statusBin.set_margin_left(6.0);
+        this._statusLabel = new St.Label({ text: '', style_class: 'popup-inactive-menu-item' });
+        this._statusBin.child = this._switch.actor;
+
+        table.add(this.icon, {row: 0, col: 0, col_span: 1, x_expand: false, x_align: St.Align.START});
+        table.add(this.label, {row: 0, col: 1, col_span: 1, y_fill: false, y_expand: true, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE});
+        table.add(this._statusBin, {row: 0, col: 2, col_span: 1, x_expand: true, x_align: St.Align.END});
+
+        this.addActor(table, { expand: true, span: 1, align: St.Align.START});
+    },
+
+    setToggleState: function(state) {
+        if(state)
+           this.icon.set_icon_name(this._imageOn);
+        else
+           this.icon.set_icon_name(this._imageOff);
+        this._switch.setToggleState(state);
+    },
+
+    get_state: function() {
+        return this._switch.state;
+    }
 };
 
 function SpecialBookmarks(name, icon, path) {
@@ -5294,6 +5401,7 @@ MyApplet.prototype = {
       try {
          this.deltaMinResize = 20;
          this.aviableWidth = 0;
+         this.metadata = metadata;
          this.uuid = metadata["uuid"];
          this.allowFavName = false;
          this.iconAppSize = 22;
@@ -5347,17 +5455,9 @@ MyApplet.prototype = {
          else
             this.actor.add_style_class_name('menu-applet-panel-bottom-box'); 
 
-         this.menu = new ConfigurableMenu(this, orientation);
-         this.menu.actor.connect('motion-event', Lang.bind(this, this._onResizeMotionEvent));
-         this.menu.actor.connect('button-press-event', Lang.bind(this, this._onBeginResize));
-         this.menu.actor.connect('leave-event', Lang.bind(this, this._disableOverResizeIcon));
-         this.menu.actor.connect('button-release-event', Lang.bind(this, this._disableResize));
-         this.menu.connect('open-state-changed', Lang.bind(this, this._onOpenStateChanged));
-         this.menu.actor.add_style_class_name('menu-background');
-
-
          this.menuManager = new PopupMenu.PopupMenuManager(this);
-         this.menuManager.addMenu(this.menu);   
+         this._updateMenuSection();
+
          this.actor.connect('key-press-event', Lang.bind(this, this._onSourceKeyPress));
          this.actor.connect('button-release-event', Lang.bind(this, this._onButtonReleaseEvent));
          this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPressEvent));
@@ -5422,6 +5522,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-app-description", "showAppDescription", this._updateAppSelectedText, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "app-description-size", "appDescriptionSize", this._updateAppSelectedText, null);
 
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "allow-resizing", "controlingSize", this._activeResize, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "automatic-size", "automaticSize", this._setAutomaticSize, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "full-screen", "fullScreen", this._setFullScreen, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "width", "width", this._updateSize, null);
@@ -6802,15 +6903,15 @@ MyApplet.prototype = {
 
    _changeView: function() {
       try {
-         if(this.controlView) {
-            this.controlView.changeViewSelected(this.iconView);
+      if(this.controlView) {
+         this.controlView.changeViewSelected(this.iconView);
          this._clearAppSize();
          this._updateAppButtonDesc();
          this._updateTextButtonWidth();
          this._setAppIconDirection();
          this._updateAppSize();
          this._refreshFavs();
-         this._updateSize();
+         this._updateSize();     
       }
       } catch(e) {
          Main.notify("Erp" + e.message);
@@ -7194,6 +7295,14 @@ MyApplet.prototype = {
       }
    },
 
+   _activeResize: function() {
+      if(this.controlView)
+         this.controlView.changeResizeActive(this.controlingSize);
+      this.fullScreen = false;
+      this.automaticSize = false;
+      this._setFullScreen();
+   },
+
    _setAutomaticSize: function() {
       if(this.controlView)
          this.controlView.changeResizeActive(false);      
@@ -7370,7 +7479,8 @@ MyApplet.prototype = {
       }
       if(event.get_button() == 3) {            
          if(this._applet_context_menu._getMenuItems().length > 0) {
-            this._applet_context_menu.toggle();			
+            this._applet_context_menu.reparentMenu(this, this.orientation);
+            this._applet_context_menu.toggle();	
          }
       }
    },
@@ -7380,15 +7490,86 @@ MyApplet.prototype = {
          this.menu.close();
          this.menuManager.removeMenu(this.menu);
          this.menu.destroy();
-         this.menu = new ConfigurableMenu(this, this.orientation);
-         this.menu.actor.connect('motion-event', Lang.bind(this, this._onResizeMotionEvent));
-         this.menu.actor.connect('button-press-event', Lang.bind(this, this._onBeginResize));
-         this.menu.actor.connect('leave-event', Lang.bind(this, this._disableOverResizeIcon));
-         this.menu.actor.connect('button-release-event', Lang.bind(this, this._disableResize));
-         this.menu.connect('open-state-changed', Lang.bind(this, this._onOpenStateChanged));
-         this.menu.actor.add_style_class_name('menu-background');
-         this.menuManager.addMenu(this.menu);
       }
+      this.menu = new ConfigurableMenu(this, this.orientation);
+      this.menu.actor.connect('motion-event', Lang.bind(this, this._onResizeMotionEvent));
+      this.menu.actor.connect('button-press-event', Lang.bind(this, this._onMenuButtonPress));
+      this.menu.actor.connect('leave-event', Lang.bind(this, this._disableOverResizeIcon));
+      this.menu.actor.connect('button-release-event', Lang.bind(this, this._onMenuButtonRelease));
+      this.menu.connect('open-state-changed', Lang.bind(this, this._onOpenStateChanged));
+      this.menu.actor.add_style_class_name('menu-background');
+      this.menuManager.addMenu(this.menu);
+
+      if(this._applet_context_menu) {
+         this._applet_context_menu.close();
+         this._menuManager.removeMenu(this._applet_context_menu);
+         this._applet_context_menu.destroy();
+      }
+
+      this._applet_context_menu = new ConfigurablePopupMenu(this, this.menu, St.Side.LEFT);
+      this._menuManager.addMenu(this._applet_context_menu);
+
+      let items = this._applet_context_menu._getMenuItems();
+
+      this.listView = new Applet.MenuItem(_("List View"), 'view-list-symbolic', Lang.bind(this, function() {
+         this.iconView = !this.iconView;
+         this._changeView();
+      }));
+      if (items.indexOf(this.listView) == -1) {
+         this._applet_context_menu.addMenuItem(this.listView);
+         this.listView.setSensitive(this.iconView);
+      }
+
+      this.gridView = new Applet.MenuItem(_("Grid View"), 'view-grid-symbolic', Lang.bind(this, function() {
+         this.iconView = !this.iconView;
+         this._changeView();
+      }));
+      if(items.indexOf(this.gridView) == -1) {
+         this._applet_context_menu.addMenuItem(this.gridView);
+         this.gridView.setSensitive(!this.iconView);
+      }
+
+      this.separatorResize = new PopupMenu.PopupSeparatorMenuItem();
+      if(items.indexOf(this.separatorResize) == -1) {
+         this._applet_context_menu.addMenuItem(this.separatorResize);
+      }
+
+      this.allowResize = new ConfigurablePopupSwitchMenuItem(_("Allow resizing"), 'changes-prevent', 'changes-allow', false);
+      this.allowResize.connect('activate', Lang.bind(this, function() {
+         this.controlingSize = !this.controlingSize;
+         this._activeResize();
+      }));
+      if (items.indexOf(this.allowResize) == -1) {
+         this._applet_context_menu.addMenuItem(this.allowResize);
+      }
+
+      this.fullScreenMenu = new ConfigurablePopupSwitchMenuItem(_("Full Screen"), 'view-restore', 'view-fullscreen', false);
+      this.fullScreenMenu.connect('activate', Lang.bind(this, function() {
+         this.fullScreen = !this.fullScreen;
+         this._setFullScreen();
+      }));
+      if(items.indexOf(this.fullScreenMenu) == -1) {
+         this._applet_context_menu.addMenuItem(this.fullScreenMenu);
+      }
+   },
+
+   _onMenuButtonRelease: function(actor, event) {
+      try {
+       if((event.get_button() == 3)&&(!this.actorResize)) {
+          this._applet_context_menu.reparentMenu(this.menu, St.Side.LEFT);
+          this._applet_context_menu.toggle();
+       } else {
+          this._applet_context_menu.close();
+       }
+       this._disableResize();
+      } catch(e) {
+         Main.notify("Error Menu", e.message);
+      }
+   },
+
+   _onMenuButtonPress: function(actor, event) {
+       if(event.get_button() == 1)
+          this._beginResize(actor, event); 
    },
 
    _onResizeMotionEvent: function(actor, event) {
@@ -7412,19 +7593,21 @@ MyApplet.prototype = {
       }
    },
 
-   _onBeginResize: function(actor, event) {
-      this.actorResize = actor;
+   _beginResize: function(actor, event) {
       let [mx, my] = event.get_coords();
       let [ax, ay] = actor.get_transformed_position();
       let aw = actor.get_width();
       let ah = actor.get_height();
       if(this._isInsideMenu(mx, my, ax, ay, aw, ah)) {
          if(this._correctPlaceResize(mx, my, ax, ay, aw, ah)) {
+            this.actorResize = actor;
             this._findMouseDeltha();
             global.set_cursor(Cinnamon.Cursor.DND_MOVE);
             this._doResize();
+            return true;
          }
       }
+      return false;
    },
 
    _findMouseDeltha: function(mx, my) {
