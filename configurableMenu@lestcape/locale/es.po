@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-03-02 01:11-0600\n"
+"PO-Revision-Date: 2014-03-02 17:45-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -159,6 +159,14 @@ msgid "Choose whether or not to swap the top and bottom panel on the menu."
 msgstr ""
 "Seleccione si desea o no intercambiar el panel superior e inferior en el "
 "menú."
+
+#. configurableMenu@lestcape->settings-schema.json->allow-search->description
+msgid "Show search entry"
+msgstr "Mostrar la entrada de búsqueda"
+
+#. configurableMenu@lestcape->settings-schema.json->allow-search->tooltip
+msgid "Choose whether or not to show search entry on the menu."
+msgstr "Elija si mostrar o no la entrada de búsqueda en el menú."
 
 #. configurableMenu@lestcape->settings-schema.json->app-title-
 #. size->description

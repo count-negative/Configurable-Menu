@@ -263,6 +263,14 @@ msgstr ""
 msgid "Choose whether or not to swap the top and bottom panel on the menu."
 msgstr ""
 
+#. configurableMenu@lestcape->settings-schema.json->allow-search->description
+msgid "Show search entry"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->allow-search->tooltip
+msgid "Choose whether or not to show search entry on the menu."
+msgstr ""
+
 #. configurableMenu@lestcape->settings-schema.json->app-title-
 #. size->description
 msgid "Font size of the selected application name:"

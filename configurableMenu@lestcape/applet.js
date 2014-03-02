@@ -5668,6 +5668,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "activate-on-hover", "activateOnHover",this._updateActivateOnHover, null);                        
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "menu-icon", "menuIcon", this._updateIconAndLabel, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "menu-label", "menuLabel", this._updateIconAndLabel, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "allow-search", "showSearhEntry", this._setSearhEntryVisible, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "search-filesystem", "searchFilesystem", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "swap-panels", "swapPanels", this._onSwapPanel, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "hover-delay", "hover_delay_ms", this._update_hover_delay, null);
@@ -6190,6 +6191,7 @@ MyApplet.prototype = {
    _makeThemeConvertion: function(themeProperties) {
       themeProperties["show-recent"] = (themeProperties["show-recent"] === 'true');
       themeProperties["show-places"] = (themeProperties["show-places"] === 'true');
+      themeProperties["allow-search"] = (themeProperties["allow-search"] === 'true');
       themeProperties["search-filesystem"] = (themeProperties["search-filesystem"] === 'true');
       themeProperties["swap-panels"] = (themeProperties["swap-panels"] === 'true');
       themeProperties["activate-on-hover"] = (themeProperties["activate-on-hover"] === 'true');
@@ -7100,6 +7102,12 @@ MyApplet.prototype = {
       }
    },
 
+   _setSearhEntryVisible: function() {
+      if(this.menu.isOpen)
+         this.menu.close();
+      this.searchEntry.visible = this.showSearhEntry;
+   },
+
    _changeView: function() {
       try {
       if(this.controlView) {
@@ -7293,6 +7301,7 @@ MyApplet.prototype = {
       this.activateOnHover = confTheme["activate-on-hover"];
       this.menuIcon = confTheme["menu-icon"];
       this.menuLabel = confTheme["menu-label"];
+      this.showSearhEntry = confTheme["allow-search"];
       this.searchFilesystem = confTheme["search-filesystem"];
       this.swapPanels = confTheme["swap-panels"];
       this.hover_delay_ms = confTheme["hover-delay"];
@@ -7358,6 +7367,7 @@ MyApplet.prototype = {
       confTheme["activate-on-hover"] = this.activateOnHover;
       confTheme["menu-icon"] = this.menuIcon;
       confTheme["menu-label"] = this.menuLabel;
+      confTheme["allow-search"] = this.showSearhEntry;
       confTheme["search-filesystem"] = this.searchFilesystem;
       confTheme["swap-panels"] = this.swapPanels;
       confTheme["hover-delay"] = this.hover_delay_ms;
@@ -8158,6 +8168,7 @@ MyApplet.prototype = {
                           this.loadClassic(); 
                           break;
          }
+         this.searchEntry.visible = this.showSearhEntry;;
          this.a11y_settings = new Gio.Settings({ schema: "org.cinnamon.desktop.a11y.applications" });
          this.a11y_settings.connect("changed::screen-magnifier-enabled", Lang.bind(this, this._updateVFade));
          this._updateVFade();
