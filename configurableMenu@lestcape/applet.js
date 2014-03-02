@@ -5367,9 +5367,6 @@ ConfigurablePopupMenu.prototype = {
       if(this.parentMenu instanceof ConfigurableMenu)
          this.parentMenu.setSubMenu(this);
       this.actor.add_style_class_name('menu-context-menu');
-      //Main.uiGroup.add_actor(this.actor);
-     // this.actor.hide();
-     // this.actor.grab_key_focus();
    },
 
    reparentMenu: function(parentMenu, orientation) {
@@ -8860,8 +8857,7 @@ MyApplet.prototype = {
       //this.operativePanel.visible = true;
       this.powerBox.actor.visible = false;
       this.endVerticalBox.visible = false;
-
-     // this.controlView.actor.visible = false;*/
+     // this.controlView.actor.visible = false;
    },
 
    _appletGenerateGnomeMenu: function(generate) {
@@ -8870,8 +8866,8 @@ MyApplet.prototype = {
       this._applet_icon_box.get_parent().remove_actor(this._applet_icon_box);
       this.onEnterMenuGnome();
       if(this._applet_categories_box) {
-         this.__menuManager.removeMenu(this.appMenuGnome);
-         this.__menuManager = null;
+        // this.__menuManager.removeMenu(this.appMenuGnome);
+        // this.__menuManager = null;
          this._applet_categories_box.destroy();
          this._applet_categories_box = null;
          this.gnomeCategories = null;
@@ -8884,9 +8880,9 @@ MyApplet.prototype = {
          this.appMenuGnome = null;
       }
       if(generate) {
-         this.__menuManager = new PopupMenu.PopupMenuManager(this);
+         //this.__menuManager = new PopupMenu.PopupMenuManager(this);
          this.appMenuGnome = new ConfigurablePopupMenu(this, this, this.orientation);
-         this.__menuManager.addMenu(this.appMenuGnome);
+         //this.__menuManager.addMenu(this.appMenuGnome);
 
          this.appMenuGnome.setArrow(this.showBoxPointer);
          this.appMenuGnome.fixToCorner(this.fixMenuCorner);
@@ -8895,7 +8891,6 @@ MyApplet.prototype = {
          this.appMenuGnome.actor.connect('button-press-event', Lang.bind(this, this._onMenuButtonPress));
          this.appMenuGnome.actor.connect('leave-event', Lang.bind(this, this._disableOverResizeIcon));
          this.appMenuGnome.actor.connect('button-release-event', Lang.bind(this, this._onMenuButtonRelease));
-         this.menu.connect('open-state-changed', Lang.bind(this, this._onOpenStateChanged));
 
          this._applet_categories_box = new St.BoxLayout({ vertical: false });
          this.actor.add(this._applet_categories_box, { y_align: St.Align.MIDDLE, y_fill: false });
@@ -9006,12 +9001,9 @@ MyApplet.prototype = {
    },
 
    openGnomeMenu: function(categoryActor) {
-      if((this.appMenuGnome)&&(this.displayed)) {
-         if(!this.menu.isOpen) {
-            this.menu.toggle();
-            this.repositionActor = categoryActor;
-            this.repositionGnomeCategory();
-         }
+      if((this.appMenuGnome)&&(this.displayed)&&(this.menu.isOpen)) {
+         if(this._applet_context_menu.isOpen)
+            this._applet_context_menu.close();
          this.appMenuGnome.reparentMenu(this.menu, St.Side.LEFT);
          if(!this.appMenuGnome.isOpen) {
             let size = this.mainBox.width - this.categoriesBox.get_allocation_box().x2 +
@@ -9023,7 +9015,9 @@ MyApplet.prototype = {
             this.appMenuGnome.repositionActor(categoryActor);
          else if(this.rootGnomeCat == actor)
             this.appMenuGnome.repositionActor(this._allAppsCategoryButton.actor);
+         return true;
       }
+      return false;
    },
 
    onCategorieGnomeChange: function(actor, event) {
