@@ -4771,10 +4771,10 @@ CategoryButtonExtended.prototype = {
             this.icon_name = icon.get_names().toString();
          else
             this.icon_name = "";
-         label = category.get_name();
+         labelName = category.get_name();
       } else
-         label = _("All Applications");
-      this.label.set_text(label);
+         labelName = _("All Applications");
+      this.label.set_text(labelName);
       if(category && this.icon_name) {
          this.icon = St.TextureCache.get_default().load_gicon(null, icon, this.iconSize);
       }
@@ -5259,11 +5259,14 @@ ConfigurableMenu.prototype = {
       this._arrowAlignment = 0.0;
       this._arrowSide = orientation;
       this.subMenu = subMenu;
+
       this._boxPointer = new ConfigurablePointer(orientation,
                                                  { x_fill: true,
                                                    y_fill: true,
                                                    x_align: St.Align.START });
       this.actor = this._boxPointer.actor;
+      Main.uiGroup.add_actor(this.actor);
+
       this.actor._delegate = this;
       this.actor.style_class = 'popup-menu-boxpointer';
       this.actor.connect('key-press-event', Lang.bind(this, this._onKeyPressEvent));
@@ -5278,8 +5281,6 @@ ConfigurableMenu.prototype = {
 
       global.focus_manager.add_group(this.actor);
       this.actor.reactive = true;
-
-      Main.uiGroup.add_actor(this.actor);
       this.actor.hide();
    },
 
@@ -5360,15 +5361,15 @@ ConfigurablePopupMenu.prototype = {
    __proto__: ConfigurableMenu.prototype,
 
    _init: function(parent, parentMenu, orientation) {
-      ConfigurableMenu.prototype._init.call(this, parentMenu.actor, orientation);
+      ConfigurableMenu.prototype._init.call(this, parentMenu, orientation);
       this.parent = parent;
       this.parentMenu = parentMenu;
       if(this.parentMenu instanceof ConfigurableMenu)
          this.parentMenu.setSubMenu(this);
       this.actor.add_style_class_name('menu-context-menu');
-      Main.uiGroup.add_actor(this.actor);
-      this.actor.hide();
-      this.actor.grab_key_focus();
+      //Main.uiGroup.add_actor(this.actor);
+     // this.actor.hide();
+     // this.actor.grab_key_focus();
    },
 
    reparentMenu: function(parentMenu, orientation) {
@@ -7121,8 +7122,10 @@ MyApplet.prototype = {
 
    _setVisibleFavorites: function() {
       if(this.appMenuGnome) {
-         this.appMenuGnome.close();
-         this.gnomeCategories[0].actor.visible = this.showFavorites;
+         if(this.appMenuGnome.isOpen)
+            this.appMenuGnome.close();
+         if((this.gnomeCategories)&&(this.gnomeCategories[0]))
+            this.gnomeCategories[0].actor.visible = this.showFavorites;
       }
       if(this.gnoMenuBox)
          this.gnoMenuBox.showFavorites(this.showFavorites);
@@ -7559,8 +7562,8 @@ MyApplet.prototype = {
       if(this.fullScreen) {
          if(this.controlView)
             this.controlView.changeResizeActive(false);
-         if(this.appMenuGnome)
-           this.appMenuGnome.close();
+         if((this.appMenuGnome)&&(this.appMenuGnome.isOpen))
+            this.appMenuGnome.close();
          this._setVisiblePointer(false);
          this.menu.fixToScreen(true);
       } else {
@@ -8807,6 +8810,10 @@ MyApplet.prototype = {
 
    loadClassicGnome: function() {
       this._appletGenerateGnomeMenu(true);
+      let section = new PopupMenu.PopupMenuSection();
+      this.appMenuGnome.addMenuItem(section);
+      section.actor.add_actor(this.operativePanel);
+
       this.allowFavName = true;
       this.betterPanel.set_vertical(true);
       this.controlSearchBox.set_vertical(true);
@@ -8847,10 +8854,6 @@ MyApplet.prototype = {
 
       this.operativePanel.add(this.favBoxWrapper, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.operativePanel.add(this.applicationsScrollBox.actor, { x_fill: true, y_fill: true, x_align: St.Align.START, expand: true });
-
-      let section = new PopupMenu.PopupMenuSection();
-      this.appMenuGnome.addMenuItem(section);
-      section.actor.add_actor(this.operativePanel);
       this.favoritesBox.set_style_class_name('');
 
       //this.searchEntry.visible = false;
@@ -8858,7 +8861,7 @@ MyApplet.prototype = {
       this.powerBox.actor.visible = false;
       this.endVerticalBox.visible = false;
 
-     // this.controlView.actor.visible = false;
+     // this.controlView.actor.visible = false;*/
    },
 
    _appletGenerateGnomeMenu: function(generate) {
@@ -8867,6 +8870,8 @@ MyApplet.prototype = {
       this._applet_icon_box.get_parent().remove_actor(this._applet_icon_box);
       this.onEnterMenuGnome();
       if(this._applet_categories_box) {
+         this.__menuManager.removeMenu(this.appMenuGnome);
+         this.__menuManager = null;
          this._applet_categories_box.destroy();
          this._applet_categories_box = null;
          this.gnomeCategories = null;
@@ -8879,7 +8884,10 @@ MyApplet.prototype = {
          this.appMenuGnome = null;
       }
       if(generate) {
+         this.__menuManager = new PopupMenu.PopupMenuManager(this);
          this.appMenuGnome = new ConfigurablePopupMenu(this, this, this.orientation);
+         this.__menuManager.addMenu(this.appMenuGnome);
+
          this.appMenuGnome.setArrow(this.showBoxPointer);
          this.appMenuGnome.fixToCorner(this.fixMenuCorner);
          this.appMenuGnome.setResizeArea(this.deltaMinResize);
@@ -8887,7 +8895,7 @@ MyApplet.prototype = {
          this.appMenuGnome.actor.connect('button-press-event', Lang.bind(this, this._onMenuButtonPress));
          this.appMenuGnome.actor.connect('leave-event', Lang.bind(this, this._disableOverResizeIcon));
          this.appMenuGnome.actor.connect('button-release-event', Lang.bind(this, this._onMenuButtonRelease));
-         //this.menu.connect('open-state-changed', Lang.bind(this, this._onOpenStateChanged));
+         this.menu.connect('open-state-changed', Lang.bind(this, this._onOpenStateChanged));
 
          this._applet_categories_box = new St.BoxLayout({ vertical: false });
          this.actor.add(this._applet_categories_box, { y_align: St.Align.MIDDLE, y_fill: false });
@@ -8961,8 +8969,8 @@ MyApplet.prototype = {
             this.selectedAppBox.setSelectedText("", "");
             this.hover.refreshFace();
          }));
-         /*if(this._applicationsBoxWidth > 0)
-            button.container.set_width(this._applicationsBoxWidth);*/
+         //if(this._applicationsBoxWidth > 0)
+         //   button.container.set_width(this._applicationsBoxWidth);
          this.placesBox.add(button.actor, {x_fill: true, expand: true});
       }
    },
@@ -8998,7 +9006,7 @@ MyApplet.prototype = {
    },
 
    openGnomeMenu: function(categoryActor) {
-      if(this.appMenuGnome) {
+      if((this.appMenuGnome)&&(this.displayed)) {
          if(!this.menu.isOpen) {
             this.menu.toggle();
             this.repositionActor = categoryActor;
@@ -9096,6 +9104,7 @@ MyApplet.prototype = {
       } catch(e) {
          Main.notify("Error repos", e.message);
       }
+      return false;
    },
 
    onLeaveMenuGnome: function() {
@@ -9618,15 +9627,10 @@ MyApplet.prototype = {
             this._setCategoryArrow(this._categoryButtons[i]);
          }
          //Main.notify("Fueron:" + viewBox.get_children().length);
-
-         if(!this.appMenuGnome) {
-            this._clearPrevCatSelection(this._allAppsCategoryButton.actor);
-            this._allAppsCategoryButton.actor.set_style_class_name('menu-category-button-selected');
-            this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
-            this._select_category(null, this._allAppsCategoryButton);
-         } else {
-           this._select_category(null, null);
-         }
+         this._clearPrevCatSelection(this._allAppsCategoryButton.actor);
+         this._allAppsCategoryButton.actor.set_style_class_name('menu-category-button-selected');
+         this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
+         this._select_category(null, this._allAppsCategoryButton);
       } catch(e) {Main.notify("errr", e.message);}
      // }));
       this._refreshPlacesAndRecent();
@@ -9661,8 +9665,10 @@ MyApplet.prototype = {
       this._recentButtons = new Array();
 
       if(this.appMenuGnome) {
-         this.appMenuGnome.close();
-         this.gnomeCategories[1].actor.visible = this.showPlaces;
+         if(this.appMenuGnome.isOpen)
+            this.appMenuGnome.close();
+         if((this.gnomeCategories)&&(this.gnomeCategories[1]))
+            this.gnomeCategories[1].actor.visible = this.showPlaces;
       }
       if(this.gnoMenuBox) {
          this.gnoMenuBox.showPlaces(this.showPlaces);
@@ -10001,7 +10007,7 @@ MyApplet.prototype = {
          this.powerBox.disableSelected();
          this.selectedAppBox.setDateTimeVisible(false);
          this.repositionActor = null;
-         if(this.appMenuGnome)
+         if((this.appMenuGnome)&&(this.appMenuGnome.isOpen))
             this.appMenuGnome.close();
       }
       return true;
