@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-02-25 21:42-0600\n"
+"PO-Revision-Date: 2014-03-02 01:11-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -452,6 +452,14 @@ msgid "Classic"
 msgstr "Classic"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
+msgid "Classic Gnome"
+msgstr "Classic Gnome"
+
+#. configurableMenu@lestcape->settings-schema.json->theme->options
+msgid "Whisker"
+msgstr "Whisker"
+
+#. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Dragon"
 msgstr "Dragon"
 
@@ -668,6 +676,14 @@ msgstr "Show scrolling area of categories"
 msgid "Choose whether or not to show the scrolling area of categories."
 msgstr "Choose whether or not to show the scrolling area of categories."
 
+#. configurableMenu@lestcape->settings-schema.json->arrow-categories->description
+msgid "Show arrow on the categories"
+msgstr "Show arrow on the categories"
+
+#. configurableMenu@lestcape->settings-schema.json->arrow-categories->tooltip
+msgid "Choose whether or not to show the arrow on the categories."
+msgstr "Choose whether or not to show the arrow on the categories."
+
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. description->description
 msgid "Show description of the selected application"
@@ -745,3 +761,15 @@ msgstr "System buttons have a box"
 #. configurableMenu@lestcape->settings-schema.json->power-box->tooltip
 msgid "Choose whether or not to have a box on the system buttons."
 msgstr "Choose whether or not to have a box on the system buttons."
+
+#. configurableMenu@lestcape->settings-schema.json->power-symbolic->description
+msgid "Show symbolic icons on the system buttons"
+msgstr "Show symbolic icons on the system buttons"
+
+#. configurableMenu@lestcape->settings-schema.json->power-symbolic->tooltip
+msgid ""
+"Enable this option to show symbolic icons, on the system buttons and disable "
+"to show full color."
+msgstr ""
+"Enable this option to show symbolic icons, on the system buttons and disable "
+"to show full color."

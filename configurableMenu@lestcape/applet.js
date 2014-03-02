@@ -66,6 +66,7 @@ const USER_DESKTOP_PATH = FileUtils.getUserDesktopDir();
 //const HOVER_ICON_SIZE = 68;
 //const APPLICATION_ICON_SIZE = 22;
 const MAX_RECENT_FILES = 20;
+const  CATEGORY_ARROW_SIZE = 12;
 //const CATEGORY_ICON_SIZE = 22;
 /*
 const LIB_PATH = '/usr/share/cinnamon/applets/menu@cinnamon.org';
@@ -1544,16 +1545,16 @@ PowerBox.prototype = {
          this.bttChanger.setActive(false);
       }));
       this.separatorPower = new SeparatorBox(false, 0);
-      //Lock screen
-      let button = new SystemButton(this.parent, null, "gnome-lockscreen", _("Lock screen"), _("Lock the screen"), this.hover, this.selectedAppBox,  this.iconSize, false);
+      //Lock screen "preferences-desktop-screensaver"
+      let button = new SystemButton(this.parent, null, "system-lock-screen", _("Lock screen"), _("Lock the screen"), this.hover, this.selectedAppBox,  this.iconSize, false);
       button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent));
       button.setAction(Lang.bind(this, this._onLockScreenAction));
 
       this._powerButtons.push(button);
         
-      //Logout button
-      button = new SystemButton(this.parent, null, "gnome-logout", _("Logout"), _("Leave the session"), this.hover, this.selectedAppBox,  this.iconSize, false);        
+      //Logout button "system-log-out" "system-users" "user-info"
+      button = new SystemButton(this.parent, null, "system-log-out", _("Logout"), _("Leave the session"), this.hover, this.selectedAppBox,  this.iconSize, false);        
       button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent));
       button.setAction(Lang.bind(this, this._onLogoutAction));
@@ -1561,13 +1562,19 @@ PowerBox.prototype = {
       this._powerButtons.push(button);
 
       //Shutdown button
-      button = new SystemButton(this.parent, null, "gnome-shutdown", _("Quit"), _("Shutdown the computer"), this.hover, this.selectedAppBox, this.iconSize, false);        
+      button = new SystemButton(this.parent, null, "system-shutdown", _("Quit"), _("Shutdown the computer"), this.hover, this.selectedAppBox, this.iconSize, false);        
       button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent)); 
       button.setAction(Lang.bind(this, this._onShutdownAction));
 
       this._powerButtons.push(button);
       this.setTheme(theme);
+   },
+
+   setIconSymbolic: function(symbolic) {
+      for(let i = 0; i < this._powerButtons.length; i++) {
+         this._powerButtons[i].setIconSymbolic(symbolic);
+      }
    },
 
    setSeparatorSpace: function(space) {
@@ -3778,6 +3785,10 @@ SystemButton.prototype = {
       this.actor.add(this.popupButton.actor, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
    },
 
+   setIconSymbolic: function(symbolic) {
+      this.popupButton.setIconSymbolic(symbolic);
+   },
+
    setIconVisible: function(haveIcon) {
       this.popupButton.setIconVisible(haveIcon);
    },
@@ -3876,7 +3887,15 @@ SystemPopupButtom.prototype = {
 
       this.addActor(this.container);
       this.label.realize();
+   },
 
+   setIconSymbolic: function(symbolic) {
+      if(this.iconObj) {
+         if(symbolic)
+            this.iconObj.set_icon_type(St.IconType.SYMBOLIC);
+         else
+            this.iconObj.set_icon_type(St.IconType.FULLCOLOR);
+      }
    },
 
    setIconVisible: function(haveIcon) {
@@ -4712,9 +4731,39 @@ CategoryButtonExtended.prototype = {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
       this.category = category;
       this.iconSize = iconSize;
+      this.arrowIcon = new St.Icon({icon_name: 'media-playback-start', icon_type: St.IconType.SYMBOLIC,
+                                    reactive: true, track_hover: true, style_class: 'popup-menu-icon' });
+        
+      this.actor._delegate = this;
+      this.label = new St.Label({ style_class: 'menu-category-button-label' });
+      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
+      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+      this.container = new St.BoxLayout();
+      this.textBox = new St.BoxLayout({ vertical: false });
+      this.setVertical(false);
+      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+
+      this._setCategoryProperties(category);
+      if(this.icon) {
+         this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+         this.icon.realize();
+      }
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: true, y_fill: false, expand: true });
+      this.addActor(this.container, { expand: true, span: 1, align: St.Align.END});
+      
+      this.label.realize();
+      this.setIconVisible(iconVisible);
+      this.internalActor = this.actor;
+      this.actor = new St.BoxLayout({ vertical: false, reactive: true, track_hover: true });
+      this.actor.add(this.internalActor, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
       this.actor.set_style_class_name('menu-category-button');
       this.actor.add_style_class_name('menu-category-button-' + this.theme);
-      var label;
+      this.internalActor.set_style_class_name('');
+   },
+
+   _setCategoryProperties: function(category) {
+      let labelName;
       let icon = null;
       if(category) {
          icon = category.get_icon();
@@ -4725,29 +4774,10 @@ CategoryButtonExtended.prototype = {
          label = category.get_name();
       } else
          label = _("All Applications");
-        
-      this.actor._delegate = this;
-      this.label = new St.Label({ text: label, style_class: 'menu-category-button-label' });
-      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
-      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
-      this.container = new St.BoxLayout();
-      this.textBox = new St.BoxLayout({ vertical: false });
-      this.setVertical(false);
-
-      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.label.set_text(label);
       if(category && this.icon_name) {
          this.icon = St.TextureCache.get_default().load_gicon(null, icon, this.iconSize);
-         if(this.icon) {
-            this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-            this.icon.realize();
-         }
       }
-      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-
-      this.addActor(this.container);
-      this.label.realize();
-      this.setIconVisible(iconVisible);
    },
 
    getCategoryID: function() {
@@ -4756,6 +4786,28 @@ CategoryButtonExtended.prototype = {
       return "All";
    },
 
+   setArrowVisible: function(visible, orientation) {
+     // Main.notify("visible:" + visible);
+      this.actor.remove_actor(this.internalActor);
+      let parentArrow = this.arrowIcon.get_parent();
+      if(parentArrow)
+         parentArrow.remove_actor(this.arrowIcon);
+
+      if(visible) {
+         if(orientation == St.Side.RIGHT) {
+            this.arrowIcon.set_icon_name('media-playback-start');
+            this.actor.add(this.internalActor, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+            this.actor.add(this.arrowIcon, { x_fill: false, expand: false, x_align: St.Align.END });
+         } else if(orientation == St.Side.LEFT) {
+            this.arrowIcon.set_icon_name('media-playback-start-rtl');
+            this.actor.add(this.arrowIcon, { x_fill: false, expand: false, x_align: St.Align.END });
+            this.actor.add(this.internalActor, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+         }
+      } else {
+         this.actor.add(this.internalActor, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      }
+   },
+
    setIconVisible: function(visible) {
       if(this.icon)
          this.icon.visible = visible;
@@ -4769,15 +4821,6 @@ CategoryButtonExtended.prototype = {
 
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
-    /*  this.label.clutter_text.line_wrap = vertical;
-      if(vertical) {
-         this.textBox.set_width(88);
-         this.textBox.set_height(32);    
-      }
-      else {
-         this.textBox.set_width(-1);
-         this.textBox.set_height(-1);
-      }*/
    }
 };
 
@@ -4786,62 +4829,19 @@ function PlaceCategoryButtonExtended(app, iconSize, iconVisible) {
 }
 
 PlaceCategoryButtonExtended.prototype = {
-   __proto__: PopupMenu.PopupBaseMenuItem.prototype,
+   __proto__: CategoryButtonExtended.prototype,
 
    _init: function(category, iconSize, iconVisible) {
-      PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
-      this.iconSize = iconSize;
-      this.actor.set_style_class_name('menu-category-button');
-      this.actor.add_style_class_name('menu-category-button-' + this.theme);
-      this.actor._delegate = this;
-      this.label = new St.Label({ text: _("Places"), style_class: 'menu-category-button-label' });
-      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
-      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
-      this.container = new St.BoxLayout();
-      this.textBox = new St.BoxLayout({ vertical: false });
-      this.setVertical(false);
+      CategoryButtonExtended.prototype._init.call(this, category, iconSize, iconVisible);
+   },
 
-      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+   _setCategoryProperties: function(category) {
+      this.label.set_text(_("Places"));
       this.icon = new St.Icon({icon_name: "folder", icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR});
-      if(this.icon) {
-         this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-         this.icon.realize();
-      }
-      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-
-      this.addActor(this.container);
-      this.icon.realize();
-      this.label.realize();
-      this.setIconVisible(iconVisible);
    },
 
    getCategoryID: function() {
       return "Places";
-   },
-
-   setIconVisible: function(visible) {
-      if(this.icon)
-         this.icon.visible = visible;
-   },
-
-   setIconSize: function (iconSize) {
-      this.iconSize = iconSize;
-      if(this.icon)
-         this.icon.set_icon_size(this.iconSize);
-   },
-
-   setVertical: function(vertical) {
-      this.container.set_vertical(vertical);
-     /* this.label.clutter_text.line_wrap = vertical;
-      if(vertical) {
-         this.textBox.set_width(88);
-         this.textBox.set_height(32);    
-      }
-      else {
-         this.textBox.set_width(-1);
-         this.textBox.set_height(-1);
-      }*/
    }
 };
 
@@ -4850,62 +4850,19 @@ function RecentCategoryButtonExtended(app, iconSize, iconVisible) {
 }
 
 RecentCategoryButtonExtended.prototype = {
-   __proto__: PopupMenu.PopupBaseMenuItem.prototype,
+   __proto__: CategoryButtonExtended.prototype,
 
    _init: function(category, iconSize, iconVisible) {
-      PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
-      this.iconSize = iconSize;
-      this.actor.set_style_class_name('menu-category-button');
-      this.actor.add_style_class_name('menu-category-button-' + this.theme);
-      this.actor._delegate = this;
-      this.label = new St.Label({ text: _("Recent Files"), style_class: 'menu-category-button-label' });
-      this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
-      this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
-      this.container = new St.BoxLayout();
-      this.textBox = new St.BoxLayout({ vertical: false });
-      this.setVertical(false);
+      CategoryButtonExtended.prototype._init.call(this, category, iconSize, iconVisible);
+   },
 
-      this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+   _setCategoryProperties: function(category) {
+      this.label.set_text(_("Recent Files"));
       this.icon = new St.Icon({icon_name: "folder-recent", icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR});
-      if(this.icon) {
-         this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-         this.icon.realize();
-      }
-      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-
-      this.addActor(this.container);
-
-      this.label.realize();
-      this.setIconVisible(iconVisible);
    },
 
    getCategoryID: function() {
       return "Recently";
-   },
-
-   setIconVisible: function(visible) {
-      if(this.icon)
-         this.icon.visible = visible;
-   },
-
-   setIconSize: function (iconSize) {
-      this.iconSize = iconSize;
-      if(this.icon)
-         this.icon.set_icon_size(this.iconSize);
-   },
-
-   setVertical: function(vertical) {
-      this.container.set_vertical(vertical);
-     /* this.label.clutter_text.line_wrap = vertical;
-      if(vertical) {
-         this.textBox.set_width(88);
-         this.textBox.set_height(32);    
-      }
-      else {
-         this.textBox.set_width(-1);
-         this.textBox.set_height(-1);
-      }*/
    }
 };
 
@@ -4939,12 +4896,14 @@ ConfigurablePointer.prototype = {
    },
 
    fixToScreen: function(actor, fixScreen) {
+      this.fixCorner = false;
       this.fixScreen = fixScreen;
       this.trySetPosition(actor, this._arrowAlignment);
       this._border.queue_repaint();
    },
 
    fixToCorner: function(actor, fixCorner) {
+      this.fixScreen = false;
       this.fixCorner = fixCorner;
       this.trySetPosition(actor, this._arrowAlignment);
       this._border.queue_repaint();
@@ -5339,6 +5298,10 @@ ConfigurableMenu.prototype = {
       this._boxPointer.fixToCorner(this.sourceActor, fixCorner);
    },
 
+   fixToScreen: function(fixCorner) {
+      this._boxPointer.fixToScreen(this.sourceActor, fixCorner);
+   },
+
    setResizeArea: function(resizeSize) {
       this._boxPointer.setResizeArea(resizeSize);
    },
@@ -5356,6 +5319,14 @@ ConfigurableMenu.prototype = {
 
    setSubMenu: function(subMenu) {
       this.subMenu = subMenu;
+   },
+
+   getCurrentMenuThemeNode: function() {
+      return this._boxPointer.getCurrentMenuThemeNode();
+   },
+
+   shiftPosition: function(x, y) {
+      this._boxPointer.shiftPosition(x, y);
    },
 
    open: function(animate) {
@@ -5672,6 +5643,8 @@ MyApplet.prototype = {
          this.execInstallLanguage();
          //_ = Gettext.domain(this.uuid).gettext;
          Gettext.bindtextdomain(this.uuid, GLib.get_home_dir() + "/.local/share/locale");
+         let iconPath = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + this.uuid + "/icons";
+         Gtk.IconTheme.get_default().append_search_path(iconPath);
 
          this.set_applet_tooltip(_("Menu"));
          this.RecentManager = new DocInfo.DocManager();
@@ -5706,6 +5679,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "gnomenu-buttons-theme", "gnoMenuButtonsTheme", this._onThemeGnoMenuButtonsChange, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-view-item", "showView", this._setVisibleViewControl, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "control-symbolic", "controlSymbolic", this._setControlButtonsSymbolic, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "power-symbolic", "powerSymbolic", this._setPowerButtonsSymbolic, null);
 
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "view-item", "iconView", this._changeView, null);
 
@@ -5755,6 +5729,7 @@ MyApplet.prototype = {
 
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "scroll-favorites", "scrollFavoritesVisible", this._setVisibleScrollFav, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "scroll-categories", "scrollCategoriesVisible", this._setVisibleScrollCat, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "arrow-categories", "arrowCategoriesVisible", this._setVisibleArrowCat, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "scroll-applications", "scrollApplicationsVisible", this._setVisibleScrollApp, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "scroll-accessible", "scrollAccessibleVisible", this._setVisibleScrollAccess, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "scroll-gnomenu", "scrollGnoMenuVisible", this._setVisibleScrollGnoMenu, null);
@@ -6224,6 +6199,7 @@ MyApplet.prototype = {
       themeProperties["enable-autoscroll"] = (themeProperties["enable-autoscroll"] === 'true');
       themeProperties["show-view-item"] = (themeProperties["show-view-item"] === 'true');
       themeProperties["control-symbolic"] = (themeProperties["control-symbolic"] === 'true');
+      themeProperties["power-symbolic"] = (themeProperties["power-symbolic"] === 'true');
       themeProperties["view-item"] = (themeProperties["view-item"] === 'true');
       themeProperties["hover-box"] = (themeProperties["hover-box"] === 'true');
       themeProperties["control-box"] = (themeProperties["control-box"] === 'true');
@@ -6253,11 +6229,13 @@ MyApplet.prototype = {
       themeProperties["show-app-description"] = (themeProperties["show-app-description"] === 'true');
       themeProperties["app-description-size"] = parseInt(themeProperties["app-description-size"]);
       themeProperties["automatic-size"] = (themeProperties["automatic-size"] === 'true');
+      themeProperties["allow-resizing"] = (themeProperties["allow-resizing"] === 'true');
       themeProperties["full-screen"] = (themeProperties["full-screen"] === 'true');
       themeProperties["width"] = parseInt(themeProperties["width"]);
       themeProperties["height"] = parseInt(themeProperties["height"]);
       themeProperties["scroll-favorites"] = (themeProperties["scroll-favorites"] === 'true');
       themeProperties["scroll-categories"] = (themeProperties["scroll-categories"] === 'true');
+      themeProperties["arrow-categories"] = (themeProperties["arrow-categories"] === 'true');
       themeProperties["scroll-applications"] = (themeProperties["scroll-applications"] === 'true');
       themeProperties["scroll-accessible"] = (themeProperties["scroll-accessible"] === 'true');
       themeProperties["scroll-gnomenu"] = (themeProperties["scroll-gnomenu"] === 'true');
@@ -7092,6 +7070,12 @@ MyApplet.prototype = {
       }
    },
 
+   _setPowerButtonsSymbolic: function() {
+      if(this.powerBox) {
+         this.powerBox.setIconSymbolic(this.powerSymbolic);
+      }
+   },
+
    _onSwapPanel: function() {
       try {
          if((this.bottomBoxSwaper)&&(this.topBoxSwaper)) {
@@ -7197,6 +7181,23 @@ MyApplet.prototype = {
       }
    },
 
+   _setVisibleArrowCat: function() {
+      for(let i = 0; i < this._categoryButtons.length; i++) {
+         this._setCategoryArrow(this._categoryButtons[i]);
+      }
+      this._setCategoryArrow(this.placesButton);
+      this._setCategoryArrow(this.recentButton);
+   },
+
+   _setCategoryArrow: function(cat) {
+      if(this.categoriesBox.get_vertical()) {
+        if(this.theme == "whisker")
+           cat.setArrowVisible(this.arrowCategoriesVisible, St.Side.LEFT);
+        else
+           cat.setArrowVisible(this.arrowCategoriesVisible, St.Side.RIGHT)
+      }
+   },
+
    _setVisibleSeparatorLine: function() {
       this.powerBox.setSeparatorLine(this.showSeparatorLine);
       if(this.accessibleBox)
@@ -7224,9 +7225,13 @@ MyApplet.prototype = {
    },
 
    _setVisibleBoxPointer: function() {
-      this.menu._boxPointer.setArrow(this.showBoxPointer);
+      this._setVisiblePointer(this.showBoxPointer);
+   },
+
+   _setVisiblePointer: function(visible) {
+      this.menu.setArrow(visible);
       if(this.appMenuGnome) {
-         this.appMenuGnome._boxPointer.setArrow(this.showBoxPointer);
+         this.appMenuGnome.setArrow(visible);
       }
    },
 
@@ -7294,6 +7299,7 @@ MyApplet.prototype = {
       this.autoscroll_enabled = confTheme["enable-autoscroll"];
       this.showView = confTheme["show-view-item"];
       this.controlSymbolic = confTheme["control-symbolic"];
+      this.powerSymbolic = confTheme["power-symbolic"];
       this.iconView = confTheme["view-item"];
       this.activateOnPress = confTheme["activate-on-press"];
       this.showHoverIconBox = confTheme["hover-box"];
@@ -7326,11 +7332,13 @@ MyApplet.prototype = {
       this.showAppDescription = confTheme["show-app-description"];
       this.appDescriptionSize = confTheme["app-description-size"];
       this.automaticSize = confTheme["automatic-size"];
+      this.controlingSize = confTheme["allow-resizing"];
       this.fullScreen = confTheme["full-screen"];
       this.width = confTheme["width"];
       this.height = confTheme["height"];
       this.scrollFavoritesVisible = confTheme["scroll-favorites"];
       this.scrollCategoriesVisible = confTheme["scroll-categories"];
+      this.arrowCategoriesVisible = confTheme["arrow-categories"];
       this.scrollApplicationsVisible = confTheme["scroll-applications"];
       this.scrollAccessibleVisible = confTheme["scroll-accessible"];
       this.scrollGnoMenuVisible = confTheme["scroll-gnomenu"];
@@ -7357,6 +7365,7 @@ MyApplet.prototype = {
 
       confTheme["show-view-item"] = this.showView;
       confTheme["control-symbolic"] = this.controlSymbolic;
+      confTheme["power-symbolic"] = this.powerSymbolic;
       confTheme["view-item"] = this.iconView;
       confTheme["activate-on-press"] = this.activateOnPress;
       confTheme["hover-box"] = this.showHoverIconBox;
@@ -7389,11 +7398,13 @@ MyApplet.prototype = {
       confTheme["show-app-description"] = this.showAppDescription;
       confTheme["app-description-size"] = this.appDescriptionSize;
       confTheme["automatic-size"] = this.automaticSize;
+      confTheme["allow-resizing"] = this.controlingSize;
       confTheme["full-screen"] = this.fullScreen;
       confTheme["width"] = this.width;
       confTheme["height"] = this.height;
       confTheme["scroll-favorites"] = this.scrollFavoritesVisible;
       confTheme["scroll-categories"] = this.scrollCategoriesVisible;
+      confTheme["arrow-categories"] = this.arrowCategoriesVisible;
       confTheme["scroll-applications"] = this.scrollApplicationsVisible;
       confTheme["scroll-accessible"] = this.scrollAccessibleVisible;
       confTheme["scroll-gnomenu"] = this.scrollGnoMenuVisible;
@@ -7446,6 +7457,7 @@ MyApplet.prototype = {
       this._setVisibleScrollApp();
       this._setVisibleScrollAccess();
       this._setVisibleScrollGnoMenu();
+      this._setVisibleArrowCat();
       if(this.separatorMiddle) {
          this.separatorMiddle.setLineVisible(this.showSeparatorLine);
          this.separatorMiddle.setSpace(this.separatorSize);
@@ -7497,6 +7509,7 @@ MyApplet.prototype = {
          this.powerBox.actor.visible = this.showPowerButtons;
          this.powerBox.setTheme(this.powerTheme);
          this.powerBox.setSpecialColor(this.showPowerBox);
+         this.powerBox.setIconSymbolic(this.powerSymbolic);
       }
       if(this.accessibleBox) {
          this.accessibleBox.setSeparatorLine(this.showSeparatorLine);
@@ -7519,8 +7532,10 @@ MyApplet.prototype = {
             this.controlView.changeResizeActive(false);
             this.controlView.changeFullScreen(this.fullScreen);
          }
-         this.menu._boxPointer.setArrow(false);
+         this._setVisiblePointer(false);
          this.menu.fixToCorner(true);
+      } else if(this.controlingSize) {
+         this._activeResize();
       }
    },
 
@@ -7544,11 +7559,15 @@ MyApplet.prototype = {
       if(this.fullScreen) {
          if(this.controlView)
             this.controlView.changeResizeActive(false);
-         this.menu._boxPointer.setArrow(false);
-         this.menu.fixToCorner(true);
+         if(this.appMenuGnome)
+           this.appMenuGnome.close();
+         this._setVisiblePointer(false);
+         this.menu.fixToScreen(true);
       } else {
-         this.menu._boxPointer.setArrow(this.showBoxPointer);
-         this.menu.fixToCorner(this.fixMenuCorner);         
+         this._setVisiblePointer(this.showBoxPointer);
+         this.menu.fixToCorner(this.fixMenuCorner);
+         if(this.appMenuGnome)
+            this.onCategorieGnomeChange(this.rootGnomeCat);
       }
       this._updateSize();
    },
@@ -7556,21 +7575,28 @@ MyApplet.prototype = {
    _updateSize: function() {
       if((this.mainBox)&&(this.displayed)) {
          let monitor = Main.layoutManager.findMonitorForActor(this.actor);
+         if(this.appMenuGnome) this.appMenuGnome.actor.set_width(-1);
          if(this.fullScreen) {
             let panelTop = this._processPanelSize(false);
             let panelButton = this._processPanelSize(true);
             //Main.notify("panelTop:" + panelTop + " panelButton:" + panelButton);
-            let themeNode = this.menu._boxPointer.getCurrentMenuThemeNode();
+            let themeNode = this.menu.getCurrentMenuThemeNode();
             let difference = this.menu.actor.get_height() - this.mainBox.get_height();
             if(difference < 0) {
                this.mainBox.set_height(monitor.height - panelButton - panelTop - 40);
-               this.mainBox.set_width(monitor.width);
+               if(this.appMenuGnome) this.mainBox.set_width(-1);
+               else this.mainBox.set_width(monitor.width);
             }
             difference = this.menu.actor.get_height() - this.mainBox.get_height();
             let bordersY = themeNode.get_length('border-bottom') + themeNode.get_length('border-top') + themeNode.get_length('-boxpointer-gap');
            /* if(panelTop == 0)
                bordersY+= 2;*/
-            this.mainBox.set_width(monitor.width - this.menu.actor.width + this.mainBox.width);
+            if(this.appMenuGnome) {
+               let minWidth = this._minimalWidth();
+               this.mainBox.set_width(minWidth);
+               this.appMenuGnome.actor.set_width(monitor.width - minWidth);
+            }
+            else this.mainBox.set_width(monitor.width - this.menu.actor.width + this.mainBox.width);
             this.mainBox.set_height(monitor.height - panelButton - panelTop + bordersY - difference);
             this._updateView();
             if((this.theme == "windows7")||(this.theme == "mint")) {
@@ -8820,7 +8846,7 @@ MyApplet.prototype = {
       this.endVerticalBox.add(this.powerBox.actor, { x_fill: true, y_fill: true, expand: false });
 
       this.operativePanel.add(this.favBoxWrapper, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.operativePanel.add(this.applicationsScrollBox.actor, { x_fill: true, y_fill: true, expand: false });
+      this.operativePanel.add(this.applicationsScrollBox.actor, { x_fill: true, y_fill: true, x_align: St.Align.START, expand: true });
 
       let section = new PopupMenu.PopupMenuSection();
       this.appMenuGnome.addMenuItem(section);
@@ -8828,7 +8854,7 @@ MyApplet.prototype = {
       this.favoritesBox.set_style_class_name('');
 
       //this.searchEntry.visible = false;
-      this.operativePanel.visible = true;
+      //this.operativePanel.visible = true;
       this.powerBox.actor.visible = false;
       this.endVerticalBox.visible = false;
 
@@ -8854,7 +8880,7 @@ MyApplet.prototype = {
       }
       if(generate) {
          this.appMenuGnome = new ConfigurablePopupMenu(this, this, this.orientation);
-         this.appMenuGnome._boxPointer.setArrow(this.showBoxPointer);
+         this.appMenuGnome.setArrow(this.showBoxPointer);
          this.appMenuGnome.fixToCorner(this.fixMenuCorner);
          this.appMenuGnome.setResizeArea(this.deltaMinResize);
          this.appMenuGnome.actor.connect('motion-event', Lang.bind(this, this._onResizeMotionEvent));
@@ -8982,7 +9008,7 @@ MyApplet.prototype = {
          if(!this.appMenuGnome.isOpen) {
             let size = this.mainBox.width - this.categoriesBox.get_allocation_box().x2 +
                        this.categoriesBox.get_allocation_box().x1;
-            this.appMenuGnome._boxPointer.shiftPosition(size, 0);
+            this.appMenuGnome.shiftPosition(size, 0);
             this.appMenuGnome.toggle();
          }
          if(categoryActor)
@@ -9589,6 +9615,7 @@ MyApplet.prototype = {
          for(let i = 0; i < this._categoryButtons.length; i++) {
             this._categoryButtons[i].setVertical(catVertical);
             viewBox.add_actor(this._categoryButtons[i].actor);
+            this._setCategoryArrow(this._categoryButtons[i]);
          }
          //Main.notify("Fueron:" + viewBox.get_children().length);
 
@@ -9686,6 +9713,7 @@ MyApplet.prototype = {
          this._categoryButtons.push(this.placesButton);
          this.placesButton.setVertical(!this.categoriesBox.get_vertical());
          this.categoriesBox.get_children()[0].add_actor(this.placesButton.actor);
+         this._setCategoryArrow(this.placesButton);
 
          let bookmarks = this._listBookmarks();
          let devices = this._listDevices();
@@ -9758,6 +9786,7 @@ MyApplet.prototype = {
          this.categoriesBox.get_children()[0].add_actor(this.recentButton.actor);
          this.recentButton.setVertical(!this.categoriesBox.get_vertical());
          this._categoryButtons.push(this.recentButton);
+         this._setCategoryArrow(this.recentButton);
 
          for(let id = 0; id < MAX_RECENT_FILES && id < this.RecentManager._infosByTimestamp.length; id++) {
             let button = new RecentButtonExtended(this, this.RecentManager._infosByTimestamp[id], this.iconView,

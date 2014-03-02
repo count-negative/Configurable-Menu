@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-02-25 21:42-0600\n"
+"PO-Revision-Date: 2014-03-02 01:11-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -128,7 +128,7 @@ msgstr "Ícono de Visualización:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-system->description
 msgid "System Buttons:"
-msgstr "Botones del Systema:"
+msgstr "Botones del Sistema:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-control->description
 msgid "Control Buttons:"
@@ -464,6 +464,14 @@ msgid "Classic"
 msgstr "Clásico"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
+msgid "Classic Gnome"
+msgstr "Gnome Clásico"
+
+#. configurableMenu@lestcape->settings-schema.json->theme->options
+msgid "Whisker"
+msgstr "Whisker"
+
+#. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Dragon"
 msgstr "Dragón"
 
@@ -686,6 +694,15 @@ msgstr ""
 "Seleccione si desea o no mostrar mostrar el área de desplazamiento de las "
 "categorías."
 
+#. configurableMenu@lestcape->settings-schema.json->arrow-categories->description
+msgid "Show arrow on the categories"
+msgstr "Mostrar una flecha en las categorias."
+
+#. configurableMenu@lestcape->settings-schema.json->arrow-categories->tooltip
+msgid "Choose whether or not to show the arrow on the categories."
+msgstr ""
+"Seleccione si desea o no mostrar una flecha de indicación en las categorías."
+
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. description->description
 msgid "Show description of the selected application"
@@ -766,4 +783,16 @@ msgstr "Los botones del sistema tienen caja"
 
 #. configurableMenu@lestcape->settings-schema.json->power-box->tooltip
 msgid "Choose whether or not to have a box on the system buttons."
-msgstr "Seleccione si desea o no que el panel accessible tenga caja."
+msgstr "Seleccione si desea o no que los botones del sistema tengan caja."
+
+#. configurableMenu@lestcape->settings-schema.json->power-symbolic->description
+msgid "Show symbolic icons on the system buttons"
+msgstr "Mostrar íconos simbólicos en los botones del sistema"
+
+#. configurableMenu@lestcape->settings-schema.json->power-symbolic->tooltip
+msgid ""
+"Enable this option to show symbolic icons, on the system buttons and disable "
+"to show full color."
+msgstr ""
+"Active esta opción para mostrar los íconos simbólicos en los botones del "
+"sistema y desactivela para mostrarlos a todo color."

@@ -604,6 +604,14 @@ msgid "Classic"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
+msgid "Classic Gnome"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->theme->options
+msgid "Whisker"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Dragon"
 msgstr ""
 
@@ -882,6 +890,14 @@ msgstr ""
 msgid "Choose whether or not to show the scrolling area of categories."
 msgstr ""
 
+#. configurableMenu@lestcape->settings-schema.json->arrow-categories->description
+msgid "Show arrow on the categories"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->arrow-categories->tooltip
+msgid "Choose whether or not to show the arrow on the categories."
+msgstr ""
+
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. description->description
 msgid "Show description of the selected application"
@@ -968,4 +984,12 @@ msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->power-box->tooltip
 msgid "Choose whether or not to have a box on the system buttons."
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->power-symbolic->description
+msgid "Show symbolic icons on the system buttons"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->power-symbolic->tooltip
+msgid "Enable this option to show symbolic icons, on the system buttons and disable to show full color."
 msgstr ""
