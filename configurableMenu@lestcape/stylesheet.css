@@ -5,6 +5,26 @@
         padding-bottom: 0px;
 }
 
+.menu-main-box-classicGnome {
+        padding: 0px;
+}
+
+.menu-favorites-box-internal {
+        padding: 1px;
+}
+
+.menu-categories-box-classicGnome {
+        padding: 0px;
+}
+
+.menu-favorites-box-classicGnome {
+        padding: 0px;
+}
+
+.menu-favorites-box-windows7 {
+        padding: 10px;
+}
+
 .menu-control-button {
         border: 1px;
         border-color: rgba(255,255,255,0);
