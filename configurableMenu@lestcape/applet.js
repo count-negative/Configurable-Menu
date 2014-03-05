@@ -7524,17 +7524,19 @@ MyApplet.prototype = {
       this._setCategoryArrow(this.recentButton);
    },
 
-   _setCategoryArrow: function(cat) {
-      if(this.categoriesBox.get_vertical()) {
-        if(this.theme == "whisker")
-           cat.setArrowVisible(this.arrowCategoriesVisible, St.Side.LEFT);
-        else if(this.theme == "classicGnome") {
-           if(this.popupOrientation == St.Side.LEFT)
-              cat.setArrowVisible(this.arrowCategoriesVisible, St.Side.RIGHT);
-           else
-              cat.setArrowVisible(this.arrowCategoriesVisible, St.Side.LEFT);
-        } else
-           cat.setArrowVisible(this.arrowCategoriesVisible, St.Side.RIGHT)
+   _setCategoryArrow: function(category) {
+      if(category) {
+         if(this.categoriesBox.get_vertical()) {
+           if(this.theme == "whisker")
+              category.setArrowVisible(this.arrowCategoriesVisible, St.Side.LEFT);
+           else if(this.theme == "classicGnome") {
+              if(this.popupOrientation == St.Side.LEFT)
+                 category.setArrowVisible(this.arrowCategoriesVisible, St.Side.RIGHT);
+              else
+                 category.setArrowVisible(this.arrowCategoriesVisible, St.Side.LEFT);
+           } else
+              category.setArrowVisible(this.arrowCategoriesVisible, St.Side.RIGHT)
+         }
       }
    },
 
@@ -7800,6 +7802,10 @@ MyApplet.prototype = {
       this._setVisibleScrollAccess();
       this._setVisibleScrollGnoMenu();
       this._setVisibleArrowCat();
+
+      this.mainBox.set_width(this.width);
+      this.mainBox.set_height(this.height);
+
       if(this.separatorMiddle) {
          this.separatorMiddle.setLineVisible(this.showSeparatorLine);
          this.separatorMiddle.setSpace(this.separatorSize);
@@ -7870,6 +7876,12 @@ MyApplet.prototype = {
       this._updateAppSize();
       this._refreshFavs();
       //this._updateView();
+      //Mainloop.idle_add(Lang.bind(this, function() {
+            this._updateView();
+            this._clearAllSelections(true);
+           /* this._clearAppSize();
+            this._updateAppSize();*/
+      //}));
       if(this.fullScreen) {
          if(this.controlView) {
             this.controlView.changeResizeActive(false);
@@ -8039,7 +8051,7 @@ MyApplet.prototype = {
                let minWidth = this.operativePanel.width + 10;
                let minHeight = this._minimalHeight();
                if(this.subMenuWidth < minWidth) {
-                  this.subMenuWidth = minWidth;
+                  this.subMenuWidth = minWidth - 2;
                   this.appMenuGnome.actor.set_width(this.subMenuWidth);
                }
                if(this.subMenuHeight < minHeight) {
@@ -8593,11 +8605,6 @@ MyApplet.prototype = {
          
          section.actor.add_actor(this.menuBox);
 
-         Mainloop.idle_add(Lang.bind(this, function() {
-            this._clearAllSelections(true);
-            this._clearAppSize();
-            this._updateAppSize();
-         }));
       } catch(e) {
          Main.notify("ErrorDisplay:", e.message);
       }
@@ -9239,7 +9246,7 @@ MyApplet.prototype = {
       let section = new PopupMenu.PopupMenuSection();
       this.appMenuGnome.addMenuItem(section);
       section.actor.add_actor(this.menuGnomeMainBox);
-      this.menuGnomeMainBox.add_actor(this.operativePanel/*, { x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: true }*/);
+      this.menuGnomeMainBox.add(this.operativePanel, { x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: true });
 
       this.allowFavName = true;
       this.betterPanel.set_vertical(true);
@@ -9264,7 +9271,7 @@ MyApplet.prototype = {
       this.categoriesWrapper.add(this.placesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.categoriesWrapper.add(this.favBoxWrapper, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
-     // this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
+      this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       
       //this.categoriesWrapper.add_actor(this.separatorMiddle.actor);
       //this.categoriesWrapper.add_actor(this.separatorBottom.actor);
@@ -9283,6 +9290,7 @@ MyApplet.prototype = {
       this.betterPanel.add(this.endBox, { x_fill: true, y_fill: true, y_align: St.Align.END, expand: false });
       this.endVerticalBox.add(this.powerBox.actor, { x_fill: true, y_fill: true, expand: false });
       this.operativePanel.add(this.applicationsScrollBox.actor, { x_fill: true, y_fill: true, x_align: St.Align.START, expand: true });
+
       this.favBoxWrapper.set_style_class_name('menu-favorites-box-classicGnome');
 
       //this.searchEntry.visible = false;
@@ -10355,15 +10363,13 @@ MyApplet.prototype = {
                this.height = maxHeigth;
             if(this.width > monitor.width)
                this.width = monitor.width;
-            this.mainBox.set_width(this.width);
-            this.mainBox.set_height(this.height);
-            if(this.updateTheme) {
-               this.updateTheme = false;
-               Mainloop.idle_add(Lang.bind(this, this._updateSize));
-            }
          } else {						
             this._setFullScreen();
          }
+        /* if(this.updateTheme) {
+            this.updateTheme = false;
+         }*/
+         Mainloop.idle_add(Lang.bind(this, this._updateSize));
       }
    },
 
