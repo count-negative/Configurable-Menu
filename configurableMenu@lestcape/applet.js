@@ -7922,6 +7922,8 @@ MyApplet.prototype = {
      if(this.appMenuGnome) {
          this.appMenuGnomeClose();
          this.appMenuGnome.fixToScreen(this.fullScreen);
+         if(!this.fullScreen)
+            this.appMenuGnome.fixToScreen(this.subMenuAlign);
       }
       if(this.controlView)
          this.controlView.changeFullScreen(this.fullScreen);
