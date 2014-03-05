@@ -634,40 +634,40 @@
         "description": "GnoMenu icons size:",
         "tooltip": "Set the GnoMenu icons size."
     },
-    "separator-subMenu-top": {
+    "separator-submenu-top": {
        "type": "separator"
     },
-    "header-subMenu": {
+    "header-submenu": {
         "type": "header",
         "description": "Submenu:"
     },
-    "separator-subMenu-bottom": {
+    "separator-submenu-bottom": {
        "type": "separator"
     },
-    "subMenu-align": {
+    "submenu-align": {
         "type": "checkbox",
         "default": false,
         "description": "Align submenu with the parent",
-        "tooltip": "Choose whether or not to Align submenu with the parent."
+        "tooltip": "Choose whether or not to align submenu with the parent."
     },
-    "subMenu-width": {
+    "submenu-width": {
         "type": "spinbutton",
         "default": 200,
         "min": 80,
         "max": 1000,
         "step": 1,
         "units": "pixels",
-        "description": "SubMenu width:",
+        "description": "Submenu width:",
         "tooltip": "Set the submenu height."
     },
-    "subMenu-height": {
+    "submenu-height": {
         "type": "spinbutton",
         "default": 300,
         "min": 100,
         "max": 1000,
         "step": 1,
         "units": "pixels",
-        "description": "SubMenu height:",
+        "description": "Submenu height:",
         "tooltip": "Set the submenu height."
     },
     "list-places": {
