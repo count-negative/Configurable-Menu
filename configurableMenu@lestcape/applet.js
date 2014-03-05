@@ -5726,6 +5726,10 @@ ConfigurableAppletMenu.prototype = {
    },
 
    _takeControl: function() {
+      if(this.parent.orientation == St.Side.TOP)
+         this.parent.actor.set_style_class_name('menu-applet-panel-top-box');
+      else
+         this.parent.actor.set_style_class_name('menu-applet-panel-bottom-box'); 
       this.parent._applet_label.get_parent().remove_actor(this.parent._applet_label);
       this.parent._applet_icon_box.get_parent().remove_actor(this.parent._applet_icon_box);
 
@@ -5785,6 +5789,11 @@ ConfigurableAppletMenu.prototype = {
       this.parent.actor.add(this.parent._applet_icon_box, { y_align: St.Align.MIDDLE, y_fill: false });
       this.parent.actor.add(this.parent._applet_label, { y_align: St.Align.MIDDLE, y_fill: false });
       this.disconnectCategories();
+      this.parent.actor.add_style_class_name('applet-box');
+      if(this.parent.orientation == St.Side.TOP)
+         this.parent.actor.add_style_class_name('menu-applet-panel-top-box');
+      else
+         this.parent.actor.add_style_class_name('menu-applet-panel-bottom-box'); 
       this.actor.destroy();
    }
 };
