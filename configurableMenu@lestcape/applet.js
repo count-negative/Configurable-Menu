@@ -5733,17 +5733,17 @@ ConfigurableAppletMenu.prototype = {
       this.parent._applet_label.get_parent().remove_actor(this.parent._applet_label);
       this.parent._applet_icon_box.get_parent().remove_actor(this.parent._applet_icon_box);
 
-      this.parent.actor.add(this.actor, { y_align: St.Align.MIDDLE, y_fill: false });
+      this.parent.actor.add(this.actor, { y_align: St.Align.MIDDLE, y_fill: true, expand: true });
       this.rootGnomeCat = new St.BoxLayout({ style_class: 'applet-box', reactive: true, track_hover: true });
       this.rootGnomeCat.add_style_class_name('menu-applet-category-box');
       this.rootGnomeCat.add(this.parent._applet_icon_box, { y_align: St.Align.MIDDLE, y_fill: false });
       this.rootGnomeCat.add(this.parent._applet_label, { y_align: St.Align.MIDDLE, y_fill: false });
-      this.actor.add(this.rootGnomeCat, { y_align: St.Align.MIDDLE, y_fill: true, expand:true });
+      this.actor.add(this.rootGnomeCat, { y_align: St.Align.MIDDLE, y_fill: true, expand: true });
    },
 
    addCategory: function(category) {
       this.categories.push(category);
-      this.actor.add(category.actor, { y_align: St.Align.MIDDLE, y_fill: true, expand:true });
+      this.actor.add(category.actor, { y_align: St.Align.MIDDLE, y_fill: true, expand: true });
    },
 
    connectCategories: function(event, callBackFunc) {
@@ -7992,7 +7992,11 @@ MyApplet.prototype = {
                   this.width = monitor.width;
                this.mainBox.set_width(this.width);
             } else {
-               if(this.width > this.minimalWidth) {
+               if(this.width > monitor.width) {
+                  this.width = monitor.width;
+                  this.mainBox.set_width(this.width);
+               }
+               else if(this.width > this.minimalWidth) {
                   this.mainBox.set_width(this.width);
                   this._clearView();
                   Mainloop.idle_add(Lang.bind(this, function() {//checking correct width and revert if it's needed.
@@ -8091,7 +8095,8 @@ MyApplet.prototype = {
    },
 
    _minimalHeight: function() {
-      let scrollBoxHeight =  this.controlSearchBox.get_height() + this.endHorizontalBox.get_height() + 10;
+      //  this.controlSearchBox.get_height() + this.endHorizontalBox.get_height() + 10;
+      let scrollBoxHeight = this.topBoxSwaper.get_height() + this.bottomBoxSwaper.get_height() + 10;
       if(!this.categoriesBox.get_vertical())
          scrollBoxHeight += this.categoriesBox.get_height();
       if(!this.favBoxWrapper.get_vertical())
@@ -8472,7 +8477,10 @@ MyApplet.prototype = {
 
          this.searchEntry.set_secondary_icon(this._searchInactiveIcon);
 
+         this.controlSearchBoxEnd = new St.BoxLayout({ vertical: false });
          this.controlSearchBox.add(this.controlBox, {x_fill: true, y_fill: true, x_align: St.Align.START, y_align: St.Align.START, expand: true });
+         this.controlSearchBox.add(this.controlSearchBoxEnd, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+
          this.searchActive = false;
          this.searchEntryText = this.searchEntry.clutter_text;
          this.searchEntryText.connect('text-changed', Lang.bind(this, this._onSearchTextChanged));
@@ -8990,7 +8998,7 @@ MyApplet.prototype = {
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.accessibleBox = new AccessibleBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize, this.showRemovable);
       this.accessibleBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
-      this.controlBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.controlSearchBoxEnd.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.standardBox.add(this.rightPane, { x_fill: true, y_fill: true, expand: true });
       this.betterPanel.set_vertical(true);
       this.betterPanel.add_actor(this.separatorTop.actor);
@@ -9237,8 +9245,8 @@ MyApplet.prototype = {
       }
       this._clearView();
       this.powerBox.actor.visible = operPanelVisible;
-      this.hover.actor.visible = operPanelVisible;
-      this.hover.container.visible = operPanelVisible;
+      //this.hover.actor.visible = operPanelVisible;
+      //this.hover.container.visible = operPanelVisible;
       if(this.accessibleBox)
          this.accessibleBox.hoverBox.visible = this.showHoverIcon;
       this.accessibleBox.actor.visible = operPanelVisible;
