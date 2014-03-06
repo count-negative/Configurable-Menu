@@ -6646,13 +6646,13 @@ MyApplet.prototype = {
            of the keybinding callback */
         let action = global.display.get_keybinding_action(keyCode, modifierState);
 
-        if (action == Meta.KeyBindingAction.CUSTOM) {
-            return true;
+        if(action == Meta.KeyBindingAction.CUSTOM) {
+           return true;
         }
 
-        if (global.display.get_is_overlay_key(keyCode, modifierState) && this.menu.isOpen) {
-            this.menu.close();
-            return true;
+        if(global.display.get_is_overlay_key(keyCode, modifierState) && this.menu.isOpen) {
+           this.menu.close();
+           return true;
         }
 
         if(actor._delegate instanceof FavoritesButtonExtended) {
@@ -7419,17 +7419,34 @@ MyApplet.prototype = {
             parent = this.bottomBoxSwaper.get_parent();
             if(parent) parent.remove_actor(this.bottomBoxSwaper);
 
+            parent = this.changeTopBoxUp.get_parent();
+            if(parent) parent.remove_actor(this.changeTopBoxUp);
+            parent = this.changeTopBoxDown.get_parent();
+            if(parent) parent.remove_actor(this.changeTopBoxDown);
+            parent = this.changeBottomBoxUp.get_parent();
+            if(parent) parent.remove_actor(this.changeBottomBoxUp);
+            parent = this.changeBottomBoxDown.get_parent();
+            if(parent) parent.remove_actor(this.changeBottomBoxDown);
+
             if(this.swapPanels) {
-               this.beginBox.add_actor(this.bottomBoxSwaper);
-               this.endBox.add_actor(this.topBoxSwaper);
                this.topBoxSwaper.set_style_class_name('menu-top-box-swap-' + this.theme);
                this.bottomBoxSwaper.set_style_class_name('menu-bottom-box-swap-' + this.theme);
+               this.beginBox.add_actor(this.bottomBoxSwaper);
+               this.endBox.add_actor(this.topBoxSwaper);
+               this.changeTopBox.add_actor(this.changeTopBoxDown);
+               this.changeTopBox.add_actor(this.changeTopBoxUp);
+               this.changeBottomBox.add_actor(this.changeBottomBoxDown);
+               this.changeBottomBox.add_actor(this.changeBottomBoxUp);
             }
             else {
                this.topBoxSwaper.set_style_class_name('menu-top-box-' + this.theme);
                this.bottomBoxSwaper.set_style_class_name('menu-bottom-box-' + this.theme);
                this.beginBox.add_actor(this.topBoxSwaper);
                this.endBox.add_actor(this.bottomBoxSwaper);
+               this.changeTopBox.add_actor(this.changeTopBoxUp);
+               this.changeTopBox.add_actor(this.changeTopBoxDown);
+               this.changeBottomBox.add_actor(this.changeBottomBoxUp);
+               this.changeBottomBox.add_actor(this.changeBottomBoxDown);
             }
          }
       } catch(e) {
@@ -7799,11 +7816,11 @@ MyApplet.prototype = {
       }
       if(this.bttChanger)
          this.bttChanger.actor.destroy();
-      this._onSwapPanel();
 
       this._setVisibleBoxPointer();
       this._setFixMenuCorner();
       this._display();
+      this._onSwapPanel();
       this._setVisibleTimeDate();
       this._setVisibleScrollFav();
       this._setVisibleScrollCat();
@@ -7964,8 +7981,8 @@ MyApplet.prototype = {
             this.mainBox.set_height(monitor.height - panelButton - panelTop + bordersY - difference);
             this._updateView();
             if((this.theme == "windows7")||(this.theme == "mint")) {
-               this.controlBox.visible = false;
-               this.controlBox.visible = true;
+               this.controlBoxStart.visible = false;
+               this.controlBoxStart.visible = true;
             }
          } else if(this.automaticSize) {
             this.mainBox.set_width(-1);
@@ -8095,7 +8112,7 @@ MyApplet.prototype = {
    },
 
    _minimalHeight: function() {
-      //  this.controlSearchBox.get_height() + this.endHorizontalBox.get_height() + 10;
+      //  this.endHorizontalBox.get_height() + this.endHorizontalBox.get_height() + 10;
       let scrollBoxHeight = this.topBoxSwaper.get_height() + this.bottomBoxSwaper.get_height() + 10;
       if(!this.categoriesBox.get_vertical())
          scrollBoxHeight += this.categoriesBox.get_height();
@@ -8109,21 +8126,11 @@ MyApplet.prototype = {
    },
 
    _minimalWidth: function() {
-      let width = this.extendedBox.get_width();
-      let interWidth = 0;
-      if(!this.categoriesBox.get_vertical()) {
-         interWidth = this.controlBox.get_width();
-         if(this.hover.actor.visible)
-           interWidth += this.hover.actor.get_width() + this.hover.menu.actor.get_width();
-         if((!this.favBoxWrapper.get_vertical())&&(this.favBoxWrapper.get_width() > width))
-            interWidth = this.favBoxWrapper.get_width();
-      }
-      if(interWidth > width)
-         width = interWidth;
+      let width = this.extendedBox.get_allocation_box().x2 - this.extendedBox.get_allocation_box().x1;
       if((this.accessibleBox)&&(this.accessibleBox.actor.visible))
          width += this.accessibleBox.actor.get_width();
 
-      return width;
+      return width// width;
    },
 
    _onButtonReleaseEvent: function(actor, event) {
@@ -8451,21 +8458,15 @@ MyApplet.prototype = {
          this.topBoxSwaper = new St.BoxLayout({ vertical: false });
          this.bottomBoxSwaper = new St.BoxLayout({ vertical: false });
 
-         this.controlSearchBox = new St.BoxLayout({ vertical: false });
-         this.controlBox = new St.BoxLayout({ vertical: true });
-         this.topBoxSwaper.add(this.controlSearchBox, { x_fill: true, y_fill: true, expand: true });
-         if(this.swapPanels) {
-            this.beginBox.add_actor(this.bottomBoxSwaper);
-            this.endBox.add_actor(this.topBoxSwaper);//, { x_fill: true, y_fill: true, expand: true });
-            this.topBoxSwaper.set_style_class_name('menu-top-box-swap-' + this.theme);
-            this.bottomBoxSwaper.set_style_class_name('menu-bottom-box-swap-' + this.theme);
-         }
-         else {
-            this.beginBox.add_actor(this.topBoxSwaper);
-            this.endBox.add_actor(this.bottomBoxSwaper);//, { x_fill: true, y_fill: true, expand: true });
-            this.topBoxSwaper.set_style_class_name('menu-top-box-' + this.theme);
-            this.bottomBoxSwaper.set_style_class_name('menu-bottom-box-' + this.theme);
-         }
+         this.changeTopBox = new St.BoxLayout({ vertical: true });
+         this.changeTopBoxUp = new St.BoxLayout({ vertical: false });
+         this.changeTopBoxDown = new St.BoxLayout({ vertical: false });
+
+         this.changeBottomBox = new St.BoxLayout({ vertical: true });
+         this.changeBottomBoxUp = new St.BoxLayout({ vertical: false });
+         this.changeBottomBoxDown = new St.BoxLayout({ vertical: false });
+
+         this.topBoxSwaper.add(this.changeTopBox, {x_fill: true, y_fill: true, x_align: St.Align.START, y_align: St.Align.START, expand: true });
 
          this.searchBox = new St.BoxLayout();
          this.searchBox.set_style_class_name('menu-search-box-' + this.theme);
@@ -8476,10 +8477,6 @@ MyApplet.prototype = {
                                            can_focus: true });
 
          this.searchEntry.set_secondary_icon(this._searchInactiveIcon);
-
-         this.controlSearchBoxEnd = new St.BoxLayout({ vertical: false });
-         this.controlSearchBox.add(this.controlBox, {x_fill: true, y_fill: true, x_align: St.Align.START, y_align: St.Align.START, expand: true });
-         this.controlSearchBox.add(this.controlSearchBoxEnd, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, y_fill: false, expand: true });
 
          this.searchActive = false;
          this.searchEntryText = this.searchEntry.clutter_text;
@@ -8632,9 +8629,9 @@ MyApplet.prototype = {
    loadClassic: function() {
       this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
-      this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
-      this.controlBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: true });
-      this.controlBox.add(this.searchBox, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.END, expand: true });
+      this.topBoxSwaper.add(this.hover.container, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
+      this.changeTopBoxUp.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: true });
+      this.changeTopBoxDown.add(this.searchBox, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.END, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true, St.Align.START);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true, St.Align.START);
@@ -8654,17 +8651,15 @@ MyApplet.prototype = {
       this.endVerticalBox.add_actor(this.separatorBottom.actor);
       this.endVerticalBox.add_actor(this.endBox);
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add_actor(this.changeBottomBox);
       this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.operativePanel.set_style_class_name('menu-operative-box');
    },
 
    loadWhisker: function() {
-      this.controlSearchBox.set_vertical(true);
-      this.controlBox.set_vertical(false);
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
-      this.controlSearchBox.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
-      this.endHorizontalBox.add(this.searchBox, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      this.endHorizontalBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.changeTopBoxDown.add(this.searchBox, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.changeTopBoxDown.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true, St.Align.START);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true, St.Align.START);
@@ -8672,8 +8667,8 @@ MyApplet.prototype = {
       this.categoriesWrapper.add(this.categoriesScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
-      this.controlBox.add(this.hover.container, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      this.controlBox.add(this.powerBox.actor, { x_fill: false, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.changeTopBoxUp.add(this.hover.container, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.changeTopBoxUp.add(this.powerBox.actor, { x_fill: false, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.rightPane.add_actor(this.separatorTop.actor);
@@ -8683,6 +8678,8 @@ MyApplet.prototype = {
       this.endVerticalBox.add_actor(this.separatorBottom.actor, { x_fill: true, y_fill: true, expand: true });
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.selectedAppBox.actor, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add_actor(this.changeBottomBox);
+      this.changeBottomBox.add_actor(this.endHorizontalBox);
       this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
       this.operativePanel.set_style_class_name('menu-operative-box');
@@ -8691,8 +8688,8 @@ MyApplet.prototype = {
    loadVampire: function() {
       this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
-      this.controlBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      this.controlSearchBox.add(this.searchBox, {x_fill: false, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.changeTopBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.topBoxSwaper.add(this.searchBox, {x_fill: false, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true, St.Align.START);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true, St.Align.START);
@@ -8713,6 +8710,7 @@ MyApplet.prototype = {
       this.endVerticalBox.add_actor(this.separatorBottom.actor, { x_fill: true, y_fill: true, expand: true });
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add_actor(this.changeBottomBox);
       this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.operativePanel.set_style_class_name('menu-operative-box');
    },
@@ -8720,8 +8718,8 @@ MyApplet.prototype = {
    loadGaribaldo: function() {
       this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
-      this.controlBox.add(this.searchBox, {x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      this.controlSearchBox.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.changeTopBox.add(this.searchBox, {x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.topBoxSwaper.add(this.controlView.actor, {x_fill: true, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true, St.Align.START);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true, St.Align.START);
@@ -8742,6 +8740,7 @@ MyApplet.prototype = {
       this.endVerticalBox.add_actor(this.separatorBottom.actor);
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add_actor(this.changeBottomBox);
       this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.operativePanel.set_style_class_name('menu-operative-box');
    },
@@ -8749,9 +8748,9 @@ MyApplet.prototype = {
    loadStylized: function() {
       this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
-      this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
-      this.controlBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: true });
-      this.controlBox.add(this.searchBox, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.END, expand: true });
+      this.topBoxSwaper.add(this.hover.container, {x_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
+      this.changeTopBoxUp.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: true });
+      this.changeTopBoxDown.add(this.searchBox, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.END, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true, St.Align.START);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true, St.Align.START);
@@ -8770,6 +8769,7 @@ MyApplet.prototype = {
       this.endVerticalBox.add_actor(this.separatorBottom.actor);
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add_actor(this.changeBottomBox);
       this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.operativePanel.set_style_class_name('menu-operative-box');
    },
@@ -8778,12 +8778,11 @@ MyApplet.prototype = {
       this.operativePanel.set_vertical(true);
       this.categoriesBox.set_vertical(false);
       this.categoriesWrapper.set_vertical(false);
-      this.controlBox.set_vertical(false);
       this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
-      this.controlBox.add(this.hover.container, {x_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: false });
-      this.controlBox.add(this.selectedAppBox.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      this.controlSearchBox.add(this.controlView.actor, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, y_fill: false, expand: true });
+      this.changeTopBoxUp.add(this.hover.container, {x_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: false });
+      this.changeTopBoxUp.add(this.selectedAppBox.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.topBoxSwaper.add(this.controlView.actor, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, y_fill: false, expand: true });
       this.selectedAppBox.setAlign(St.Align.START);
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.operativePanel.add(this.separatorMiddle.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
@@ -8806,6 +8805,7 @@ MyApplet.prototype = {
       this.endVerticalBox.add_actor(this.separatorBottom.actor);
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add_actor(this.changeBottomBox);
       this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.operativePanelExpanded.set_style_class_name('menu-operative-box');
    },
@@ -8816,9 +8816,9 @@ MyApplet.prototype = {
       this.categoriesWrapper.set_vertical(false);
       this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
-      this.controlBox.add(this.controlView.actor, {x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      this.controlSearchBox.add(this.selectedAppBox.actor, {x_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: false });
-      this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, y_fill: false, expand: false });
+      this.changeTopBox.add(this.controlView.actor, {x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.topBoxSwaper.add(this.selectedAppBox.actor, {x_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: false });
+      this.topBoxSwaper.add(this.hover.container, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.operativePanel.add(this.separatorMiddle.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, false, St.Align.START);
@@ -8841,6 +8841,7 @@ MyApplet.prototype = {
       this.endVerticalBox.add_actor(this.separatorBottom.actor);
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add_actor(this.changeBottomBox);
       this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.operativePanelExpanded.set_style_class_name('menu-operative-box');
    },
@@ -8853,8 +8854,8 @@ MyApplet.prototype = {
       this.favBoxWrapper.set_vertical(false);
       this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
-      this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: false });
-      this.controlSearchBox.add(this.selectedAppBox.actor, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.changeTopBoxUp.add(this.hover.container, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.changeTopBoxUp.add(this.selectedAppBox.actor, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, false, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, false, St.Align.START);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, false, St.Align.START);
@@ -8877,6 +8878,7 @@ MyApplet.prototype = {
       this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: false });
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add_actor(this.changeBottomBox);
       this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.operativePanelExpanded.set_style_class_name('menu-operative-box');
    },
@@ -8884,7 +8886,7 @@ MyApplet.prototype = {
    loadAccessible: function() {
       this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
-      this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
+      this.changeTopBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true, St.Align.START);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true, St.Align.START);
@@ -8905,6 +8907,7 @@ MyApplet.prototype = {
       this.endVerticalBox.add_actor(this.separatorBottom.actor);
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add_actor(this.changeBottomBox);
       this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.operativePanel.set_style_class_name('menu-operative-box');
    },
@@ -8912,7 +8915,7 @@ MyApplet.prototype = {
    loadAccessibleInverted: function() {
       this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
-      this.controlBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
+      this.changeTopBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true, St.Align.START);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true, St.Align.START);
@@ -8933,6 +8936,7 @@ MyApplet.prototype = {
       this.endVerticalBox.add_actor(this.separatorBottom.actor);
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add_actor(this.changeBottomBox);
       this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.operativePanel.set_style_class_name('menu-operative-box');
    },
@@ -8941,11 +8945,11 @@ MyApplet.prototype = {
       this.allowFavName = true;
       this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
-      this.controlBox.add(this.panelAppsName, {x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.changeTopBox.add(this.panelAppsName, {x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
       this.bttChanger = new ButtonChangerBox(this, "forward", 20, [_("All Applications"), _("Favorites")], 0, Lang.bind(this, this._onPanelMintChange));
       this.bttChanger.setTheme(this.theme);
       this.bttChanger.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
-      this.controlSearchBox.add(this.bttChanger.actor, {x_fill: false, x_align: St.Align.END, y_align: St.Align.START, expand: true });
+      this.topBoxSwaper.add(this.bttChanger.actor, {x_fill: false, x_align: St.Align.END, y_align: St.Align.START, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true, St.Align.START);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, true, St.Align.MIDDLE);
@@ -8969,6 +8973,7 @@ MyApplet.prototype = {
       this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add_actor(this.changeBottomBox);
       this.endHorizontalBox.add(this.searchBox, {x_fill: true, x_align: St.Align.END, y_align: St.Align.END, y_fill: false, expand: false });
       this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
@@ -8998,16 +9003,17 @@ MyApplet.prototype = {
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.accessibleBox = new AccessibleBox(this, this.hover, this.selectedAppBox, this.controlView, this.powerBox, false, this.iconAccessibleSize, this.showRemovable);
       this.accessibleBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
-      this.controlSearchBoxEnd.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.topBoxSwaper.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.standardBox.add(this.rightPane, { x_fill: true, y_fill: true, expand: true });
       this.betterPanel.set_vertical(true);
       this.betterPanel.add_actor(this.separatorTop.actor);
       this.betterPanel.add(this.operativePanelExpanded, { x_fill: true, y_fill: true, y_align: St.Align.MIDDLE, expand: true });
       this.betterPanel.add_actor(this.separatorBottom.actor);
       this.operativePanelExpanded.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
-      this.endVerticalBox.add(this.bttChanger.actor, { x_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: false });
-      this.endVerticalBox.add(this.searchBox, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.END, expand: false });
+      this.changeBottomBoxUp.add(this.bttChanger.actor, { x_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: false });
+      this.changeBottomBoxDown.add(this.searchBox, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.END, expand: false });
       this.betterPanel.add(this.endBox, { x_fill: true, y_fill: true, y_align: St.Align.END, expand: false });
+      this.endVerticalBox.add(this.changeBottomBox, { x_fill: true, y_fill: true, expand: true });
       this.endHorizontalBox.add(this.endVerticalBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.operativePanel.visible = false;
@@ -9024,8 +9030,8 @@ MyApplet.prototype = {
       this.allowFavName = true;
       this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
-      this.controlBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.changeTopBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.topBoxSwaper.add(this.hover.container, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true, St.Align.START);
@@ -9047,8 +9053,9 @@ MyApplet.prototype = {
       this.gnoMenuBox = new GnoMenuBox(this, this.hover, this.selectedAppBox, this.powerBox, true, this.iconAccessibleSize, Lang.bind(this, this._onPanelGnoMenuChange));
       this.gnoMenuBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.operativePanelExpanded.add(this.gnoMenuBox.actor, { y_fill: true, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
-      this.endVerticalBox.add_actor(this.searchBox);
-      this.endVerticalBox.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.changeBottomBoxUp.add(this.searchBox, { x_fill: true, y_fill: true, expand: true });
+      this.changeBottomBoxDown.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.endVerticalBox.add(this.changeBottomBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endVerticalBox, { x_fill: true, y_fill: true, expand: true });
       this.selectedAppBox.setAlign(St.Align.START);
       this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
@@ -9064,8 +9071,8 @@ MyApplet.prototype = {
       this.allowFavName = true;
       this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
-      this.controlBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.changeTopBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.topBoxSwaper.add(this.hover.container, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true, St.Align.START);
@@ -9087,8 +9094,9 @@ MyApplet.prototype = {
       this.gnoMenuBox = new GnoMenuBox(this, this.hover, this.selectedAppBox, this.powerBox, true, this.iconAccessibleSize, Lang.bind(this, this._onPanelGnoMenuChange));
       this.gnoMenuBox.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
       this.operativePanelExpanded.add(this.gnoMenuBox.actor, { y_fill: true, x_align: St.Align.MIDDLE, y_align: St.Align.START, expand: true });
-      this.endVerticalBox.add_actor(this.searchBox);
-      this.endVerticalBox.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.changeBottomBoxUp.add(this.searchBox, { x_fill: true, y_fill: true, expand: true });
+      this.changeBottomBoxDown.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.endVerticalBox.add(this.changeBottomBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endVerticalBox, { x_fill: true, y_fill: true, expand: true });
       this.selectedAppBox.setAlign(St.Align.START);
       this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
@@ -9104,8 +9112,8 @@ MyApplet.prototype = {
       this.allowFavName = true;
       this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
-      this.controlBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.changeTopBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.topBoxSwaper.add(this.hover.container, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true, St.Align.START);
@@ -9130,6 +9138,7 @@ MyApplet.prototype = {
       this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
       this.endVerticalBox.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endVerticalBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add_actor(this.changeBottomBox);
       this.selectedAppBox.setAlign(St.Align.START);
       this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.operativePanel.visible = false;
@@ -9143,8 +9152,8 @@ MyApplet.prototype = {
       this.allowFavName = true;
       this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
-      this.controlBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      this.controlSearchBox.add(this.hover.container, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.changeTopBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.topBoxSwaper.add(this.hover.container, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
       this.powerBox = new PowerBox(this, "horizontal", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, true, St.Align.START);
@@ -9169,6 +9178,7 @@ MyApplet.prototype = {
       this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
       this.endVerticalBox.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endVerticalBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add_actor(this.changeBottomBox);
       this.selectedAppBox.setAlign(St.Align.START);
       this.operativePanel.add(this.applicationsScrollBox.actor, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.operativePanel.visible = false;
@@ -9241,7 +9251,7 @@ MyApplet.prototype = {
       }
       else {
          this.accessibleBox.takeHover(false);
-         this.controlSearchBox.add_actor(this.hover.container);
+         this.topBoxSwaper.add_actor(this.hover.container);
       }
       this._clearView();
       this.powerBox.actor.visible = operPanelVisible;
@@ -9269,8 +9279,7 @@ MyApplet.prototype = {
 
       this.allowFavName = true;
       this.betterPanel.set_vertical(true);
-      this.controlSearchBox.set_vertical(true);
-      this.controlBox.set_vertical(false);
+      this.changeTopBoxDown.set_vertical(true);
       //this.selectedAppBox.setAlign(St.Align.START);
 
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
@@ -9295,10 +9304,10 @@ MyApplet.prototype = {
       //this.categoriesWrapper.add_actor(this.separatorMiddle.actor);
       //this.categoriesWrapper.add_actor(this.separatorBottom.actor);
 
-      this.controlBox.add(this.hover.container, {x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: false });
-      this.controlBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
-      this.controlSearchBox.add(this.searchBox, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      this.controlSearchBox.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.changeTopBoxUp.add(this.hover.container, {x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: false });
+      this.changeTopBoxUp.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.changeTopBoxDown.add(this.searchBox, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.changeTopBoxDown.add(this.controlView.actor, {x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
 
       
       //this.betterPanel.add_actor(this.separatorTop.actor);
@@ -9306,6 +9315,7 @@ MyApplet.prototype = {
 
       this.endHorizontalBox.add(this.endVerticalBox, { x_fill: true, y_fill: true, expand: true });
       this.bottomBoxSwaper.add(this.endHorizontalBox, { x_fill: true, y_fill: true, expand: true });
+      this.bottomBoxSwaper.add_actor(this.changeBottomBox);
       this.betterPanel.add(this.endBox, { x_fill: true, y_fill: true, y_align: St.Align.END, expand: false });
       this.endVerticalBox.add(this.powerBox.actor, { x_fill: true, y_fill: true, expand: false });
       this.operativePanel.add(this.applicationsScrollBox.actor, { x_fill: true, y_fill: true, x_align: St.Align.START, expand: true });
@@ -9367,6 +9377,12 @@ MyApplet.prototype = {
          } catch(e) {
             Main.notify("Appp error", e.message);
          }
+      } else {
+         this.menu.actor.set_style('');
+         this.menu.box.set_style('');
+         this.categoriesBox.set_style('');
+         this.placesBox.set_style('');
+         this.favoritesBox.set_style('');
       }
       } catch(e) {
          Main.notify("Gnome error", e.message);
