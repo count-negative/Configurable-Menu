@@ -1,165 +1,50 @@
-Cinnamon Applet: Configurable Menu version v0.9-Beta
-==============
+Cinnamon Applet: Configurable Menu Version: v0.9-Beta
 
-Release Date: 01 February 2014
+Last version release date: 21 january 2014
+***
+Authors: [Lester Carballo Pérez](https://github.com/lestcape) and [Garibaldo](https://github.com/Garibaldo).
 
-Authors: Lester Carballo Pérez(https://github.com/lestcape) and Garibaldo(https://github.com/Garibaldo).
+Contact: lestcape@gmail.com
 
-Email: lestcape@gmail.com
+***
+Special thanks to:
 
-Website: https://github.com/lestcape/Configurable-Menu
-
-More Information: https://github.com/lestcape/Configurable-Menu/wiki
+- [Bernard](https://github.com/zagortenay333) (Help adding support to the Cinnamon themes).
+- Eliermi Cunha Junior(jpegrande@gmail.com) (Help finding errors and making several promotional videos).
 
 --------------
+![](https://raw.github.com/wiki/lestcape/Configurable-Menu/img/Capture.png)
 
-"Configurable Menu is a fork of the Cinnamon stock menu applet. It has much more features and is extremely configurable."
-
-![Alt text](/configurableMenu@lestcape/Capture.png)
-
-This latest version brings a lot of cool new stuff.
-
-Some features:
+Description
 --------------
+Configurable Menu is a fork of the Cinnamon stock menu applet. It has much more features and is extremely configurable.
+This latest version brings a lot of cool new stuff, like:
 
-1.	You choose how the menu should be opened: by pressing & releasing the mouse button, by just pressing the mouse button, or by hovering the mouse pointer on the menu icon.
-2.	You can define the exact size of the menu (width and height) using the menu settings.
+- Choose among many different menu layouts.
+- Choose different system buttons layouts.
+- Define the exact size of the menu (width and height) also with the mouse.
+- Show the menu in full screen mode.
+- Show/Hide and change the size of some components.
+- Two different modes of viewing the menu entrys with multiple columns.
+- New drag & drop options.
+- Handle removable drives.
 
-3.	Now you can also resize the menu by dragging a resize handle (on the menu corner) with the mouse!
+A more detail list can be found [here](https://github.com/lestcape/Configurable-Menu/wiki/Some-features).
+And much more coming...
 
-4.	Now you can show the menu in full screen mode!
-
-5.	You can choose among many different menu layouts.
-
-6.	You can choose among many different system buttons layouts.
-
-7.	The menu can show a magnified picture of the icon which is being hovered, similarly to the Windows 7 start menu.
-
-8.	You can show/hide favorites, hover icon, system buttons, control buttons, data/time, separators etc...
-
-9.	You can separate the system buttons from the favorites.
-
-10.	You have two different modes of viewing the application entries: List View and Grid View.
-
-11.	List View can have multiple columns.
-
-12.	You can have favorites with multiple lines (rows or columns).
-
-13.	You can drag & drop menu items onto the desktop.
-
-14.	Autoscrolling works also horizontally when using some menu layouts.
-
-15.	You can define the size of the application icons, category icons, favorites icons, system buttons, control buttons etc.
-
-16.	You can define the font size of the application description/name.
-
-17.	You can have a different configuration for each layout.
-
-18.	The removable drives are now show in accessible panel and also can be removed directly.
-
-19.	Now you can rename the apps on the accessible panel.
-
-20.	You can swap top and bottom menu panels.
-
-21.	And much more coming...
-
-
-This program is free software:
+Help
 --------------
-You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+Here you can find interesting information about Configurable Menu.
+   - [Layouts](https://github.com/lestcape/Configurable-Menu/wiki/Menu-layouts)
+   - [Components](https://github.com/lestcape/Configurable-Menu/wiki/Menu-components)
+   - [Settings](https://github.com/lestcape/Configurable-Menu/wiki/Settings)
+   - [Cinnamon themes support](https://github.com/lestcape/Configurable-Menu/wiki/Theme-Support)
+   - [New languages](https://github.com/lestcape/Configurable-Menu/wiki/Add-new-languages)
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/.
-
-
-Installation instructions of nightly build:
+Change log
 --------------
-1. Download this applet from their website: https://github.com/lestcape/Configurable-Menu/archive/master.zip
-2. Unzip the downloaded file and copy the folder configurableMenu@lestcape at /home/USERNAME/.local/share/cinnamon/applets/ where USER is the user for your operating system.
-3. Enable the applet in Cinnamon Settings and use it.
+See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/Change-Log).
 
-Be cautious: This version of applet is still considered non-stable and may have bugs... Install it for testing purposes only.
-
-
-Add theme support:
---------------
-- List of new style class and pseudo style class for the main menu box:
-    - menu-main-box
-
-- List of new style class and pseudo style class for the hover icon:
-    - menu-hover-icon-box
-    - menu-hover-icon-box:open
-
-- List of new style class and pseudo style class for the control buttons:
-    - menu-control-buttons-box
-    - menu-control-resize-box
-    - menu-control-view-box
-    - menu-control-button
-    - menu-control-button:open
-    - menu-control-button-selected (when hover or focus)
-
-- List of new style class and pseudo style class for the accessible panel:
-    - menu-accessible-box
-    - menu-accessible-devices-box
-    - menu-accessible-places-box
-    - menu-accessible-system-box
-
-- List of new style class and pseudo style class for the Mint layout:
-    - menu-operative-mint-box
-    - menu-top-mint-box
-    - menu-bottom-mint-box
-
-- List of new style class and pseudo style class for the Windows 7 layout:
-    - menu-operative-windows-box
-    - menu-top-windows-box
-    - menu-bottom-windows-box
-
-- List of new style class and pseudo style class for all layouts except the Windows 7 and Mint layout:
-    - menu-top-box
-    - menu-bottom-box
-
-- List of new style class and pseudo style class for the GnoMenu layouts (Note: The buttons can position in the future in 4 different ways, it's why we have 4 existing style classes):
-
-    - menu-gno-button-box
-    - menu-gno-operative-box
-    - menu-gno-operative-box-selected (when hover or focus on any gno button)
-    - menu-gno-button-left
-    - menu-gno-button-left-selected (when hover or focus)
-    - menu-gno-button-right
-    - menu-gno-button-right-selected (when hover or focus)
-    - menu-gno-button-top
-    - menu-gno-button-top-selected (when hover or focus)
-    - menu-gno-button-bottom
-    - menu-gno-button-bottom-selected (when hover or focus)
-    - menu-gno-power-left (just the parent of power panel, not the power panel)
-    - menu-gno-power-right (just the parent of power panel, not the power panel)
-    - menu-gno-power-top (just the parent of power panel, not the power panel)
-    - menu-gno-power-bottom (just the parent of power panel, not the power panel)
-
-- Settings restrictions on the style class:
-
-    - menu-accessible-box:         Can only used if the option "Accessible panel has a box" it's active.
-    - menu-accessible-devices-box: Can only show if you have any removable device.
-    - menu-hover-icon-box:         Can only show if the option "Hover icon have a box" it's active.
-    - menu-control-resize-box:     Can only show if the option "Control buttons have a box" it's active.
-    - menu-control-view-box:       Can only show if the option "Control buttons have a box" it's active.
-    - menu-gno-button-box:         Can only used if the option "GnoMenu buttons have a box" it's active.
-
-More info: https://github.com/lestcape/Configurable-Menu/wiki/Add-theme-support
-
-
-Add new languages:
---------------
-1. Install the poedit program.
-2. Open the file default.po with the poedit software. This file is located in the folder /home/USER/.local/share/cinnamon/applets/configurableMenu@lestcape/locale/
-3. Make the translation, save the result, and send the .po file updated by the e-mail address here present, or add directly into the website of this software
-
-More info: https://github.com/lestcape/Configurable-Menu/wiki/Add-new-languages
-
-
-Change Log:
-==============
 0.9-Beta
    - Was added support for more languages.
    - Was added spanish language.
@@ -177,7 +62,18 @@ Change Log:
    - Changed the control buttons icons and was added the option to be symbolic or full color.
    - You can swap top and bottom menu panels.
 
-A complete change log can be found here: https://github.com/lestcape/Configurable-Menu/wiki/Change-Log
+This program is free software:
+--------------
+You can redistribute it and/or modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program.
+If not, see http://www.gnu.org/licenses/.
 
 ==============
 To report bugs, request new features and make suggestions, please visit:
