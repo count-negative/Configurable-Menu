@@ -204,6 +204,149 @@ function toUTF8FromAscii(ascii) {
    return utftext;
 };
 
+function SearchItem(parent, provider, search_path, icon_path, iconSize, appWidth, appDesc, vertical){
+   this._init(parent, provider, search_path, icon_path, iconSize, appWidth, appDesc, vertical);
+}
+
+SearchItem.prototype = {
+   __proto__: PopupMenu.PopupBaseMenuItem.prototype,
+
+   _init: function(parent, provider, path, icon_path, iconSize, appWidth, appDesc, vertical){
+      PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
+      this.actor.set_style_class_name('menu-application-button');
+      this.iconSize = iconSize;
+      this.parent = parent;
+      this.provider = provider;
+      this.path = path;
+      this.string = "";
+      let fileIcon = Gio.file_new_for_path(icon_path);
+      this.icon_uri = fileIcon.get_uri();
+      this.app = this._createAppWrapper(provider, path, icon_path);
+      this.name = this.app.get_name();
+      this.labelName = new St.Label({ text: this.name , style_class: 'menu-application-button-label' });
+      this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
+      this.labelDesc.visible = false;
+      this.container = new St.BoxLayout();
+      this.textBox = new St.BoxLayout({ vertical: true });
+      this.setTextMaxWidth(appWidth);
+      this.setAppDescriptionVisible(appDesc);
+      this.setVertical(vertical);
+
+      this.icon = this.app.create_icon_texture(this.iconSize);
+      // St.TextureCache.get_default().load_uri_async(this.icon_uri, this.iconSize, this.iconSize);
+      if(this.icon) {
+         this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+         this.icon.realize();
+      }
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      this.addActor(this.container);
+
+      this.labelName.realize();
+      this.labelDesc.realize();
+      this.isDraggableApp = false;
+   },
+
+   setIconSize: function (iconSize) {
+      this.iconSize = iconSize;
+      if(this.icon) {
+         let visible = this.icon.visible; 
+         let parentIcon = this.icon.get_parent();
+         if(parentIcon)
+            parentIcon.remove_actor(this.icon);
+         this.icon.destroy();
+         this.icon = this.app.create_icon_texture(this.iconSize);
+         this.icon.visible = visible;
+         this.container.insert_actor(this.icon, 0);
+      }
+   },
+
+   setAppDescriptionVisible: function(visible) {
+      this.labelDesc.visible = visible;
+      if(this.app.get_description())
+         this.labelDesc.set_text(this.app.get_description().split("\n")[0]);
+   },
+
+   setTextMaxWidth: function(maxWidth) {
+      //this.textBox.set_width(maxWidth);
+      this.textBox.style="max-width: "+maxWidth+"px;";
+      this.textWidth = maxWidth;
+   },
+
+   setVertical: function(vertical) {
+      this.container.set_vertical(vertical);
+      let parentL = this.labelName.get_parent();
+      if(parentL) parentL.remove_actor(this.labelName);
+      parentL = this.labelDesc.get_parent();
+      if(parentL) parentL.remove_actor(this.labelDesc);
+      this.setTextMaxWidth(this.textWidth);
+      if(vertical) {
+         this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+         this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });  
+      }
+      else {
+         this.textBox.add(this.labelName, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+         this.textBox.add(this.labelDesc, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+      }
+   },
+
+   setActive: function(active){
+      if(active)
+         this.actor.set_style_class_name("menu-application-button-selected");
+      else
+         this.actor.set_style_class_name('menu-application-button');
+   },
+
+   setString: function(string) {
+      this.string = string;
+      this.labelName.set_text(" Search " + this.provider + " for " + string);
+   },
+
+   activate: function(event){
+      while(this.string.indexOf(" ")!= -1) {
+         this.string = this.string.replace(" ", "%20");
+      }
+
+      Util.spawnCommandLine("xdg-open " + this.path + this.string);
+      this.parent.toggle();
+   },
+
+   _createAppWrapper: function(provider, pathOrCommand, icon_path) {
+      // We need this fake app to help appEnterEvent/appLeaveEvent 
+      // work with our search result.
+      this.app = {
+         get_app_info: function() {
+            this.appInfo = {
+               get_filename: function() {
+                  return pathOrCommand;
+               }
+            };
+            return this.appInfo;
+         },
+         get_id: function() {
+            return provider;
+         },
+         get_description: function() {
+            return pathOrCommand;
+         },
+         get_name: function() {
+            return  provider;
+         },
+         is_window_backed: function() {
+            return false;
+         },
+         create_icon_texture: function(appIconSize) {
+            try {
+              let gicon = new Gio.FileIcon({ file: Gio.file_new_for_path(icon_path) });
+              return  new St.Icon({gicon: gicon, icon_size: appIconSize, icon_type: St.IconType.FULLCOLOR});
+            } catch (e) {}
+            return null;
+         }
+      };
+      return this.app;
+   }
+};
+
+
 function ScrollItemsBox(parent, panelToScroll, vertical, align) {
    this._init(parent, panelToScroll, vertical, align);
 }
@@ -5970,6 +6113,7 @@ MyApplet.prototype = {
          this.minimalHeight = -1;
          this._timeOutSettings = 0;
          this.idWaitingGnome = 0;
+         this._searchItems = [];
 
          this.execInstallLanguage();
          //_ = Gettext.domain(this.uuid).gettext;
@@ -6002,7 +6146,6 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "menu-icon", "menuIcon", this._updateIconAndLabel, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "menu-label", "menuLabel", this._updateIconAndLabel, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "allow-search", "showSearhEntry", this._setSearhEntryVisible, null);
-         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "search-filesystem", "searchFilesystem", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "swap-panels", "swapPanels", this._onSwapPanel, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "hover-delay", "hover_delay_ms", this._update_hover_delay, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "enable-autoscroll", "autoscroll_enabled", this._update_autoscroll, null);
@@ -6081,6 +6224,11 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "submenu-height", "subMenuHeight", this._updateSubMenuSize, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "submenu-align", "subMenuAlign", this._alignSubMenu, null);
 
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "search-filesystem", "searchFilesystem", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "search-web", "searchWeb", this._onSearchEnginesChanged, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "search-wikipedia", "searchWikipedia", this._onSearchEnginesChanged, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "search-google", "searchGoogle", this._onSearchEnginesChanged, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "search-duckduckgo", "searchDuckduckgo", this._onSearchEnginesChanged, null);
 
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "classic", "stringClassic", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "classicGnome", "stringClassicGnome", null, null);
@@ -6125,6 +6273,8 @@ MyApplet.prototype = {
          //St.TextureCache.get_default().connect("icon-theme-changed", Lang.bind(this, this._onThemeChange));
          St.TextureCache.get_default().connect("icon-theme-changed", Lang.bind(this, this._updateSize));
          this.RecentManager.connect('changed', Lang.bind(this, this._refreshPlacesAndRecent));
+
+         //change this on settings //global.settings.connect("changed::menu-search-engines", Lang.bind(this, this._onSearchEnginesChanged));
 
          this._fileFolderAccessActive = false;
          this._pathCompleter = new Gio.FilenameCompleter();
@@ -6530,7 +6680,7 @@ MyApplet.prototype = {
       themeProperties["show-recent"] = (themeProperties["show-recent"] === 'true');
       themeProperties["show-places"] = (themeProperties["show-places"] === 'true');
       themeProperties["allow-search"] = (themeProperties["allow-search"] === 'true');
-      themeProperties["search-filesystem"] = (themeProperties["search-filesystem"] === 'true');
+     // themeProperties["search-filesystem"] = (themeProperties["search-filesystem"] === 'true');
       themeProperties["swap-panels"] = (themeProperties["swap-panels"] === 'true');
       themeProperties["activate-on-hover"] = (themeProperties["activate-on-hover"] === 'true');
       themeProperties["hover-delay"] = parseInt(themeProperties["hover-delay"]);
@@ -6599,6 +6749,7 @@ MyApplet.prototype = {
    },
 
    _onAppsChange: function() {
+      this._onSearchEnginesChanged();
       this._refreshApps();
       this._updateAppButtonDesc();
       this._updateTextButtonWidth();
@@ -7120,6 +7271,11 @@ MyApplet.prototype = {
             visibleAppButtons.push(this._transientButtons[i]);
          }
       }
+      for(let i = 0; i < this._searchItems.length; i++) {
+         if(this._searchItems[i].actor.visible) {
+            visibleAppButtons.push(this._searchItems[i]);
+         }
+      }
       return visibleAppButtons;
    },
 
@@ -7156,6 +7312,10 @@ MyApplet.prototype = {
       for(let i = 0; i < this._recentButtons.length; i++) {
          this._recentButtons[i].container.set_width(this._applicationsBoxWidth);
       }
+      for(let i = 0; i < this._searchItems.length; i++) {
+         if(this._searchItems[i] instanceof SearchItem)
+            this._searchItems[i].container.set_width(this._applicationsBoxWidth);
+      }
       if(this.theme == "windows7") {
          this.searchEntry.set_width(this._applicationsBoxWidth + 20);
       }
@@ -7172,6 +7332,10 @@ MyApplet.prototype = {
       for(let i = 0; i < this._recentButtons.length; i++) {
          this._recentButtons[i].container.set_width(-1);
       }
+      for(let i = 0; i < this._searchItems.length; i++) {
+         if(this._searchItems[i] instanceof SearchItem)
+            this._searchItems[i].container.set_width(-1);
+      }
    },
 
    _updateAppButtonDesc: function() {  
@@ -7183,6 +7347,10 @@ MyApplet.prototype = {
       }
       for(let i = 0; i < this._recentButtons.length; i++) {
          this._recentButtons[i].setAppDescriptionVisible(this.appButtonDescription);
+      }
+      for(let i = 0; i < this._searchItems.length; i++) {
+         if(this._searchItems[i] instanceof SearchItem)
+            this._searchItems[i].setAppDescriptionVisible(this.appButtonDescription);
       }
    },
 
@@ -7196,6 +7364,10 @@ MyApplet.prototype = {
       for(let i = 0; i < this._recentButtons.length; i++) {
          this._recentButtons[i].setTextMaxWidth(this.textButtonWidth);
       }
+      for(let i = 0; i < this._searchItems.length; i++) {
+         if(this._searchItems[i] instanceof SearchItem)
+            this._searchItems[i].setTextMaxWidth(this.textButtonWidth);
+      }
       //transientButtons are update automatically...
    },
 
@@ -7208,6 +7380,10 @@ MyApplet.prototype = {
       }
       for(let i = 0; i < this._recentButtons.length; i++) {
          this._recentButtons[i].setVertical(this.iconView);
+      }
+      for(let i = 0; i < this._searchItems.length; i++) {
+         if(this._searchItems[i] instanceof SearchItem)
+            this._searchItems[i].setVertical(this.iconView);
       }
       //transientButtons are update automatically...
    },
@@ -7662,7 +7838,7 @@ MyApplet.prototype = {
       this.menuIcon = confTheme["menu-icon"];
       this.menuLabel = confTheme["menu-label"];
       this.showSearhEntry = confTheme["allow-search"];
-      this.searchFilesystem = confTheme["search-filesystem"];
+      //this.searchFilesystem = confTheme["search-filesystem"];
       this.swapPanels = confTheme["swap-panels"];
       this.hover_delay_ms = confTheme["hover-delay"];
       this.autoscroll_enabled = confTheme["enable-autoscroll"];
@@ -7728,7 +7904,7 @@ MyApplet.prototype = {
       confTheme["menu-icon"] = this.menuIcon;
       confTheme["menu-label"] = this.menuLabel;
       confTheme["allow-search"] = this.showSearhEntry;
-      confTheme["search-filesystem"] = this.searchFilesystem;
+     // confTheme["search-filesystem"] = this.searchFilesystem;
       confTheme["swap-panels"] = this.swapPanels;
       confTheme["hover-delay"] = this.hover_delay_ms;
       confTheme["enable-autoscroll"] = this.autoscroll_enabled;
@@ -8616,6 +8792,8 @@ MyApplet.prototype = {
 
          this._refreshApps();
 
+         this._onSearchEnginesChanged();
+
          this.signalKeyPowerID = 0;
          this._update_autoscroll();
          
@@ -8624,6 +8802,52 @@ MyApplet.prototype = {
       } catch(e) {
          Main.notify("ErrorDisplay:", e.message);
       }
+   },
+
+   _onSearchEnginesChanged: function() {
+      //this._searchList = global.settings.get_value('menu-search-engines').deep_unpack();
+      this._searchList = new Array();
+      this._searchItems.forEach(function(item) {
+         item.actor.destroy();
+      });
+      let language = Gtk.get_default_language().to_string();
+      if(language) {
+         let locale = language.substr(0, language.indexOf("-"));
+         if(locale) language = locale;
+      }
+      if(!language)
+        language = "es";
+      this._searchItems = [];
+      if(this.searchWeb) {
+         this._searchList.push(["", "", ""]);
+         if(this.searchDuckduckgo)
+            this._searchList.push(["DuckDuckGo", "https://duckduckgo.com/?t=lm&q=", "duckduckgo.svg"]);
+         if(this.searchWikipedia)
+            this._searchList.push(["Wikipedia", "http://" + language + ".wikipedia.org/wiki/Special:Search?search=", "wikipedia.svg"]);
+         if(this.searchGoogle)
+            this._searchList.push(["Google", "http://www.google.com/cse?cx=002683415331144861350%3Atsq8didf9x0&ie=utf-8&sa=Search&q=", "google.svg"]);
+         let path, button;
+         for(let i in this._searchList) {
+            path = this._searchList[i][2];
+            if(path == "") {
+               button = new PopupMenu.PopupSeparatorMenuItem();
+            } else {
+               if(path.indexOf("/") == -1)
+                  path = this.metadata.path + "/icons/" + path;
+               button = new SearchItem(this.menu, this._searchList[i][0], this._searchList[i][1], path,
+                                       this.iconAppSize, this.textButtonWidth, this.appButtonDescription, this.iconView);
+               if(this._applicationsBoxWidth > 0)
+                  button.container.set_width(this._applicationsBoxWidth);
+               
+               button.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, button));
+               this._addEnterEvent(button, Lang.bind(this, this._appEnterEvent, button));
+            }
+            this._searchItems.push(button);
+         }
+      }
+   },
+
+   _getUserLocale: function() {
    },
 
    loadClassic: function() {
@@ -9700,7 +9924,7 @@ MyApplet.prototype = {
       this._updateSize();
    },
 
-   _displayButtons: function(appCategory, places, recent, apps, autocompletes) {
+   _displayButtons: function(appCategory, places, recent, apps, autocompletes, search) {
       if(appCategory) {
          if(appCategory == "all") {
             for(let i = 0; i < this._applicationsButtons.length; i++) {
@@ -9813,12 +10037,17 @@ MyApplet.prototype = {
             this._transientButtons.push(button);
             button.actor.visible = true;
             button.actor.realize();
-            if(!this.iconView) {
-               //button.setVertical(this.iconView);
-               viewBox = new St.BoxLayout({ vertical: true });
-               viewBox.add_actor(button.actor);
-               this.applicationsBox.add_actor(viewBox);
-            }
+         }
+      }
+      if(search) {
+         for(let i = 0; i < this._searchItems.length; i++) {
+            this._searchItems[i].actor.visible = true;
+            if(!(this._searchItems[i] instanceof PopupMenu.PopupSeparatorMenuItem))
+               this._searchItems[i].setString(search);
+         }
+      } else {
+         for(let i in this._searchItems) {
+            this._searchItems[i].actor.hide();
          }
       }
       this._updateView();
@@ -9842,23 +10071,76 @@ MyApplet.prototype = {
                   this.resetSearch();
                   this._select_category(null, this._allAppsCategoryButton);
                }));
-             }
-             this._setCategoriesButtonActive(false);
-             this._doSearch();
-          } else {
-             if(this._searchIconClickedId > 0)
-                this.searchEntry.disconnect(this._searchIconClickedId);
-             this._searchIconClickedId = 0;
-             this.searchEntry.set_secondary_icon(this._searchInactiveIcon);
-             this._previousSearchPattern = "";
-             this._setCategoriesButtonActive(true);
-             if(!this.appMenuGnome) {
-                this._select_category(null, this._allAppsCategoryButton);
-             }
-          }
-          return false;
-       }
-    },
+            }
+            this._setCategoriesButtonActive(false);
+            this._doSearch();
+         } else {
+            if(this._searchIconClickedId > 0)
+               this.searchEntry.disconnect(this._searchIconClickedId);
+            this._searchIconClickedId = 0;
+            this.searchEntry.set_secondary_icon(this._searchInactiveIcon);
+            this._previousSearchPattern = "";
+            this._setCategoriesButtonActive(true);
+            if(!this.appMenuGnome) {
+               this._select_category(null, this._allAppsCategoryButton);
+            }
+         }
+         return false;
+      }
+   },
+
+   _doSearch: function() {
+      this._searchTimeoutId = 0;
+      let pattern = this.searchEntryText.get_text().replace(/^\s+/g, '').replace(/\s+$/g, '').toLowerCase();
+      if(pattern==this._previousSearchPattern) return false;
+      this._previousSearchPattern = pattern;
+      this._activeContainer = null;
+      this._activeActor = null;
+      this._selectedItemIndex = null;
+      this._previousTreeItemIndex = null;
+      this._previousTreeSelectedActor = null;
+      this._previousSelectedActor = null;
+       
+      // _listApplications returns all the applications when the search
+      // string is zero length. This will happend if you type a space
+      // in the search entry.
+      if(pattern.length == 0) {
+         return false;
+      }
+
+      var appResults = this._listApplications(null, pattern);
+      var placesResults = new Array();
+      var bookmarks = this._listBookmarks(pattern);
+      for(var i in bookmarks)
+         placesResults.push(bookmarks[i].name);
+      var devices = this._listDevices(pattern);
+      for(var i in devices)
+         placesResults.push(devices[i].name);
+      var recentResults = new Array();
+      for(let i = 0; i < this._recentButtons.length; i++) {
+         if(!(this._recentButtons[i] instanceof RecentClearButtonExtended) && this._recentButtons[i].button_name.toLowerCase().indexOf(pattern) != -1)
+            recentResults.push(this._recentButtons[i].button_name);
+      }
+
+      var acResults = new Array(); // search box autocompletion results
+      if(this.searchFilesystem) {
+         // Don't use the pattern here, as filesystem is case sensitive
+         acResults = this._getCompletions(this.searchEntryText.get_text());
+      }
+
+      //this._displayButtons(null, placesResults, recentResults, appResults, acResults);
+      this._displayButtons(null, placesResults, recentResults, appResults, acResults, this.searchEntryText.get_text());
+      this.appBoxIter.reloadVisible();
+      if(this.appBoxIter.getNumVisibleChildren() > 0) {
+         let item_actor = this.appBoxIter.getFirstVisible();
+         this._selectedItemIndex = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
+         this._activeContainer = this.applicationsBox;
+         if(item_actor && item_actor != this.searchEntry) {
+            item_actor._delegate.emit('enter-event');
+         }
+      }
+      return false;
+   },
 
    _selectDisplayLayout: function(actor, event) {
       if((this.bttChanger)&&(this.bttChanger.getSelected() == _("All Applications"))&&(this.searchActive)) {
