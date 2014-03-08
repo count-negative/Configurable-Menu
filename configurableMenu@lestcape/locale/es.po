@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-03-02 17:45-0600\n"
+"PO-Revision-Date: 2014-03-07 23:13-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -149,6 +149,14 @@ msgstr "Panel Accessible:"
 #. configurableMenu@lestcape->settings-schema.json->header-gnomenu->description
 msgid "GnoMenu Panel:"
 msgstr "Panel GnoMenu:"
+
+#. configurableMenu@lestcape->settings-schema.json->header-submenu->description
+msgid "Submenu:"
+msgstr "Submenú:"
+
+#. configurableMenu@lestcape->settings-schema.json->header-search->description
+msgid "General search options:"
+msgstr "Opciones generales de búsqueda:"
 
 #. configurableMenu@lestcape->settings-schema.json->swap-panels->description
 msgid "Swap the top and bottom panel"
@@ -804,3 +812,60 @@ msgid ""
 msgstr ""
 "Active esta opción para mostrar los íconos simbólicos en los botones del "
 "sistema y desactivela para mostrarlos a todo color."
+
+#. configurableMenu@lestcape->settings-schema.json->submenu-align->description
+msgid "Align the submenu with the parent"
+msgstr "Alinear el submenú con el padre"
+
+#. configurableMenu@lestcape->settings-schema.json->submenu-align->tooltip
+msgid "Choose whether or not to align the submenu with the parent."
+msgstr "Elija si desea o no alinear el submenú con el padre."
+
+#. configurableMenu@lestcape->settings-schema.json->submenu-width->description
+msgid "Submenu width:"
+msgstr "Ancho del submenú"
+
+#. configurableMenu@lestcape->settings-schema.json->submenu-width->tooltip
+msgid "Set the submenu width."
+msgstr "Ajuste el ancho de submenú."
+
+#. configurableMenu@lestcape->settings-schema.json->submenu-height->description
+msgid "Submenu height:"
+msgstr "Alto del submenú"
+
+#. configurableMenu@lestcape->settings-schema.json->submenu-height->tooltip
+msgid "Set the submenu height."
+msgstr "Ajuste el alto del submenú."
+
+#. configurableMenu@lestcape->settings-schema.json->search-web->description
+msgid "Enable web search"
+msgstr "Habilitar búsqueda en la web"
+
+#. configurableMenu@lestcape->settings-schema.json->search-web->tooltip
+msgid "Allows the web search with the selected search engines."
+msgstr ""
+"Permitir la búsqueda en la web con los motores de búsqueda seleccionados."
+
+#. configurableMenu@lestcape->settings-schema.json->search-wikipedia->description
+msgid "Enable web search with wikipedia"
+msgstr "Habilitar la búsqueda web con wikipedia"
+
+#. configurableMenu@lestcape->settings-schema.json->search-wikipedia->tooltip
+msgid "Allows web search to the wikipedia search engine."
+msgstr "Permitir la búsqueda en la web al motor de búsqueda wikipedia."
+
+#. configurableMenu@lestcape->settings-schema.json->"search-google->description
+msgid "Enable web search with google"
+msgstr "Habilitar búsqueda en la web con google"
+
+#. configurableMenu@lestcape->settings-schema.json->search-google->tooltip
+msgid "Allows web search to the google search engine."
+msgstr "Permitir la búsqueda en la web al motor de búsqueda google."
+
+#. configurableMenu@lestcape->settings-schema.json->"search-duckduckgo->description
+msgid "Enable web search with duckduckgo"
+msgstr "Habilitar búsqueda en la web con duckduckgo"
+
+#. configurableMenu@lestcape->settings-schema.json->search-duckduckgo->tooltip
+msgid "Allows web search to the duckduckgo search engine."
+msgstr "Permitir la búsqueda en la web al motor de búsqueda duckduckgo."

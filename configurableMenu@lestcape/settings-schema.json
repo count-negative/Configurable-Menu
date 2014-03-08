@@ -641,8 +641,8 @@
     "submenu-align": {
         "type": "checkbox",
         "default": false,
-        "description": "Align submenu with the parent",
-        "tooltip": "Choose whether or not to align submenu with the parent."
+        "description": "Align the submenu with the parent",
+        "tooltip": "Choose whether or not to align the submenu with the parent."
     },
     "submenu-width": {
         "type": "spinbutton",
@@ -652,7 +652,7 @@
         "step": 1,
         "units": "pixels",
         "description": "Submenu width:",
-        "tooltip": "Set the submenu height."
+        "tooltip": "Set the submenu width."
     },
     "submenu-height": {
         "type": "spinbutton",
@@ -684,7 +684,7 @@
         "type": "checkbox",
         "default": false,
         "description": "Enable web search",
-        "tooltip": "Allows web search with the your selected engineering in search box."
+        "tooltip": "Allows the web search with the selected search engines."
     },
     "search-wikipedia": {
         "type": "checkbox",
@@ -692,7 +692,7 @@
         "indent": true,
         "dependency": "search-web",
         "description": "Enable web search with wikipedia",
-        "tooltip": "Allows web search on the wikipedia web site."
+        "tooltip": "Allows web search to the wikipedia search engine."
     },
     "search-google": {
         "type": "checkbox",
@@ -700,7 +700,7 @@
         "indent": true,
         "dependency": "search-web",
         "description": "Enable web search with google",
-        "tooltip": "Allows web search on the google web site."
+        "tooltip": "Allows web search to the google search engine."
     },
     "search-duckduckgo": {
         "type": "checkbox",
@@ -708,7 +708,7 @@
         "indent": true,
         "dependency": "search-web",
         "description": "Enable web search with duckduckgo",
-        "tooltip": "Allows web search on the duckduckgo web site."
+        "tooltip": "Allows web search to the duckduckgo search engine."
     },
     "list-places": {
         "type": "generic",

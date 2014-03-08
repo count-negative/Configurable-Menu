@@ -1,6 +1,6 @@
 Cinnamon Applet: Configurable Menu Version: v0.9-Beta
 
-Last version release date: 21 january 2014
+Last version release date: 07 March 2014
 ***
 Authors: [Lester Carballo Pérez](https://github.com/lestcape) and [Garibaldo](https://github.com/Garibaldo).
 
@@ -40,6 +40,7 @@ Here you can find interesting information about Configurable Menu.
    - [Settings](https://github.com/lestcape/Configurable-Menu/wiki/Settings)
    - [Cinnamon themes support](https://github.com/lestcape/Configurable-Menu/wiki/Theme-Support)
    - [New languages](https://github.com/lestcape/Configurable-Menu/wiki/Add-new-languages)
+   - [Install nightly build](https://github.com/lestcape/Configurable-Menu/wiki/Install-Nightly-Build)
 
 Change log
 --------------
