@@ -10144,12 +10144,10 @@ MyApplet.prototype = {
 
    _selectDisplayLayout: function(actor, event) {
       if((this.bttChanger)&&(this.bttChanger.getSelected() == _("All Applications"))&&(this.searchActive)) {
-         if(this.searchEntry.text == "")
-            this.bttChanger.activateNext();
+         this.bttChanger.activateNext();
       }
       if((this.gnoMenuBox)&&(this.gnoMenuBox.getSelected() != _("All Applications"))&&(this.searchActive)) {
-         if(this.searchEntry.text == "")
-            this.gnoMenuBox.setSelected(_("All Applications"));
+         this.gnoMenuBox.setSelected(_("All Applications"));
       }
       if(this.appMenuGnome) {
          if(this.searchActive) {
