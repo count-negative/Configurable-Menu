@@ -8180,13 +8180,14 @@ MyApplet.prototype = {
             this.width = this.mainBox.get_width();
             this.mainBox.set_width(this.width);
          } else {
+            let difference = this.menu.actor.get_height() - this.mainBox.get_height();
             if(this.width > this.mainBox.get_width()) {
-               if(this.width > monitor.width)
-                  this.width = monitor.width;
+               if(this.width > monitor.width - difference)
+                  this.width = monitor.width - difference;
                this.mainBox.set_width(this.width);
             } else {
-               if(this.width > monitor.width) {
-                  this.width = monitor.width;
+               if(this.width > monitor.width - difference) {
+                  this.width = monitor.width - difference;
                   this.mainBox.set_width(this.width);
                }
                else if(this.width > this.minimalWidth) {
