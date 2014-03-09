@@ -32,6 +32,10 @@ This latest version brings a lot of cool new stuff, like:
 A more detail list can be found [here](https://github.com/lestcape/Configurable-Menu/wiki/Some-features).
 And much more coming...
 
+This applet not longer has support for Arch Linux.
+
+The comunity of Arch Linux do not want that I or other Cinnamon developer, publish about Cinnamon, and receive the users feedback (necessary on the developing any app). When the comunity of Arch Linux, want to be open to the free software world, sure that I want to support Arch Linux again...
+
 Help
 --------------
 Here you can find interesting information about Configurable Menu.
