@@ -1,6 +1,6 @@
 Cinnamon Applet: Configurable Menu Version: v0.9-Beta
 
-Last version release date: 07 March 2014
+Last version release date: 12 March 2014
 ***
 Authors: [Lester Carballo Pérez](https://github.com/lestcape) and [Garibaldo](https://github.com/Garibaldo).
 
@@ -11,6 +11,13 @@ Special thanks to:
 
 - [Bernard](https://github.com/zagortenay333) (Help adding support to the Cinnamon themes).
 - Eliermi Cunha Junior(jpegrande@gmail.com) (Help finding errors and making several promotional videos).
+
+--------------
+Author of language translation:
+--------------
+- English:   Garibaldo (https://github.com/Garibaldo) and Lester Carballo Pérez(lestcape@gmail.com)
+- Spanish:   Lester Carballo Pérez(lestcape@gmail.com)
+- Portugese: Eliermi Cunha Junior(jpegrande@gmail.com)
 
 --------------
 ![](https://raw.github.com/wiki/lestcape/Configurable-Menu/img/Capture.png)
@@ -52,7 +59,7 @@ See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/C
 
 0.9-Beta
    - Was added support for more languages.
-   - Was added spanish language.
+   - Was added Spanish and Portugese language.
    - Now you can have a different configuration for each layout.
    - The removable drives are now show in accessible panel and also can be removed.
    - The full screen mode was improved, now can be see better in more themes.
