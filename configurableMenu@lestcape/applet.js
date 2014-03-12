@@ -2732,40 +2732,31 @@ VisibleChildIteratorExtended.prototype = {
 
    reloadVisible: function() {
       try {
-      /*if(this._numberView == 1) {
          this.visible_children = new Array();
          this.abs_index = new Array();
-         let child;
-         let children = this.container.get_children();
-         for (let i = 0; i < children.length; i++) {
-            child = children[i];
-            if (child.visible) {
-                this.visible_children.push(child);
-                this.abs_index.push(i);
-            }
-         }
-      }
-      else {*/
-         this.visible_children = new Array();
-         this.abs_index = new Array();
+         this.cat_index = new Array();
          this.inter_index = new Array();
-         let child, internalBox, intIndex;
-         let children = this.container.get_children();
-         for(let j = 0; j < children.length; j++) {
-            internalBox = children[j].get_children();
-            intIndex = 0;
-            for(let i = 0; i < internalBox.length; i++) {
-               child = internalBox[i];
-               if(child.visible) {
-                  this.visible_children.push(child);
-                  this.abs_index.push(j);
-                  this.inter_index.push(intIndex);
-                  intIndex++;
+         let child, children, internalBox, interIndex;
+         let childrenCat = this.container.get_children();
+         for(let k = 0; k < childrenCat.length; k++) {
+            children = childrenCat[k].get_children();
+            for(let j = 0; j < children.length; j++) {
+               internalBox = children[j].get_children();
+               iterIndex = 0;
+               for(let i = 0; i < internalBox.length; i++) {
+                  child = internalBox[i];
+                  if(child.visible) {
+                     this.visible_children.push(child);
+                     this.abs_index.push(j);
+                     this.cat_index.push(k);
+                     this.inter_index.push(iterIndex);
+                     iterIndex++;
+                  }
                }
             }
          }
-   //   }
-      this._num_children = this.visible_children.length;
+         this._num_cat = childrenCat.length;
+         this._num_children = this.visible_children.length;
       } catch(e) {
          Main.notify(e.message);
       }
@@ -2775,10 +2766,18 @@ VisibleChildIteratorExtended.prototype = {
       this._numberView = numberView;
    },
 
+   getAppAt: function(k, x, y) {
+      return this.container.get_child_at_index(k).get_child_at_index(x).get_child_at_index(y);
+      /*for(let k = 0; k < childrenCat.length; k++) {
+          
+      }*/
+   },
+
    getNextVisible: function(cur_child) {
-      if(this.visible_children.indexOf(cur_child) == this._num_children-1)
+      let pos = this.visible_children.indexOf(cur_child);
+      if(pos == this._num_children-1)
          return this.visible_children[0];
-      else
+      else /*if(this.inter_index[pos])*/
          return this.visible_children[this.visible_children.indexOf(cur_child)+1];
    },
 
@@ -2836,6 +2835,13 @@ VisibleChildIteratorExtended.prototype = {
       //return child.get_parent().get_parent().get_children().indexOf(child.get_parent());
       if(this.inter_index)
          return this.inter_index[this.visible_children.indexOf(child)];
+      return 0;
+   },
+
+   getCategoryIndexOfChild: function(child) {
+      //return child.get_parent().get_parent().get_children().indexOf(child.get_parent());
+      if(this.inter_index)
+         return this.cat_index[this.visible_children.indexOf(child)];
       return 0;
    },
 
@@ -6823,7 +6829,7 @@ MyApplet.prototype = {
         } else if(this._activeContainer === null) {
            item_actor = this._navegationInit(symbol);
         } else if(this._activeContainer == this.applicationsBox) {
-           item_actor = this._navegateAppBox(symbol, this._selectedItemIndex, this._selectedRowIndex);
+           item_actor = this._navegateAppBox(symbol, this._selectedItemIndex, this._selectedCategoryIndex, this._selectedRowIndex);
         } else if(this._activeContainer == this.categoriesBox) {
            item_actor = this._navegateCatBox(symbol, this._selectedRowIndex);
         } else if (this.searchFilesystem && (this._fileFolderAccessActive || symbol == Clutter.slash)) {
@@ -6938,18 +6944,20 @@ MyApplet.prototype = {
             return item_actor;
          }
          this._activeContainer = this.applicationsBox;
-         this._previousSelectedActor = this.applicationsBox.get_child_at_index(0).get_child_at_index(0);
+        // this._previousSelectedActor = this.applicationsBox.get_child_at_index(0).get_child_at_index(0);
+         this._previousSelectedActor = this.appBoxIter.getAppAt(0, 0, 0);
          this._previousTreeSelectedActor._delegate.emit('enter-event');
 
          item_actor = this.appBoxIter.getFirstVisible();
          this._selectedItemIndex = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
+         this._selectedCategoryIndex = this.appBoxIter.getCategoryIndexOfChild(item_actor);
          this._selectedRowIndex = this.appBoxIter.getInternalIndexOfChild(item_actor);
       }
       //global.stage.set_key_focus(this.powerBox.actor);
       return item_actor;
    },
 
-   _navegateAppBox: function(symbol, index, rowIndex) {
+   _navegateAppBox: function(symbol, index, catIndex, rowIndex) {
       let item_actor;
       if(!this.operativePanel.visible) {
          this.fav_actor = this._changeFocusElement(this.searchEntry);
@@ -6963,14 +6971,17 @@ MyApplet.prototype = {
          item_actor = this.searchEntry;
       }
       else if(symbol == Clutter.KEY_Up) {
-         this._previousSelectedActor = this.applicationsBox.get_child_at_index(index).get_child_at_index(2*rowIndex);
+         //this._previousSelectedActor = this.applicationsBox.get_child_at_index(index).get_child_at_index(2*rowIndex);
+         this._previousSelectedActor = this.appBoxIter.getAppAt(catIndex, index, 2*rowIndex);
+
          item_actor = this.appBoxIter.getPrevVisible(this._previousSelectedActor);
          this._previousVisibleIndex = this.appBoxIter.getVisibleIndex(item_actor);
          index = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
          this.applicationsScrollBox.scrollToActor(item_actor._delegate.actor);
       } 
       else if(symbol == Clutter.KEY_Down) {
-         this._previousSelectedActor = this.applicationsBox.get_child_at_index(index).get_child_at_index(2*rowIndex);
+         //this._previousSelectedActor = this.applicationsBox.get_child_at_index(index).get_child_at_index(2*rowIndex);
+         this._previousSelectedActor = this.appBoxIter.getAppAt(catIndex, index, 2*rowIndex);
          item_actor = this.appBoxIter.getNextVisible(this._previousSelectedActor);
          this._previousVisibleIndex = this.appBoxIter.getVisibleIndex(item_actor);
          index = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
@@ -6979,7 +6990,8 @@ MyApplet.prototype = {
       else if(symbol == Clutter.KEY_Right) {
          if(this._previousTreeSelectedActor)
             this._previousTreeSelectedActor._delegate.emit('enter-event');
-         this._previousSelectedActor = this.applicationsBox.get_child_at_index(index).get_child_at_index(2*rowIndex);
+         //this._previousSelectedActor = this.applicationsBox.get_child_at_index(index).get_child_at_index(2*rowIndex);
+         this._previousSelectedActor = this.appBoxIter.getAppAt(catIndex, index, 2*rowIndex);
          item_actor = this.appBoxIter.getRightVisible(this._previousSelectedActor);
          this._previousVisibleIndex = this.appBoxIter.getVisibleIndex(item_actor);
          index = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
@@ -6989,7 +7001,8 @@ MyApplet.prototype = {
          if(this._previousTreeSelectedActor)
             this._previousTreeSelectedActor._delegate.emit('enter-event');
          if(index == 0) {
-            this._previousSelectedActor = this.applicationsBox.get_child_at_index(index).get_child_at_index(0);
+            //this._previousSelectedActor = this.applicationsBox.get_child_at_index(index).get_child_at_index(0);
+            this._previousSelectedActor = this.appBoxIter.getAppAt(catIndex, index, 0);
             item_actor = (this._previousTreeSelectedActor) ? this._previousTreeSelectedActor : this.catBoxIter.getFirstVisible();
             index = this.catBoxIter.getAbsoluteIndexOfChild(item_actor);
             this._previousTreeSelectedActor = item_actor;
@@ -6997,14 +7010,16 @@ MyApplet.prototype = {
             this.hover.refreshFace();
             this.selectedAppBox.setSelectedText("", "");
          } else {
-            this._previousSelectedActor = this.applicationsBox.get_child_at_index(index).get_child_at_index(2*rowIndex);
+            //this._previousSelectedActor = this.applicationsBox.get_child_at_index(index).get_child_at_index(2*rowIndex);
+            this._previousSelectedActor = this.appBoxIter.getAppAt(catIndex, index, 2*rowIndex);
             item_actor = this.appBoxIter.getLeftVisible(this._previousSelectedActor);
             this._previousVisibleIndex = this.appBoxIter.getVisibleIndex(item_actor);
             index = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
             this.applicationsScrollBox.scrollToActor(item_actor._delegate.actor);
          }
       } else if((symbol == Clutter.KEY_Return) || (symbol == Clutter.KP_Enter)) {
-         item_actor = this.applicationsBox.get_child_at_index(index).get_child_at_index(2*rowIndex);
+         //item_actor = this.applicationsBox.get_child_at_index(index).get_child_at_index(2*rowIndex);
+         item_actor = this.appBoxIter.getAppAt(catIndex, index, 2*rowIndex);
          item_actor._delegate.activate();
       }
       this._selectedItemIndex = index;
@@ -7027,14 +7042,16 @@ MyApplet.prototype = {
       else if(!this.gnoMenuBox) {
          if(this.categoriesBox.get_vertical()) {
             if(symbol == Clutter.KEY_Up) {
-               this._previousTreeSelectedActor = this.categoriesBox.get_child_at_index(0).get_child_at_index(index);
+               //this._previousTreeSelectedActor = this.categoriesBox.get_child_at_index(0).get_child_at_index(index);
+               this._previousTreeSelectedActor = this.catBoxIter.getAppAt(0, 0, index);
                this._previousTreeSelectedActor._delegate.isHovered = false;
                item_actor = this.catBoxIter.getPrevVisible(this._activeActor)
                index = this.catBoxIter.getAbsoluteIndexOfChild(item_actor);
                this.categoriesScrollBox.scrollToActor(item_actor._delegate.actor);
             }
             else if(symbol == Clutter.KEY_Down) {
-               this._previousTreeSelectedActor = this.categoriesBox.get_child_at_index(0).get_child_at_index(index);
+               //this._previousTreeSelectedActor = this.categoriesBox.get_child_at_index(0).get_child_at_index(index);
+               this._previousTreeSelectedActor = this.catBoxIter.getAppAt(0, 0, index);
                this._previousTreeSelectedActor._delegate.isHovered = false;
                item_actor = this.catBoxIter.getNextVisible(this._activeActor)
                index = this.catBoxIter.getAbsoluteIndexOfChild(item_actor);
@@ -7051,7 +7068,8 @@ MyApplet.prototype = {
             }
          } else {
             if(symbol == Clutter.KEY_Right) {
-               this._previousTreeSelectedActor = this.categoriesBox.get_child_at_index(0).get_child_at_index(index);
+              // this._previousTreeSelectedActor = this.categoriesBox.get_child_at_index(0).get_child_at_index(index);
+               this._previousTreeSelectedActor = this.catBoxIter.getAppAt(0, 0, index);
                this._previousTreeSelectedActor._delegate.isHovered = false;
                item_actor = this.catBoxIter.getNextVisible(this._activeActor)
                index = this.catBoxIter.getAbsoluteIndexOfChild(item_actor);
@@ -7059,7 +7077,8 @@ MyApplet.prototype = {
                this.categoriesScrollBox.scrollToActor(item_actor._delegate.actor);
             }
             else if(symbol == Clutter.KEY_Left) {
-               this._previousTreeSelectedActor = this.categoriesBox.get_child_at_index(0).get_child_at_index(index);
+               //this._previousTreeSelectedActor = this.categoriesBox.get_child_at_index(0).get_child_at_index(index);
+               this._previousTreeSelectedActor = this.catBoxIter.getAppAt(0, 0, index);
                this._previousTreeSelectedActor._delegate.isHovered = false;
                item_actor = this.catBoxIter.getPrevVisible(this._activeActor)
                index = this.catBoxIter.getAbsoluteIndexOfChild(item_actor);
@@ -7163,7 +7182,7 @@ MyApplet.prototype = {
             }
             this._selectedItemIndex = index;
          } else if(this._activeContainer == this.applicationsBox) {
-            item_actor = this._navegateAppBox(symbol, this._selectedItemIndex, this._selectedRowIndex);
+            item_actor = this._navegateAppBox(symbol, this._selectedItemIndex, this._selectedCategoryIndex, this._selectedRowIndex);
          }
          let copyPreviousTreeSelectedActor = this._previousTreeSelectedActor;
          if((item_actor)&&(item_actor._delegate))
@@ -7271,6 +7290,11 @@ MyApplet.prototype = {
             visibleAppButtons.push(this._transientButtons[i]);
          }
       }
+      return visibleAppButtons;
+   },
+
+   _getSearchVisibleButtons: function() {
+      let visibleAppButtons = new Array();
       for(let i = 0; i < this._searchItems.length; i++) {
          if(this._searchItems[i].actor.visible) {
             visibleAppButtons.push(this._searchItems[i]);
@@ -7288,12 +7312,18 @@ MyApplet.prototype = {
          if(this.iconViewCount < 1)
             this.iconViewCount = 1; 
       }
+      //Main.notify("count>" + this._applicationsBoxWidth);
       this.appBoxIter.setNumberView(this.iconViewCount);
 
       let viewBox;
-      for(let i = 0; i < this.iconViewCount; i++) {
-         viewBox = new St.BoxLayout({ vertical: true, width: (this._applicationsBoxWidth) });
-         this.applicationsBox.add(viewBox, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.START, expand: true });
+      let internalCat = this.applicationsBox.get_children();
+      for(let i = 0; i < internalCat.length; i++) {
+         if(!(internalCat[i]._delegate instanceof PopupMenu.PopupSeparatorMenuItem)) {
+            for(let j = 0; j < this.iconViewCount; j++) {
+               viewBox = new St.BoxLayout({ vertical: true, width: (this._applicationsBoxWidth) });
+               internalCat[i].add(viewBox, { x_fill: false, y_fill: true, x_align: St.Align.START, y_align: St.Align.START, expand: true });
+            }
+         }
       }
    },
 
@@ -7390,11 +7420,30 @@ MyApplet.prototype = {
 
    _updateView: function() {
       this._clearView();
-      let visibleAppButtons = this._getAppVisibleButtons();
       this._updateAppPrefNumIcons();
+      let visibleAppButtons = this._getAppVisibleButtons();
       try {
          let currValue, falseActor;
-         let viewBox = this.applicationsBox.get_children();
+        // let viewBox = this.applicationsBox.get_children()[0].get_children();
+         let viewBox = this.standarAppBox.get_children();
+         //Main.notify("view:" + viewBox[0]);
+         for(let i = 0; i < visibleAppButtons.length; i += this.iconViewCount) {
+            for(let j = 0; j < this.iconViewCount; j++) {
+               currValue = i + j;
+               if((currValue < visibleAppButtons.length)&&(viewBox[j])) {
+                  viewBox[j].add_actor(visibleAppButtons[currValue].actor);   
+                  if(visibleAppButtons[currValue].menu)
+                     viewBox[j].add_actor(visibleAppButtons[currValue].menu.actor);
+                  else {//Remplace menu actor by a hide false actor.
+                     falseActor = new St.BoxLayout();
+                     falseActor.hide();
+                     viewBox[j].add_actor(falseActor);
+                  }
+               }
+            }
+         }
+         visibleAppButtons = this._getSearchVisibleButtons();
+         viewBox = this.searchAppBox.get_children();
          for(let i = 0; i < visibleAppButtons.length; i += this.iconViewCount) {
             for(let j = 0; j < this.iconViewCount; j++) {
                currValue = i + j;
@@ -7416,16 +7465,22 @@ MyApplet.prototype = {
    },
 
    _clearView: function() {
-      let appBox = this.applicationsBox.get_children();
-      let appItem;
-      for(let i = 0; i < appBox.length; i++) {
-         appItem = appBox[i].get_children();
-         if(appItem) {
-            for(let j = 0; j < appItem.length; j++)
-               appBox[i].remove_actor(appItem[j]);
-            appBox[i].destroy();
-            this.applicationsBox.remove_actor(appBox[i]);
+      let internalCat = this.applicationsBox.get_children();
+      for(let k = 0; k < internalCat.length; k++) {
+         if(!(internalCat[k]._delegate instanceof PopupMenu.PopupSeparatorMenuItem)) {
+            let appBox = internalCat[k].get_children();
+            let appItem;
+            for(let i = 0; i < appBox.length; i++) {
+               appItem = appBox[i].get_children();
+               if(appItem) {
+                  for(let j = 0; j < appItem.length; j++)
+                     appBox[i].remove_actor(appItem[j]);
+                  appBox[i].destroy();
+                  internalCat[k].remove_actor(appBox[i]);
+               }
+            }
          }
+         //this.applicationsBox.remove_actor(internalCat[0]);
       }
    },
 
@@ -7664,6 +7719,7 @@ MyApplet.prototype = {
       if(this.gnoMenuBox)
          this.gnoMenuBox.showFavorites(this.showFavorites);
       this.favoritesScrollBox.actor.visible = this.showFavorites;
+      this.favBoxWrapper.visible = this.showFavorites;
       this._refreshFavs();
       this._updateSize();
    },
@@ -8021,6 +8077,7 @@ MyApplet.prototype = {
          this.separatorBottom.setSpace(this.separatorSize);
       }
       this.favoritesScrollBox.actor.visible = this.showFavorites;
+      this.favBoxWrapper.visible = this.showFavorites;
       this.selectedAppBox.setTitleVisible(this.showAppTitle);
       this.selectedAppBox.setDescriptionVisible(this.showAppDescription);
       this.selectedAppBox.setTitleSize(this.appTitleSize);
@@ -8168,10 +8225,12 @@ MyApplet.prototype = {
                let operPanelVisible = this.operativePanel.visible;
                this.operativePanel.visible = true;
                this.favoritesScrollBox.actor.visible = false;
+               this.favBoxWrapper.visible = false;
                this.height = this.mainBox.get_height();
                this.mainBox.set_height(this.height);
                this.operativePanel.visible = operPanelVisible;
                this.favoritesScrollBox.actor.visible = !operPanelVisible;
+               this.favBoxWrapper.visible = !operPanelVisible;
             } else {
                this.height = this.mainBox.get_height();
                this.mainBox.set_height(this.height);
@@ -8686,8 +8745,16 @@ MyApplet.prototype = {
          this.categoriesSpaceUp = new St.BoxLayout({ style_class: 'menu-categories-space-' + this.theme });
          this.categoriesSpaceDown = new St.BoxLayout({ style_class: 'menu-categories-space-' + this.theme });
          this.categoriesBox.add_style_class_name('menu-categories-box-' + this.theme);
-         this.applicationsBox = new St.BoxLayout({ style_class: 'menu-applications-box', vertical: false });
+         this.applicationsBox = new St.BoxLayout({ style_class: 'menu-applications-box', vertical: true });
          this.applicationsBox.add_style_class_name('menu-applications-box-' + this.theme);
+         this.standarAppBox = new St.BoxLayout({ vertical: false });
+         this.searchAppBox = new St.BoxLayout({ vertical: false });
+         this.applicationsBox.add(this.standarAppBox, { x_fill: true, y_fill: true, x_align: St.Align.START, y_align: St.Align.START, expand: true });
+         this.searchAppSeparator = new PopupMenu.PopupSeparatorMenuItem();
+         this.searchAppSeparator.actor.hide();
+         this.applicationsBox.add(this.searchAppSeparator.actor, { x_fill: true, y_fill: true, x_align: St.Align.START, y_align: St.Align.START, expand: true });
+         this.applicationsBox.add(this.searchAppBox, { x_fill: true, y_fill: true, x_align: St.Align.START, y_align: St.Align.START, expand: true });
+
          this.favoritesBox = new St.BoxLayout({ vertical: true, style_class: 'menu-favorites-box-internal' });
          this.favoritesBox.add_style_class_name('menu-favorites-box-internal-' + this.theme);
          this.favBoxWrapper = new St.BoxLayout({ vertical: true, style_class: 'menu-favorites-box' });
@@ -8817,10 +8884,10 @@ MyApplet.prototype = {
          if(locale) language = locale;
       }
       if(!language)
-        language = "es";
+         language = "en";
       this._searchItems = [];
       if(this.searchWeb) {
-         this._searchList.push(["", "", ""]);
+         //this._searchList.push(["", "", ""]);
          if(this.searchDuckduckgo)
             this._searchList.push(["DuckDuckGo", "https://duckduckgo.com/?t=lm&q=", "duckduckgo.svg"]);
          if(this.searchWikipedia)
@@ -8830,9 +8897,9 @@ MyApplet.prototype = {
          let path, button;
          for(let i in this._searchList) {
             path = this._searchList[i][2];
-            if(path == "") {
+            /*if(path == "") {
                button = new PopupMenu.PopupSeparatorMenuItem();
-            } else {
+            } else {*/
                if(path.indexOf("/") == -1)
                   path = this.metadata.path + "/icons/" + path;
                button = new SearchItem(this.menu, this._searchList[i][0], this._searchList[i][1], path,
@@ -8842,7 +8909,7 @@ MyApplet.prototype = {
                
                button.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, button));
                this._addEnterEvent(button, Lang.bind(this, this._appEnterEvent, button));
-            }
+            //}
             this._searchItems.push(button);
          }
       }
@@ -9418,8 +9485,10 @@ MyApplet.prototype = {
          this._activeContainer = null;
          this.operativePanel.visible = false;
          this.favoritesScrollBox.actor.visible = true;
+         this.favBoxWrapper.visible = true;
       } else {
          this.favoritesScrollBox.actor.visible = false;
+         this.favBoxWrapper.visible = false;
          this.operativePanel.visible = true;
          let selectedButton;
          if(selected == _("All Applications"))
@@ -9488,6 +9557,7 @@ MyApplet.prototype = {
       this.operativePanel.visible = !operPanelVisible;
       this.favBoxWrapper.visible = operPanelVisible;
       this.favoritesScrollBox.actor.visible = operPanelVisible;
+      this.favBoxWrapper.visible = operPanelVisible;
      /* if((this.showAppTitle)||(this.showAppDescription))
          this.endHorizontalBox.visible = !operPanelVisible;*/
 
@@ -9694,6 +9764,7 @@ MyApplet.prototype = {
                this.hover.actor.visible = this.showHoverIcon;
                this.hover.container.visible = this.showHoverIcon;
                this.favoritesScrollBox.actor.visible = false;
+               this.favBoxWrapper.visible = false;
                this.controlView.actor.visible = false;
                this.categoriesScrollBox.actor.visible = true;
                this.placesScrollBox.actor.visible = false;
@@ -9712,6 +9783,7 @@ MyApplet.prototype = {
                this.hover.actor.visible = this.showHoverIcon;
                this.hover.container.visible = this.showHoverIcon;
                this.favoritesScrollBox.actor.visible = true;
+               this.favBoxWrapper.visible = true;
                this.powerBox.actor.visible = false;
                this.endVerticalBox.visible = false;
                this.controlView.actor.visible = false;
@@ -9727,6 +9799,7 @@ MyApplet.prototype = {
                this.hover.actor.visible = this.showHoverIcon;
                this.hover.container.visible = this.showHoverIcon;
                this.favoritesScrollBox.actor.visible = false;
+               this.favBoxWrapper.visible = false;
                this.controlView.actor.visible = false;
                this.categoriesScrollBox.actor.visible = true;
                this.placesScrollBox.actor.visible = true;
@@ -9742,6 +9815,7 @@ MyApplet.prototype = {
                this.hover.actor.visible = this.showHoverIcon;
                this.hover.container.visible = this.showHoverIcon;
                this.favoritesScrollBox.actor.visible = false;
+               this.favBoxWrapper.visible = false;
                this.controlView.actor.visible = this.showView;
                this.categoriesScrollBox.actor.visible = true;
                this.placesScrollBox.actor.visible = false;
@@ -10041,12 +10115,15 @@ MyApplet.prototype = {
          }
       }
       if(search) {
+         this.searchAppSeparator.actor.show();
          for(let i = 0; i < this._searchItems.length; i++) {
             this._searchItems[i].actor.visible = true;
+            this._searchItems[i].actor.style_class = "menu-application-button";
             if(!(this._searchItems[i] instanceof PopupMenu.PopupSeparatorMenuItem))
                this._searchItems[i].setString(search);
          }
       } else {
+         this.searchAppSeparator.actor.hide();
          for(let i in this._searchItems) {
             this._searchItems[i].actor.hide();
          }
@@ -10224,7 +10301,8 @@ MyApplet.prototype = {
    _refreshApps: function() {
       for(let i = 0; i < this._categoryButtons.length; i++)
          this._categoryButtons[i].actor.destroy();
-      this.applicationsBox.destroy_all_children();
+      //this.applicationsBox.destroy_all_children();
+      this.standarAppBox.destroy_all_children();
       this._applicationsButtons = new Array();
       this._transientButtons = new Array();
       this._categoryButtons = new Array();
@@ -10342,16 +10420,17 @@ MyApplet.prototype = {
       //Mainloop.idle_add(Lang.bind(this, function() {
 
          let catVertical = !this.categoriesBox.get_vertical();
-         let wrapperBox = new St.BoxLayout({ vertical: this.categoriesBox.get_vertical() });
-         if(this.categoriesBox.get_children().length == 0)
-            this.categoriesBox.add_actor(wrapperBox);
-         let viewBox = this.categoriesBox.get_children()[0];
-         for(let i = 0; i < this._categoryButtons.length; i++) {
-            this._categoryButtons[i].setVertical(catVertical);
-            viewBox.add_actor(this._categoryButtons[i].actor);
-            this._setCategoryArrow(this._categoryButtons[i]);
+         if(this.categoriesBox.get_children().length == 0) {
+            let wrapperCatBox = new St.BoxLayout({ vertical: this.categoriesBox.get_vertical() });
+            let viewBox = new St.BoxLayout({ vertical: this.categoriesBox.get_vertical() });
+            wrapperCatBox.add_actor(viewBox);
+            this.categoriesBox.add_actor(wrapperCatBox);
+            for(let i = 0; i < this._categoryButtons.length; i++) {
+               this._categoryButtons[i].setVertical(catVertical);
+               viewBox.add_actor(this._categoryButtons[i].actor);
+               this._setCategoryArrow(this._categoryButtons[i]);
+            }
          }
-         //Main.notify("Fueron:" + viewBox.get_children().length);
          this._clearPrevCatSelection(this._allAppsCategoryButton.actor);
          this._allAppsCategoryButton.actor.set_style_class_name('menu-category-button-selected');
          this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
@@ -10369,8 +10448,12 @@ MyApplet.prototype = {
       for(let i = 0; i < this._recentButtons.length; i ++) {
          this._recentButtons[i].actor.destroy();
       }
-      if(this.categoriesBox.get_children().length == 0)
-         this.categoriesBox.add_actor(new St.BoxLayout({ vertical: this.categoriesBox.get_vertical() }));
+      if(this.categoriesBox.get_children().length == 0) {
+         let wrapperCatBox = new St.BoxLayout({ vertical: this.categoriesBox.get_vertical() });
+         let viewBox = new St.BoxLayout({ vertical: this.categoriesBox.get_vertical() });
+         wrapperCatBox.add_actor(viewBox);
+         this.categoriesBox.add_actor(wrapperCatBox);
+      }
       let tempCat;
       for(let i = 0; i < this._categoryButtons.length; i++) {
          tempCat = this._categoryButtons[i];
@@ -10441,7 +10524,7 @@ MyApplet.prototype = {
          }));
          this._categoryButtons.push(this.placesButton);
          this.placesButton.setVertical(!this.categoriesBox.get_vertical());
-         this.categoriesBox.get_children()[0].add_actor(this.placesButton.actor);
+         this.categoriesBox.get_child_at_index(0).get_child_at_index(0).add_actor(this.placesButton.actor);
          this._setCategoryArrow(this.placesButton);
 
          let bookmarks = this._listBookmarks();
@@ -10512,7 +10595,7 @@ MyApplet.prototype = {
             this._select_category(null, null);
          }));
 
-         this.categoriesBox.get_children()[0].add_actor(this.recentButton.actor);
+         this.categoriesBox.get_child_at_index(0).get_child_at_index(0).add_actor(this.recentButton.actor);
          this.recentButton.setVertical(!this.categoriesBox.get_vertical());
          this._categoryButtons.push(this.recentButton);
          this._setCategoryArrow(this.recentButton);
@@ -10580,7 +10663,9 @@ MyApplet.prototype = {
    _addEnterEvent: function(button, callback) {
       let _callback = Lang.bind(this, function() {
          try {
-            let parent = button.actor.get_parent();
+            let parent = button.actor.get_parent()
+            if(parent)
+               parent = parent.get_parent();
             if((parent)&&(parent != this.categoriesBox))
                parent = parent.get_parent();
             if(this._activeContainer !== this.applicationsBox && parent !== this._activeContainer) {
@@ -10609,11 +10694,12 @@ MyApplet.prototype = {
             this._activeActor = button.actor;
             if(this._activeContainer) {
                this._selectedItemIndex = this._activeContainer._vis_iter.getAbsoluteIndexOfChild(this._activeActor);
+               this._selectedCategoryIndex = this._activeContainer._vis_iter.getCategoryIndexOfChild(this._activeActor);
                this._selectedRowIndex = this._activeContainer._vis_iter.getInternalIndexOfChild(this._activeActor);
             }
             callback();
          } catch(e) {
-            Main.notify("error3", e.message);
+            Main.notify("Error on addEnterEvent", e.message);
          }
       });
       button.connect('enter-event', _callback);
