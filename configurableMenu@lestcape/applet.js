@@ -82,6 +82,16 @@ function _(str) {
    return Gettext.gettext(str);
 };
 
+function urldecode(str) {
+  //       discuss at: http://phpjs.org/functions/urldecode/
+  return decodeURIComponent((str + '')
+    .replace(/%(?![\da-f]{2})/gi, function() {
+      // PHP tolerates poorly formed escape sequences
+      return '%25';
+    })
+    .replace(/\+/g, '%20'));
+}
+
 
 function toUTF8FromHex(hex) {
    return toUTF8FromAscii(toAscciiFromHex(hex));
@@ -104,7 +114,8 @@ function toAscciiFromHex(encode) {
            else
              last = encode.indexOf(splitEncode[i]);
            transcode = encode.substr(result.length, last - result.length).toLowerCase();
-           result += decodeURIComponent(transcode.replace(/\s+/g, '').replace(/%[0-9A-F]{2}/g, '%$&')) + splitEncode[i];
+           //result += decodeURIComponent(transcode.replace(/\s+/g, '').replace(/%[0-9A-F]{2}/g, '%$&')) + splitEncode[i];
+           result += urldecode(transcode.replace(/\s+/g, '').replace(/%[0-9A-F]{2}/g, '%$&')) + splitEncode[i];
         }
       }
    } catch(e) {
