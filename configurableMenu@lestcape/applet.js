@@ -82,139 +82,6 @@ function _(str) {
    return Gettext.gettext(str);
 };
 
-function urldecode(str) {
-  //       discuss at: http://phpjs.org/functions/urldecode/
-  return decodeURIComponent((str + '')
-    .replace(/%(?![\da-f]{2})/gi, function() {
-      // PHP tolerates poorly formed escape sequences
-      return '%25';
-    })
-    .replace(/\+/g, '%20'));
-}
-
-
-function toUTF8FromHex(hex) {
-   return toUTF8FromAscii(toAscciiFromHex(hex));
-};
-
-function toAscciiFromHex(encode) {
-   let result = "";
-   try {
-      let splitEncode = encode.split(/%[0-9A-F]{2}/);
-      let last, transcode;
-      for(let i = 0; i < splitEncode.length; i++) {
-        if(splitEncode[i] != "") {
-           result += splitEncode[i];
-        } else {
-           while((i < splitEncode.length)&&(splitEncode[i] == "")) {
-             i++;
-           }
-           if(i == splitEncode.length)
-             last = encode.indexOf(splitEncode[i-1]);
-           else
-             last = encode.indexOf(splitEncode[i]);
-           transcode = encode.substr(result.length, last - result.length).toLowerCase();
-           //result += decodeURIComponent(transcode.replace(/\s+/g, '').replace(/%[0-9A-F]{2}/g, '%$&')) + splitEncode[i];
-           result += urldecode(transcode.replace(/\s+/g, '').replace(/%[0-9A-F]{2}/g, '%$&')) + splitEncode[i];
-        }
-      }
-   } catch(e) {
-      Main.notify("Error in transcode" + e.message);
-   }
-   return result;
-};
-
-function toAsciiFromUTF8(utf8) {
-   // From: http://phpjs.org/functions
-   var tmp_arr = [], i = 0, ac = 0, c1 = 0, c2 = 0, c3 = 0, c4 = 0;
-
-   utf8 += '';
-
-   while(i < utf8.length) {
-      c1 = utf8.charCodeAt(i);
-      if(c1 <= 191) {
-         tmp_arr[ac++] = String.fromCharCode(c1);
-         i++;
-      } else if (c1 <= 223) {
-         c2 = utf8.charCodeAt(i + 1);
-         tmp_arr[ac++] = String.fromCharCode(((c1 & 31) << 6) | (c2 & 63));
-         i += 2;
-      } else if (c1 <= 239) {
-         // http://en.wikipedia.org/wiki/UTF-8#Codepage_layout
-         c2 = utf8.charCodeAt(i + 1);
-         c3 = utf8.charCodeAt(i + 2);
-         tmp_arr[ac++] = String.fromCharCode(((c1 & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
-         i += 3;
-      } else {
-         c2 = utf8.charCodeAt(i + 1);
-         c3 = utf8.charCodeAt(i + 2);
-         c4 = utf8.charCodeAt(i + 3);
-         c1 = ((c1 & 7) << 18) | ((c2 & 63) << 12) | ((c3 & 63) << 6) | (c4 & 63);
-         c1 -= 0x10000;
-         tmp_arr[ac++] = String.fromCharCode(0xD800 | ((c1>>10) & 0x3FF));
-         tmp_arr[ac++] = String.fromCharCode(0xDC00 | (c1 & 0x3FF));
-         i += 4;
-      }
-   }
-   return tmp_arr.join('');
-};
-
-function toUTF8FromAscii(ascii) {
-   // From: http://phpjs.org/functions
-   if(ascii === null || typeof ascii === "undefined") {
-      return "";
-   }
-
-   var string = (ascii + ''); // .replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-   var utftext = '',
-      start, end, stringl = 0;
-
-   start = end = 0;
-   stringl = string.length;
-   for(var n = 0; n < stringl; n++) {
-      var c1 = string.charCodeAt(n);
-      var enc = null;
-
-      if(c1 < 128) {
-         end++;
-      } else if (c1 > 127 && c1 < 2048) {
-         enc = String.fromCharCode(
-           (c1 >> 6)         | 192,
-           ( c1        & 63) | 128
-         );
-      } else if (c1 & 0xF800 != 0xD800) {
-         enc = String.fromCharCode(
-            (c1 >> 12)        | 224,
-            ((c1 >> 6)  & 63) | 128,
-            ( c1        & 63) | 128
-         );
-      } else { // surrogate pairs
-         if(c1 & 0xFC00 != 0xD800) { throw new RangeError("Unmatched trail surrogate at " + n); }
-         var c2 = string.charCodeAt(++n);
-         if (c2 & 0xFC00 != 0xDC00) { throw new RangeError("Unmatched lead surrogate at " + (n-1)); }
-         c1 = ((c1 & 0x3FF) << 10) + (c2 & 0x3FF) + 0x10000;
-         enc = String.fromCharCode(
-            (c1 >> 18)        | 240,
-            ((c1 >> 12) & 63) | 128,
-            ((c1 >> 6)  & 63) | 128,
-            ( c1        & 63) | 128
-         );
-      }
-      if(enc !== null) {
-         if(end > start) {
-            utftext += string.slice(start, end);
-         }
-         utftext += enc;
-         start = end = n + 1;
-      }
-   }
-
-   if(end > start) {
-      utftext += string.slice(start, stringl);
-   }
-   return utftext;
-};
-
 function SearchItem(parent, provider, search_path, icon_path, iconSize, appWidth, appDesc, vertical){
    this._init(parent, provider, search_path, icon_path, iconSize, appWidth, appDesc, vertical);
 }
@@ -682,11 +549,16 @@ DriveMenuItems.prototype = {
          },
          get_description: function() {
             if(place.id.indexOf("bookmark:") == -1)
-               return toAscciiFromHex(place.id.slice(13));
-            return toAscciiFromHex(place.id.slice(16));
+               return place.id.slice(13);
+            try {
+               return decodeURIComponent(place.id.slice(16));
+            } catch(e) {
+               Main.notify("Error on decode, the encode of the bookmark are unsupported", e.message);
+            }
+            return place.id.slice(16);
          },
          get_name: function() {
-            return toAscciiFromHex(place.name);
+            return place.name;
          },
          create_icon_texture: function(appIconSize) {
             return place.iconFactory(appIconSize);
@@ -2753,15 +2625,15 @@ VisibleChildIteratorExtended.prototype = {
             children = childrenCat[k].get_children();
             for(let j = 0; j < children.length; j++) {
                internalBox = children[j].get_children();
-               iterIndex = 0;
+               interIndex = 0;
                for(let i = 0; i < internalBox.length; i++) {
                   child = internalBox[i];
                   if(child.visible) {
                      this.visible_children.push(child);
                      this.abs_index.push(j);
                      this.cat_index.push(k);
-                     this.inter_index.push(iterIndex);
-                     iterIndex++;
+                     this.inter_index.push(interIndex);
+                     interIndex++;
                   }
                }
             }
@@ -4441,8 +4313,13 @@ PlaceButtonAccessibleExtended.prototype = {
             this.appInfo = {
                get_filename: function() {
                   if(place.id.indexOf("bookmark:") == -1)
-                     return toAscciiFromHex(place.id.slice(13));
-                  return toAscciiFromHex(place.id.slice(16));
+                     return place.id.slice(13);
+                  try {
+                     return decodeURIComponent(place.id.slice(16));
+                  } catch(e) {
+                     Main.notify("Error on decode, the encode of the bookmark are unsupported", e.message);
+                  }
+                  return place.id.slice(16);
                }
             };
             return this.appInfo;
@@ -4458,13 +4335,18 @@ PlaceButtonAccessibleExtended.prototype = {
          },
          get_description: function() {
             if(place.id.indexOf("bookmark:") == -1)
-               return toAscciiFromHex(place.id.slice(13));
-            return toAscciiFromHex(place.id.slice(16));
+               return place.id.slice(13);
+            try {
+               return decodeURIComponent(place.id.slice(16));
+            } catch(e) {
+               Main.notify("Error on decode, the encode of the bookmark are unsupported", e.message);
+            }
+            return place.id.slice(16);
          },
          get_name: function() {
             if((alterName)&&(alterName != ""))
-               return toAscciiFromHex(alterName);
-            return toAscciiFromHex(place.name);
+               return alterName;
+            return place.name;
          },
          create_icon_texture: function(appIconSize) {
             return place.iconFactory(appIconSize);
@@ -4499,16 +4381,17 @@ PlaceButtonAccessibleExtended.prototype = {
             return "folder";
          },
          make_desktop_file: function() {
-            let name = toUTF8FromAscii(this.get_name());
-            let path = toUTF8FromAscii(this.get_app_info().get_filename());
+            let name = this.get_name();
+            let path = this.get_app_info().get_filename();
             let raw_file = "[Desktop Entry]\n" + "Name=" + name + "\n" + "Comment=" + path + "\n" +
                            "Exec=xdg-open \"" + path + "\"\n" + "Icon=" + this.get_icon_name() +
                            "\n" + "Terminal=false\n" + "StartupNotify=true\n" + "Type=Application\n" +
                            "Actions=Window;\n" + "NoDisplay=true";
             let desktopFile = Gio.File.new_for_path(USER_DESKTOP_PATH+"/"+name+".desktop");
-            let fp = desktopFile.create(0, null);
-            fp.write(raw_file, null);
-            fp.close;
+            let rawDesktop = desktopFile.replace(null, false, Gio.FileCreateFlags.NONE, null);
+            let out_file = Gio.BufferedOutputStream.new_sized (rawDesktop, 4096);
+            Cinnamon.write_string_to_stream(out_file, raw_file);
+            out_file.close(null);
             Util.spawnCommandLine("chmod +x \""+USER_DESKTOP_PATH+"/"+name+".desktop\"");
          }
       };
