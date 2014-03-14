@@ -199,6 +199,10 @@ msgstr ""
 msgid "Trash"
 msgstr ""
 
+#: applet.js:6213
+msgid "Search %s for %s"
+msgstr ""
+
 #. configurableMenu@lestcape->settings-schema.json->header-layouts->description
 msgid "Layouts:"
 msgstr ""

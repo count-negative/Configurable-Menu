@@ -176,7 +176,8 @@ SearchItem.prototype = {
 
    setString: function(string) {
       this.string = string;
-      this.labelName.set_text(" Search " + this.provider + " for " + string);
+      let webText = _("Search %s for %s").format(this.provider, string);
+      this.labelName.set_text(webText);
    },
 
    activate: function(event){
@@ -6849,7 +6850,7 @@ MyApplet.prototype = {
            return true;
         }
         else if(!item_actor) {
-           return true;
+           return false;
         }
         //Main.notify("Item:" + item_actor._delegate);
         if(item_actor._delegate) {
@@ -7118,6 +7119,8 @@ MyApplet.prototype = {
          }
          this._selectedItemIndex = index;
       }
+      if(!item_actor)
+        item_actor = this.searchEntry;
       return item_actor;
    },
 
@@ -7885,7 +7888,6 @@ MyApplet.prototype = {
    },
 
    _onThemeChange: function() {
-      this.updateTheme = true;
       this._updateComplete();
       this._updateSize();
    },
@@ -8911,7 +8913,6 @@ MyApplet.prototype = {
          language = "en";
       this._searchItems = [];
       if(this.searchWeb) {
-         //this._searchList.push(["", "", ""]);
          if(this.searchDuckduckgo)
             this._searchList.push(["DuckDuckGo", "https://duckduckgo.com/?t=lm&q=", "duckduckgo.svg"]);
          if(this.searchWikipedia)
@@ -8921,19 +8922,15 @@ MyApplet.prototype = {
          let path, button;
          for(let i in this._searchList) {
             path = this._searchList[i][2];
-            /*if(path == "") {
-               button = new PopupMenu.PopupSeparatorMenuItem();
-            } else {*/
-               if(path.indexOf("/") == -1)
-                  path = this.metadata.path + "/icons/" + path;
-               button = new SearchItem(this.menu, this._searchList[i][0], this._searchList[i][1], path,
-                                       this.iconAppSize, this.textButtonWidth, this.appButtonDescription, this.iconView);
-               if(this._applicationsBoxWidth > 0)
-                  button.container.set_width(this._applicationsBoxWidth);
+            if(path.indexOf("/") == -1)
+               path = this.metadata.path + "/icons/" + path;
+            button = new SearchItem(this.menu, this._searchList[i][0], this._searchList[i][1], path,
+                                    this.iconAppSize, this.textButtonWidth, this.appButtonDescription, this.iconView);
+            if(this._applicationsBoxWidth > 0)
+               button.container.set_width(this._applicationsBoxWidth);
                
-               button.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, button));
-               this._addEnterEvent(button, Lang.bind(this, this._appEnterEvent, button));
-            //}
+            button.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, button));
+            this._addEnterEvent(button, Lang.bind(this, this._appEnterEvent, button));
             this._searchItems.push(button);
          }
       }
@@ -10797,10 +10794,10 @@ MyApplet.prototype = {
          } else {						
             this._setFullScreen();
          }
-        /* if(this.updateTheme) {
-            this.updateTheme = false;
-         }*/
-         Mainloop.idle_add(Lang.bind(this, this._updateSize));
+         let minWidth = this._minimalWidth();
+         if(this.width < minWidth) {
+            Mainloop.idle_add(Lang.bind(this, this._updateSize));
+         }
       }
    },
 
