@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-03-13 14:00-0600\n"
+"PO-Revision-Date: 2014-03-14 07:58-0600\n"
 "Last-Translator: Eliermi Cunha Junior <jpegrande@gmailcom>\n"
-"Language-Team: Eliermi Cunha Junior <jpegrande@gmailcom>\n"
+"Language-Team: Eliermi Cunha Junior <jpegrande@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: pt_BR\n"
+"Language: PT_BR\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 1.5.4\n"
 
@@ -93,6 +93,10 @@ msgstr "Filtro:"
 #: applet.js:5817 applet.js:6100 applet.js:6131 applet.js:6165
 msgid "Favorites"
 msgstr "Favoritos"
+
+#: applet.js:6213
+msgid "Search %s for %s"
+msgstr "Buscar em %s por %s"
 
 #. configurableMenu@lestcape->settings-schema.json->header-layouts->description
 msgid "Layouts:"
@@ -396,7 +400,7 @@ msgstr "Escolha mostrar ou não botões de controle."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-app-size->description
 msgid "Application icon size:"
-msgstr "Tamanho dos ícones das aplicações:"
+msgstr "Tamanho dos ícones em aplicações:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-app-size->tooltip
 msgid "Set the application icon size."
@@ -437,7 +441,7 @@ msgstr "Escolha o tamanho do separador:"
 
 #. configurableMenu@lestcape->settings-schema.json->time-format->description
 msgid "Time format:"
-msgstr "Formato da data:"
+msgstr "Formato da hora:"
 
 #. configurableMenu@lestcape->settings-schema.json->time-format->tooltip
 msgid "Choose the time format to show time on the menu."
@@ -629,7 +633,7 @@ msgstr "Escolha mostrar ou não a hora e a data no menu."
 #. configurableMenu@lestcape->settings-schema.json->automatic-
 #. size->description
 msgid "Automatic size"
-msgstr "tamanho automático"
+msgstr "Redimensionamento automático"
 
 #. configurableMenu@lestcape->settings-schema.json->allow-resizing->tooltip
 msgid "Choose whether or not to allow resizing the menu."
