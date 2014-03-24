@@ -144,7 +144,7 @@ PackageInstallerWrapper.prototype = {
    executeUpdater: function(action) {
       let updaterPath = this._getUpdaterPath();
       if(updaterPath != "") {
-         this.execCommand(this.pathToLocalUpdater + " " + action);
+         this.execCommand(updaterPath + " " + action);
       }
    },
 
@@ -280,9 +280,10 @@ PackageInstallerWrapper.prototype = {
       }
    },
 
-   _setChmod: function(permissions, path) {
+   _setChmod: function(path, permissions) {
       //permissions = +x
-      Util.spawnCommandLine("chmod "+ permissions + "\"" + path + "\"");
+      let command = "chmod " + permissions + " \"" + path + "\"";
+      this.execCommand(command);
    },
 
    execCommand: function(command) {
