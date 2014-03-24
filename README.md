@@ -1,6 +1,6 @@
 Cinnamon Applet: Configurable Menu Version: v0.9-Beta
 
-Last version release date: 12 March 2014
+Last version release date: 24 March 2014
 ***
 Authors: [Lester Carballo Pérez](https://github.com/lestcape) and [Garibaldo](https://github.com/Garibaldo).
 
@@ -17,7 +17,7 @@ Author of language translation:
 --------------
 - English:   Garibaldo (https://github.com/Garibaldo) and Lester Carballo Pérez(lestcape@gmail.com)
 - Spanish:   Lester Carballo Pérez(lestcape@gmail.com)
-- Portugese: Eliermi Cunha Junior(jpegrande@gmail.com)
+- Portugese(Br): Eliermi Cunha Junior(jpegrande@gmail.com)
 
 --------------
 ![](https://raw.github.com/wiki/lestcape/Configurable-Menu/img/Capture.png)
@@ -35,6 +35,7 @@ This latest version brings a lot of cool new stuff, like:
 - Two different modes of viewing the menu entrys with multiple columns.
 - New drag & drop options.
 - Handle removable drives.
+- Can Install, uninstall, and search for packages.
 
 A more detail list can be found [here](https://github.com/lestcape/Configurable-Menu/wiki/Some-features).
 And much more coming...
@@ -53,13 +54,24 @@ Here you can find interesting information about Configurable Menu.
    - [New languages](https://github.com/lestcape/Configurable-Menu/wiki/Add-new-languages)
    - [Install nightly build](https://github.com/lestcape/Configurable-Menu/wiki/Install-Nightly-Build)
 
+Cinnamon Installer
+--------------
+Configurable Menu is a applet of the Cinnamon desktop. This desktop can be installed on different Linux distributions and therefore managing the packages that Configurable Menu makes, needs the help of the Cinnamon Installer tool.
+
+The main objective of Cinnamon Installer is that it may be implemented in most of the distributions. However this is far from happening for now. Any help will be well received.
+
+You can found more information about Cinnamon Installer on the [Cinnamon Installer website](https://github.com/lestcape/Cinnamon-Installer).
+
 Change log
 --------------
 See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/Change-Log).
 
 0.9-Beta
+   - Improved the menu speed.
+   - Can Install, uninstall, and search for packages (depend on if Cinnamon Installer can run on you OS).
+   - Added web search.
    - Was added support for more languages.
-   - Was added Spanish and Portugese language.
+   - Was added Spanish and Portugese(Br) language.
    - Now you can have a different configuration for each layout.
    - The removable drives are now show in accessible panel and also can be removed.
    - The full screen mode was improved, now can be see better in more themes.
@@ -73,6 +85,9 @@ See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/C
    - Now you can rename the apps on the accessible panel.
    - Changed the control buttons icons and was added the option to be symbolic or full color.
    - You can swap top and bottom menu panels.
+   - Control and system buttons now can be symbolic or full color.
+   - Allow to remove the search entry.
+   - Allow to have arrow on the categories.
 
 This program is free software:
 --------------

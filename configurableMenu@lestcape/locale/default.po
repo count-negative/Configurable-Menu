@@ -18,6 +18,22 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Poedit-Language: English\n"
 
+#: applet.js:83 applet.js:3678 cinnamonMenu.js:536
+msgid "Execution of '%s' failed:"
+msgstr ""
+
+#: applet.js:103 applet.js:3678 cinnamonMenu.js:536
+msgid "Command not found."
+msgstr ""
+
+#: applet.js:133 applet.js:3678 cinnamonMenu.js:536
+msgid "Package %s"
+msgstr ""
+
+#: applet.js:150 applet.js:3678 cinnamonMenu.js:536
+msgid "Package to install %s"
+msgstr ""
+
 #: applet.js:383 applet.js:3678 cinnamonMenu.js:536
 msgid "Places"
 msgstr ""
@@ -265,6 +281,10 @@ msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->header-search->description
 msgid "General search options:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->header-install->description
+msgid "Installer and uninstaller tools:"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->swap-panels->description
@@ -1040,33 +1060,72 @@ msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->search-web->description
 msgid "Enable web search"
-msgstr "Enable web search"
+msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->search-web->tooltip
 msgid "Allows the web search with the selected search engines."
-msgstr "Allows the web search with the selected search engines."
+msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->search-wikipedia->description
 msgid "Enable web search with wikipedia"
-msgstr "Enable web search with wikipedia"
+msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->search-wikipedia->tooltip
 msgid "Allows web search to the wikipedia search engine."
-msgstr "Allows web search to the wikipedia search engine."
+msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->"search-google->description
 msgid "Enable web search with"
-msgstr "Enable web search with"
+msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->search-google->tooltip
 msgid "Allows web search to the google search engine."
-msgstr "Allows web search to the google search engine."
+msgstr ""
 
-#. configurableMenu@lestcape->settings-schema.json->"search-duckduckgo->description
+#. configurableMenu@lestcape->settings-schema.json->search-duckduckgo->description
 msgid "Enable web search with duckduckgo"
-msgstr "Enable web search with duckduckgo"
+msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->search-duckduckgo->tooltip
 msgid "Allows web search to the duckduckgo search engine."
-msgstr "Allows web search to the duckduckgo search engine."
+msgstr ""
 
+#. configurableMenu@lestcape->settings-schema.json->installer-tools->description
+msgid "Enable the Cinnamon Installer tool"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->installer-tools->tooltip
+msgid "Allows install, uninstall and search for programs and packages(need internet connection to be download)."
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->installer-search->description
+msgid "Enable to search for packages"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->installer-search->tooltip
+msgid "Allows search for new packages on the repository."
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->installer-update-button->description
+msgid "Update the Cinnamon Installer tool"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->installer-update-button->tooltip
+msgid "Press this button to update the Cinnamon Installer tool."
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->installer-update-check->description
+msgid "Enable to check for a new version of Cinnamon Installer when the menu started"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->installer-update-check->tooltip
+msgid "Allows to check for a new version of Cinnamon Installer when the menu started."
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->installer-uninstall-button->description
+msgid "Uninstall the Cinnamon Installer tool"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->installer-uninstall-button->tooltip
+msgid "Press this button to uninstall the Cinnamon Installer tool."
+msgstr ""

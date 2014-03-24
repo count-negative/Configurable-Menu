@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-03-14 06:56-0600\n"
+"PO-Revision-Date: 2014-03-24 02:14-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -17,6 +17,22 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 1.5.4\n"
+
+#: applet.js:83 applet.js:3678 cinnamonMenu.js:536
+msgid "Execution of '%s' failed:"
+msgstr "Ha fallado ejecución de '%s':"
+
+#: applet.js:103 applet.js:3678 cinnamonMenu.js:536
+msgid "Command not found."
+msgstr "Comando no encontrado"
+
+#: applet.js:133 applet.js:3678 cinnamonMenu.js:536
+msgid "Package %s"
+msgstr "Paquete %s"
+
+#: applet.js:150 applet.js:3678 cinnamonMenu.js:536
+msgid "Package to install %s"
+msgstr "Paquete para instalar %s"
 
 #: applet.js:383 applet.js:3678 cinnamonMenu.js:536 applet.js:1452
 msgid "List View"
@@ -161,6 +177,10 @@ msgstr "Submenú:"
 #. configurableMenu@lestcape->settings-schema.json->header-search->description
 msgid "General search options:"
 msgstr "Opciones generales de búsqueda:"
+
+#. configurableMenu@lestcape->settings-schema.json->header-install->description
+msgid "Installer and uninstaller tools:"
+msgstr "Herramienta para instalar y desintalar:"
 
 #. configurableMenu@lestcape->settings-schema.json->swap-panels->description
 msgid "Swap the top and bottom panel"
@@ -858,7 +878,7 @@ msgstr "Habilitar la búsqueda web con wikipedia"
 msgid "Allows web search to the wikipedia search engine."
 msgstr "Permitir la búsqueda en la web al motor de búsqueda wikipedia."
 
-#. configurableMenu@lestcape->settings-schema.json->"search-google->description
+#. configurableMenu@lestcape->settings-schema.json->search-google->description
 msgid "Enable web search with google"
 msgstr "Habilitar búsqueda en la web con google"
 
@@ -866,10 +886,62 @@ msgstr "Habilitar búsqueda en la web con google"
 msgid "Allows web search to the google search engine."
 msgstr "Permitir la búsqueda en la web al motor de búsqueda google."
 
-#. configurableMenu@lestcape->settings-schema.json->"search-duckduckgo->description
+#. configurableMenu@lestcape->settings-schema.json->search-duckduckgo->description
 msgid "Enable web search with duckduckgo"
 msgstr "Habilitar búsqueda en la web con duckduckgo"
 
 #. configurableMenu@lestcape->settings-schema.json->search-duckduckgo->tooltip
 msgid "Allows web search to the duckduckgo search engine."
 msgstr "Permitir la búsqueda en la web al motor de búsqueda duckduckgo."
+
+#. configurableMenu@lestcape->settings-schema.json->installer-tools->description
+msgid "Enable the Cinnamon Installer tool"
+msgstr "Activar la herramienta Cinnamon Installer"
+
+#. configurableMenu@lestcape->settings-schema.json->installer-tools->tooltip
+msgid ""
+"Allows install, uninstall and search for programs and packages(need internet "
+"connection to be download)."
+msgstr ""
+"Permite instalar, desinstalar, buscar programas y paquetes (necesita "
+"conexión a Internet para ser descargado)."
+
+#. configurableMenu@lestcape->settings-schema.json->installer-search->description
+msgid "Enable to search for packages"
+msgstr "Habilitar la búsqueda de paquetes"
+
+#. configurableMenu@lestcape->settings-schema.json->installer-search->tooltip
+msgid "Allows search for new packages on the repository."
+msgstr "Permite la búsqueda de nuevos paquetes en el repositorio."
+
+#. configurableMenu@lestcape->settings-schema.json->installer-update-button->description
+msgid "Update the Cinnamon Installer tool"
+msgstr "Actualización de la herramienta Cinnamon Installer"
+
+#. configurableMenu@lestcape->settings-schema.json->installer-update-button->tooltip
+msgid "Press this button to update the Cinnamon Installer tool."
+msgstr "Presione este botón para actualizar la herramienta Cinnamon Installer."
+
+#. configurableMenu@lestcape->settings-schema.json->installer-update-check->description
+msgid ""
+"Enable to check for a new version of Cinnamon Installer when the menu started"
+msgstr ""
+"Habilitar para comprobar si hay una nueva versión de la Cinnamon Installer "
+"cuando se inicie el menú"
+
+#. configurableMenu@lestcape->settings-schema.json->installer-update-check->tooltip
+msgid ""
+"Allows to check for a new version of Cinnamon Installer when the menu "
+"started."
+msgstr ""
+"Permite comprobar si hay una nueva versión de la Cinnamon Installer cuando "
+"se inicie el menú."
+
+#. configurableMenu@lestcape->settings-schema.json->installer-uninstall-button->description
+msgid "Uninstall the Cinnamon Installer tool"
+msgstr "Desinstalar la herramienta Cinnamon Installer"
+
+#. configurableMenu@lestcape->settings-schema.json->installer-uninstall-button->tooltip
+msgid "Press this button to uninstall the Cinnamon Installer tool."
+msgstr ""
+"Presione este botón para desinstalar la herramienta Cinnamon Installer."

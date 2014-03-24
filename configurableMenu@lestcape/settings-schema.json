@@ -664,7 +664,7 @@
         "description": "Submenu height:",
         "tooltip": "Set the submenu height."
     },
-   "separator-search-top": {
+    "separator-search-top": {
        "type": "separator"
     },
     "header-search": {
@@ -709,6 +709,52 @@
         "dependency": "search-web",
         "description": "Enable web search with duckduckgo",
         "tooltip": "Allows web search to the duckduckgo search engine."
+    },
+    "separator-install-top": {
+       "type": "separator"
+    },
+    "header-install": {
+        "type": "header",
+        "description": "Installer and uninstaller tools:"
+    },
+    "separator-install-bottom": {
+       "type": "separator"
+    },
+    "installer-tools": {
+        "type": "checkbox",
+        "default": false,
+        "description": "Enable the Cinnamon Installer tool",
+        "tooltip": "Allows install, uninstall and search for programs and packages(need internet connection to be download)."
+    },
+    "installer-search": {
+        "type": "checkbox",
+        "default": false,
+        "indent": true,
+        "dependency": "installer-tools",
+        "description": "Enable to search for packages",
+        "tooltip": "Allows search for new packages on the repository."
+    },
+    "installer-update-button": {
+        "type": "button",
+        "dependency": "installer-tools",
+        "description": "Update the Cinnamon Installer tool",
+        "callback": "_updateInstaller",
+        "tooltip": "Press this button to update the Cinnamon Installer tool."
+    },
+    "installer-update-check": {
+        "type": "checkbox",
+        "default": false,
+        "indent": true,
+        "dependency": "installer-tools",
+        "description": "Enable to check for a new version of Cinnamon Installer when the menu started",
+        "tooltip": "Allows to check for a new version of Cinnamon Installer when the menu started."
+    },
+    "installer-uninstall-button": {
+        "type": "button",
+        "dependency": "installer-tools",
+        "description": "Uninstall the Cinnamon Installer tool",
+        "callback": "_uninstallInstaller",
+        "tooltip": "Press this button to uninstall the Cinnamon Installer tool."
     },
     "list-places": {
         "type": "generic",

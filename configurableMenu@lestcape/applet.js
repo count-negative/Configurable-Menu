@@ -82,14 +82,494 @@ function _(str) {
    return Gettext.gettext(str);
 };
 
-function SearchItem(parent, provider, search_path, icon_path, iconSize, appWidth, appDesc, vertical){
-   this._init(parent, provider, search_path, icon_path, iconSize, appWidth, appDesc, vertical);
+function PackageInstallerWrapper(parent) {
+   this._init(parent);
+}
+
+PackageInstallerWrapper.prototype = {
+   _init: function(parent) {
+      this.parent = parent;
+      this.actorSearchBox = null;
+      this.iconSize = 22;
+      this.appWidth = 150;
+      this.appDesc = false;
+      this.vertical = false;
+      this.pathToLocalUpdater = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + this.parent.uuid + "/pkg_updater/Updater.py";
+      this.pathToRemoteUpdater = GLib.get_home_dir() + "/.local/share/Cinnamon-Installer/Cinnamon-Installer/Updater.py";
+      this.pathToPKG = GLib.get_home_dir() + "/.local/share/Cinnamon-Installer/Cinnamon-Installer.py";
+      this.pathToPkgIcon = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + this.parent.uuid + "/icons/install.svg"
+      this.listButtons = new Array();
+      this.pakages = [];
+   },
+
+   _getUpdaterPath: function() {
+      let updaterPath = "";
+      if(GLib.file_test(this.pathToLocalUpdater, GLib.FileTest.EXISTS))
+         updaterPath = this.pathToLocalUpdater;
+      else if(GLib.file_test(this.pathToRemoteUpdater, GLib.FileTest.EXISTS))
+         updaterPath = this.pathToRemoteUpdater;
+      if((updaterPath != "")&&(!GLib.file_test(updaterPath, GLib.FileTest.IS_EXECUTABLE))) {
+         this._setChmod(updaterPath, '+x');
+      }
+      return updaterPath;
+   },
+
+   setSearchBox: function(actorSearchBox, actorSeparator) {
+      this.actorSearchBox = actorSearchBox;
+      this.actorSeparator = actorSeparator;
+   },
+
+   exist: function() {
+      return GLib.file_test(this.pathToPKG, GLib.FileTest.EXISTS);
+   },
+
+   checkForUpdate: function() {
+      let updaterPath = this._getUpdaterPath();
+      if(updaterPath != "") {
+         let query = updaterPath + " --qupdate silent";
+         this.execCommandSyncPipe(query, Lang.bind(this, this._doUpdate));
+      }
+   },
+
+   _doUpdate: function(command, sucess, result) {
+      //"update" and "ready"
+      if(result.indexOf("update") == 0) {
+         this.executeUpdater("--qupdate gui");
+      } else if(result.indexOf("internet") == 0) {
+         Main.notify(_("Internet connection is required to check for update of Cinnamon Installer."));
+      }
+   },
+//is file: GLib.FileTest.IS_REGULAR
+//is dir: GLib.FileTest.IS_DIR
+   executeUpdater: function(action) {
+      let updaterPath = this._getUpdaterPath();
+      if(updaterPath != "") {
+         this.execCommand(this.pathToLocalUpdater + " " + action);
+      }
+   },
+
+   executeSearch: function(pattern) {
+      this.activeSearch = ((pattern)&&(pattern.length > 2));
+      if(this.activeSearch) {
+         if(!GLib.file_test(this.pathToPKG, GLib.FileTest.IS_EXECUTABLE)) {
+            this._setChmod(this.pathToPKG, '+x');
+         }
+         let query = this.pathToPKG + " --qpackage " + pattern;
+         this.execCommandSyncPipe(query, Lang.bind(this, this._doSearchPackage));
+      } else
+         this.pakages = []
+   },
+
+   cleanSearch: function() {
+      this.executeSearch("");
+   },
+
+   updateButtonStatus: function(iconSize, textWidth, appDesc, vertical, appWidth) {
+      this.appWidth = appWidth;
+      this.iconSize = iconSize;
+      this.textWidth = textWidth;
+      this.appDesc = appDesc;
+      this.vertical = vertical;
+   },
+
+   installPackage: function(packageName) {
+      let query = this.pathToPKG + " --ipackage " + packageName;
+      this.execCommand(query);
+   },
+
+   uninstallProgram: function(programId) {
+      let length = programId.length;
+      if(programId.substring(length-8, length) == ".desktop") {
+         let programName = programId.substring(0, length-8);
+         let query = this.pathToPKG + " --uprogram " + programName;
+         this.execCommand(query);
+      }
+   },
+
+   _doSearchPackage: function(command, sucess, result) {
+      try {
+         this.pakages = [];
+         if(this.activeSearch) 
+            this.pakages = result.split("\n");
+         this._createButtons();
+         Mainloop.idle_add(Lang.bind(this, function() {
+            this.parent._updateView();
+         }));
+      } catch(e) {
+         Main.notify(e);
+      }
+   },
+
+   _createButtons: function() {
+      try {
+         this.listButtons = new Array();
+            let btt;
+            for(let i = 0; i < this.pakages.length - 1; i++) {
+               btt = new PackageItem(this.parent.menu, this, this.pakages[i], this.pathToPkgIcon, this.iconSize, this.textWidth, this.appDesc, this.vertical, this.appWidth);
+               btt.actor.realize();
+               this.listButtons.push(btt);
+               btt.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, btt));
+               this.parent._addEnterEvent(btt, Lang.bind(this, this._appEnterEvent, btt));
+            }
+            this.actorSeparator.visible = (this.listButtons.length > 0);
+      } catch(e) {
+         Main.notify("button creation fail", e.message);
+      }
+   },
+
+   updateView: function() {
+      try {
+         this._createButtons();
+         viewBox = this.actorSearchBox.get_children();
+         for(let i = 0; i < this.listButtons.length; i += this.parent.iconViewCount) {
+            for(let j = 0; j < this.parent.iconViewCount; j++) {
+               currValue = i + j;
+               if((currValue < this.listButtons.length)&&(viewBox[j])) {
+                  viewBox[j].add_actor(this.listButtons[currValue].actor);
+                  falseActor = new St.BoxLayout();
+                  falseActor.hide();
+                  viewBox[j].add_actor(falseActor);
+               }
+            }
+         }
+      } catch(e) {
+         Main.notify("err", e.message);
+      }
+   },
+
+   clearView: function() {
+      let appBox = this.actorSearchBox.get_children();
+      let appItem;
+      for(let i = 0; i < appBox.length; i++) {
+         appItem = appBox[i].get_children();
+         if(appItem) {
+            for(let j = 0; j < appItem.length; j++) {
+               appBox[i].remove_actor(appItem[j]);
+               appItem[j].destroy()
+            }
+            this.actorSearchBox.remove_actor(appBox[i]);
+            appBox[i].destroy();
+         }
+      }
+   },
+
+   _appEnterEvent: function(applicationButton) {
+      if(applicationButton.app.get_description())
+         this.parent.selectedAppBox.setSelectedText(applicationButton.app.get_name(), applicationButton.app.get_description());
+      else
+         this.parent.selectedAppBox.setSelectedText(applicationButton.app.get_name(), "");
+      this.parent._previousVisibleIndex = this.parent.appBoxIter.getVisibleIndex(applicationButton.actor);
+      this.parent._clearPrevAppSelection(applicationButton.actor);
+      applicationButton.actor.style_class = "menu-application-button-selected";
+      this.parent.hover.refreshApp(applicationButton.app);
+   },
+
+   _appLeaveEvent: function(a, b, applicationButton) {
+      this.parent._previousSelectedActor = applicationButton.actor;
+      applicationButton.actor.style_class = "menu-application-button";
+      this.parent.selectedAppBox.setSelectedText("", "");
+      this.parent.hover.refreshFace();
+   },
+
+   _execCommandSyncPipe: function(command, callBackFunction) {
+      try {
+         this._trySpawnAsyncPipe(command, callBackFunction);
+      } catch (e) {
+         let title = _("Execution of '%s' failed:").format(command);
+         Main.notifyError(title, e.message);
+      }
+   },
+
+   _setChmod: function(permissions, path) {
+      //permissions = +x
+      Util.spawnCommandLine("chmod "+ permissions + "\"" + path + "\"");
+   },
+
+   execCommand: function(command) {
+      try {
+         let [success, argv] = GLib.shell_parse_argv(command);
+         this._trySpawnAsync(argv);
+         return true;
+      } catch (e) {
+         let title = _("Execution of '%s' failed:").format(command);
+         Main.notifyError(title, e.message);
+      }
+      return false;
+   },
+
+   execCommandSyncPipe: function(command, callBackFunction) {
+      try {
+         this._trySpawnAsyncPipe(command, callBackFunction);
+      } catch (e) {
+         let title = _("Execution of '%s' failed:").format(command);
+         Main.notifyError(title, e.message);
+      }
+   },
+
+   _trySpawnAsync: function(argv) {
+      try {   
+         GLib.spawn_async(null, argv, null,
+            GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.STDOUT_TO_DEV_NULL  | GLib.SpawnFlags.STDERR_TO_DEV_NULL,
+            null, null);
+      } catch (err) {
+         if (err.code == GLib.SpawnError.G_SPAWN_ERROR_NOENT) {
+            err.message = _("Commafnd not found.");
+         } else {
+            // The exception from gjs contains an error string like:
+            //   Error invoking GLib.spawn_command_line_async: Failed to
+            //   execute child process "foo" (No such file or directory)
+            // We are only interested in the part in the parentheses. (And
+            // we can't pattern match the text, since it gets localized.)
+            err.message = err.message.replace(/.*\((.+)\)/, '$1');
+         }
+         throw err;
+      }
+   },
+
+   _trySpawnAsyncPipe: function(command, callback) {
+      try {
+         let [success, argv] = GLib.shell_parse_argv("sh -c '" + command + "'");
+         if(success) {
+            this._callbackPipe = callback;
+            this._commandPipe = command;
+            let [exit, pid, stdin, stdout, stderr] =
+                 GLib.spawn_async_with_pipes(null, /* cwd */
+                                          argv, /* args */
+                                          null, /* env */
+                                          GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.DO_NOT_REAP_CHILD, /*Use env path and no repet*/
+                                          null /* child_setup */);
+
+            this._childPid = pid;
+            this._stdin = new Gio.UnixOutputStream({ fd: stdin, close_fd: true });
+            this._stdout = new Gio.UnixInputStream({ fd: stdout, close_fd: true });
+            this._stderr = new Gio.UnixInputStream({ fd: stderr, close_fd: true });
+         
+            // We need this one too, even if don't actually care of what the process
+            // has to say on stderr, because otherwise the fd opened by g_spawn_async_with_pipes
+            // is kept open indefinitely
+            this._stderrStream = new Gio.DataInputStream({ base_stream: this._stderr });
+            this._dataStdout = new Gio.DataInputStream({ base_stream: this._stdout });
+
+            this._readStdout();
+
+            this._childWatch = GLib.child_watch_add(GLib.PRIORITY_DEFAULT, pid, Lang.bind(this, function(pid, status, requestObj) {
+               GLib.source_remove(this._childWatch);
+               this._stdin.close(null);
+            }));
+         }
+         //throw
+      } catch(err) {
+         if (err.code == GLib.SpawnError.G_SPAWN_ERROR_NOENT) {
+            err.message = _("Command not found.");
+         } else {
+            // The exception from gjs contains an error string like:
+            //   Error invoking GLib.spawn_command_line_async: Failed to
+            //   execute child process "foo" (No such file or directory)
+            // We are only interested in the part in the parentheses. (And
+            // we can't pattern match the text, since it gets localized.)
+            err.message = err.message.replace(/.*\((.+)\)/, '$1');
+         }
+         throw err;
+      }
+   },
+
+   _readStdout: function() {
+      this._dataStdout.fill_async(-1, GLib.PRIORITY_DEFAULT, null, Lang.bind(this, function(stream, result) {
+         try {
+            if((result)||(this._dataStdout.fill_finish(result) == 0)) { // end of file
+               let val = stream.peek_buffer().toString();
+               if(val != "")
+                  this._callbackPipe(this._commandPipe, true, val);
+
+               this._stdout.close(null);
+               return;
+            }
+
+            // Try to read more
+            this._dataStdout.set_buffer_size(2 * this._dataStdout.get_buffer_size());
+            this._readStdout();
+         } catch(e) {
+            global.log(e.toString());
+         }
+      }));
+
+      this._stderrStream.fill_async(-1, GLib.PRIORITY_DEFAULT, null, Lang.bind(this, function(stream, result) {
+         try {
+            if((!result)||(this._stderrStream.fill_finish(result) == 0)) { // end of file
+               try {
+                  let val = stream.peek_buffer().toString();
+                  if(val != "")
+                     this._callbackPipe(this._commandPipe, false, val);
+               } catch(e) {
+                  global.log(e.toString());
+               }
+               this._stderr.close(null);
+               return;
+            }
+
+            // Try to read more
+            this._stderrStream.set_buffer_size(2 * this._stderrStream.get_buffer_size());
+            this._readStdout();
+         } catch(e) {
+            global.log(e.toString());
+         }
+      }));
+   }
+};
+
+function PackageItem(parent, pkg, packageName, icon_path, iconSize, textWidth, appDesc, vertical, appWidth) {
+   this._init(parent, pkg, packageName, icon_path, iconSize, textWidth, appDesc, vertical, appWidth);
+}
+
+PackageItem.prototype = {
+   __proto__: PopupMenu.PopupBaseMenuItem.prototype,
+
+   _init: function(parent, pkg, packageName, icon_path, iconSize, textWidth, appDesc, vertical, appWidth) {
+      PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
+      this.actor.set_style_class_name('menu-application-button');
+      this.iconSize = iconSize;
+      this.parent = parent;
+      this.pkg = pkg;
+      this.packageName = packageName;
+      this.string = "";
+      let fileIcon = Gio.file_new_for_path(icon_path);
+      this.icon_uri = fileIcon.get_uri();
+      this.app = this._createAppWrapper(packageName, icon_path);
+      this.name = this.app.get_name();
+      this.labelName = new St.Label({ text: this.name , style_class: 'menu-application-button-label' });
+      this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
+      this.labelDesc.visible = false;
+      this.container = new St.BoxLayout();
+      this.container.set_width(appWidth);
+      this.textBox = new St.BoxLayout({ vertical: true });
+      this.setTextMaxWidth(textWidth);
+      this.setAppDescriptionVisible(appDesc);
+      this.setVertical(vertical);
+
+      this.icon = this.app.create_icon_texture(this.iconSize);
+      // St.TextureCache.get_default().load_uri_async(this.icon_uri, this.iconSize, this.iconSize);
+      if(this.icon) {
+         this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+         this.icon.realize();
+      }
+      this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      this.addActor(this.container);
+
+      this.labelName.realize();
+      this.labelDesc.realize();
+      this.isDraggableApp = false;
+   },
+
+   setIconSize: function (iconSize) {
+      this.iconSize = iconSize;
+      if(this.icon) {
+         let visible = this.icon.visible; 
+         let parentIcon = this.icon.get_parent();
+         if(parentIcon)
+            parentIcon.remove_actor(this.icon);
+         this.icon.destroy();
+         this.icon = this.app.create_icon_texture(this.iconSize);
+         this.icon.visible = visible;
+         this.container.insert_actor(this.icon, 0);
+      }
+   },
+
+   setAppDescriptionVisible: function(visible) {
+      this.labelDesc.visible = visible;
+      if(this.app.get_description())
+         this.labelDesc.set_text(this.app.get_description().split("\n")[0]);
+   },
+
+   setTextMaxWidth: function(maxWidth) {
+      //this.textBox.set_width(maxWidth);
+      this.textBox.style="max-width: "+maxWidth+"px;";
+      this.textWidth = maxWidth;
+   },
+
+   setVertical: function(vertical) {
+      this.container.set_vertical(vertical);
+      let parentL = this.labelName.get_parent();
+      if(parentL) parentL.remove_actor(this.labelName);
+      parentL = this.labelDesc.get_parent();
+      if(parentL) parentL.remove_actor(this.labelDesc);
+      this.setTextMaxWidth(this.textWidth);
+      if(vertical) {
+         this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+         this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });  
+      }
+      else {
+         this.textBox.add(this.labelName, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+         this.textBox.add(this.labelDesc, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+      }
+   },
+
+   setActive: function(active){
+      if(active)
+         this.actor.set_style_class_name("menu-application-button-selected");
+      else
+         this.actor.set_style_class_name('menu-application-button');
+   },
+
+   setString: function(string) {
+      this.string = string;
+      let webText = _("Package %s").format(this.packageName);
+      this.labelName.set_text(webText);
+   },
+
+   activate: function(event){
+      while(this.string.indexOf(" ")!= -1) {
+         this.string = this.string.replace(" ", "%20");
+      }
+
+      this.pkg.installPackage(this.packageName);
+      this.parent.toggle();
+   },
+
+   _createAppWrapper: function(packageName, icon_path) {
+      // We need this fake app to help appEnterEvent/appLeaveEvent 
+      // work with our search result.
+      this.app = {
+         get_app_info: function() {
+            this.appInfo = {
+               get_filename: function() {
+                  return packageName;
+               }
+            };
+            return this.appInfo;
+         },
+         get_id: function() {
+            return packageName;
+         },
+         get_description: function() {
+            return _("Package to install %s").format(packageName);
+         },
+         get_name: function() {
+            return packageName;
+         },
+         is_window_backed: function() {
+            return false;
+         },
+         create_icon_texture: function(appIconSize) {
+            try {
+              let gicon = new Gio.FileIcon({ file: Gio.file_new_for_path(icon_path) });
+              return  new St.Icon({gicon: gicon, icon_size: appIconSize, icon_type: St.IconType.FULLCOLOR});
+            } catch (e) {}
+            return null;
+         }
+      };
+      return this.app;
+   }
+};
+
+
+function SearchItem(parent, provider, search_path, icon_path, iconSize, textWidth, appDesc, vertical) {
+   this._init(parent, provider, search_path, icon_path, iconSize, textWidth, appDesc, vertical);
 }
 
 SearchItem.prototype = {
    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
 
-   _init: function(parent, provider, path, icon_path, iconSize, appWidth, appDesc, vertical){
+   _init: function(parent, provider, path, icon_path, iconSize, textWidth, appDesc, vertical) {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
       this.actor.set_style_class_name('menu-application-button');
       this.iconSize = iconSize;
@@ -106,7 +586,7 @@ SearchItem.prototype = {
       this.labelDesc.visible = false;
       this.container = new St.BoxLayout();
       this.textBox = new St.BoxLayout({ vertical: true });
-      this.setTextMaxWidth(appWidth);
+      this.setTextMaxWidth(textWidth);
       this.setAppDescriptionVisible(appDesc);
       this.setVertical(vertical);
 
@@ -2383,7 +2863,7 @@ ApplicationContextMenuItemExtended.prototype = {
                   parentBtt.setAppsList(appsList);
                }
             }
-           } catch (e) {Main.notify("access", e.message);}
+            } catch (e) {Main.notify("access", e.message);}
             break;
          case "edit_name":
             try {
@@ -2396,7 +2876,7 @@ ApplicationContextMenuItemExtended.prototype = {
                   (this._appButton.scrollActor != this._appButton.parent.favoritesScrollBox)&&(!this._appButton.nameEntry.visible))
                   this._appButton.editText(true);
             }
-           } catch (e) {Main.notify("access", e.message);}
+            } catch (e) {Main.notify("access", e.message);}
             break;
          case "default_name":
             try {
@@ -2410,7 +2890,7 @@ ApplicationContextMenuItemExtended.prototype = {
                   this._appButton.setDefaultText();
                }
             }
-           } catch (e) {Main.notify("access", e.message);}
+            } catch (e) {Main.notify("access", e.message);}
             break;
          case "save_name":
             try {
@@ -2425,8 +2905,16 @@ ApplicationContextMenuItemExtended.prototype = {
                   this._appButton.editText(false);
                }
             }
-           } catch (e) {Main.notify("access", e.message);}
+            } catch (e) {Main.notify("access", e.message);}
             break;
+         case "uninstall_app":
+            try {
+               if(!this._appButton.app.isPlace) {
+                  this._appButton.parent.pkg.uninstallProgram(this._appButton.app.get_id());
+               }
+            } catch (e) {Main.notify("access", e.message);}
+            break;
+
       }
       this._appButton.toggleMenu();
       return false;
@@ -2511,6 +2999,10 @@ GenericApplicationButtonExtended.prototype = {
                   menuItem = new ApplicationContextMenuItemExtended(this, _("Add to accessible panel"), "add_to_accessible_panel");
                   this.menu.addMenuItem(menuItem);
                }
+            }
+            if(this.parent.enableInstaller) {
+               menuItem = new ApplicationContextMenuItemExtended(this, _("Uninstall"), "uninstall_app");
+               this.menu.addMenuItem(menuItem);
             }
             if((this instanceof FavoritesButtonExtended)&&(this.parentScroll != this.parent.favoritesScrollBox)) {
                if(this.nameEntry.visible) {
@@ -4652,7 +5144,7 @@ RecentClearButtonExtended.prototype = {
       if(parentL) parentL.remove_actor(this.labelName);
       parentL = this.labelDesc.get_parent();
       if(parentL) parentL.remove_actor(this.labelDesc);
-      this.setTextMaxWidth( this.textWidth);
+      this.setTextMaxWidth(this.textWidth);
       if(vertical) {
          this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
          this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });  
@@ -6129,6 +6621,7 @@ MyApplet.prototype = {
          this._timeOutSettings = 0;
          this.idWaitingGnome = 0;
          this._searchItems = [];
+         this.pkg = new PackageInstallerWrapper(this);
 
          this.execInstallLanguage();
          //_ = Gettext.domain(this.uuid).gettext;
@@ -6245,6 +6738,10 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "search-google", "searchGoogle", this._onSearchEnginesChanged, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "search-duckduckgo", "searchDuckduckgo", this._onSearchEnginesChanged, null);
 
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "installer-tools", "enableInstaller", this._packageInstallerChanged, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "installer-search", "enablePackageSearch", this._packageSearchChanged, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "installer-update-check", "enableCheckUpdate", this._packageInstallerCheck, null);
+
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "classic", "stringClassic", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "classicGnome", "stringClassicGnome", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "whisker", "stringWhisker", null, null);
@@ -6298,7 +6795,7 @@ MyApplet.prototype = {
 
          this._updateConfig();
          this._updateComplete();
-
+         this._packageInstallerCheck();
       }
       catch (e) {
          Main.notify("ErrorMain:", e.message);
@@ -7369,10 +7866,14 @@ MyApplet.prototype = {
       for(let i = 0; i < this._recentButtons.length; i++) {
          this._recentButtons[i].container.set_width(this._applicationsBoxWidth);
       }
+      for(let i = 0; i < this._transientButtons.length; i++) {
+         this._transientButtons[i].container.set_width(this._applicationsBoxWidth);
+      }
       for(let i = 0; i < this._searchItems.length; i++) {
          if(this._searchItems[i] instanceof SearchItem)
             this._searchItems[i].container.set_width(this._applicationsBoxWidth);
       }
+      this.pkg.updateButtonStatus(this.iconAppSize, this.textButtonWidth, this.appButtonDescription, this.iconView, this._applicationsBoxWidth);
       if(this.theme == "windows7") {
          this.searchEntry.set_width(this._applicationsBoxWidth + 20);
       }
@@ -7389,10 +7890,14 @@ MyApplet.prototype = {
       for(let i = 0; i < this._recentButtons.length; i++) {
          this._recentButtons[i].container.set_width(-1);
       }
+      for(let i = 0; i < this._transientButtons.length; i++) {
+         this._transientButtons[i].container.set_width(-1);
+      }
       for(let i = 0; i < this._searchItems.length; i++) {
          if(this._searchItems[i] instanceof SearchItem)
             this._searchItems[i].container.set_width(-1);
       }
+      this.pkg.updateButtonStatus(this.iconAppSize, this.textButtonWidth, this.appButtonDescription, this.iconView, -1);
    },
 
    _updateAppButtonDesc: function() {  
@@ -7405,13 +7910,17 @@ MyApplet.prototype = {
       for(let i = 0; i < this._recentButtons.length; i++) {
          this._recentButtons[i].setAppDescriptionVisible(this.appButtonDescription);
       }
+      for(let i = 0; i < this._transientButtons.length; i++) {
+         this._transientButtons[i].setAppDescriptionVisible(this.appButtonDescription);
+      }
       for(let i = 0; i < this._searchItems.length; i++) {
          if(this._searchItems[i] instanceof SearchItem)
             this._searchItems[i].setAppDescriptionVisible(this.appButtonDescription);
       }
+      this.pkg.updateButtonStatus(this.iconAppSize, this.textButtonWidth, this.appButtonDescription, this.iconView, this._applicationsBoxWidth);
    },
 
-   _updateTextButtonWidth: function() {  
+   _updateTextButtonWidth: function() {
       for(let i = 0; i < this._applicationsButtons.length; i++) {
          this._applicationsButtons[i].setTextMaxWidth(this.textButtonWidth);
       }
@@ -7421,11 +7930,14 @@ MyApplet.prototype = {
       for(let i = 0; i < this._recentButtons.length; i++) {
          this._recentButtons[i].setTextMaxWidth(this.textButtonWidth);
       }
+      for(let i = 0; i < this._transientButtons.length; i++) {
+         this._transientButtons[i].setTextMaxWidth(this.textButtonWidth);
+      }
       for(let i = 0; i < this._searchItems.length; i++) {
          if(this._searchItems[i] instanceof SearchItem)
             this._searchItems[i].setTextMaxWidth(this.textButtonWidth);
       }
-      //transientButtons are update automatically...
+      this.pkg.updateButtonStatus(this.iconAppSize, this.textButtonWidth, this.appButtonDescription, this.iconView, this._applicationsBoxWidth);
    },
 
    _setAppIconDirection: function() {
@@ -7438,11 +7950,14 @@ MyApplet.prototype = {
       for(let i = 0; i < this._recentButtons.length; i++) {
          this._recentButtons[i].setVertical(this.iconView);
       }
+      for(let i = 0; i < this._transientButtons.length; i++) {
+         this._transientButtons[i].setVertical(this.iconView);
+      }
       for(let i = 0; i < this._searchItems.length; i++) {
          if(this._searchItems[i] instanceof SearchItem)
             this._searchItems[i].setVertical(this.iconView);
       }
-      //transientButtons are update automatically...
+      this.pkg.updateButtonStatus(this.iconAppSize, this.textButtonWidth, this.appButtonDescription, this.iconView, this._applicationsBoxWidth);
    },
 
    _updateView: function() {
@@ -7450,6 +7965,7 @@ MyApplet.prototype = {
       this._updateAppPrefNumIcons();
       let visibleAppButtons = this._getAppVisibleButtons();
       try {
+         this.pkg.updateView();
          let currValue, falseActor;
         // let viewBox = this.applicationsBox.get_children()[0].get_children();
          let viewBox = this.standarAppBox.get_children();
@@ -7492,22 +8008,32 @@ MyApplet.prototype = {
    },
 
    _clearView: function() {
-      let internalCat = this.applicationsBox.get_children();
-      for(let k = 0; k < internalCat.length; k++) {
-         if(!(internalCat[k]._delegate instanceof PopupMenu.PopupSeparatorMenuItem)) {
-            let appBox = internalCat[k].get_children();
-            let appItem;
-            for(let i = 0; i < appBox.length; i++) {
-               appItem = appBox[i].get_children();
-               if(appItem) {
-                  for(let j = 0; j < appItem.length; j++)
-                     appBox[i].remove_actor(appItem[j]);
-                  appBox[i].destroy();
-                  internalCat[k].remove_actor(appBox[i]);
-               }
+      this.pkg.clearView();
+      if(!(this.standarAppBox._delegate instanceof PopupMenu.PopupSeparatorMenuItem)) {
+         let appBox = this.standarAppBox.get_children();
+         let appItem;
+         for(let i = 0; i < appBox.length; i++) {
+            appItem = appBox[i].get_children();
+            if(appItem) {
+               for(let j = 0; j < appItem.length; j++)
+                  appBox[i].remove_actor(appItem[j]);
+               appBox[i].destroy();
+               this.standarAppBox.remove_actor(appBox[i]);
             }
          }
-         //this.applicationsBox.remove_actor(internalCat[0]);
+      }
+      if(!(this.searchAppBox._delegate instanceof PopupMenu.PopupSeparatorMenuItem)) {
+         let appBox = this.searchAppBox.get_children();
+         let appItem;
+         for(let i = 0; i < appBox.length; i++) {
+            appItem = appBox[i].get_children();
+            if(appItem) {
+               for(let j = 0; j < appItem.length; j++)
+                  appBox[i].remove_actor(appItem[j]);
+               appBox[i].destroy();
+               this.searchAppBox.remove_actor(appBox[i]);
+            }
+         }
       }
    },
 
@@ -8775,11 +9301,17 @@ MyApplet.prototype = {
          this.applicationsBox.add_style_class_name('menu-applications-box-' + this.theme);
          this.standarAppBox = new St.BoxLayout({ vertical: false });
          this.searchAppBox = new St.BoxLayout({ vertical: false });
+         this.packageAppBox = new St.BoxLayout({ vertical: false });
          this.applicationsBox.add(this.standarAppBox, { x_fill: true, y_fill: true, x_align: St.Align.START, y_align: St.Align.START, expand: true });
          this.searchAppSeparator = new PopupMenu.PopupSeparatorMenuItem();
          this.searchAppSeparator.actor.hide();
          this.applicationsBox.add(this.searchAppSeparator.actor, { x_fill: true, y_fill: true, x_align: St.Align.START, y_align: St.Align.START, expand: true });
          this.applicationsBox.add(this.searchAppBox, { x_fill: true, y_fill: true, x_align: St.Align.START, y_align: St.Align.START, expand: true });
+         this.packageAppSeparator = new PopupMenu.PopupSeparatorMenuItem();
+         this.packageAppSeparator.actor.hide();
+         this.applicationsBox.add(this.packageAppSeparator.actor, { x_fill: true, y_fill: true, x_align: St.Align.START, y_align: St.Align.START, expand: true });
+         this.applicationsBox.add(this.packageAppBox, { x_fill: true, y_fill: true, x_align: St.Align.START, y_align: St.Align.START, expand: true });
+         this.pkg.setSearchBox(this.packageAppBox, this.packageAppSeparator.actor);
 
          this.favoritesBox = new St.BoxLayout({ vertical: true, style_class: 'menu-favorites-box-internal' });
          this.favoritesBox.add_style_class_name('menu-favorites-box-internal-' + this.theme);
@@ -8896,6 +9428,33 @@ MyApplet.prototype = {
       } catch(e) {
          Main.notify("ErrorDisplay:", e.message);
       }
+   },
+
+   _packageInstallerChanged: function() {
+      if(this.enableInstaller) {
+         if(!this.pkg.exist())
+            this.pkg.executeUpdater("--qupdate gui");
+         else
+            this.pkg.executeUpdater("--qupdate test");
+      }
+   },
+
+   _packageSearchChanged: function() {
+      if(!this.enablePackageSearch)
+         this.pkg.cleanSearch();
+   },
+
+   _packageInstallerCheck: function() {
+      if(this.enableCheckUpdate)
+         this.pkg.checkForUpdate();
+   },
+
+   _updateInstaller: function() {
+      this.pkg.executeUpdater("--qupdate gui");
+   },
+
+   _uninstallInstaller: function() {
+      this.pkg.executeUpdater("--uninstall gui");
    },
 
    _onSearchEnginesChanged: function() {
@@ -9644,60 +10203,56 @@ MyApplet.prototype = {
 
    _appletGenerateGnomeMenu: function(generate) {
       try {
-      if(this.appMenuGnome) {
-         this.appletMenu.destroy();
-         this.appletMenu = null;
-         this.categoriesExcludes = null;
-         this.categoriesIncludes = null;
-         this.appMenuGnome.destroy();
-         this.appMenuGnome = null;
-         this.placesObj = null;
-      }
-      this.onEnterMenuGnome();
-
-      if(generate) {
-         this.appletMenu = new ConfigurableAppletMenu(this);
-         this.appletMenu.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
-         this.appMenuGnome = new ConfigurablePopupMenu(this, this, this.orientation);
-         try {
-         this.appMenuGnome.setArrow(this.showBoxPointer);
-         this.appMenuGnome.fixToCorner(this.fixMenuCorner);
-         this.appMenuGnome.actor.connect('motion-event', Lang.bind(this, this._onResizeMotionEvent));
-         this.appMenuGnome.actor.connect('button-press-event', Lang.bind(this, this._onMenuButtonPress));
-         this.appMenuGnome.actor.connect('leave-event', Lang.bind(this, this._disableOverResizeIcon));
-         this.appMenuGnome.actor.connect('button-release-event', Lang.bind(this, this._onMenuButtonRelease));
-
-         let newGnomeCat = new GnomeCategoryButton(this, "Favorites", "", false, this.orientation, this._panelHeight);
-         this.appletMenu.addCategory(newGnomeCat);
-         newGnomeCat = new GnomeCategoryButton(this, "Places", "", false, this.orientation, this._panelHeight);
-         this.appletMenu.addCategory(newGnomeCat);
-         newGnomeCat = new GnomeCategoryButton(this, "System", "", false, this.orientation, this._panelHeight);
-         this.appletMenu.addCategory(newGnomeCat);
-         this.appletMenu.connectCategories('button-press-event', Lang.bind(this, this.onCategorieGnomeChange));
-         this.appletMenu.connectCategories('enter-event', Lang.bind(this, this.onCategorieGnomeChange));
-
-         this.appMenuGnome.actor.connect('enter-event', Lang.bind(this, this.onEnterMenuGnome));
-         this.menu.actor.connect('enter-event', Lang.bind(this, this.onEnterMenuGnome));
-         this.appMenuGnome.actor.connect('leave-event', Lang.bind(this, this.onLeaveMenuGnome));
-         this.menu.actor.connect('leave-event', Lang.bind(this, this.onLeaveMenuGnome));
-         this.placesBox = new St.BoxLayout({ vertical: true, style_class: 'menu-applications-box' });
-         this.placesBox.add_style_class_name('menu-applications-box-' + this.theme);
-
-         this.menu.actor.set_style('padding: 0px; border-left: none; border-right: none; border-top: none; border-bottom: none;');
-         this.menu.box.set_style('padding: 0px; border-left: none; border-right: none; border-top: none; border-bottom: none;');
-         this.categoriesBox.set_style('padding: 0px; border-left: none; border-right: none; border-top: none; border-bottom: none;');
-         this.placesBox.set_style('padding: 0px; border-left: none; border-right: none; border-top: none; border-bottom: none;');
-         this.favoritesBox.set_style('padding: 0px; border-left: none; border-right: none; border-top: none; border-bottom: none;');
-         } catch(e) {
-            Main.notify("Appp error", e.message);
+         if(this.appMenuGnome) {
+            this.appletMenu.destroy();
+            this.appletMenu = null;
+            this.categoriesExcludes = null;
+            this.categoriesIncludes = null;
+            this.appMenuGnome.destroy();
+            this.appMenuGnome = null;
+            this.placesObj = null;
          }
-      } else {
-         this.menu.actor.set_style('');
-         this.menu.box.set_style('');
-         this.categoriesBox.set_style('');
-         this.placesBox.set_style('');
-         this.favoritesBox.set_style('');
-      }
+         this.onEnterMenuGnome();
+
+         if(generate) {
+            this.appletMenu = new ConfigurableAppletMenu(this);
+            this.appletMenu.actor.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
+            this.appMenuGnome = new ConfigurablePopupMenu(this, this, this.orientation);
+            this.appMenuGnome.setArrow(this.showBoxPointer);
+            this.appMenuGnome.fixToCorner(this.fixMenuCorner);
+            this.appMenuGnome.actor.connect('motion-event', Lang.bind(this, this._onResizeMotionEvent));
+            this.appMenuGnome.actor.connect('button-press-event', Lang.bind(this, this._onMenuButtonPress));
+            this.appMenuGnome.actor.connect('leave-event', Lang.bind(this, this._disableOverResizeIcon));
+            this.appMenuGnome.actor.connect('button-release-event', Lang.bind(this, this._onMenuButtonRelease));
+
+            let newGnomeCat = new GnomeCategoryButton(this, "Favorites", "", false, this.orientation, this._panelHeight);
+            this.appletMenu.addCategory(newGnomeCat);
+            newGnomeCat = new GnomeCategoryButton(this, "Places", "", false, this.orientation, this._panelHeight);
+            this.appletMenu.addCategory(newGnomeCat);
+            newGnomeCat = new GnomeCategoryButton(this, "System", "", false, this.orientation, this._panelHeight);
+            this.appletMenu.addCategory(newGnomeCat);
+            this.appletMenu.connectCategories('button-press-event', Lang.bind(this, this.onCategorieGnomeChange));
+            this.appletMenu.connectCategories('enter-event', Lang.bind(this, this.onCategorieGnomeChange));
+
+            this.appMenuGnome.actor.connect('enter-event', Lang.bind(this, this.onEnterMenuGnome));
+            this.menu.actor.connect('enter-event', Lang.bind(this, this.onEnterMenuGnome));
+            this.appMenuGnome.actor.connect('leave-event', Lang.bind(this, this.onLeaveMenuGnome));
+            this.menu.actor.connect('leave-event', Lang.bind(this, this.onLeaveMenuGnome));
+            this.placesBox = new St.BoxLayout({ vertical: true, style_class: 'menu-applications-box' });
+            this.placesBox.add_style_class_name('menu-applications-box-' + this.theme);
+
+            this.menu.actor.set_style('padding: 0px; border-left: none; border-right: none; border-top: none; border-bottom: none;');
+            this.menu.box.set_style('padding: 0px; border-left: none; border-right: none; border-top: none; border-bottom: none;');
+            this.categoriesBox.set_style('padding: 0px; border-left: none; border-right: none; border-top: none; border-bottom: none;');
+            this.placesBox.set_style('padding: 0px; border-left: none; border-right: none; border-top: none; border-bottom: none;');
+            this.favoritesBox.set_style('padding: 0px; border-left: none; border-right: none; border-top: none; border-bottom: none;');
+         } else {
+            this.menu.actor.set_style('');
+            this.menu.box.set_style('');
+            this.categoriesBox.set_style('');
+            this.placesBox.set_style('');
+            this.favoritesBox.set_style('');
+         }
       } catch(e) {
          Main.notify("Gnome error", e.message);
       }
@@ -10152,6 +10707,10 @@ MyApplet.prototype = {
          for(let i in this._searchItems) {
             this._searchItems[i].actor.hide();
          }
+      }
+      if(this.enablePackageSearch) {
+         this.pkg.updateButtonStatus(this.iconAppSize, this.textButtonWidth, this.appButtonDescription, this.iconView, this._applicationsBoxWidth);
+         this.pkg.executeSearch(search);
       }
       this._updateView();
    },
