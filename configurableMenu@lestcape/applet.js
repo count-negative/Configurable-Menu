@@ -94,6 +94,7 @@ PackageInstallerWrapper.prototype = {
       this.appWidth = 150;
       this.appDesc = false;
       this.vertical = false;
+      this.pythonVer = "python2";
       this.pathToLocalUpdater = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + this.parent.uuid + "/pkg_updater/Updater.py";
       this.pathToRemoteUpdater = GLib.get_home_dir() + "/.local/share/Cinnamon-Installer/Cinnamon-Installer/Updater.py";
       this.pathToPKG = GLib.get_home_dir() + "/.local/share/Cinnamon-Installer/Cinnamon-Installer.py";
@@ -126,7 +127,7 @@ PackageInstallerWrapper.prototype = {
    checkForUpdate: function() {
       let updaterPath = this._getUpdaterPath();
       if(updaterPath != "") {
-         let query = updaterPath + " --qupdate silent";
+         let query = this.pythonVer + " " + updaterPath + " --qupdate silent";
          this.execCommandSyncPipe(query, Lang.bind(this, this._doUpdate));
       }
    },
@@ -144,7 +145,7 @@ PackageInstallerWrapper.prototype = {
    executeUpdater: function(action) {
       let updaterPath = this._getUpdaterPath();
       if(updaterPath != "") {
-         this.execCommand(updaterPath + " " + action);
+         this.execCommand(this.pythonVer + " " + updaterPath + " " + action);
       }
    },
 
@@ -154,7 +155,7 @@ PackageInstallerWrapper.prototype = {
          if(!GLib.file_test(this.pathToPKG, GLib.FileTest.IS_EXECUTABLE)) {
             this._setChmod(this.pathToPKG, '+x');
          }
-         let query = this.pathToPKG + " --qpackage " + pattern;
+         let query = this.pythonVer + " " + this.pathToPKG + " --qpackage " + pattern;
          this.execCommandSyncPipe(query, Lang.bind(this, this._doSearchPackage));
       } else
          this.pakages = []
@@ -173,7 +174,7 @@ PackageInstallerWrapper.prototype = {
    },
 
    installPackage: function(packageName) {
-      let query = this.pathToPKG + " --ipackage " + packageName;
+      let query = this.pythonVer + " " + this.pathToPKG + " --ipackage " + packageName;
       this.execCommand(query);
    },
 
@@ -181,7 +182,7 @@ PackageInstallerWrapper.prototype = {
       let length = programId.length;
       if(programId.substring(length-8, length) == ".desktop") {
          let programName = programId.substring(0, length-8);
-         let query = this.pathToPKG + " --uprogram " + programName;
+         let query = this.pythonVer + " " + this.pathToPKG + " --uprogram " + programName;
          this.execCommand(query);
       }
    },
@@ -9005,8 +9006,10 @@ MyApplet.prototype = {
 
       this.allowResize = new ConfigurablePopupSwitchMenuItem(_("Allow resizing"), 'changes-prevent', 'changes-allow', false);
       this.allowResize.connect('activate', Lang.bind(this, function() {
-         this.controlingSize = !this.controlingSize;
-         this._activeResize();
+         Mainloop.idle_add(Lang.bind(this, function() {
+            this.controlingSize = !this.controlingSize;
+            this._activeResize();
+         }));
       }));
       if (items.indexOf(this.allowResize) == -1) {
          this._applet_context_menu.addMenuItem(this.allowResize);
@@ -9014,8 +9017,10 @@ MyApplet.prototype = {
 
       this.fullScreenMenu = new ConfigurablePopupSwitchMenuItem(_("Full Screen"), 'view-restore', 'view-fullscreen', false);
       this.fullScreenMenu.connect('activate', Lang.bind(this, function() {
-         this.fullScreen = !this.fullScreen;
-         this._setFullScreen();
+         Mainloop.idle_add(Lang.bind(this, function() {
+            this.fullScreen = !this.fullScreen;
+            this._setFullScreen();
+         }));
       }));
       if(items.indexOf(this.fullScreenMenu) == -1) {
          this._applet_context_menu.addMenuItem(this.fullScreenMenu);
@@ -10577,7 +10582,7 @@ MyApplet.prototype = {
          this.accessibleBox.closeContextMenus(excludeApp, animate);
       if(this.placesObj)
          this.placesObj.closeAllContextMenu(null, animate);
-      this._updateSize();
+      //this._updateSize();
    },
 
    _displayButtons: function(appCategory, places, recent, apps, autocompletes, search) {
