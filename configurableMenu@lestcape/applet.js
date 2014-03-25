@@ -183,7 +183,6 @@ PackageInstallerWrapper.prototype = {
       if(programId.substring(length-8, length) == ".desktop") {
          let programName = programId.substring(0, length-8);
          let query = this.pythonVer + " " + this.pathToPKG + " --uprogram " + programName.toLowerCase();
-         Main.notify(query);
          this.execCommand(query);
       }
    },
