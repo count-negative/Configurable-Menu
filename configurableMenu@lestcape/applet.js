@@ -182,7 +182,8 @@ PackageInstallerWrapper.prototype = {
       let length = programId.length;
       if(programId.substring(length-8, length) == ".desktop") {
          let programName = programId.substring(0, length-8);
-         let query = this.pythonVer + " " + this.pathToPKG + " --uprogram " + programName;
+         let query = this.pythonVer + " " + this.pathToPKG + " --uprogram " + programName.toLowerCase();
+         Main.notify(query);
          this.execCommand(query);
       }
    },
@@ -9461,6 +9462,10 @@ MyApplet.prototype = {
 
    _uninstallInstaller: function() {
       this.pkg.executeUpdater("--uninstall gui");
+      Main.notify("Cinnamon Installer was removed");
+      this.enablePackageSearch = false;
+      this.enableCheckUpdate = false;
+      this.enableInstaller = false;
    },
 
    _onSearchEnginesChanged: function() {
