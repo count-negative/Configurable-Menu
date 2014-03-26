@@ -221,7 +221,8 @@ PackageInstallerWrapper.prototype = {
    updateView: function() {
       try {
          this._createButtons();
-         viewBox = this.actorSearchBox.get_children();
+         let viewBox = this.actorSearchBox.get_children();
+         let currValue, falseActor;
          for(let i = 0; i < this.listButtons.length; i += this.parent.iconViewCount) {
             for(let j = 0; j < this.parent.iconViewCount; j++) {
                currValue = i + j;
@@ -7345,17 +7346,14 @@ MyApplet.prototype = {
         } else {
            return false;
         }
-        if(item_actor == this.searchEntry) {
-           return true;
-        }
-        else if(!item_actor) {
+        if((!item_actor)||(item_actor == this.searchEntry)) {
            return false;
         }
         //Main.notify("Item:" + item_actor._delegate);
         if(item_actor._delegate) {
            item_actor._delegate.emit('enter-event');
+           return true;
         }
-        return true;
       }
       catch(e) {
         Main.notify("ErrorKey", e.message);
@@ -7760,6 +7758,7 @@ MyApplet.prototype = {
             case 'menu-gno-operative-box-bottom':
                    return Clutter.KEY_Down;
       }
+      return Clutter.KEY_Left;
    },
 
    _navegateBttChanger: function(symbol) {
@@ -10521,6 +10520,7 @@ MyApplet.prototype = {
                 this.gnoMenuBox._setStyleGreyed(this.gnoMenuBox._actionButtons[i], active);
           }*/
        } catch (e) {
+          Main.notify("Categ Erro", e.message)
           global.log(e);
        }
    },
