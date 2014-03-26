@@ -9441,6 +9441,9 @@ MyApplet.prototype = {
             this.pkg.executeUpdater("--qupdate gui");
          else
             this.pkg.executeUpdater("--qupdate test");
+      } else {
+         this.enablePackageSearch = false;
+         this.enableCheckUpdate = false;
       }
    },
 
