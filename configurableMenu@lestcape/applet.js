@@ -2954,9 +2954,14 @@ GenericApplicationButtonExtended.prototype = {
                this.parent.closeApplicationsContextMenus(this.app, true);
                this.actor.get_parent().set_height(200);
                this.toggleMenu();
+               this.actor.get_parent().set_height(-1);
                this.parent._updateSize();
+
             } else {
                this.toggleMenu();
+               Mainloop.idle_add(Lang.bind(this, function() {
+                  this.parent._updateSize();
+               }));
             }
          }
       }
