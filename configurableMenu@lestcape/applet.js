@@ -5421,7 +5421,10 @@ CategoryButtonExtended.prototype = {
          labelName = _("All Applications");
       this.label.set_text(labelName);
       if(category && this.icon_name) {
-         this.icon = St.TextureCache.get_default().load_gicon(null, icon, this.iconSize);
+         if(global.ui_scale)
+            this.icon = St.TextureCache.get_default().load_gicon(null, icon, this.iconSize, global.ui_scale);
+         else
+            this.icon = St.TextureCache.get_default().load_gicon(null, icon, this.iconSize);
       }
    },
 
