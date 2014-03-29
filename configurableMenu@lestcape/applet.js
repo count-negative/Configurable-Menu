@@ -82,6 +82,113 @@ function _(str) {
    return Gettext.gettext(str);
 };
 
+
+function TerminalReader(command, callback) {
+   this._init(command, callback);
+}
+
+TerminalReader.prototype = {
+   _init: function(command, callback) {
+      this._callbackPipe = callback;
+      this._commandPipe = command;
+      this.idle = true;
+   },
+
+   executeReader: function() {
+      if(this.idle) {
+         this.idle = false;
+         try {
+            let [success, argv] = GLib.shell_parse_argv("sh -c '" + this._commandPipe + "'");
+            if(success) {
+               let [exit, pid, stdin, stdout, stderr] =
+                    GLib.spawn_async_with_pipes(null, /* cwd */
+                                                argv, /* args */
+                                                null, /* env */
+                                                GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.DO_NOT_REAP_CHILD, /*Use env path and no repet*/
+                                                null /* child_setup */);
+
+               this._childPid = pid;
+               this._stdin = new Gio.UnixOutputStream({ fd: stdin, close_fd: true });
+               this._stdout = new Gio.UnixInputStream({ fd: stdout, close_fd: true });
+               this._stderr = new Gio.UnixInputStream({ fd: stderr, close_fd: true });
+         
+               // We need this one too, even if don't actually care of what the process
+               // has to say on stderr, because otherwise the fd opened by g_spawn_async_with_pipes
+               // is kept open indefinitely
+               this._stderrStream = new Gio.DataInputStream({ base_stream: this._stderr });
+               this._dataStdout = new Gio.DataInputStream({ base_stream: this._stdout });
+
+               this.resOut = 1;
+               this._readStdout();
+               this.resErr = 1;
+               this._readStderror();
+
+               this._childWatch = GLib.child_watch_add(GLib.PRIORITY_DEFAULT, pid, Lang.bind(this, function(pid, status, requestObj) {
+                  GLib.source_remove(this._childWatch);
+                  this._stdin.close(null);
+                  this.idle = true;
+               }));
+            }
+            //throw
+         } catch(err) {
+            if (err.code == GLib.SpawnError.G_SPAWN_ERROR_NOENT) {
+               err.message = _("Command not found.");
+            } else {
+               // The exception from gjs contains an error string like:
+               //   Error invoking GLib.spawn_command_line_async: Failed to
+               //   execute child process "foo" (No such file or directory)
+               // We are only interested in the part in the parentheses. (And
+               // we can't pattern match the text, since it gets localized.)
+               err.message = err.message.replace(/.*\((.+)\)/, '$1');
+            }
+            throw err;
+         }
+      }
+   },
+
+   _readStdout: function() {
+      this._dataStdout.fill_async(-1, GLib.PRIORITY_DEFAULT, null, Lang.bind(this, function(stream, result) {
+         try {
+            if((!this._dataStdout.is_closed()) && (this.resOut != -1))
+               this.resOut = this._dataStdout.fill_finish(result);// end of file
+            if(this.resOut == 0) {
+               let val = stream.peek_buffer().toString();
+               if(val != "")
+                  this._callbackPipe(this._commandPipe, true, val);
+               this._stdout.close(null);
+            } else {
+               // Try to read more
+               this._dataStdout.set_buffer_size(2 * this._dataStdout.get_buffer_size());
+               this._readStdout();
+            }
+         } catch(e) {
+            global.log(e.toString());
+         }
+      }));
+   },
+
+   _readStderror: function() {
+      this._stderrStream.fill_async(-1, GLib.PRIORITY_DEFAULT, null, Lang.bind(this, function(stream, result) {
+         try {
+            if((!this._stderrStream.is_closed()) && (this.resErr != -1))
+               this.resErr = this._stderrStream.fill_finish(result);
+            if(this.resErr == 0) { // end of file
+               let val = stream.peek_buffer().toString();
+               if(val != "")
+                  this._callbackPipe(this._commandPipe, false, val);
+               this._stderr.close(null);
+               return;
+            } else {
+               this._stderrStream.set_buffer_size(2 * this._stderrStream.get_buffer_size());
+               this._readStderror();
+            }
+         } catch(e) {
+            global.log(e.toString());
+         }
+      }));
+   }
+};
+
 function PackageInstallerWrapper(parent) {
    this._init(parent);
 }
@@ -128,7 +235,7 @@ PackageInstallerWrapper.prototype = {
       let updaterPath = this._getUpdaterPath();
       if(updaterPath != "") {
          let query = this.pythonVer + " " + updaterPath + " --qupdate silent";
-         this.execCommandSyncPipe(query, Lang.bind(this, this._doUpdate));
+         this._execCommandSyncPipe(query, Lang.bind(this, this._doUpdate));
       }
    },
 
@@ -145,7 +252,7 @@ PackageInstallerWrapper.prototype = {
    executeUpdater: function(action) {
       let updaterPath = this._getUpdaterPath();
       if(updaterPath != "") {
-         this.execCommand(this.pythonVer + " " + updaterPath + " " + action);
+         this._execCommand(this.pythonVer + " " + updaterPath + " " + action);
       }
    },
 
@@ -155,10 +262,19 @@ PackageInstallerWrapper.prototype = {
          if(!GLib.file_test(this.pathToPKG, GLib.FileTest.IS_EXECUTABLE)) {
             this._setChmod(this.pathToPKG, '+x');
          }
-         let query = this.pythonVer + " " + this.pathToPKG + " --qpackage " + pattern;
-         this.execCommandSyncPipe(query, Lang.bind(this, this._doSearchPackage));
+         let query = this.pythonVer + " " + this.pathToPKG + " --qpackage ";
+         let patternList = pattern.toLowerCase().split(" ");
+         let patternQuery = "";
+         for(patt in patternList)
+            patternQuery += patternList[patt] + ",";
+         this.activeSearch = (patternQuery.length > 3);
+         if(this.activeSearch) {
+            query += "\"" + patternQuery.substring(0, patternQuery.length-1) + "\"";
+            this._execCommandSyncPipe(query, Lang.bind(this, this._doSearchPackage));
+         } else
+            this.pakages = [];
       } else
-         this.pakages = []
+         this.pakages = [];
    },
 
    cleanSearch: function() {
@@ -175,7 +291,7 @@ PackageInstallerWrapper.prototype = {
 
    installPackage: function(packageName) {
       let query = this.pythonVer + " " + this.pathToPKG + " --ipackage " + packageName;
-      this.execCommand(query);
+      this._execCommand(query);
    },
 
    uninstallProgram: function(programId) {
@@ -183,7 +299,7 @@ PackageInstallerWrapper.prototype = {
       if(programId.substring(length-8, length) == ".desktop") {
          let programName = programId.substring(0, length-8);
          let query = this.pythonVer + " " + this.pathToPKG + " --uprogram " + programName.toLowerCase();
-         this.execCommand(query);
+         this._execCommand(query);
       }
    },
 
@@ -285,10 +401,10 @@ PackageInstallerWrapper.prototype = {
    _setChmod: function(path, permissions) {
       //permissions = +x
       let command = "chmod " + permissions + " \"" + path + "\"";
-      this.execCommand(command);
+      this._execCommand(command);
    },
 
-   execCommand: function(command) {
+   _execCommand: function(command) {
       try {
          let [success, argv] = GLib.shell_parse_argv(command);
          this._trySpawnAsync(argv);
@@ -298,15 +414,6 @@ PackageInstallerWrapper.prototype = {
          Main.notifyError(title, e.message);
       }
       return false;
-   },
-
-   execCommandSyncPipe: function(command, callBackFunction) {
-      try {
-         this._trySpawnAsyncPipe(command, callBackFunction);
-      } catch (e) {
-         let title = _("Execution of '%s' failed:").format(command);
-         Main.notifyError(title, e.message);
-      }
    },
 
    _trySpawnAsync: function(argv) {
@@ -330,93 +437,8 @@ PackageInstallerWrapper.prototype = {
    },
 
    _trySpawnAsyncPipe: function(command, callback) {
-      try {
-         let [success, argv] = GLib.shell_parse_argv("sh -c '" + command + "'");
-         if(success) {
-            this._callbackPipe = callback;
-            this._commandPipe = command;
-            let [exit, pid, stdin, stdout, stderr] =
-                 GLib.spawn_async_with_pipes(null, /* cwd */
-                                          argv, /* args */
-                                          null, /* env */
-                                          GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.DO_NOT_REAP_CHILD, /*Use env path and no repet*/
-                                          null /* child_setup */);
-
-            this._childPid = pid;
-            this._stdin = new Gio.UnixOutputStream({ fd: stdin, close_fd: true });
-            this._stdout = new Gio.UnixInputStream({ fd: stdout, close_fd: true });
-            this._stderr = new Gio.UnixInputStream({ fd: stderr, close_fd: true });
-         
-            // We need this one too, even if don't actually care of what the process
-            // has to say on stderr, because otherwise the fd opened by g_spawn_async_with_pipes
-            // is kept open indefinitely
-            this._stderrStream = new Gio.DataInputStream({ base_stream: this._stderr });
-            this._dataStdout = new Gio.DataInputStream({ base_stream: this._stdout });
-
-            this._readStdout();
-
-            this._childWatch = GLib.child_watch_add(GLib.PRIORITY_DEFAULT, pid, Lang.bind(this, function(pid, status, requestObj) {
-               GLib.source_remove(this._childWatch);
-               this._stdin.close(null);
-            }));
-         }
-         //throw
-      } catch(err) {
-         if (err.code == GLib.SpawnError.G_SPAWN_ERROR_NOENT) {
-            err.message = _("Command not found.");
-         } else {
-            // The exception from gjs contains an error string like:
-            //   Error invoking GLib.spawn_command_line_async: Failed to
-            //   execute child process "foo" (No such file or directory)
-            // We are only interested in the part in the parentheses. (And
-            // we can't pattern match the text, since it gets localized.)
-            err.message = err.message.replace(/.*\((.+)\)/, '$1');
-         }
-         throw err;
-      }
-   },
-
-   _readStdout: function() {
-      this._dataStdout.fill_async(-1, GLib.PRIORITY_DEFAULT, null, Lang.bind(this, function(stream, result) {
-         try {
-            if((result)||(this._dataStdout.fill_finish(result) == 0)) { // end of file
-               let val = stream.peek_buffer().toString();
-               if(val != "")
-                  this._callbackPipe(this._commandPipe, true, val);
-
-               this._stdout.close(null);
-               return;
-            }
-
-            // Try to read more
-            this._dataStdout.set_buffer_size(2 * this._dataStdout.get_buffer_size());
-            this._readStdout();
-         } catch(e) {
-            global.log(e.toString());
-         }
-      }));
-
-      this._stderrStream.fill_async(-1, GLib.PRIORITY_DEFAULT, null, Lang.bind(this, function(stream, result) {
-         try {
-            if((!result)||(this._stderrStream.fill_finish(result) == 0)) { // end of file
-               try {
-                  let val = stream.peek_buffer().toString();
-                  if(val != "")
-                     this._callbackPipe(this._commandPipe, false, val);
-               } catch(e) {
-                  global.log(e.toString());
-               }
-               this._stderr.close(null);
-               return;
-            }
-
-            // Try to read more
-            this._stderrStream.set_buffer_size(2 * this._stderrStream.get_buffer_size());
-            this._readStdout();
-         } catch(e) {
-            global.log(e.toString());
-         }
-      }));
+     let terminal = new TerminalReader(command, callback);
+     terminal.executeReader();
    }
 };
 
