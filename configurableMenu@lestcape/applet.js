@@ -241,14 +241,6 @@ PackageInstallerWrapper.prototype = {
             this.parent._addEnterEvent(btt, Lang.bind(this, this._appEnterEvent, btt));
             this.listButtons[i].actor.visible = true;
          }
-         for(let i = 0; i < this.cacheSize; i++) {
-            this.pakages.push("");
-         }
-         this.updateView();
-         this.pakages = [];
-         for(let i = 0; i < this.cacheSize; i++) {
-            this.listButtons[i].actor.visible = false;
-         }
       }
       this.cacheUpdate = true;
    },
@@ -348,7 +340,6 @@ PackageInstallerWrapper.prototype = {
 
    _createButtons: function() {
       try {
-         //this.listButtons = new Array();
          let btt;
          for(let i = this.listButtons.length; i < this.pakages.length; i++) {
             btt = new PackageItem(this.parent.menu, this, this.pakages[i], this.gIconInstaller, this.iconSize, this.textWidth, this.appDesc, this.vertical, this.appWidth);
@@ -357,14 +348,11 @@ PackageInstallerWrapper.prototype = {
             btt.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, btt));
             this.parent._addEnterEvent(btt, Lang.bind(this, this._appEnterEvent, btt));
          }
-         for(let i = this.pakages.length; i < this.listButtons.length; i++) {
+         for(let i = 0; i < this.listButtons.length; i++) {
             this.listButtons[i].actor.visible = false;
          }
          for(let i = 0; i < this.pakages.length; i++) {
             this.listButtons[i].updateData(this.pakages[i], this.iconSize, this.textWidth, this.appDesc, this.vertical, this.appWidth);
-         }
-         for(let i = 0; i < this.pakages.length; i++) {
-            this.listButtons[i].actor.visible = true;
          }
          this.actorSeparator.visible = (this.pakages.length > 0);
       } catch(e) {
@@ -388,9 +376,18 @@ PackageInstallerWrapper.prototype = {
                }
             }
          }
+         this._makeVisible();
       } catch(e) {
          Main.notify("err", e.message);
       }
+   },
+
+   _makeVisible: function() {
+      Mainloop.idle_add(Lang.bind(this, function() {
+         for(let i = 0; i < this.pakages.length; i++) {
+            this.listButtons[i].actor.visible = true;
+         }
+      }));
    },
 
    clearView: function() {
