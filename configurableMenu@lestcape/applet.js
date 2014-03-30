@@ -198,14 +198,18 @@ PackageInstallerWrapper.prototype = {
       this.parent = parent;
       this.actorSearchBox = null;
       this.iconSize = 22;
-      this.appWidth = 150;
+      this.appWidth = 200;
+      this.textWidth = 150;
       this.appDesc = false;
       this.vertical = false;
+      this.cacheSize = 30;
+      this.cacheUpdate = false;
       this.pythonVer = "python3";
       this.pathToLocalUpdater = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + this.parent.uuid + "/pkg_updater/Updater.py";
       this.pathToRemoteUpdater = GLib.get_home_dir() + "/.local/share/Cinnamon-Installer/Cinnamon-Installer/Updater.py";
       this.pathToPKG = GLib.get_home_dir() + "/.local/share/Cinnamon-Installer/Cinnamon-Installer.py";
       this.pathToPkgIcon = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + this.parent.uuid + "/icons/install.svg"
+      this.gIconInstaller = new Gio.FileIcon({ file: Gio.file_new_for_path(this.pathToPkgIcon) });
       this.listButtons = new Array();
       this.pakages = [];
    },
@@ -225,6 +229,28 @@ PackageInstallerWrapper.prototype = {
    setSearchBox: function(actorSearchBox, actorSeparator) {
       this.actorSearchBox = actorSearchBox;
       this.actorSeparator = actorSeparator;
+   },
+
+   preloadCache: function() { //this preload a cache for buttons..
+      if(!this.cacheUpdate) {
+         for(let i = 0; i < this.cacheSize; i++) {
+            btt = new PackageItem(this.parent.menu, this, "", this.gIconInstaller, this.iconSize, this.textWidth, this.appDesc, this.vertical, this.appWidth);
+            btt.actor.realize();
+            this.listButtons.push(btt);
+            btt.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, btt));
+            this.parent._addEnterEvent(btt, Lang.bind(this, this._appEnterEvent, btt));
+            this.listButtons[i].actor.visible = true;
+         }
+         for(let i = 0; i < this.cacheSize; i++) {
+            this.pakages.push("");
+         }
+         this.updateView();
+         this.pakages = [];
+         for(let i = 0; i < this.cacheSize; i++) {
+            this.listButtons[i].actor.visible = false;
+         }
+      }
+      this.cacheUpdate = true;
    },
 
    exist: function() {
@@ -275,6 +301,8 @@ PackageInstallerWrapper.prototype = {
             this.pakages = [];
       } else
          this.pakages = [];
+      if(this.parent.menu.isOpen)
+         this.preloadCache();
    },
 
    cleanSearch: function() {
@@ -305,11 +333,12 @@ PackageInstallerWrapper.prototype = {
 
    _doSearchPackage: function(command, sucess, result) {
       try {
-         this.pakages = [];
-         if(this.activeSearch) 
-            this.pakages = result.split("\n");
-         this._createButtons();
          Mainloop.idle_add(Lang.bind(this, function() {
+            this.pakages = [];
+            if(this.activeSearch) 
+               this.pakages = result.split("\n");
+            if(this.pakages.length > 0)
+               this.pakages.splice(this.pakages.length-1, 1);
             this.parent._updateView();
          }));
       } catch(e) {
@@ -319,16 +348,25 @@ PackageInstallerWrapper.prototype = {
 
    _createButtons: function() {
       try {
-         this.listButtons = new Array();
-            let btt;
-            for(let i = 0; i < this.pakages.length - 1; i++) {
-               btt = new PackageItem(this.parent.menu, this, this.pakages[i], this.pathToPkgIcon, this.iconSize, this.textWidth, this.appDesc, this.vertical, this.appWidth);
-               btt.actor.realize();
-               this.listButtons.push(btt);
-               btt.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, btt));
-               this.parent._addEnterEvent(btt, Lang.bind(this, this._appEnterEvent, btt));
-            }
-            this.actorSeparator.visible = (this.listButtons.length > 0);
+         //this.listButtons = new Array();
+         let btt;
+         for(let i = this.listButtons.length; i < this.pakages.length; i++) {
+            btt = new PackageItem(this.parent.menu, this, this.pakages[i], this.gIconInstaller, this.iconSize, this.textWidth, this.appDesc, this.vertical, this.appWidth);
+            btt.actor.realize();
+            this.listButtons.push(btt);
+            btt.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, btt));
+            this.parent._addEnterEvent(btt, Lang.bind(this, this._appEnterEvent, btt));
+         }
+         for(let i = this.pakages.length; i < this.listButtons.length; i++) {
+            this.listButtons[i].actor.visible = false;
+         }
+         for(let i = 0; i < this.pakages.length; i++) {
+            this.listButtons[i].updateData(this.pakages[i], this.iconSize, this.textWidth, this.appDesc, this.vertical, this.appWidth);
+         }
+         for(let i = 0; i < this.pakages.length; i++) {
+            this.listButtons[i].actor.visible = true;
+         }
+         this.actorSeparator.visible = (this.pakages.length > 0);
       } catch(e) {
          Main.notify("button creation fail", e.message);
       }
@@ -339,10 +377,10 @@ PackageInstallerWrapper.prototype = {
          this._createButtons();
          let viewBox = this.actorSearchBox.get_children();
          let currValue, falseActor;
-         for(let i = 0; i < this.listButtons.length; i += this.parent.iconViewCount) {
+         for(let i = 0; i < this.pakages.length; i += this.parent.iconViewCount) {
             for(let j = 0; j < this.parent.iconViewCount; j++) {
                currValue = i + j;
-               if((currValue < this.listButtons.length)&&(viewBox[j])) {
+               if((currValue < this.pakages.length)&&(viewBox[j])) {
                   viewBox[j].add_actor(this.listButtons[currValue].actor);
                   falseActor = new St.BoxLayout();
                   falseActor.hide();
@@ -363,7 +401,7 @@ PackageInstallerWrapper.prototype = {
          if(appItem) {
             for(let j = 0; j < appItem.length; j++) {
                appBox[i].remove_actor(appItem[j]);
-               appItem[j].destroy()
+               //appItem[j].destroy()
             }
             this.actorSearchBox.remove_actor(appBox[i]);
             appBox[i].destroy();
@@ -442,24 +480,23 @@ PackageInstallerWrapper.prototype = {
    }
 };
 
-function PackageItem(parent, pkg, packageName, icon_path, iconSize, textWidth, appDesc, vertical, appWidth) {
-   this._init(parent, pkg, packageName, icon_path, iconSize, textWidth, appDesc, vertical, appWidth);
+function PackageItem(parent, pkg, packageName, gIconInstaller, iconSize, textWidth, appDesc, vertical, appWidth) {
+   this._init(parent, pkg, packageName, gIconInstaller, iconSize, textWidth, appDesc, vertical, appWidth);
 }
 
 PackageItem.prototype = {
    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
 
-   _init: function(parent, pkg, packageName, icon_path, iconSize, textWidth, appDesc, vertical, appWidth) {
+   _init: function(parent, pkg, packageName, gIconInstaller, iconSize, textWidth, appDesc, vertical, appWidth) {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this);
       this.actor.set_style_class_name('menu-application-button');
       this.iconSize = iconSize;
       this.parent = parent;
       this.pkg = pkg;
       this.packageName = packageName;
+      this.gIconInstaller = gIconInstaller;
       this.string = "";
-      let fileIcon = Gio.file_new_for_path(icon_path);
-      this.icon_uri = fileIcon.get_uri();
-      this.app = this._createAppWrapper(packageName, icon_path);
+      this.app = this._createAppWrapper(packageName, gIconInstaller);
       this.name = this.app.get_name();
       this.labelName = new St.Label({ text: this.name , style_class: 'menu-application-button-label' });
       this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
@@ -469,10 +506,10 @@ PackageItem.prototype = {
       this.textBox = new St.BoxLayout({ vertical: true });
       this.setTextMaxWidth(textWidth);
       this.setAppDescriptionVisible(appDesc);
+      this.container.set_vertical(!vertical);
       this.setVertical(vertical);
 
       this.icon = this.app.create_icon_texture(this.iconSize);
-      // St.TextureCache.get_default().load_uri_async(this.icon_uri, this.iconSize, this.iconSize);
       if(this.icon) {
          this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
          this.icon.realize();
@@ -485,46 +522,68 @@ PackageItem.prototype = {
       this.isDraggableApp = false;
    },
 
-   setIconSize: function (iconSize) {
-      this.iconSize = iconSize;
-      if(this.icon) {
-         let visible = this.icon.visible; 
-         let parentIcon = this.icon.get_parent();
-         if(parentIcon)
-            parentIcon.remove_actor(this.icon);
-         this.icon.destroy();
-         this.icon = this.app.create_icon_texture(this.iconSize);
-         this.icon.visible = visible;
-         this.container.insert_actor(this.icon, 0);
+   updateData: function(packageName, iconSize, textWidth, appDesc, vertical, appWidth) {
+      this.packageName = packageName;
+      this.app = this._createAppWrapper(packageName, this.gIconInstaller);
+      this.name = this.app.get_name();
+      this.labelName.set_text(this.name);
+      this.setIconSize(iconSize);
+      this.setTextMaxWidth(textWidth);
+      this.setAppDescriptionVisible(appDesc);
+      this.setVertical(vertical);
+      this.container.set_width(appWidth);
+   },
+
+   setIconSize: function(iconSize) {
+      if(this.iconSize != iconSize) {
+         this.iconSize = iconSize;
+         if(this.icon) {
+            let visible = this.icon.visible; 
+            let parentIcon = this.icon.get_parent();
+            if(parentIcon)
+               parentIcon.remove_actor(this.icon);
+            this.icon.destroy();
+            this.icon = this.app.create_icon_texture(this.iconSize);
+            this.icon.visible = visible;
+            this.container.insert_actor(this.icon, 0);
+         }
       }
    },
 
    setAppDescriptionVisible: function(visible) {
-      this.labelDesc.visible = visible;
-      if(this.app.get_description())
-         this.labelDesc.set_text(this.app.get_description().split("\n")[0]);
+      if(this.labelDesc.visible != visible) {
+         this.labelDesc.visible = visible;
+      }
+      if(visible) {
+         let desc = this.app.get_description();
+         if(desc)
+            this.labelDesc.set_text(desc.split("\n")[0]);
+      }
    },
 
    setTextMaxWidth: function(maxWidth) {
-      //this.textBox.set_width(maxWidth);
-      this.textBox.style="max-width: "+maxWidth+"px;";
-      this.textWidth = maxWidth;
+      if(this.textWidth != maxWidth) {
+         this.textBox.style="max-width: "+maxWidth+"px;";
+         this.textWidth = maxWidth;
+      }
    },
 
    setVertical: function(vertical) {
-      this.container.set_vertical(vertical);
-      let parentL = this.labelName.get_parent();
-      if(parentL) parentL.remove_actor(this.labelName);
-      parentL = this.labelDesc.get_parent();
-      if(parentL) parentL.remove_actor(this.labelDesc);
-      this.setTextMaxWidth(this.textWidth);
-      if(vertical) {
-         this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-         this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });  
-      }
-      else {
-         this.textBox.add(this.labelName, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
-         this.textBox.add(this.labelDesc, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+      if(this.container.get_vertical() != vertical) {
+         this.container.set_vertical(vertical);
+         let parentL = this.labelName.get_parent();
+         if(parentL) parentL.remove_actor(this.labelName);
+         parentL = this.labelDesc.get_parent();
+         if(parentL) parentL.remove_actor(this.labelDesc);
+         this.setTextMaxWidth(this.textWidth);
+         if(vertical) {
+            this.textBox.add(this.labelName, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+            this.textBox.add(this.labelDesc, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });  
+         }
+         else {
+            this.textBox.add(this.labelName, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+            this.textBox.add(this.labelDesc, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+         }
       }
    },
 
@@ -550,7 +609,7 @@ PackageItem.prototype = {
       this.parent.toggle();
    },
 
-   _createAppWrapper: function(packageName, icon_path) {
+   _createAppWrapper: function(packageName, gIconInstaller) {
       // We need this fake app to help appEnterEvent/appLeaveEvent 
       // work with our search result.
       this.app = {
@@ -576,8 +635,9 @@ PackageItem.prototype = {
          },
          create_icon_texture: function(appIconSize) {
             try {
-              let gicon = new Gio.FileIcon({ file: Gio.file_new_for_path(icon_path) });
-              return  new St.Icon({gicon: gicon, icon_size: appIconSize, icon_type: St.IconType.FULLCOLOR});
+              //let gicon = new Gio.FileIcon({ file: Gio.file_new_for_path(icon_path) });
+              //return new St.Icon({gicon: gicon, icon_size: appIconSize, icon_type: St.IconType.FULLCOLOR});
+              return new St.Icon({gicon: gIconInstaller, icon_size: appIconSize, icon_type: St.IconType.FULLCOLOR});
             } catch (e) {}
             return null;
          }
