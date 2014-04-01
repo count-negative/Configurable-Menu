@@ -205,6 +205,8 @@ PackageInstallerWrapper.prototype = {
       this.cacheSize = 30;
       this.cacheUpdate = false;
       this.pythonVer = "python3";
+      //this.pathCinnamonDefaultUninstall = "/usr/bin/cinnamon-remove-application";
+      //this._canCinnamonUninstallApps = GLib.file_test(this.pathCinnamonDefaultUninstall, GLib.FileTest.EXISTS);
       this.pathToLocalUpdater = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + this.parent.uuid + "/pkg_updater/Updater.py";
       this.pathToRemoteUpdater = GLib.get_home_dir() + "/.local/share/Cinnamon-Installer/Cinnamon-Installer/Updater.py";
       this.pathToPKG = GLib.get_home_dir() + "/.local/share/Cinnamon-Installer/Cinnamon-Installer.py";
@@ -320,6 +322,14 @@ PackageInstallerWrapper.prototype = {
          let programName = programId.substring(0, length-8);
          let query = this.pythonVer + " " + this.pathToPKG + " --uprogram " + programName.toLowerCase();
          this._execCommand(query);
+         // This will be used to uninstall app, if cinnamon add a good tools...
+         /*if(this._canCinnamonUninstallApps) {
+            let fileName = GLib.find_program_in_path(programName);
+            if(fileName) {
+               this._execCommand("gksu -m '" + _("Please provide your password to uninstall this application") +
+                                 "' " + this.pathCinnamonDefaultUninstall " '" + fileName+ "'");
+            }
+         }*/
       }
    },
 
@@ -458,7 +468,7 @@ PackageInstallerWrapper.prototype = {
             null, null);
       } catch (err) {
          if (err.code == GLib.SpawnError.G_SPAWN_ERROR_NOENT) {
-            err.message = _("Commafnd not found.");
+            err.message = _("Command not found.");
          } else {
             // The exception from gjs contains an error string like:
             //   Error invoking GLib.spawn_command_line_async: Failed to
@@ -3022,7 +3032,20 @@ GenericApplicationButtonExtended.prototype = {
          this.menu.connect('open-state-changed', Lang.bind(this, this._subMenuOpenStateChanged));
       }
    },
-    
+
+   highlight: function() {
+      this.actor.add_style_pseudo_class('highlighted');
+   },
+
+   unhighlight: function() {
+      var app_key = this.app.get_id();
+      if (app_key == null) {
+          app_key = this.app.get_name() + ":" + this.app.get_description();
+      }
+      this.parent._knownApps.push(app_key);
+      this.actor.remove_style_pseudo_class('highlighted');
+   },
+
    _onButtonReleaseEvent: function (actor, event) {
       if(event.get_button()==1) {
          this.activate(event);
@@ -3048,6 +3071,7 @@ GenericApplicationButtonExtended.prototype = {
    },
     
    activate: function(event) {
+      this.unhighlight(); 
       this.app.open_new_window(-1);
       this.parent.menu.close();
    },
@@ -6697,6 +6721,8 @@ MyApplet.prototype = {
          this._activeActor = null;
          this._applicationsBoxWidth = 0;
          this.menuIsOpening = false;
+         this._knownApps = new Array(); // Used to keep track of apps that are already installed, so we can highlight newly installed ones
+         this._appsWereRefreshed = false;
          this.signalKeyPowerID = 0;
          this.showTimeDate = false;
          this.timeFormat = "%H:%M";
@@ -11100,6 +11126,9 @@ MyApplet.prototype = {
          let sr = a.app.get_name().toLowerCase() > b.app.get_name().toLowerCase();
          return sr;
       });
+
+      this._appsWereRefreshed = true;
+
       try {
       //Mainloop.idle_add(Lang.bind(this, function() {
 
@@ -11418,6 +11447,20 @@ MyApplet.prototype = {
                   this._addEnterEvent(applicationButton, Lang.bind(this, this._appEnterEvent, applicationButton));
                   applicationButton.category.push(top_dir.get_menu_id());
                   this._applicationsButtonFromApp[app_key] = applicationButton;
+                  var app_is_known = false;
+                  for(var i = 0; i < this._knownApps.length; i++) {
+                     if(this._knownApps[i] == app_key) {
+                        app_is_known = true;
+                     }
+                  }
+                  if(!app_is_known) {
+                     if(this._appsWereRefreshed) {
+                        applicationButton.highlight();
+                     }
+                     else {
+                        this._knownApps.push(app_key);
+                     }
+                  }
                } else {
                   this._applicationsButtonFromApp[app_key].category.push(dir.get_menu_id());
                }

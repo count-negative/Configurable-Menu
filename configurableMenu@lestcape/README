@@ -1,6 +1,6 @@
 Cinnamon Applet: Configurable Menu Version: v0.9-Beta
 
-Last version release date: 24 March 2014
+Last version release date: 31 March 2014
 ***
 Authors: Lester Carballo Pérez (https://github.com/lestcape) and Garibaldo (https://github.com/Garibaldo).
 
@@ -91,6 +91,8 @@ See a complete Change log : https://github.com/lestcape/Configurable-Menu/wiki/C
    - Control and system buttons now can be symbolic or full color.
    - Allow to remove the search entry.
    - Allow to have arrow on the categories.
+   - Added the feature to Highlight newly installed apps.
+   - Added the code to call cinnamon-remove-application to be used if this work well.
 
 This program is free software:
 --------------
