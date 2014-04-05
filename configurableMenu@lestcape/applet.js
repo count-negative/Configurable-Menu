@@ -6050,40 +6050,126 @@ function ConfigurableMenu(launcher, orientation, subMenu) {
 }
 
 ConfigurableMenu.prototype = {
-   __proto__: Applet.AppletPopupMenu.prototype,
+   __proto__: PopupMenu.PopupMenuBase.prototype,
 
    _init: function(launcher, orientation, subMenu) {
       PopupMenu.PopupMenuBase.prototype._init.call (this, launcher.actor, 'popup-menu-content');
+      try {
+         this._arrowAlignment = 0.0;
+         this._arrowSide = orientation;
+         this.subMenu = subMenu;
 
-      this._arrowAlignment = 0.0;
-      this._arrowSide = orientation;
-      this.subMenu = subMenu;
+         this._boxPointer = new ConfigurablePointer(orientation,
+                                                    { x_fill: true,
+                                                      y_fill: true,
+                                                      x_align: St.Align.START });
+         this.actor = this._boxPointer.actor;
+         Main.uiGroup.add_actor(this.actor);
 
-      this._boxPointer = new ConfigurablePointer(orientation,
-                                                 { x_fill: true,
-                                                   y_fill: true,
-                                                   x_align: St.Align.START });
-      this.actor = this._boxPointer.actor;
-      Main.uiGroup.add_actor(this.actor);
+         this.actor._delegate = this;
+         this.actor.style_class = 'popup-menu-boxpointer';
+         this.actor.connect('key-press-event', Lang.bind(this, this._onKeyPressEvent));
 
-      this.actor._delegate = this;
-      this.actor.style_class = 'popup-menu-boxpointer';
-      this.actor.connect('key-press-event', Lang.bind(this, this._onKeyPressEvent));
+         this._boxWrapper = new Cinnamon.GenericContainer();
+         this._boxWrapper.connect('get-preferred-width', Lang.bind(this, this._boxGetPreferredWidth));
+         this._boxWrapper.connect('get-preferred-height', Lang.bind(this, this._boxGetPreferredHeight));
+         this._boxWrapper.connect('allocate', Lang.bind(this, this._boxAllocate));
+         this._boxPointer.bin.set_child(this._boxWrapper);
+         this._boxWrapper.add_actor(this.box);
+         this.actor.add_style_class_name('popup-menu');
 
-      this._boxWrapper = new Cinnamon.GenericContainer();
-      this._boxWrapper.connect('get-preferred-width', Lang.bind(this, this._boxGetPreferredWidth));
-      this._boxWrapper.connect('get-preferred-height', Lang.bind(this, this._boxGetPreferredHeight));
-      this._boxWrapper.connect('allocate', Lang.bind(this, this._boxAllocate));
-      this._boxPointer.bin.set_child(this._boxWrapper);
-      this._boxWrapper.add_actor(this.box);
-      this.actor.add_style_class_name('popup-menu');
-
-      global.focus_manager.add_group(this.actor);
-      this.actor.reactive = true;
-      this.actor.hide();
+         global.focus_manager.add_group(this.actor);
+         this.actor.reactive = true;
+         this.actor.hide();
+      } catch(e) {
+         Main.notify("ErrorMenuCreation", e.message);
+      }
    },
 
-    _onKeyFocusOut: function (actor) {
+   setArrowSide: function(side) {
+      this._arrowSide = side;
+      this._boxPointer.setArrowSide(side);
+   },
+
+   _boxGetPreferredWidth: function (actor, forHeight, alloc) {
+      let columnWidths = this.getColumnWidths();
+      this.setColumnWidths(columnWidths);
+      // Now they will request the right sizes
+      [alloc.min_size, alloc.natural_size] = this.box.get_preferred_width(forHeight);
+   },
+
+   _boxGetPreferredHeight: function (actor, forWidth, alloc) {
+      [alloc.min_size, alloc.natural_size] = this.box.get_preferred_height(forWidth);
+   },
+
+   _boxAllocate: function (actor, box, flags) {
+      this.box.allocate(box, flags);
+   },
+
+   _onKeyPressEvent: function(actor, event) {
+      if(event.get_key_symbol() == Clutter.Escape) {
+         this.close(true);
+         return true;
+      }
+      return false;
+   },
+
+   setArrowOrigin: function(origin) {
+      this._boxPointer.setArrowOrigin(origin);
+   },
+
+   setSourceAlignment: function(alignment) {
+      this._boxPointer.setSourceAlignment(alignment);
+   },
+
+   open: function(animate) {
+      if(this.isOpen)
+         return;
+      this.setMaxHeight();
+
+      this.isOpen = true;
+        
+      if(global.menuStackLength == undefined)
+         global.menuStackLength = 0;
+      global.menuStackLength += 1;
+
+      this._boxPointer.setPosition(this.sourceActor, this._arrowAlignment);
+      this._boxPointer.show(animate);
+
+      this.actor.raise_top();
+
+      this.emit('open-state-changed', true);
+   },
+
+   close: function(animate) {
+      if(!this.isOpen)
+         return;      
+      this.isOpen = false;
+      global.menuStackLength -= 1;
+
+      Main.panel._hidePanel();
+      if(Main.panel2 != null)
+         Main.panel2._hidePanel();
+
+      if(this._activeMenuItem)
+         this._activeMenuItem.setActive(false);
+
+      this._boxPointer.hide(animate);
+      this.emit('open-state-changed', false);
+   },
+
+   // Setting the max-height won't do any good if the minimum height of the
+   // menu is higher then the screen; it's useful if part of the menu is
+   // scrollable so the minimum height is smaller than the natural height
+   setMaxHeight: function() {
+      let monitor = Main.layoutManager.primaryMonitor;
+      let maxHeight = Math.round(monitor.height - Main.panel.actor.height - this.actor.get_theme_node().get_length('-boxpointer-gap'));
+      if (Main.panel2!==null) maxHeight -= Main.panel2.actor.height;
+         this.actor.style = ('max-height: ' + maxHeight + 'px;');
+   },
+
+//*************************************************
+   _onKeyFocusOut: function (actor) {
       if(this._popupMenu.isOpen)
           return true;
         this.setActive(false);
