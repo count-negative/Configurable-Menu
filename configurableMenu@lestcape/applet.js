@@ -92,6 +92,7 @@ TerminalReader.prototype = {
       this._callbackPipe = callback;
       this._commandPipe = command;
       this.idle = true;
+      this._childWatch = null;
    },
 
    executeReader: function() {
@@ -117,6 +118,8 @@ TerminalReader.prototype = {
                // is kept open indefinitely
                this._stderrStream = new Gio.DataInputStream({ base_stream: this._stderr });
                this._dataStdout = new Gio.DataInputStream({ base_stream: this._stdout });
+               this._cancellableStderrStream = new Gio.Cancellable();
+               this._cancellableStdout = new Gio.Cancellable();
 
                this.resOut = 1;
                this._readStdout();
@@ -125,6 +128,7 @@ TerminalReader.prototype = {
 
                this._childWatch = GLib.child_watch_add(GLib.PRIORITY_DEFAULT, pid, Lang.bind(this, function(pid, status, requestObj) {
                   GLib.source_remove(this._childWatch);
+                  this._childWatch = null;
                   this._stdin.close(null);
                   this.idle = true;
                }));
@@ -146,20 +150,60 @@ TerminalReader.prototype = {
       }
    },
 
+   destroy: function() {
+      try {
+         if(this._childWatch) {
+            GLib.source_remove(this._childWatch);
+            this._childWatch = null;
+         }
+         if(!this._dataStdout.is_closed()) {
+            this._cancellableStdout.cancel();
+            this._stdout.close_async(0, null, Lang.bind(this, this.closeStdout));
+         }
+         if(!this._stderrStream.is_closed()) {
+            this._cancellableStderrStream.cancel();
+            this._stderrStream.close_async(0, null, Lang.bind(this, this.closeStderrStream));
+         }
+         this._stdin.close(null);
+         this.idle = true;
+      }
+      catch(e) {
+         Main.notify("Error on close" + this._dataStdout.is_closed(), e.message);
+      }
+   },
+
+   closeStderrStream: function(std, result) {
+      try {
+        std.close_finish(result);
+      } catch(e) {
+         std.close_async(0, null, Lang.bind(this, this.closeStderrStream));
+      }
+   },
+
+   closeStdout: function(std, result) {
+      try {
+        std.close_finish(result);
+      } catch(e) {
+         std.close_async(0, null, Lang.bind(this, this.closeStderrStream));
+      }
+   },
+
    _readStdout: function() {
-      this._dataStdout.fill_async(-1, GLib.PRIORITY_DEFAULT, null, Lang.bind(this, function(stream, result) {
+      this._dataStdout.fill_async(-1, GLib.PRIORITY_DEFAULT, this._cancellableStdout, Lang.bind(this, function(stream, result) {
          try {
-            if((!this._dataStdout.is_closed()) && (this.resOut != -1))
-               this.resOut = this._dataStdout.fill_finish(result);// end of file
-            if(this.resOut == 0) {
-               let val = stream.peek_buffer().toString();
-               if(val != "")
-                  this._callbackPipe(this._commandPipe, true, val);
-               this._stdout.close(null);
-            } else {
-               // Try to read more
-               this._dataStdout.set_buffer_size(2 * this._dataStdout.get_buffer_size());
-               this._readStdout();
+            if(!this._dataStdout.is_closed()) {
+               if(this.resOut != -1)
+                  this.resOut = this._dataStdout.fill_finish(result);// end of file
+               if(this.resOut == 0) {
+                  let val = stream.peek_buffer().toString();
+                  if(val != "")
+                     this._callbackPipe(this._commandPipe, true, val);
+                  this._stdout.close(this._cancellableStdout);
+               } else {
+                  // Try to read more
+                  this._dataStdout.set_buffer_size(2 * this._dataStdout.get_buffer_size());
+                  this._readStdout();
+               }
             }
          } catch(e) {
             global.log(e.toString());
@@ -168,19 +212,20 @@ TerminalReader.prototype = {
    },
 
    _readStderror: function() {
-      this._stderrStream.fill_async(-1, GLib.PRIORITY_DEFAULT, null, Lang.bind(this, function(stream, result) {
+      this._stderrStream.fill_async(-1, GLib.PRIORITY_DEFAULT, this._cancellableStderrStream, Lang.bind(this, function(stream, result) {
          try {
-            if((!this._stderrStream.is_closed()) && (this.resErr != -1))
-               this.resErr = this._stderrStream.fill_finish(result);
-            if(this.resErr == 0) { // end of file
-               let val = stream.peek_buffer().toString();
-               if(val != "")
-                  this._callbackPipe(this._commandPipe, false, val);
-               this._stderr.close(null);
-               return;
-            } else {
-               this._stderrStream.set_buffer_size(2 * this._stderrStream.get_buffer_size());
-               this._readStderror();
+            if(!this._stderrStream.is_closed()) {
+               if(this.resErr != -1)
+                  this.resErr = this._stderrStream.fill_finish(result);
+               if(this.resErr == 0) { // end of file
+                  let val = stream.peek_buffer().toString();
+                  if(val != "")
+                     this._callbackPipe(this._commandPipe, false, val);
+                  this._stderr.close(null);
+               } else {
+                  this._stderrStream.set_buffer_size(2 * this._stderrStream.get_buffer_size());
+                  this._readStderror();
+               }
             }
          } catch(e) {
             global.log(e.toString());
@@ -197,6 +242,7 @@ PackageInstallerWrapper.prototype = {
    _init: function(parent) {
       this.parent = parent;
       this.actorSearchBox = null;
+      this.lastedSearch = null;
       this.iconSize = 22;
       this.appWidth = 200;
       this.textWidth = 150;
@@ -290,7 +336,9 @@ PackageInstallerWrapper.prototype = {
          this.activeSearch = (patternQuery.length > 3);
          if(this.activeSearch) {
             query += "\"" + patternQuery.substring(0, patternQuery.length-1) + "\"";
-            this._execCommandSyncPipe(query, Lang.bind(this, this._doSearchPackage));
+            if(this.lastedSearch)
+               this.lastedSearch.destroy();
+            this.lastedSearch = this._execCommandSyncPipe(query, Lang.bind(this, this._doSearchPackage));
          } else
             this.pakages = [];
       } else
@@ -436,7 +484,7 @@ PackageInstallerWrapper.prototype = {
 
    _execCommandSyncPipe: function(command, callBackFunction) {
       try {
-         this._trySpawnAsyncPipe(command, callBackFunction);
+         return this._trySpawnAsyncPipe(command, callBackFunction);
       } catch (e) {
          let title = _("Execution of '%s' failed:").format(command);
          Main.notifyError(title, e.message);
@@ -482,8 +530,9 @@ PackageInstallerWrapper.prototype = {
    },
 
    _trySpawnAsyncPipe: function(command, callback) {
-     let terminal = new TerminalReader(command, callback);
-     terminal.executeReader();
+      let terminal = new TerminalReader(command, callback);
+      terminal.executeReader();
+      return terminal;
    }
 };
 
