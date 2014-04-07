@@ -2877,6 +2877,7 @@ ApplicationContextMenuItemExtended.prototype = {
    },
 
    activate: function (event) {
+      let needClose = false;
       switch (this._action) {
          case "add_to_panel":
             try {
@@ -3003,12 +3004,15 @@ ApplicationContextMenuItemExtended.prototype = {
             try {
                if(!this._appButton.app.isPlace) {
                   this._appButton.parent.pkg.uninstallProgram(this._appButton.app.get_id());
+                  needClose = true;
                }
             } catch (e) {Main.notify("access", e.message);}
             break;
 
       }
       this._appButton.toggleMenu();
+      if(needClose)
+         this._appButton.parent.menu.close();
       return false;
    }
 };
@@ -3077,7 +3081,9 @@ GenericApplicationButtonExtended.prototype = {
    },
     
    closeMenu: function() {
-      if(this.withMenu) this.menu.close();
+      if(this.withMenu) {
+         this.menu.close();
+      }
    },
     
    toggleMenu: function() {
@@ -6050,7 +6056,8 @@ function ConfigurableMenu(launcher, orientation, subMenu) {
 }
 
 ConfigurableMenu.prototype = {
-   __proto__: PopupMenu.PopupMenuBase.prototype,
+   __proto__: Applet.AppletPopupMenu.prototype,
+  // __proto__: PopupMenu.PopupMenuBase.prototype,
 
    _init: function(launcher, orientation, subMenu) {
       PopupMenu.PopupMenuBase.prototype._init.call (this, launcher.actor, 'popup-menu-content');
