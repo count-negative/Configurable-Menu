@@ -88,7 +88,7 @@
     },
     "fix-menu-corner": {
         "type": "checkbox",
-        "default": false,
+        "default": true,
         "description": "Menu bordering screen edge",
         "tooltip": "Choose whether or not the menu bordering the screen edge."
     },
@@ -128,7 +128,7 @@
     },
     "width": {
         "type": "spinbutton",
-        "default": 700,
+        "default": 530,
         "min": 200,
         "max": 3000,
         "step": 5,
@@ -138,7 +138,7 @@
     },
     "height": {
         "type": "spinbutton",
-        "default": 500,
+        "default": 600,
         "min": 300,
         "max": 2000,
         "step": 5,
@@ -196,7 +196,7 @@
     },
     "icon-cat-size": {
         "type": "spinbutton",
-        "default": 22,
+        "default": 32,
         "min": 10,
         "max": 100,
         "step": 1,
@@ -218,7 +218,7 @@
     },
     "scroll-categories": {
         "type": "checkbox",
-        "default": true,
+        "default": false,
         "description": "Show scrolling area of categories",
         "tooltip": "Choose whether or not to show the scrolling area of categories."
     },
@@ -326,7 +326,7 @@
     },
     "show-hover-icon": {
         "type": "checkbox",
-        "default": true,
+        "default": false,
         "description": "Show hover icon",
         "tooltip": "Choose whether or not to show hover icon on the menu."
     },
@@ -382,7 +382,7 @@
     },
     "power-box": {
         "type": "checkbox",
-        "default": true,
+        "default": false,
         "description": "System buttons have a box",
         "tooltip": "Choose whether or not to have a box on the system buttons."
     },
@@ -414,19 +414,19 @@
     },
     "show-view-item": {
         "type": "checkbox",
-        "default": true,
+        "default": false,
         "description": "Show control buttons",
         "tooltip": "Choose whether or not to show control buttons."
     },
     "control-box": {
         "type": "checkbox",
-        "default": true,
+        "default": false,
         "description": "Control buttons have a box",
         "tooltip": "Choose whether or not to have a box on the control buttons."
     },
     "view-item": {
         "type": "checkbox",
-        "default": true,
+        "default": false,
         "description": "Show application entries in grid view",
         "tooltip": "Enable show application entries in grid(icon) view and disable show application entries in list view."
     },
@@ -458,7 +458,7 @@
     },
     "spacer-line": {
         "type": "checkbox",
-        "default": true,
+        "default": false,
         "description": "Show separator line",
         "tooltip": "Choose whether or not to show a line on separator."
     },
@@ -774,7 +774,7 @@
     },
     "classic": {
         "type": "generic",
-        "default": "power-theme::vertical;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;allow-search::true;;swap-panels::false;;hover-delay::0;;enable-autoscroll::true;;show-view-item::false;;control-symbolic::false;;power-symbolic::false;;view-item::false;;activate-on-press::true;;hover-box::false;;control-box::false;;power-box::false;;accessible-box::false;;gnomenu-box::false;;show-removable-drives::false;;accessible-icons::true;;categories-icons::true;;app-button-width::300;;app-description::false;;icon-app-size::22;;icon-cat-size::32;;icon-max-fav-size::32;;icon-power-size::32;;icon-control-size::22;;icon-hover-size::68;;icon-accessible-size::22;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::1;;show-hover-icon::false;;show-power-buttons::true;;show-time-date::false;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;allow-resizing::true;;full-screen::false;;width::516;;height::596.0012817382812;;scroll-favorites::false;;scroll-categories::false;;arrow-categories::false;;scroll-applications::true;;scroll-accessible::true;;scroll-gnomenu::false;;spacer-line::false;;spacer-size::10;;show-box-pointer::true;;fix-menu-corner::true"
+        "default": "power-theme::vertical;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;allow-search::true;;swap-panels::false;;hover-delay::0;;enable-autoscroll::true;;show-view-item::false;;control-symbolic::false;;power-symbolic::false;;view-item::false;;activate-on-press::true;;hover-box::false;;control-box::false;;power-box::false;;accessible-box::false;;gnomenu-box::false;;show-removable-drives::false;;accessible-icons::true;;categories-icons::true;;app-button-width::300;;app-description::false;;icon-app-size::22;;icon-cat-size::32;;icon-max-fav-size::32;;icon-power-size::32;;icon-control-size::22;;icon-hover-size::68;;icon-accessible-size::22;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::1;;show-hover-icon::false;;show-power-buttons::true;;show-time-date::false;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;allow-resizing::true;;full-screen::false;;width::530;;height::600;;scroll-favorites::false;;scroll-categories::false;;arrow-categories::false;;scroll-applications::true;;scroll-accessible::true;;scroll-gnomenu::false;;spacer-line::false;;spacer-size::10;;show-box-pointer::true;;fix-menu-corner::true"
     },
     "classicGnome": {
         "type": "generic",
