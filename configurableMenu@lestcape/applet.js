@@ -9533,6 +9533,7 @@ MyApplet.prototype = {
 
          this.searchActive = false;
          this.searchEntryText = this.searchEntry.clutter_text;
+         this.searchEntryText.connect('key-press-event', Lang.bind(this, this._onMenuKeyPress));
          this.idSignalTextChange = 0;
          this.searchEntryText.connect('key-focus-in', Lang.bind(this, function(actor) {
             if(this.idSignalTextChange == 0)
@@ -11699,6 +11700,7 @@ MyApplet.prototype = {
          this.repositionActor = null;
          this._activeGnomeMenu();
          this.appMenuGnomeClose();
+         this.categoriesScrollBox.scrollToActor(this._allAppsCategoryButton.actor);
       }
    }
 };
