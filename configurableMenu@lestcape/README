@@ -1,6 +1,6 @@
 Cinnamon Applet: Configurable Menu Version: v0.9-Beta
 
-Last version release date: 11 April 2014
+Last version release date: 12 April 2014
 ***
 Authors: Lester Carballo Pérez (https://github.com/lestcape) and Garibaldo (https://github.com/Garibaldo).
 Contact: lestcape@gmail.com
@@ -91,6 +91,7 @@ See a complete Change log : https://github.com/lestcape/Configurable-Menu/wiki/C
    - You can have arrows in on the categories.
    - Added the new feature of Cinnamon Menu of Highlight newly installed apps.
    - Added the code to call cinnamon-remove-application to be used if user want, when this feature be included on Cinnamon.
+   - Added some fancy effects on opening and closing.
 
 This program is free software:
 --------------

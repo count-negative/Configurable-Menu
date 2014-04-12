@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-04-12 02:41-0600\n"
+"PO-Revision-Date: 2014-04-12 08:52-0600\n"
 "Last-Translator: Eliermi Cunha Junior <jpegrande@gmailcom>\n"
 "Language-Team: Eliermi Cunha Junior <jpegrande@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -20,19 +20,19 @@ msgstr ""
 
 #: applet.js:83 applet.js:3678 cinnamonMenu.js:536
 msgid "Execution of '%s' failed:"
-msgstr "Execution of '%s' failed:"
+msgstr "Execução de '%s' falhou:"
 
 #: applet.js:103 applet.js:3678 cinnamonMenu.js:536
 msgid "Command not found."
-msgstr "Command not found."
+msgstr "Comando não encontrado."
 
 #: applet.js:133 applet.js:3678 cinnamonMenu.js:536
 msgid "Package %s"
-msgstr "Package %s"
+msgstr "Pacotes %s"
 
 #: applet.js:150 applet.js:3678 cinnamonMenu.js:536
 msgid "Package to install %s"
-msgstr "Package to install %s"
+msgstr "Pacotes para instalar %s"
 
 #: applet.js:383 applet.js:3678 cinnamonMenu.js:536 applet.js:1452
 msgid "List View"
@@ -180,39 +180,39 @@ msgstr " Opções gerais de busca:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-install->description
 msgid "Installer and uninstaller tools:"
-msgstr "Installer and uninstaller tools:"
+msgstr "Ferramentas instalador e Desinstalador:"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->description
 msgid "Effect on opening and closing:"
-msgstr ""
+msgstr "Efeito de abertura e fechamento:"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->tooltip
 msgid "Select the effect on the menu opening and closing."
-msgstr ""
+msgstr "Selecione o efeito de abertura e fechamento do menu."
 
 #. configurableMenu@lestcape->settings-schema.json->effect->options
 msgid "None"
-msgstr ""
+msgstr "nenhum"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->options
 msgid "Dispel"
-msgstr ""
+msgstr "dissipar"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->options
 msgid "Hide Horizontal"
-msgstr ""
+msgstr "Esconder Horizontal"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->options
 msgid "Hide Vertical"
-msgstr ""
+msgstr "Esconder Vertical"
 
 #. configurableMenu@lestcape->settings-schema.json->effect-time->description
 msgid "Duration of effect:"
-msgstr ""
+msgstr "Duração de efeito:"
 
 #. configurableMenu@lestcape->settings-schema.json->effect-time->tooltip
 msgid "The time on seconds to perform the effect(More time is slower)."
-msgstr ""
+msgstr "O tempo em segundos para executar o efeito (mais tempo é mais lento)."
 
 #. configurableMenu@lestcape->settings-schema.json->swap-panels->description
 msgid "Swap the top and bottom panel"
@@ -521,11 +521,11 @@ msgstr "Acessível"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Classic"
-msgstr "Clásico"
+msgstr "Clássico"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Classic Gnome"
-msgstr "Gnome Clásico"
+msgstr "Gnome Clássico"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Whisker"
@@ -901,50 +901,52 @@ msgstr "Permitir pesquisa na web com o motor de busca DuckDuckGo."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-tools->description
 msgid "Enable the Cinnamon Installer tool"
-msgstr "Enable the Cinnamon Installer tool"
+msgstr "Ativar ferramenta Cinnamon instalador "
 
 #. configurableMenu@lestcape->settings-schema.json->installer-tools->tooltip
 msgid ""
 "Allows install, uninstall and search for programs and packages(need internet "
 "connection to be download)."
 msgstr ""
-"Allows install, uninstall and search for programs and packages(need internet "
-"connection to be download)."
+"Permitir instalar,desinstalar e buscar pacotes de programas(necessário "
+"conexão a internet para download)."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-search->description
 msgid "Enable to search for packages"
-msgstr "Enable to search for packages"
+msgstr "Ativar busca por pacotes"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-search->tooltip
 msgid "Allows search for new packages on the repository."
-msgstr "Allows search for new packages on the repository."
+msgstr "Permite busca de novos pacotes no repositório."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-button->description
 msgid "Update the Cinnamon Installer tool"
-msgstr "Update the Cinnamon Installer tool"
+msgstr "Atualize a ferramenta Cinnamon Instalador"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-button->tooltip
 msgid "Press this button to update the Cinnamon Installer tool."
-msgstr "Press this button to update the Cinnamon Installer tool."
+msgstr "Pressione este botão para atualizar a ferramenta Cinnamon instalador."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-check->description
 msgid ""
 "Enable to check for a new version of Cinnamon Installer when the menu started"
 msgstr ""
-"Enable to check for a new version of Cinnamon Installer when the menu started"
+"Permitir verificar se há uma nova versão Cinnamon instalador quando menu "
+"iniciar."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-check->tooltip
 msgid ""
 "Allows to check for a new version of Cinnamon Installer when the menu "
 "started."
 msgstr ""
-"Allows to check for a new version of Cinnamon Installer when the menu "
-"started."
+"Permite verificar se há uma nova versão do Cinnamon instalador quando o menu "
+"iniciou."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-uninstall-button->description
 msgid "Uninstall the Cinnamon Installer tool"
-msgstr "Uninstall the Cinnamon Installer tool"
+msgstr "Desinstalar a ferramenta Cinnamon instalador"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-uninstall-button->tooltip
 msgid "Press this button to uninstall the Cinnamon Installer tool."
-msgstr "Press this button to uninstall the Cinnamon Installer tool."
+msgstr ""
+"Pressione este botão para desinstalar a ferramenta Cinnamon instalador."

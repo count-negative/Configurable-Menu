@@ -1,5 +1,5 @@
 //Cinnamon Applet: Configurable Menu version v0.9-Beta
-//Release Date: 11 April 2014
+//Release Date: 12 April 2014
 //
 //Authors: Lester Carballo Pérez(https://github.com/lestcape) and Garibaldo(https://github.com/Garibaldo).
 //
