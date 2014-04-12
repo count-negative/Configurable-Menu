@@ -11830,41 +11830,44 @@ MyApplet.prototype = {
    _addEnterEvent: function(button, callback) {
       let _callback = Lang.bind(this, function() {
          try {
-            let parent = button.actor.get_parent()
-            if(parent)
-               parent = parent.get_parent();
-            if((parent)&&(parent != this.categoriesBox))
-               parent = parent.get_parent();
-            if(this._activeContainer !== this.applicationsBox && parent !== this._activeContainer) {
-               this._previousTreeItemIndex = this._selectedItemIndex;
-               this._previousTreeSelectedActor = this._activeActor;
-               this._previousSelectedActor = null;
+            if(this.lastActor != button.actor) {
+               this.lastActor = button.actor;
+               let parent = button.actor.get_parent()
+               if(parent)
+                  parent = parent.get_parent();
+               if((parent)&&(parent != this.categoriesBox))
+                  parent = parent.get_parent();
+               if(this._activeContainer !== this.applicationsBox && parent !== this._activeContainer) {
+                  this._previousTreeItemIndex = this._selectedItemIndex;
+                  this._previousTreeSelectedActor = this._activeActor;
+                  this._previousSelectedActor = null;
+               }
+               if(this._previousTreeSelectedActor && this._activeContainer !== this.categoriesBox &&
+                  parent !== this._activeContainer && button !== this._previousTreeSelectedActor) {
+                  this._previousTreeSelectedActor.set_style_class_name('menu-category-button');
+                  this._previousTreeSelectedActor.add_style_class_name('menu-category-button-' + this.theme);
+               }
+               if((parent)&&(parent != this._activeContainer)) {
+                  parent._vis_iter.reloadVisible();
+               }
+               let _maybePreviousActor = this._activeActor;
+               if(_maybePreviousActor && this._activeContainer === this.applicationsBox) {
+                  this._previousSelectedActor = _maybePreviousActor;
+                  this._clearPrevAppSelection();
+               }
+               if(parent === this.categoriesBox && !this.searchActive) {
+                  this._previousSelectedActor = _maybePreviousActor;
+                  this._clearPrevCatSelection();
+               }
+               this._activeContainer = parent;
+               this._activeActor = button.actor;
+               if(this._activeContainer) {
+                  this._selectedItemIndex = this._activeContainer._vis_iter.getAbsoluteIndexOfChild(this._activeActor);
+                  this._selectedCategoryIndex = this._activeContainer._vis_iter.getCategoryIndexOfChild(this._activeActor);
+                  this._selectedRowIndex = this._activeContainer._vis_iter.getInternalIndexOfChild(this._activeActor);
+               }
+               callback();
             }
-            if(this._previousTreeSelectedActor && this._activeContainer !== this.categoriesBox &&
-               parent !== this._activeContainer && button !== this._previousTreeSelectedActor) {
-               this._previousTreeSelectedActor.set_style_class_name('menu-category-button');
-               this._previousTreeSelectedActor.add_style_class_name('menu-category-button-' + this.theme);
-            }
-            if((parent)&&(parent != this._activeContainer)) {
-                parent._vis_iter.reloadVisible();
-            }
-            let _maybePreviousActor = this._activeActor;
-            if(_maybePreviousActor && this._activeContainer === this.applicationsBox) {
-               this._previousSelectedActor = _maybePreviousActor;
-               this._clearPrevAppSelection();
-            }
-            if(parent === this.categoriesBox && !this.searchActive) {
-               this._previousSelectedActor = _maybePreviousActor;
-               this._clearPrevCatSelection();
-            }
-            this._activeContainer = parent;
-            this._activeActor = button.actor;
-            if(this._activeContainer) {
-               this._selectedItemIndex = this._activeContainer._vis_iter.getAbsoluteIndexOfChild(this._activeActor);
-               this._selectedCategoryIndex = this._activeContainer._vis_iter.getCategoryIndexOfChild(this._activeActor);
-               this._selectedRowIndex = this._activeContainer._vis_iter.getInternalIndexOfChild(this._activeActor);
-            }
-            callback();
          } catch(e) {
             Main.notify("Error on addEnterEvent", e.message);
          }
@@ -11991,13 +11994,13 @@ MyApplet.prototype = {
          //    this.accessibleBox.refreshAccessibleItems();
          if(this.gnoMenuBox)
             this.gnoMenuBox.setSelected(_("Favorites"));
-         this.destroyVectorBox();
          this.powerBox.disableSelected();
          this.selectedAppBox.setDateTimeVisible(false);
          this.repositionActor = null;
          this._activeGnomeMenu();
          this.appMenuGnomeClose();
          this.categoriesScrollBox.scrollToActor(this._allAppsCategoryButton.actor);
+         this.destroyVectorBox();
       }
    }
 };
