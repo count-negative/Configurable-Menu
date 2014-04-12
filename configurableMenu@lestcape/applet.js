@@ -1,5 +1,5 @@
 //Cinnamon Applet: Configurable Menu version v0.9-Beta
-//Release Date: 07 March 2014
+//Release Date: 11 April 2014
 //
 //Authors: Lester Carballo Pérez(https://github.com/lestcape) and Garibaldo(https://github.com/Garibaldo).
 //
@@ -234,6 +234,67 @@ TerminalReader.prototype = {
    }
 };
 
+function PackagekitWrapper(parent) {
+   this._init(parent);
+}
+
+PackagekitWrapper.prototype = {
+   _init: function(parent) {
+      const Pk = imports.gi.PackageKitGlib;
+      this._client = new Pk.Client();
+      this.filter = Pk.PK_FILTER_ENUM_NOT_INSTALLED
+      this._cancellable = null;
+   },
+
+   searchUninstallPackage: function(pattern, callBackFunc) {
+      this.callBackFunc = callBackFunc;
+      Mainloop.idle_add(Lang.bind(this, function() {
+         try {
+            this._cancellable = new Gio.Cancellable();
+            //This generate a core dump.
+            //this._client.search_names_async(this.filter, [pattern], this._cancellable, Lang.bind(this, this._updatesProgress), Lang.bind(this, this._finishSearch));
+            let result = this._client.search_names(this.filter, [pattern], this._cancellable, Lang.bind(this, this._updatesPr));
+            if(this._cancellable) {
+               this._packages = result.get_package_array();
+               let resPkg = new Array();
+               for(let i = 0; i < this._packages.length; i++) {
+                  if(resPkg.indexOf(this._packages[i].get_name()) == -1)
+                     resPkg.push(this._packages[i].get_name());
+               }
+               if((this._packages.length > 0)&&(this.callBackFunc))
+                  this.callBackFunc(resPkg);
+            }
+         } catch(e) {
+            //Main.notify("errorkit", e.message);
+         }
+      }));
+   },
+
+   destroy: function() {
+      try {
+         if(this._cancellable) {
+            this._cancellable.cancel();
+            this._cancellable = null;
+         }
+      }
+      catch(e) {
+         Main.notify("Error on close" + this._dataStdout.is_closed(), e.message);
+      }
+   },
+
+   _finishSearch: function(progress, a, b, c, d) {
+      Main.notify("was");
+   },
+
+   _updatesPr: function(progress, a, b, c, d) {
+      //Main.notify("was");
+   },
+
+   _updatesProgress: function(progress, a, b, c, d) {
+      Main.notify("was" + progress);
+   }
+};
+
 function PackageInstallerWrapper(parent) {
    this._init(parent);
 }
@@ -251,6 +312,8 @@ PackageInstallerWrapper.prototype = {
       this.cacheSize = 30;
       this.cacheUpdate = false;
       this.pythonVer = "python3";
+      this.kitInstaller = null;
+      //this._tryToConectedPackageKit();
       //this.pathCinnamonDefaultUninstall = "/usr/bin/cinnamon-remove-application";
       //this._canCinnamonUninstallApps = GLib.file_test(this.pathCinnamonDefaultUninstall, GLib.FileTest.EXISTS);
       this.pathToLocalUpdater = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + this.parent.uuid + "/pkg_updater/Updater.py";
@@ -260,6 +323,15 @@ PackageInstallerWrapper.prototype = {
       this.gIconInstaller = new Gio.FileIcon({ file: Gio.file_new_for_path(this.pathToPkgIcon) });
       this.listButtons = new Array();
       this.pakages = [];
+   },
+
+   _tryToConectedPackageKit: function() {
+      try {
+         this.kitInstaller = new PackagekitWrapper();
+      } catch(e) {
+         //Main.notify("error", e.message);
+         this.kitInstaller = null;
+      }
    },
 
    _getUpdaterPath: function() {
@@ -323,28 +395,36 @@ PackageInstallerWrapper.prototype = {
    },
 
    executeSearch: function(pattern) {
-      this.activeSearch = ((pattern)&&(pattern.length > 2));
-      if(this.activeSearch) {
-         if(!GLib.file_test(this.pathToPKG, GLib.FileTest.IS_EXECUTABLE)) {
-            this._setChmod(this.pathToPKG, '+x');
-         }
-         let query = this.pythonVer + " " + this.pathToPKG + " --qpackage ";
-         let patternList = pattern.toLowerCase().split(" ");
-         let patternQuery = "";
-         for(patt in patternList)
-            patternQuery += patternList[patt] + ",";
-         this.activeSearch = (patternQuery.length > 3);
+      if(this.kitInstaller) {
+         this.activeSearch = ((pattern)&&(pattern.length > 2));
          if(this.activeSearch) {
-            query += "\"" + patternQuery.substring(0, patternQuery.length-1) + "\"";
-            if(this.lastedSearch)
-               this.lastedSearch.destroy();
-            this.lastedSearch = this._execCommandSyncPipe(query, Lang.bind(this, this._doSearchPackage));
+            this.kitInstaller.destroy()
+            this.kitInstaller.searchUninstallPackage(pattern, Lang.bind(this, this._doSearchPackageKit));
+         }
+      } else {
+         this.activeSearch = ((pattern)&&(pattern.length > 2));
+         if(this.activeSearch) {
+            if(!GLib.file_test(this.pathToPKG, GLib.FileTest.IS_EXECUTABLE)) {
+               this._setChmod(this.pathToPKG, '+x');
+            }
+            let query = this.pythonVer + " " + this.pathToPKG + " --qpackage ";
+            let patternList = pattern.toLowerCase().split(" ");
+            let patternQuery = "";
+            for(patt in patternList)
+               patternQuery += patternList[patt] + ",";
+            this.activeSearch = (patternQuery.length > 3);
+            if(this.activeSearch) {
+               query += "\"" + patternQuery.substring(0, patternQuery.length-1) + "\"";
+               if(this.lastedSearch)
+                  this.lastedSearch.destroy();
+               this.lastedSearch = this._execCommandSyncPipe(query, Lang.bind(this, this._doSearchPackage));
+            } else
+               this.pakages = [];
          } else
             this.pakages = [];
-      } else
-         this.pakages = [];
-      if(this.parent.menu.isOpen)
-         this.preloadCache();
+         if(this.parent.menu.isOpen)
+            this.preloadCache();
+      }
    },
 
    cleanSearch: function() {
@@ -394,6 +474,13 @@ PackageInstallerWrapper.prototype = {
       } catch(e) {
          Main.notify(e);
       }
+   },
+
+   _doSearchPackageKit: function(pakagesList) {
+      Mainloop.idle_add(Lang.bind(this, function() {
+         this.pakages = pakagesList;
+            this.parent._updateView();
+      }));
    },
 
    _createButtons: function() {
@@ -489,6 +576,7 @@ PackageInstallerWrapper.prototype = {
          let title = _("Execution of '%s' failed:").format(command);
          Main.notifyError(title, e.message);
       }
+      return null;
    },
 
    _setChmod: function(path, permissions) {
@@ -6176,42 +6264,6 @@ ConfigurableMenu.prototype = {
 
    setSourceAlignment: function(alignment) {
       this._boxPointer.setSourceAlignment(alignment);
-   },
-
-   open: function(animate) {
-      if(this.isOpen)
-         return;
-      this.setMaxHeight();
-
-      this.isOpen = true;
-        
-      if(global.menuStackLength == undefined)
-         global.menuStackLength = 0;
-      global.menuStackLength += 1;
-
-      this._boxPointer.setPosition(this.sourceActor, this._arrowAlignment);
-      this._boxPointer.show(animate);
-
-      this.actor.raise_top();
-
-      this.emit('open-state-changed', true);
-   },
-
-   close: function(animate) {
-      if(!this.isOpen)
-         return;      
-      this.isOpen = false;
-      global.menuStackLength -= 1;
-
-      Main.panel._hidePanel();
-      if(Main.panel2 != null)
-         Main.panel2._hidePanel();
-
-      if(this._activeMenuItem)
-         this._activeMenuItem.setActive(false);
-
-      this._boxPointer.hide(animate);
-      this.emit('open-state-changed', false);
    },
 
    // Setting the max-height won't do any good if the minimum height of the

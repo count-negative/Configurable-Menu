@@ -1,16 +1,14 @@
 Cinnamon Applet: Configurable Menu Version: v0.9-Beta
 
-Last version release date: 31 March 2014
+Last version release date: 11 April 2014
 ***
 Authors: Lester Carballo Pérez (https://github.com/lestcape) and Garibaldo (https://github.com/Garibaldo).
-
 Contact: lestcape@gmail.com
-
 ***
 Special thanks to:
 
 - Bernard              (https://github.com/zagortenay333) Help adding support to the Cinnamon themes.
-- Eliermi Cunha Junior (jpegrande@gmail.com)              Help finding errors and making several promotional videos.
+- Eliermi Cunha Junior (jpegrande@gmail.com)              Help finding errors, promotion and several more things.
 
 --------------
 Author of language translation:
@@ -70,29 +68,29 @@ See a complete Change log : https://github.com/lestcape/Configurable-Menu/wiki/C
 
 0.9-Beta
    - Improved the menu speed.
-   - Can Install, uninstall, and search for packages (depend on if Cinnamon Installer can run on you OS).
+   - Can Install, uninstall, and search for packages (depend on if Cinnamon Installer can run on your OS).
    - Added web search.
    - Was added support for more languages.
-   - Was added Spanish and Portugese(Br) language.
+   - Was added Spanish and Portugese(Br).
    - Now you can have a different configuration for each layout.
    - The removable drives are now show in accessible panel and also can be removed.
-   - Context menu now have the most uses option and can show also if you have the menu open.
-   - The full screen mode was improved, now can be see better in more themes.
+   - The context menu now have the most usefully options and can be showed also if you have the menu open.
+   - The full screen mode was improved, now can be show better in more themes.
    - Now the property "Maximum width of the application entry text" it's really a maximum width and not the width.
    - Added support for the old Clutter.Color API to fix the bug "Clutter.Color.from_string is not a function" when you start the applet.
    - Fixed the bug on mint and windows 7 layouts. This error involves the closure of the menu in the case of the searchEntry do not has a focus.
-   - The Menu now can be improved using the css file of any Cinnamon theme.
+   - The Menu now can be improved using the css file, of any Cinnamon theme.
    - Removed the hover icon borders, due to allow more compatibility with cinnamon themes.
    - The new layouts of Vampire, Garibaldo, GnoMenu Left, GnoMenu Right, GnoMenu Top, GnoMenu Bottom and Gnome Classic was added.
    - Several visually improvement in different layouts, especially the horizontal.
    - Now you can rename the apps on the accessible panel.
    - Changed the control buttons icons and was added the option to be symbolic or full color.
-   - You can swap top and bottom menu panels(also the box inside the the panels was swapped).
+   - You can swap top and bottom menu panels(also swap the box inside the panels).
    - Control and system buttons now can be symbolic or full color.
-   - Allow to remove the search entry.
-   - Allow to have arrow on the categories.
-   - Added the feature to Highlight newly installed apps.
-   - Added the code to call cinnamon-remove-application to be used if this work well.
+   - Allowed remove the search entry.
+   - You can have arrows in on the categories.
+   - Added the new feature of Cinnamon Menu of Highlight newly installed apps.
+   - Added the code to call cinnamon-remove-application to be used if user want, when this feature be included on Cinnamon.
 
 This program is free software:
 --------------
