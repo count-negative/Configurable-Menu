@@ -6202,6 +6202,8 @@ ConfigurableMenu.prototype = {
          this._arrowAlignment = 0.0;
          this._arrowSide = orientation;
          this.subMenu = subMenu;
+         this.effectType = "none";
+         this.effectTime = 0.4;
 
          this._boxPointer = new ConfigurablePointer(orientation,
                                                     { x_fill: true,
@@ -6228,6 +6230,14 @@ ConfigurableMenu.prototype = {
       } catch(e) {
          Main.notify("ErrorMenuCreation", e.message);
       }
+   },
+
+   setEffect: function(effect) {
+      this.effectType = effect;
+   },
+
+   setEffectTime: function(effectTime) {
+      this.effectTime = effectTime;
    },
 
    setArrowSide: function(side) {
@@ -6328,12 +6338,235 @@ ConfigurableMenu.prototype = {
          this.subMenu.close();*/
       Applet.AppletPopupMenu.prototype.open.call(this, animate);
       this.repositionActor(this.sourceActor);
+      this._applyEffectOnOpen(animate);
    },
 
    close: function(animate) {
       /*if(this.subMenu)
          this.subMenu.close();*/
+      this._applyEffectOnClose(animate);
+   },
+
+   _applyEffectOnOpen: function(animate) {
+      switch(this.effectType) {
+         case "none"  :
+            this._effectNoneOpen();
+            break;
+         case "dispel":
+            this._effectDispelOpen();
+            break;
+         case "hideHorizontal"  :
+            this._effectHideHorizontalOpen();
+            break;
+         case "hideVertical"  :
+            this._effectHideVerticalOpen();
+            break;
+         case "scale" :
+            this._effectScaleOpen();
+            break;
+      }
+   },
+
+   _applyEffectOnClose: function(animate) {
+      switch(this.effectType) {
+         case "none"  :
+            this._effectNoneClose(animate);
+            break;
+         case "dispel":
+            this._effectDispelClose();
+            break;
+         case "hideHorizontal":
+            this._effectHideHorizontalClose();
+            break;
+         case "hideVertical":
+            this._effectHideVerticalClose();
+            break;
+         case "scale":
+            this._effectScaleClose();
+            break;
+      }
+   },
+
+   _effectNoneOpen: function() {
+   },
+
+   _effectNoneClose: function(animate) {
       Applet.AppletPopupMenu.prototype.close.call(this, animate);
+   },
+
+   _effectDispelOpen: function() {
+      Tweener.addTween(this.actor,
+      {  opacity: 0,
+         time: 0,
+         transition: 'easeInSine',
+         onComplete: Lang.bind(this, function() {
+            Tweener.addTween(this.actor,
+            {  opacity: 255,
+               time: this.effectTime,
+               transition: 'easeInSine'
+            })
+         })
+      });
+   },
+
+   _effectDispelClose: function() {
+      Tweener.addTween(this.actor,
+      {  opacity: 0,
+         time: this.effectTime,
+         transition: 'easeInSine',
+         onComplete: Lang.bind(this, function() {
+            Applet.AppletPopupMenu.prototype.close.call(this, false);
+         })
+      });
+   },
+
+  _effectHideHorizontalOpen: function() {
+      let [startX, ay] = this.sourceActor.get_transformed_position();
+      Tweener.addTween(this.actor,
+      {
+         x: startX,
+         scale_x: 0,
+         opacity: 255,
+         time: 0,
+         transition: 'easeOutQuad',
+         onComplete: Lang.bind(this, function() {
+            Tweener.addTween(this.actor,
+            {
+                x: 0,
+                scale_x: 1,
+                opacity: 255,
+                time: this.effectTime
+            })
+         })
+      });
+   },
+
+   _effectHideHorizontalClose: function() {
+      let [startX, ay] = this.sourceActor.get_transformed_position();
+      Tweener.addTween(this.actor,
+      {
+         x: startX,
+         scale_x: 0,
+         opacity: 255,
+         time: this.effectTime,
+         transition: 'easeOutQuad',
+         onComplete: Lang.bind(this, function() {
+            Applet.AppletPopupMenu.prototype.close.call(this, false);
+            Tweener.addTween(this.actor,
+            {
+                x: 0,
+                scale_x: 1,
+                opacity: 255,
+                time: 0
+            })
+         })
+      });
+   },
+
+   _effectHideVerticalOpen: function() {
+      let startY = this.sourceActor.height;
+      if(this._arrowSide == St.Side.BOTTOM) {
+         let monitor = Main.layoutManager.primaryMonitor;
+         startY =  monitor.height - startY;
+      }
+      Tweener.addTween(this.actor,
+      {
+         y: startY,
+         scale_y: 0,
+         opacity: 255,
+         time: 0,
+         transition: 'easeOutQuad',
+         onComplete: Lang.bind(this, function() {
+            Tweener.addTween(this.actor,
+            {
+                y: 0,
+                scale_y: 1,
+                opacity: 255,
+                time: this.effectTime
+            })
+         })
+      });
+   },
+
+   _effectHideVerticalClose: function() {
+      let startY = this.sourceActor.height;
+      if(this._arrowSide == St.Side.BOTTOM) {
+         let monitor = Main.layoutManager.primaryMonitor;
+         startY =  monitor.height - startY;
+      }
+      Tweener.addTween(this.actor,
+      {
+         y: startY,
+         scale_y: 0,
+         opacity: 255,
+         time: this.effectTime,
+         transition: 'easeOutQuad',
+         onComplete: Lang.bind(this, function() {
+            Applet.AppletPopupMenu.prototype.close.call(this, false);
+            Tweener.addTween(this.actor,
+            {
+                y: 0,
+                scale_y: 1,
+                opacity: 255,
+                time: 0
+            })
+         })
+      });
+   },
+
+   _effectScaleOpen: function() {
+      let [ax, ay] = this.sourceActor.get_transformed_position();
+      let startX = ax;
+      let startY = this.sourceActor.height;
+      if(this._arrowSide == St.Side.BOTTOM) {
+         let monitor = Main.layoutManager.primaryMonitor;
+         startY =  monitor.height - startY;
+      }
+      Tweener.addTween(this.actor,
+      {
+         x: startX, y: startY,
+         scale_x: 0, scale_y: 0,
+         opacity: 255,
+         time: 0,
+         transition: 'easeOutQuad',
+         onComplete: Lang.bind(this, function() {
+            Tweener.addTween(this.actor,
+            {
+                x: 0, y: 0,
+                scale_x: 1, scale_y: 1,
+                opacity: 255,
+                time: this.effectTime
+            })
+         })
+      });
+   },
+
+   _effectScaleClose: function() {
+      let [ax, ay] = this.sourceActor.get_transformed_position();
+      let startX = ax;
+      let startY = this.sourceActor.height;
+      if(this._arrowSide == St.Side.BOTTOM) {
+         let monitor = Main.layoutManager.primaryMonitor;
+         startY =  monitor.height - startY;
+      }
+      Tweener.addTween(this.actor,
+      {
+         x: startX, y: startY,
+         scale_x: 0, scale_y: 0,
+         opacity: 255,
+         time: this.effectTime,
+         transition: 'easeOutQuad',
+         onComplete: Lang.bind(this, function() {
+            Applet.AppletPopupMenu.prototype.close.call(this, false);
+            Tweener.addTween(this.actor,
+            {
+                x: 0, y: 0,
+                scale_x: 1, scale_y: 1,
+                opacity: 255,
+                time: 0
+            })
+         })
+      });
    },
 
    destroy: function() {
@@ -6418,13 +6651,13 @@ ConfigurablePopupMenu.prototype = {
       //(Dalcde idea)Temporarily change source actor to Main.uiGroup to "trick"
       // the menu manager to think that right click submenus are part of it.
       this.parentMenu.sourceActor = Main.uiGroup;
-      ConfigurableMenu.prototype.open.call(this, animate);
+      Applet.AppletPopupMenu.prototype.open.call(this, animate);
    },
 
    close: function(animate) {
       this.parentMenu.sourceActor = this.parent.actor;
-      ConfigurableMenu.prototype.close.call(this, animate);
-      if(this.parent.searchEntry)
+      Applet.AppletPopupMenu.prototype.close.call(this, animate);
+      if((this.parentMenu.isOpen)&&(this.parent.searchEntry))
          this.parent.searchEntry.grab_key_focus();
    }
 };
@@ -6964,6 +7197,8 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "menu-icon", "menuIcon", this._updateIconAndLabel, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "menu-label", "menuLabel", this._updateIconAndLabel, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "allow-search", "showSearhEntry", this._setSearhEntryVisible, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "effect", "effect", this._onEffectChange, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "effect-time", "effectTime", this._onEffectTimeChange, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "swap-panels", "swapPanels", this._onSwapPanel, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "hover-delay", "hover_delay_ms", this._update_hover_delay, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "enable-autoscroll", "autoscroll_enabled", this._update_autoscroll, null);
@@ -8503,6 +8738,14 @@ MyApplet.prototype = {
       }
    },
 
+   _onEffectChange: function() {
+      this.menu.setEffect(this.effect);
+   },
+
+   _onEffectTimeChange: function() {
+      this.menu.setEffectTime(this.effectTime);
+   },
+
    _onSwapPanel: function() {
       try {
          if((this.bottomBoxSwaper)&&(this.topBoxSwaper)) {
@@ -8913,6 +9156,8 @@ MyApplet.prototype = {
       this._setFixMenuCorner();
       this._display();
       this._onSwapPanel();
+      this._onEffectChange();
+      this._onEffectTimeChange();
       this._setVisibleTimeDate();
       this._setVisibleScrollFav();
       this._setVisibleScrollCat();

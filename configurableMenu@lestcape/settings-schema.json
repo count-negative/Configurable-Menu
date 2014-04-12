@@ -62,6 +62,29 @@
         "description": "Text",
         "tooltip": "Enter custom text to show in the panel."
     },
+    "effect": {
+        "type": "combobox",
+        "description": "Effect on opening and closing:",
+        "default": "none",
+        "tooltip": "Select the effect on the menu opening and closing.",
+        "options": {
+            "None": "none",
+            "Dispel": "dispel",
+            "Hide Horizontal": "hideHorizontal",
+            "Hide Vertical": "hideVertical",
+            "Scale": "scale"
+        }
+    },
+    "effect-time": {
+        "type": "spinbutton",
+        "default": 0.4,
+        "min": 0,
+        "max": 1,
+        "step": 0.05,
+        "units": "seconds",
+        "description": "Duration of effect:",
+        "tooltip": "The time on seconds to perform the effect(More time is slower)."
+    },
     "swap-panels": {
         "type": "checkbox",
         "default": false,

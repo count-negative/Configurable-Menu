@@ -287,6 +287,38 @@ msgstr ""
 msgid "Installer and uninstaller tools:"
 msgstr ""
 
+#. configurableMenu@lestcape->settings-schema.json->effect->description
+msgid "Effect on opening and closing:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->effect->tooltip
+msgid "Select the effect on the menu opening and closing."
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->effect->options
+msgid "None"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->effect->options
+msgid "Dispel"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->effect->options
+msgid "Hide Horizontal"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->effect->options
+msgid "Hide Vertical"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->effect-time->description
+msgid "Duration of effect:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->effect-time->tooltip
+msgid "The time on seconds to perform the effect(More time is slower)."
+msgstr ""
+
 #. configurableMenu@lestcape->settings-schema.json->swap-panels->description
 msgid "Swap the top and bottom panel"
 msgstr ""

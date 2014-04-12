@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-03-24 02:14-0600\n"
+"PO-Revision-Date: 2014-04-12 02:41-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -181,6 +181,39 @@ msgstr "Opciones generales de búsqueda:"
 #. configurableMenu@lestcape->settings-schema.json->header-install->description
 msgid "Installer and uninstaller tools:"
 msgstr "Herramienta para instalar y desintalar:"
+
+#. configurableMenu@lestcape->settings-schema.json->effect->description
+msgid "Effect on opening and closing:"
+msgstr "Efecto sobre la apertura y cierre:"
+
+#. configurableMenu@lestcape->settings-schema.json->effect->tooltip
+msgid "Select the effect on the menu opening and closing."
+msgstr "Seleccionar el efecto sobre la apertura y el cierre del menú."
+
+#. configurableMenu@lestcape->settings-schema.json->effect->options
+msgid "None"
+msgstr "Ninguno"
+
+#. configurableMenu@lestcape->settings-schema.json->effect->options
+msgid "Dispel"
+msgstr "Desvanecer"
+
+#. configurableMenu@lestcape->settings-schema.json->effect->options
+msgid "Hide Horizontal"
+msgstr "Ocultar Horizontal"
+
+#. configurableMenu@lestcape->settings-schema.json->effect->options
+msgid "Hide Vertical"
+msgstr "Ocultar Vertical"
+
+#. configurableMenu@lestcape->settings-schema.json->effect-time->description
+msgid "Duration of effect:"
+msgstr "Duración del efecto:"
+
+#. configurableMenu@lestcape->settings-schema.json->effect-time->tooltip
+msgid "The time on seconds to perform the effect(More time is slower)."
+msgstr ""
+"El tiempo en segundos para realizar el efecto (Más tiempo es más lento)."
 
 #. configurableMenu@lestcape->settings-schema.json->swap-panels->description
 msgid "Swap the top and bottom panel"
