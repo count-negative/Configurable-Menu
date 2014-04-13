@@ -353,6 +353,7 @@ PackageInstallerWrapper.prototype = {
 
    preloadCache: function() { //this preload a cache for buttons..
       if(!this.cacheUpdate) {
+         let btt;
          for(let i = 0; i < this.cacheSize; i++) {
             btt = new PackageItem(this.parent.menu, this, "", this.gIconInstaller, this.iconSize, this.textWidth, this.appDesc, this.vertical, this.appWidth);
             btt.actor.realize();
@@ -487,16 +488,15 @@ PackageInstallerWrapper.prototype = {
       try {
          let btt;
          for(let i = this.listButtons.length; i < this.pakages.length; i++) {
+            if(this.parent.cancelUpdate) break;
             btt = new PackageItem(this.parent.menu, this, this.pakages[i], this.gIconInstaller, this.iconSize, this.textWidth, this.appDesc, this.vertical, this.appWidth);
             btt.actor.realize();
             this.listButtons.push(btt);
             btt.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, btt));
             this.parent._addEnterEvent(btt, Lang.bind(this, this._appEnterEvent, btt));
          }
-         for(let i = 0; i < this.listButtons.length; i++) {
-            this.listButtons[i].actor.visible = false;
-         }
          for(let i = 0; i < this.pakages.length; i++) {
+            if(this.parent.cancelUpdate) break;
             this.listButtons[i].updateData(this.pakages[i], this.iconSize, this.textWidth, this.appDesc, this.vertical, this.appWidth);
          }
          this.actorSeparator.visible = (this.pakages.length > 0);
@@ -511,7 +511,9 @@ PackageInstallerWrapper.prototype = {
          let viewBox = this.actorSearchBox.get_children();
          let currValue, falseActor;
          for(let i = 0; i < this.pakages.length; i += this.parent.iconViewCount) {
+            if(this.parent.cancelUpdate) break;
             for(let j = 0; j < this.parent.iconViewCount; j++) {
+               if(this.parent.cancelUpdate) break;
                currValue = i + j;
                if((currValue < this.pakages.length)&&(viewBox[j])) {
                   viewBox[j].add_actor(this.listButtons[currValue].actor);
@@ -530,7 +532,12 @@ PackageInstallerWrapper.prototype = {
    _makeVisible: function() {
       Mainloop.idle_add(Lang.bind(this, function() {
          for(let i = 0; i < this.pakages.length; i++) {
+            if(this.parent.cancelUpdate) break;
             this.listButtons[i].actor.visible = true;
+         }
+         for(let i = this.pakages.length; i < this.listButtons.length; i++) {
+            if(this.parent.cancelUpdate) break;
+            this.listButtons[i].actor.visible = false;
          }
       }));
    },
@@ -539,14 +546,13 @@ PackageInstallerWrapper.prototype = {
       let appBox = this.actorSearchBox.get_children();
       let appItem;
       for(let i = 0; i < appBox.length; i++) {
+         if(this.parent.cancelUpdate) break;
          appItem = appBox[i].get_children();
          if(appItem) {
             for(let j = 0; j < appItem.length; j++) {
+               if(this.parent.cancelUpdate) break;
                appBox[i].remove_actor(appItem[j]);
-               //appItem[j].destroy()
             }
-            this.actorSearchBox.remove_actor(appBox[i]);
-            appBox[i].destroy();
          }
       }
    },
@@ -7148,6 +7154,7 @@ MyApplet.prototype = {
          this._activeActor = null;
          this._applicationsBoxWidth = 0;
          this.menuIsOpening = false;
+         this.cancelUpdate = false;
          this._knownApps = new Array(); // Used to keep track of apps that are already installed, so we can highlight newly installed ones
          this._appsWereRefreshed = false;
          this.signalKeyPowerID = 0;
@@ -8379,18 +8386,33 @@ MyApplet.prototype = {
          if(this.iconViewCount < 1)
             this.iconViewCount = 1; 
       }
-      //Main.notify("count>" + this._applicationsBoxWidth);
       this.appBoxIter.setNumberView(this.iconViewCount);
+   },
 
-      let viewBox;
+  _updateAppNumColumms: function() {
+      let newViewBox;
       let internalCat = this.applicationsBox.get_children();
+      let numberColumms, appBox;
       for(let i = 0; i < internalCat.length; i++) {
+         if(this.cancelUpdate) break;
          if(!(internalCat[i]._delegate instanceof PopupMenu.PopupSeparatorMenuItem)) {
-            for(let j = 0; j < this.iconViewCount; j++) {
-               viewBox = new St.BoxLayout({ vertical: true, width: (this._applicationsBoxWidth) });
-               internalCat[i].add(viewBox, { x_fill: false, y_fill: true, x_align: St.Align.START, y_align: St.Align.START, expand: true });
+            appBox = internalCat[i].get_children();
+            numberColumms = appBox.length;
+            for(let j = numberColumms; j < this.iconViewCount; j++) {
+               if(this.cancelUpdate) break;
+               newViewBox = new St.BoxLayout({ vertical: true, width: (this._applicationsBoxWidth) });
+               internalCat[i].add(newViewBox, { x_fill: false, y_fill: true, x_align: St.Align.START, y_align: St.Align.START, expand: true });
             }
-         }
+            for(let j = 0; j < appBox.length; j++) {
+                if(this.cancelUpdate) break;
+                appBox[j].set_width(this._applicationsBoxWidth);
+            }
+            for(let j = this.iconViewCount; j < appBox.length; j++) {
+               if(this.cancelUpdate) break;
+               internalCat[i].remove_actor(appBox[j]);
+               appBox[j].destroy();
+            }
+         }  
       }
    },
 
@@ -8504,17 +8526,19 @@ MyApplet.prototype = {
    },
 
    _updateView: function() {
-      this._clearView();
+      this.cancelUpdate = false;
       this._updateAppPrefNumIcons();
+      this._clearView();
+      this._updateAppNumColumms();
       let visibleAppButtons = this._getAppVisibleButtons();
       try {
          this.pkg.updateView();
          let currValue, falseActor;
-        // let viewBox = this.applicationsBox.get_children()[0].get_children();
          let viewBox = this.standarAppBox.get_children();
-         //Main.notify("view:" + viewBox[0]);
          for(let i = 0; i < visibleAppButtons.length; i += this.iconViewCount) {
+            if(this.cancelUpdate) break;
             for(let j = 0; j < this.iconViewCount; j++) {
+               if(this.cancelUpdate) break;
                currValue = i + j;
                if((currValue < visibleAppButtons.length)&&(viewBox[j])) {
                   viewBox[j].add_actor(visibleAppButtons[currValue].actor);   
@@ -8531,7 +8555,9 @@ MyApplet.prototype = {
          visibleAppButtons = this._getSearchVisibleButtons();
          viewBox = this.searchAppBox.get_children();
          for(let i = 0; i < visibleAppButtons.length; i += this.iconViewCount) {
+            if(this.cancelUpdate) break;
             for(let j = 0; j < this.iconViewCount; j++) {
+               if(this.cancelUpdate) break;
                currValue = i + j;
                if((currValue < visibleAppButtons.length)&&(viewBox[j])) {
                   viewBox[j].add_actor(visibleAppButtons[currValue].actor);   
@@ -8545,6 +8571,7 @@ MyApplet.prototype = {
                }
             }
          }
+
       } catch(e) {
         Main.notify("Error10", e.message);
       }
@@ -8552,29 +8579,26 @@ MyApplet.prototype = {
 
    _clearView: function() {
       this.pkg.clearView();
-      if(!(this.standarAppBox._delegate instanceof PopupMenu.PopupSeparatorMenuItem)) {
-         let appBox = this.standarAppBox.get_children();
-         let appItem;
-         for(let i = 0; i < appBox.length; i++) {
-            appItem = appBox[i].get_children();
-            if(appItem) {
-               for(let j = 0; j < appItem.length; j++)
-                  appBox[i].remove_actor(appItem[j]);
-               appBox[i].destroy();
-               this.standarAppBox.remove_actor(appBox[i]);
+      let appBox = this.standarAppBox.get_children();
+      let appItem;
+      for(let i = 0; i < appBox.length; i++) {
+         if(this.cancelUpdate) break;
+         appItem = appBox[i].get_children();
+         if(appItem) {
+            for(let j = 0; j < appItem.length; j++) {
+               if(this.cancelUpdate) break;
+               appBox[i].remove_actor(appItem[j]);
             }
          }
       }
-      if(!(this.searchAppBox._delegate instanceof PopupMenu.PopupSeparatorMenuItem)) {
-         let appBox = this.searchAppBox.get_children();
-         let appItem;
-         for(let i = 0; i < appBox.length; i++) {
-            appItem = appBox[i].get_children();
-            if(appItem) {
-               for(let j = 0; j < appItem.length; j++)
-                  appBox[i].remove_actor(appItem[j]);
-               appBox[i].destroy();
-               this.searchAppBox.remove_actor(appBox[i]);
+      appBox = this.searchAppBox.get_children();
+      for(let i = 0; i < appBox.length; i++) {
+         if(this.cancelUpdate) break;
+         appItem = appBox[i].get_children();
+         if(appItem) {
+            for(let j = 0; j < appItem.length; j++) {
+               if(this.cancelUpdate) break;
+               appBox[i].remove_actor(appItem[j]);
             }
          }
       }
@@ -9719,8 +9743,8 @@ MyApplet.prototype = {
       if(this.actorResize) {
          let [mx, my, mask] = global.get_pointer();
          let [ax, ay] = this.actorResize.get_transformed_position();
-         aw = this.actorResize.get_width();
-         ah = this.actorResize.get_height();
+         let aw = this.actorResize.get_width();
+         let ah = this.actorResize.get_height();
          let monitor = Main.layoutManager.findMonitorForActor(this.actor);
          let middelScreen = (monitor.x + monitor.width)/2;
          let [cx, cy] = this.actor.get_transformed_position();
@@ -11398,14 +11422,14 @@ MyApplet.prototype = {
          }
       }
    },
-
+/*
    _onApplicationButtonRealized: function(actor) {
       if(actor.get_width() > this._applicationsBoxWidth) {
          this._applicationsBoxWidth = actor.get_width(); // The answer to life...
          //this.applicationsBox.set_width(this.iconViewCount*this._applicationsBoxWidth + 42);
       }
    },
-
+*/
    _refreshFavs: function() {
       if(this.fRef) return false;
       this.fRef = true;
@@ -11482,6 +11506,7 @@ MyApplet.prototype = {
          this._allAppsCategoryButton = new CategoryButtonExtended(null, this.iconCatSize, this.showCategoriesIcons);
          this._addEnterEvent(this._allAppsCategoryButton, Lang.bind(this, function() {
             if(!this.searchActive) {
+               this.makeVectorBox(this._allAppsCategoryButton.actor);
                this._allAppsCategoryButton.isHovered = true;
                if(this.hover_delay > 0) {
                   Tweener.addTween(this, {
@@ -11503,7 +11528,6 @@ MyApplet.prototype = {
                   this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
                   this._select_category(null, this._allAppsCategoryButton);
                }
-               this.makeVectorBox(this._allAppsCategoryButton.actor);
             }
          }));
          this._allAppsCategoryButton.actor.connect('leave-event', Lang.bind(this, function () {
@@ -11531,6 +11555,7 @@ MyApplet.prototype = {
                   let categoryButton = new CategoryButtonExtended(dir, this.iconCatSize, this.showCategoriesIcons);
                   this._addEnterEvent(categoryButton, Lang.bind(this, function() {
                      if(!this.searchActive) {
+                        this.makeVectorBox(categoryButton.actor);
                         categoryButton.isHovered = true;
                         if(this.hover_delay > 0) {
                            Tweener.addTween(this, {
@@ -11552,7 +11577,6 @@ MyApplet.prototype = {
                            categoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
                            this._select_category(dir, categoryButton);
                         }
-                        this.makeVectorBox(categoryButton.actor);
                      }
                   }));
                   categoryButton.actor.connect('leave-event', Lang.bind(this, function () {
@@ -11651,6 +11675,7 @@ MyApplet.prototype = {
          this.placesButton = new PlaceCategoryButtonExtended(null, this.iconCatSize, this.showCategoriesIcons);
          this._addEnterEvent(this.placesButton, Lang.bind(this, function() {
             if(!this.searchActive) {
+               this.makeVectorBox(this.placesButton.actor);
                this.placesButton.isHovered = true;
                if(this.hover_delay > 0) {
                   Tweener.addTween(this, {
@@ -11670,7 +11695,6 @@ MyApplet.prototype = {
                   this._displayButtons(null, -1);
                }
                this._select_category(null, this.placesButton);
-               this.makeVectorBox(this.placesButton.actor);
             }
          }));
          this.placesButton.actor.connect('leave-event', Lang.bind(this, function () {
@@ -11723,6 +11747,7 @@ MyApplet.prototype = {
          this.recentButton = new RecentCategoryButtonExtended(null, this.iconCatSize, this.showCategoriesIcons);
          this._addEnterEvent(this.recentButton, Lang.bind(this, function() {
             if(!this.searchActive) {
+               this.makeVectorBox(this.recentButton.actor);
                this.recentButton.isHovered = true;
                if(this.hover_delay > 0) {
                   Tweener.addTween(this, {
@@ -11741,7 +11766,6 @@ MyApplet.prototype = {
                   this.recentButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
                   this._displayButtons(null, null, -1);
                }
-               this.makeVectorBox(this.recentButton.actor);
                this._select_category(null, this.recentButton);
             }
          }));
@@ -11830,6 +11854,7 @@ MyApplet.prototype = {
    _addEnterEvent: function(button, callback) {
       let _callback = Lang.bind(this, function() {
          try {
+            this.cancelUpdate = true;
             if(this.lastActor != button.actor) {
                this.lastActor = button.actor;
                let parent = button.actor.get_parent()
@@ -11898,7 +11923,7 @@ MyApplet.prototype = {
                   let applicationButton = new ApplicationButtonExtended(this, this.applicationsScrollBox, app, this.iconView, this.iconAppSize,
                                                                         this.iconMaxFavSize, this.textButtonWidth, this.appButtonDescription);
                   this._applicationsButtons.push(applicationButton);
-                  applicationButton.actor.connect('realize', Lang.bind(this, this._onApplicationButtonRealized));
+                  //applicationButton.actor.connect('realize', Lang.bind(this, this._onApplicationButtonRealized));
                   applicationButton.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, applicationButton));
                   this._addEnterEvent(applicationButton, Lang.bind(this, this._appEnterEvent, applicationButton));
                   applicationButton.category.push(top_dir.get_menu_id());
