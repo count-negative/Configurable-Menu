@@ -33,7 +33,6 @@ const Util = imports.misc.util;
 const Tweener = imports.ui.tweener;
 const Pango = imports.gi.Pango;
 const DND = imports.ui.dnd;
-const GMenu = imports.gi.GMenu;
 const Meta = imports.gi.Meta;
 const Clutter = imports.gi.Clutter;
 const Applet = imports.ui.applet;
@@ -57,7 +56,12 @@ const AppletPath = imports.ui.appletManager.applets['configurableMenu@lestcape']
 const CinnamonMenu = AppletPath.cinnamonMenu;
 const BoxPointer = imports.ui.boxpointer;
 const Gettext = imports.gettext;
-
+try {
+   APIMenu = imports.gi.CMenu;
+} catch(e) {
+   APIMenu = imports.gi.GMenu;
+}
+const CMenu = APIMenu;
 let appsys = Cinnamon.AppSystem.get_default();
 
 const USER_DESKTOP_PATH = FileUtils.getUserDesktopDir();
@@ -82,6 +86,51 @@ function _(str) {
    return Gettext.gettext(str);
 };
 
+
+function SettingComboHandler(settings, comboName) {
+   this._init(settings, comboName);
+}
+
+SettingComboHandler.prototype = {
+   _init: function(settings, comboName) {
+      this.settings = settings;
+      this.comboName = comboName;
+      this.pathToOriginalSettings = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + uuid + "/settings-schema.json";
+      this.orgSettingsJson= JSON.parse(Cinnamon.get_file_contents_utf8_sync(this.pathToOriginalSettings));
+      this.file_changed_timeout = 0;
+   },
+
+   _readDataFromCombo: function() {
+   },
+
+   _writeDataToCombo: function(json, data) {
+      try {
+         let fontItem, lengthItem, family;
+         json["search-engine"]["options"] = data;
+         let raw_file = JSON.stringify(new_json, null, 4);
+         let file = Gio.file_new_for_path(patch);
+         if(file.delete(null, null)) {
+            let f = Gio.file_new_for_path(this.file.get_path());
+            let raw = f.replace(null, false, Gio.FileCreateFlags.NONE, null);
+            let out_file = Gio.BufferedOutputStream.new_sized (raw, 4096);
+            Cinnamon.write_string_to_stream(out_file, JSON.stringify(this.json, null, 4));
+            out_file.close(null);
+            if(this.file_changed_timeout == 0)
+               this.file_changed_timeout = Mainloop.timeout_add(300, Lang.bind(this, this._reloadData))
+         } else {
+            //global.logError("Failed gain write access to settings file for applet/desklet '" + this.uuid + "', instance ") + this.instanceId;
+         }
+      } catch(e) {
+         this.showErrorMessage(e.message);
+      }
+
+      _reloadData: function() {
+         Mainloop.source_remove(this.file_changed_timeout);
+         this.file_changed_timeout = 0;
+         this.settings._maybe_update_settings_file();
+      }
+   }
+};
 
 function TerminalReader(command, callback) {
    this._init(command, callback);
@@ -5288,6 +5337,8 @@ RecentButtonExtended.prototype = {
 
    _onButtonReleaseEvent: function(actor, event) {
       if(event.get_button() == 1) {
+         //This is new on 2.2
+         //this.file.launch();
          Gio.app_info_launch_default_for_uri(this.file.uri, global.create_app_launch_context());
          this.parent.menu.close();
       }
@@ -5295,6 +5346,7 @@ RecentButtonExtended.prototype = {
 
    activate: function(event) {
       Gio.app_info_launch_default_for_uri(this.file.uri, global.create_app_launch_context());
+      //this.file.launch();
       this.parent.menu.close();
    },
 
@@ -5442,7 +5494,8 @@ FavoritesButtonExtended.prototype = {
          else
             monitorHeight = monitor.width;
          let real_size = (0.7*monitorHeight) / this.nbFavorites;
-         icon_size = 0.7*real_size;
+         if(global.ui_scale) icon_size = 0.6*real_size/global.ui_scale;
+         else icon_size = 0.6*real_size;
          if(icon_size > this.iconSize) icon_size = this.iconSize;
       }
       this.actor.set_style_class_name('menu-favorites-button');
@@ -5673,10 +5726,7 @@ CategoryButtonExtended.prototype = {
          labelName = _("All Applications");
       this.label.set_text(labelName);
       if(category && this.icon_name) {
-         if(global.ui_scale)
-            this.icon = St.TextureCache.get_default().load_gicon(null, icon, this.iconSize, global.ui_scale);
-         else
-            this.icon = St.TextureCache.get_default().load_gicon(null, icon, this.iconSize);
+         this.icon = St.TextureCache.get_default().load_gicon(null, icon, this.iconSize);
       }
    },
 
@@ -7200,7 +7250,9 @@ MyApplet.prototype = {
 
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-recent", "showRecent", this._refreshPlacesAndRecent, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "show-places", "showPlaces", this._refreshPlacesAndRecent, null);
-         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "activate-on-hover", "activateOnHover",this._updateActivateOnHover, null);                        
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "activate-on-hover", "activateOnHover",this._updateActivateOnHover, null);
+         //this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "menu-icon-custom", "menuIconCustom", this._updateIconAndLabel, null);
+                        
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "menu-icon", "menuIcon", this._updateIconAndLabel, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "menu-label", "menuLabel", this._updateIconAndLabel, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "allow-search", "showSearhEntry", this._setSearhEntryVisible, null);
@@ -7333,9 +7385,11 @@ MyApplet.prototype = {
             }
          }));
          Main.placesManager.connect('places-updated', Lang.bind(this, this._refreshPlacesAndRecent));
-         Main.themeManager.connect('theme-set', Lang.bind(this, this._onChangeCinnamonTheme));
+         Main.themeManager.connect('theme-set', Lang.bind(this, this._onChangeCinnamonTheme));//this._updateIconAndLabel));cinnamon 2.2
+
          //St.TextureCache.get_default().connect("icon-theme-changed", Lang.bind(this, this._onThemeChange));
-         St.TextureCache.get_default().connect("icon-theme-changed", Lang.bind(this, this._updateSize));
+         St.TextureCache.get_default().connect("icon-theme-changed", Lang.bind(this, this._updateSize));//this.onIconThemeChanged));cinnamon 2.2
+
          this.RecentManager.connect('changed', Lang.bind(this, this._refreshPlacesAndRecent));
 
          //change this on settings //global.settings.connect("changed::menu-search-engines", Lang.bind(this, this._onSearchEnginesChanged));
@@ -7354,6 +7408,40 @@ MyApplet.prototype = {
          global.logError(e);
       }
    },
+
+   _updateIconAndLabel: function() {
+      this.menuIconCustom = true;
+      try {
+         if((this.menuIcon == global.datadir + '/theme/menu.png')&&
+            (!GLib.file_test(this.menuIcon, GLib.FileTest.EXISTS)))
+            this.menuIcon = global.datadir + '/theme/menu.svg'
+
+         if((this.menuIcon == "") || ((GLib.path_is_absolute(this.menuIcon)) &&
+            (GLib.file_test(this.menuIcon, GLib.FileTest.EXISTS)))) {
+            this.set_applet_icon_path(this.menuIcon);
+         } else if (Gtk.IconTheme.get_default().has_icon(this.menuIcon)) {
+            if(this.menuIcon.search("-symbolic") != -1)
+               this.set_applet_icon_symbolic_name(this.menuIcon);
+            else
+               this.set_applet_icon_name(this.menuIcon);
+         } else if(Gtk.IconTheme.get_default().has_icon("menu"))
+            this.set_applet_icon_name("menu");
+      } catch(e) {
+         global.logWarning("Could not load icon file \""+this.menuIcon+"\" for menu button");
+      }
+      if(this.menuLabel != "")
+         this.set_applet_label(_(this.menuLabel));
+      else
+         this.set_applet_label("");
+   },
+
+/* cinnamon 2.2
+   onIconThemeChanged: function() {
+        this._refreshApps();
+        this._refreshFavs();
+        this._refreshPlacesAndRecent;
+   },
+*/
 
    _isDirectory: function(fDir) {
       try {
@@ -11546,8 +11634,8 @@ MyApplet.prototype = {
             
          let iter = root.iter();
          let nextType;
-         while((nextType = iter.next()) != GMenu.TreeItemType.INVALID) {
-            if(nextType == GMenu.TreeItemType.DIRECTORY) {
+         while((nextType = iter.next()) != CMenu.TreeItemType.INVALID) {
+            if(nextType == CMenu.TreeItemType.DIRECTORY) {
                let dir = iter.get_directory();
                if(dir.get_is_nodisplay())
                   continue;
@@ -11906,8 +11994,8 @@ MyApplet.prototype = {
       var has_entries = false;
       var nextType;
       if(!top_dir) top_dir = dir;
-      while((nextType = iter.next()) != GMenu.TreeItemType.INVALID) {
-         if(nextType == GMenu.TreeItemType.ENTRY) {
+      while((nextType = iter.next()) != CMenu.TreeItemType.INVALID) {
+         if(nextType == CMenu.TreeItemType.ENTRY) {
             var entry = iter.get_entry();
             if(!entry.get_app_info().get_nodisplay()) {
                has_entries = true;
@@ -11946,7 +12034,7 @@ MyApplet.prototype = {
                   this._applicationsButtonFromApp[app_key].category.push(dir.get_menu_id());
                }
             }
-         } else if (nextType == GMenu.TreeItemType.DIRECTORY) {
+         } else if (nextType == CMenu.TreeItemType.DIRECTORY) {
             let subdir = iter.get_directory();
             if(this._loadCategory(subdir, top_dir)) {
                has_entries = true;
