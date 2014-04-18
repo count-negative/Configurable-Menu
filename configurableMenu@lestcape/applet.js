@@ -71,6 +71,7 @@ const USER_DESKTOP_PATH = FileUtils.getUserDesktopDir();
 //const APPLICATION_ICON_SIZE = 22;
 const MAX_RECENT_FILES = 20;
 const  CATEGORY_ARROW_SIZE = 12;
+const INITIAL_BUTTON_LOAD = 30;
 //const CATEGORY_ICON_SIZE = 22;
 /*
 const LIB_PATH = '/usr/share/cinnamon/applets/menu@cinnamon.org';
@@ -3592,6 +3593,7 @@ HoverIcon.prototype = {
          this.container = new St.BoxLayout({ vertical: false });
          this.container.add_actor(this.actor);
 
+         this.actor.set_height(this.iconSize);
          this._userIcon = new St.Icon({ icon_size: this.iconSize });
          this.icon = new St.Icon({ icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR });
          
@@ -3694,6 +3696,7 @@ HoverIcon.prototype = {
          this.icon.set_icon_size(this.iconSize);
       if(this.lastApp)
          this.lastApp.set_icon_size(this.iconSize);
+      this.actor.set_height(this.iconSize);
    },
 
    _onButtonReleaseEvent: function (actor, event) {
@@ -12067,13 +12070,11 @@ MyApplet.prototype = {
    _initialDisplay: function() {
       if(!this.displayed) {
          this._findOrientation();
-         this.initButtonLoad = 30;
-         let n = Math.min(this._applicationsButtons.length, this.initButtonLoad);
+         let n = Math.min(this._applicationsButtons.length, INITIAL_BUTTON_LOAD);
          for(let i = 0; i < n; i++) {
-            if(!this._applicationsButtons[i].actor.visible)
-               this._applicationsButtons[i].actor.show();
+            this._applicationsButtons[i].actor.show();
          }
-         Mainloop.idle_add(Lang.bind(this, this._initial_cat_selection));
+         Mainloop.idle_add(Lang.bind(this, this._initial_cat_selection, n));
          this.displayed = true;
          if(!this.fullScreen) {
             let monitor = Main.layoutManager.findMonitorForActor(this.actor);
