@@ -9934,7 +9934,6 @@ MyApplet.prototype = {
                this.idSignalTextChange = this.searchEntryText.connect('text-changed', Lang.bind(this, this._onSearchTextChanged));
          }));
          this.searchEntryText.connect('key-focus-out', Lang.bind(this, function(actor) {
-            this.menuIsOpening = true;
             if(this.idSignalTextChange > 0)
                this.searchEntryText.disconnect(this.idSignalTextChange);
             this.idSignalTextChange = 0;
