@@ -9934,7 +9934,7 @@ MyApplet.prototype = {
                this.idSignalTextChange = this.searchEntryText.connect('text-changed', Lang.bind(this, this._onSearchTextChanged));
          }));
          this.searchEntryText.connect('key-focus-out', Lang.bind(this, function(actor) {
-            //this.menuIsOpening = true;
+            this.menuIsOpening = true;
             if(this.idSignalTextChange > 0)
                this.searchEntryText.disconnect(this.idSignalTextChange);
             this.idSignalTextChange = 0;
@@ -12037,8 +12037,8 @@ MyApplet.prototype = {
       }
       else {
          this.actor.remove_style_pseudo_class('active');
+         this._select_category(null, this._allAppsCategoryButton);
          if(this.searchActive) {
-            this._select_category(null, this._allAppsCategoryButton);
             this.resetSearch();
          }
          if(this.bttChanger) 
