@@ -8432,7 +8432,7 @@ MyApplet.prototype = {
    _putFocus: function() {
       global.stage.set_key_focus(this.fav_actor);
    },
-
+/*
    _getAppVisibleButtons: function() {
       let visibleAppButtons = new Array();
       for(let i = 0; i < this._applicationsButtons.length; i++) {
@@ -8467,7 +8467,7 @@ MyApplet.prototype = {
       }
       return visibleAppButtons;
    },
-
+*/
    _updateAppPrefNumIcons: function() {
       this.aviableWidth = this.applicationsScrollBox.actor.get_allocation_box().x2-this.applicationsScrollBox.actor.get_allocation_box().x1 - 42;
       if((this.aviableWidth > 0)&&(this._applicationsBoxWidth > 0)) {// + 42
@@ -8621,20 +8621,19 @@ MyApplet.prototype = {
       this._updateAppPrefNumIcons();
       this._clearView();
       this._updateAppNumColumms();
-      let visibleAppButtons = this._getAppVisibleButtons();
       try {
          this.pkg.updateView();
          let currValue, falseActor;
          let viewBox = this.standarAppBox.get_children();
-         for(let i = 0; i < visibleAppButtons.length; i += this.iconViewCount) {
+         for(let i = 0; i < this.visibleAppButtons.length; i += this.iconViewCount) {
             if(this.cancelUpdate) break;
             for(let j = 0; j < this.iconViewCount; j++) {
                if(this.cancelUpdate) break;
                currValue = i + j;
-               if((currValue < visibleAppButtons.length)&&(viewBox[j])) {
-                  viewBox[j].add_actor(visibleAppButtons[currValue].actor);   
-                  if(visibleAppButtons[currValue].menu)
-                     viewBox[j].add_actor(visibleAppButtons[currValue].menu.actor);
+               if((currValue < this.visibleAppButtons.length)&&(viewBox[j])) {
+                  viewBox[j].add_actor(this.visibleAppButtons[currValue].actor);   
+                  if(this.visibleAppButtons[currValue].menu)
+                     viewBox[j].add_actor(this.visibleAppButtons[currValue].menu.actor);
                   else {//Remplace menu actor by a hide false actor.
                      falseActor = new St.BoxLayout();
                      falseActor.hide();
@@ -8643,17 +8642,16 @@ MyApplet.prototype = {
                }
             }
          }
-         visibleAppButtons = this._getSearchVisibleButtons();
          viewBox = this.searchAppBox.get_children();
-         for(let i = 0; i < visibleAppButtons.length; i += this.iconViewCount) {
+         for(let i = 0; i < this.visibleSearchButtons.length; i += this.iconViewCount) {
             if(this.cancelUpdate) break;
             for(let j = 0; j < this.iconViewCount; j++) {
                if(this.cancelUpdate) break;
                currValue = i + j;
-               if((currValue < visibleAppButtons.length)&&(viewBox[j])) {
-                  viewBox[j].add_actor(visibleAppButtons[currValue].actor);   
-                  if(visibleAppButtons[currValue].menu)
-                     viewBox[j].add_actor(visibleAppButtons[currValue].menu.actor);
+               if((currValue < this.visibleSearchButtons.length)&&(viewBox[j])) {
+                  viewBox[j].add_actor(this.visibleSearchButtons[currValue].actor);   
+                  if(this.visibleSearchButtons[currValue].menu)
+                     viewBox[j].add_actor(this.visibleSearchButtons[currValue].menu.actor);
                   else {//Remplace menu actor by a hide false actor.
                      falseActor = new St.BoxLayout();
                      falseActor.hide();
@@ -9354,13 +9352,9 @@ MyApplet.prototype = {
       this._setAppIconDirection();
       this._updateAppSize();
       this._refreshFavs();
-      //this._updateView();
-      //Mainloop.idle_add(Lang.bind(this, function() {
-            this._updateView();
-            this._clearAllSelections(true);
-           /* this._clearAppSize();
-            this._updateAppSize();*/
-      //}));
+      this._updateView();
+      this._select_category(null, this._allAppsCategoryButton);
+      this._clearAllSelections(true);
       if(this.fullScreen) {
          if(this.controlView) {
             this.controlView.changeResizeActive(false);
@@ -11294,19 +11288,18 @@ MyApplet.prototype = {
    },
 
    _displayButtons: function(appCategory, places, recent, apps, autocompletes, search) {
+      this.visibleAppButtons = new Array();
       if(appCategory) {
          if(appCategory == "all") {
             for(let i = 0; i < this._applicationsButtons.length; i++) {
-               if(!this._applicationsButtons[i].actor.visible) {
-                  this._applicationsButtons[i].actor.visible = true;//.show();
-               }
+               this._applicationsButtons[i].actor.visible = true;//.show();
+               this.visibleAppButtons.push(this._applicationsButtons[i]);
             }
          } else {
             for(let i = 0; i < this._applicationsButtons.length; i++) {
                if(this._applicationsButtons[i].category.indexOf(appCategory) != -1) {
-                  if(!this._applicationsButtons[i].actor.visible) {
-                     this._applicationsButtons[i].actor.visible = true;//.show();
-                  }
+                  this._applicationsButtons[i].actor.visible = true;//.show();
+                  this.visibleAppButtons.push(this._applicationsButtons[i]);
                } else {
                   if(this._applicationsButtons[i].actor.visible) {
                      this._applicationsButtons[i].actor.visible = false;//.hide();
@@ -11317,72 +11310,57 @@ MyApplet.prototype = {
       } else if(apps) {
          for(let i = 0; i < this._applicationsButtons.length; i++) {
             if(apps.indexOf(this._applicationsButtons[i].name) != -1) {
-               if(!this._applicationsButtons[i].actor.visible) {
-                  this._applicationsButtons[i].actor.visible = true;//.show();
-               }
+               this._applicationsButtons[i].actor.visible = true;//.show();
+               this.visibleAppButtons.push(this._applicationsButtons[i]);
             } else {
-               if(this._applicationsButtons[i].actor.visible) {
-                  this._applicationsButtons[i].actor.visible = false;//.hide();
-               }
+               this._applicationsButtons[i].actor.visible = false;//.hide();
             }
          }
       } else {
          for(let i = 0; i < this._applicationsButtons.length; i++) {
-            if(this._applicationsButtons[i].actor.visible) {
-               this._applicationsButtons[i].actor.visible = false;//.hide();
-            }
+            this._applicationsButtons[i].actor.visible = false;//.hide();
          }
       }
       if(places) {
          if(places == -1) {
             for(let i = 0; i < this._placesButtons.length; i++) {
                this._placesButtons[i].actor.visible = true;//.show();
+               this.visibleAppButtons.push(this._placesButtons[i]);
             }
          } else {
             for(let i = 0; i < this._placesButtons.length; i++) {
                if(places.indexOf(this._placesButtons[i].button_name) != -1) {
-                  if(!this._placesButtons[i].actor.visible) {
-                     this._placesButtons[i].actor.visible = true;//.show();
-                  }
+                  this._placesButtons[i].actor.visible = true;//.show();
+                  this.visibleAppButtons.push(this._placesButtons[i]);
                } else {
-                  if(this._placesButtons[i].actor.visible) {
-                     this._placesButtons[i].actor.visible = false;//.hide();
-                  }
+                  this._placesButtons[i].actor.visible = false;//.hide();
                }
             }
          }
       } else {
          for(let i = 0; i < this._placesButtons.length; i++) {
-            if(this._placesButtons[i].actor.visible) {
-               this._placesButtons[i].actor.visible = false;//.hide();
-            }
+            this._placesButtons[i].actor.visible = false;//.hide();
          }
       }
       if(recent) {
          if(recent == -1) {
             for(let i = 0; i < this._recentButtons.length; i++) {
-               if(!this._recentButtons[i].actor.visible) {
-                  this._recentButtons[i].actor.visible = true;//.show();
-               }
+               this._recentButtons[i].actor.visible = true;//.show();
+               this.visibleAppButtons.push(this._recentButtons[i]);
             }
          } else {
             for(let i = 0; i < this._recentButtons.length; i++) {
                if(recent.indexOf(this._recentButtons[i].button_name) != -1) {
-                  if(!this._recentButtons[i].actor.visible) {
-                     this._recentButtons[i].actor.visible = true;//.show();
-                  }
+                  this._recentButtons[i].actor.visible = true;//.show();
+                  this.visibleAppButtons.push(this._recentButtons[i]);
                } else {
-                  if(this._recentButtons[i].actor.visible) {
-                     this._recentButtons[i].actor.visible = false;//.hide();
-                  }
+                  this._recentButtons[i].actor.visible = false;//.hide();
                }
             }
          }
       } else {
          for(let i = 0; i < this._recentButtons.length; i++) {
-            if(this._recentButtons[i].actor.visible) {
-               this._recentButtons[i].actor.visible = false;//.hide();
-            }
+            this._recentButtons[i].actor.visible = false;//.hide();
          }
       }
 
@@ -11405,13 +11383,16 @@ MyApplet.prototype = {
             this._addEnterEvent(button, Lang.bind(this, this._appEnterEvent, button));
             this._transientButtons.push(button);
             button.actor.visible = true;
+            this.visibleAppButtons.push(button);
             button.actor.realize();
          }
       }
+      this.visibleSearchButtons = new Array();
       if(search) {
          this.searchAppSeparator.actor.show();
          for(let i = 0; i < this._searchItems.length; i++) {
             this._searchItems[i].actor.visible = true;
+            this.visibleSearchButtons.push(this._searchItems[i]);
             this._searchItems[i].actor.style_class = "menu-application-button";
             if(!(this._searchItems[i] instanceof PopupMenu.PopupSeparatorMenuItem))
                this._searchItems[i].setString(search);
