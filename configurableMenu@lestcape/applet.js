@@ -538,7 +538,6 @@ PackageInstallerWrapper.prototype = {
       try {
          let btt;
          for(let i = this.listButtons.length; i < this.pakages.length; i++) {
-            //if(this.parent.cancelUpdate) break;
             btt = new PackageItem(this.parent.menu, this, this.pakages[i], this.gIconInstaller, this.iconSize, this.textWidth, this.appDesc, this.vertical, this.appWidth);
             btt.actor.realize();
             this.listButtons.push(btt);
@@ -546,7 +545,6 @@ PackageInstallerWrapper.prototype = {
             this.parent._addEnterEvent(btt, Lang.bind(this, this._appEnterEvent, btt));
          }
          for(let i = 0; i < this.pakages.length; i++) {
-            //if(this.parent.cancelUpdate) break;
             this.listButtons[i].updateData(this.pakages[i], this.iconSize, this.textWidth, this.appDesc, this.vertical, this.appWidth);
          }
          this.actorSeparator.visible = (this.pakages.length > 0);
@@ -556,38 +554,37 @@ PackageInstallerWrapper.prototype = {
    },
 
    updateView: function() {
-      try {
-         this._createButtons();
-         let viewBox = this.actorSearchBox.get_children();
-         let currValue, falseActor;
-         for(let i = 0; i < this.pakages.length; i += viewBox.length) {
-            //if(this.parent.cancelUpdate) break;
-            currValue = i;
-            for(let j = 0; j < viewBox.length; j++) {
-               //if(this.parent.cancelUpdate) break;
-               if(currValue < this.pakages.length) {
-                  viewBox[j].add_actor(this.listButtons[currValue].actor);
-                  falseActor = new St.BoxLayout();
-                  falseActor.hide();
-                  viewBox[j].add_actor(falseActor);
+      if(this.pakages.length > 0) {
+         try { 
+            this._createButtons();
+            let viewBox = this.actorSearchBox.get_children();
+            let currValue, falseActor;
+            for(let i = 0; i < this.pakages.length; i += viewBox.length) {
+               currValue = i;
+               for(let j = 0; j < viewBox.length; j++) {
+                  if(currValue < this.pakages.length) {
+                     viewBox[j].add_actor(this.listButtons[currValue].actor);
+                     falseActor = new St.BoxLayout();
+                     falseActor.hide();
+                     viewBox[j].add_actor(falseActor);
+                  }
+                  currValue++;
                }
-               currValue++;
             }
+            this._makeVisible();
+         } catch(e) {
+            Main.notify("err", e.message);
          }
-         this._makeVisible();
-      } catch(e) {
-         Main.notify("err", e.message);
-      }
+      } else
+         this.actorSeparator.visible = false;
    },
 
    _makeVisible: function() {
       Mainloop.idle_add(Lang.bind(this, function() {
          for(let i = 0; i < this.pakages.length; i++) {
-            //if(this.parent.cancelUpdate) break;
             this.listButtons[i].actor.visible = true;
          }
          for(let i = this.pakages.length; i < this.listButtons.length; i++) {
-            //if(this.parent.cancelUpdate) break;
             this.listButtons[i].actor.visible = false;
          }
       }));
@@ -597,10 +594,8 @@ PackageInstallerWrapper.prototype = {
       let appBox = this.actorSearchBox.get_children();
       let appItem;
       for(let i = 0; i < appBox.length; i++) {
-         //if(this.parent.cancelUpdate) break;
          appItem = appBox[i].get_children();
          for(let j = 0; j < appItem.length; j++) {
-            //if(this.parent.cancelUpdate) break;
             appBox[i].remove_actor(appItem[j]);
          }
       }
@@ -1835,7 +1830,7 @@ AccessibleBox.prototype = {
       }
       return false;
    },
-
+/*
    closeContextMenus: function(excludeApp, animate) {
       for(var app in this._staticButtons) {
          if((app!=excludeApp)&&(this._staticButtons[app].menu)&&(this._staticButtons[app].menu.isOpen)) {
@@ -1847,7 +1842,7 @@ AccessibleBox.prototype = {
          }
       }
    },
-
+*/
    takeHover: function(take) {
       let parent = this.hover.container.get_parent();
       if(parent) {
@@ -3249,12 +3244,12 @@ GenericApplicationButtonExtended.prototype = {
       if(event.get_button()==3) {
          if(this.withMenu) {
             if(!this.menu.isOpen) {
-               this.parent.closeApplicationsContextMenus(this.app, true);
+               this.parent.closeApplicationsContextMenus(true);
                this.actor.get_parent().set_height(200);
                this.toggleMenu();
+               this.parent._previousContextMenuOpen = this;
                this.actor.get_parent().set_height(-1);
                this.parent._updateSize();
-
             } else {
                this.toggleMenu();
                Mainloop.idle_add(Lang.bind(this, function() {
@@ -3354,7 +3349,7 @@ GenericApplicationButtonExtended.prototype = {
          }
       }
       this.menu.toggle();
-      this.parent._updateSize();
+      //this.parent._updateSize();
    },
     
    _subMenuOpenStateChanged: function() {
@@ -3368,7 +3363,7 @@ GenericApplicationButtonExtended.prototype = {
 /*
       if(symbol == Clutter.KEY_space) {
          if((this.withMenu) && (!this.menu.isOpen)) {
-            this.parent.closeApplicationsContextMenus(this.app, true);
+            this.parent.closeApplicationsContextMenus(true);
          }
          this.toggleMenu();
          return true;
@@ -5031,7 +5026,8 @@ PlaceButtonAccessibleExtended.prototype = {
       }
       if(event.get_button()==3) {
          if((this.withMenu) && (!this.menu.isOpen)) {
-            this.parent.closeApplicationsContextMenus(this.app, true);
+            this.parent.closeApplicationsContextMenus(true);
+            this.parent._previousContextMenuOpen = this;
          } else {
             this.editText(false);
          }
@@ -5289,9 +5285,9 @@ PlaceButtonExtended.prototype = {
          this.activate(event);
       }
       if(event.get_button()==3) {
-
          if((this.withMenu) && (!this.menu.isOpen)) {
-            this.parent.closeApplicationsContextMenus(this.app, true);
+            this.parent.closeApplicationsContextMenus(true);
+            this.parent._previousContextMenuOpen = this;
          }
          //Main.notify("nnoo " + this.withMenu);
          this.toggleMenu();
@@ -6391,11 +6387,19 @@ ConfigurableMenu.prototype = {
       this._boxPointer.shiftPosition(x, y);
    },
 
+   openClean: function(animate) {
+      Applet.AppletPopupMenu.prototype.open.call(this, animate);
+      this.repositionActor(this.sourceActor);
+   },
+
+   closeClean: function(animate) {
+      Applet.AppletPopupMenu.prototype.close.call(this, animate);
+   },
+
    open: function(animate) {
       /*if(this.subMenu)
          this.subMenu.close();*/
-      Applet.AppletPopupMenu.prototype.open.call(this, animate);
-      this.repositionActor(this.sourceActor);
+      this.openClean(animate);
       this._applyEffectOnOpen(animate);
    },
 
@@ -6449,7 +6453,7 @@ ConfigurableMenu.prototype = {
    },
 
    _effectNoneClose: function(animate) {
-      Applet.AppletPopupMenu.prototype.close.call(this, animate);
+      this.closeClean(animate);
    },
 
    _effectDispelOpen: function() {
@@ -7108,7 +7112,7 @@ PlacesGnome.prototype = {
          this._listPlaces.push(button);
       }
    },
-
+/*
    closeAllContextMenu: function(excludeApp, animate) {
       let menuC;
       for(let i = 0; i < this._listPlaces.length; i++) {
@@ -7121,7 +7125,7 @@ PlacesGnome.prototype = {
          }
       }
    },
-
+*/
    _removeRemovable: function() {
       let placesChilds = this.removablePlaces.get_children();
       for(let i = 0; i < placesChilds.length; i++) {
@@ -7198,6 +7202,7 @@ MyApplet.prototype = {
          this._recentButtons = new Array();
          this._categoryButtons = new Array();
          this._selectedItemIndex = null;
+         this._previousContextMenuOpen = null;
          this._previousTreeItemIndex = null;
          this._previousSelectedActor = null;
          this._previousVisibleIndex = null;
@@ -7206,7 +7211,6 @@ MyApplet.prototype = {
          this._activeActor = null;
          this._applicationsBoxWidth = 0;
          this.menuIsOpening = false;
-         this.cancelUpdate = false;
          this._knownApps = new Array(); // Used to keep track of apps that are already installed, so we can highlight newly installed ones
          this._appsWereRefreshed = false;
          this.signalKeyPowerID = 0;
@@ -8435,34 +8439,35 @@ MyApplet.prototype = {
    _updateAppPrefNumIcons: function() {
       this.aviableWidth = this.applicationsScrollBox.actor.get_allocation_box().x2-this.applicationsScrollBox.actor.get_allocation_box().x1 - 42;
       if((this.aviableWidth > 0)&&(this._applicationsBoxWidth > 0)) {// + 42
-         this.iconViewCount = Math.floor(this.aviableWidth/this._applicationsBoxWidth);
-         if(this.iconViewCount*this._applicationsBoxWidth > this.aviableWidth)
-            this.iconViewCount--;
-         if(this.iconViewCount < 1)
-            this.iconViewCount = 1; 
+         let newNumber = Math.floor(this.aviableWidth/this._applicationsBoxWidth);
+         if(newNumber*this._applicationsBoxWidth > this.aviableWidth)
+            newNumber--;
+         if(newNumber < 1)
+            newNumber = 1;
+         if(this.iconViewCount != newNumber) {
+            this.iconViewCount = newNumber;
+            this.appBoxIter.setNumberView(this.iconViewCount);
+            return true;
+         }
       }
-      this.appBoxIter.setNumberView(this.iconViewCount);
+      return false;
    },
 
   _updateAppNumColumms: function() {
       let internalCat = this.applicationsBox.get_children();
       let appBox, newViewBox;
       for(let i = 0; i < internalCat.length; i++) {
-         //if(this.cancelUpdate) break;
          if(!(internalCat[i]._delegate instanceof PopupMenu.PopupSeparatorMenuItem)) {
             appBox = internalCat[i].get_children();
             for(let j = appBox.length; j < this.iconViewCount; j++) {
-               //if(this.cancelUpdate) break;
                newViewBox = new St.BoxLayout({ vertical: true, width: (this._applicationsBoxWidth) });
                internalCat[i].add(newViewBox, { x_fill: false, y_fill: true, x_align: St.Align.START, y_align: St.Align.START, expand: true });
             }
             for(let j = this.iconViewCount; j < appBox.length; j++) {
-               //if(this.cancelUpdate) break;
                internalCat[i].remove_actor(appBox[j]);
                appBox[j].destroy();
             }
             for(let j = 0; j < appBox.length; j++) {
-                //if(this.cancelUpdate) break;
                 appBox[j].set_width(this._applicationsBoxWidth);
             }
          }  
@@ -8579,8 +8584,7 @@ MyApplet.prototype = {
    },
 
    _updateView: function() {
-      //this.cancelUpdate = false;
-      this._updateAppPrefNumIcons();
+      this._updateAppPrefNumIcons()
       this._clearView();
       this._updateAppNumColumms();
       try {
@@ -8588,10 +8592,8 @@ MyApplet.prototype = {
          let currValue, falseActor;
          let viewBox = this.standarAppBox.get_children();
          for(let i = 0; i < this.visibleAppButtons.length; i += viewBox.length) {
-            //if(this.cancelUpdate) break;
             currValue = i;
             for(let j = 0; j < viewBox.length; j++) {
-               //if(this.cancelUpdate) break;
                if(currValue < this.visibleAppButtons.length) {
                   viewBox[j].add_actor(this.visibleAppButtons[currValue].actor);   
                   if(this.visibleAppButtons[currValue].menu)
@@ -8605,23 +8607,23 @@ MyApplet.prototype = {
                currValue++;
             }
          }
-         viewBox = this.searchAppBox.get_children();
-         for(let i = 0; i < this.visibleSearchButtons.length; i += viewBox.length) {
-            //if(this.cancelUpdate) break;
-            currValue = i;
-            for(let j = 0; j < viewBox.length; j++) {
-               //if(this.cancelUpdate) break;
-               if(currValue < this.visibleSearchButtons.length) {
-                  viewBox[j].add_actor(this.visibleSearchButtons[currValue].actor);   
-                  if(this.visibleSearchButtons[currValue].menu)
-                     viewBox[j].add_actor(this.visibleSearchButtons[currValue].menu.actor);
-                  else {//Remplace menu actor by a hide false actor.
-                     falseActor = new St.BoxLayout();
-                     falseActor.hide();
-                     viewBox[j].add_actor(falseActor);
+         if(this.visibleSearchButtons) {
+            viewBox = this.searchAppBox.get_children();
+            for(let i = 0; i < this.visibleSearchButtons.length; i += viewBox.length) {
+               currValue = i;
+               for(let j = 0; j < viewBox.length; j++) {
+                  if(currValue < this.visibleSearchButtons.length) {
+                     viewBox[j].add_actor(this.visibleSearchButtons[currValue].actor);   
+                     if(this.visibleSearchButtons[currValue].menu)
+                        viewBox[j].add_actor(this.visibleSearchButtons[currValue].menu.actor);
+                     else {//Remplace menu actor by a hide false actor.
+                        falseActor = new St.BoxLayout();
+                        falseActor.hide();
+                        viewBox[j].add_actor(falseActor);
+                     }
                   }
+                  currValue++;
                }
-               currValue++;
             }
          }
       } catch(e) {
@@ -8634,20 +8636,18 @@ MyApplet.prototype = {
       let appBox = this.standarAppBox.get_children();
       let appItem;
       for(let i = 0; i < appBox.length; i++) {
-         //if(this.cancelUpdate) break;
          appItem = appBox[i].get_children();
          for(let j = 0; j < appItem.length; j++) {
-            //if(this.cancelUpdate) break;
             appBox[i].remove_actor(appItem[j]);
          }
       }
-      appBox = this.searchAppBox.get_children();
-      for(let i = 0; i < appBox.length; i++) {
-         //if(this.cancelUpdate) break;
-         appItem = appBox[i].get_children();
-         for(let j = 0; j < appItem.length; j++) {
-            //if(this.cancelUpdate) break;
-            appBox[i].remove_actor(appItem[j]);
+      if(this.visibleSearchButtons) {
+         appBox = this.searchAppBox.get_children();
+         for(let i = 0; i < appBox.length; i++) {
+            appItem = appBox[i].get_children();
+            for(let j = 0; j < appItem.length; j++) {
+               appBox[i].remove_actor(appItem[j]);
+            }
          }
       }
    },
@@ -9325,6 +9325,12 @@ MyApplet.prototype = {
          this._activeResize();
       }
       this._alignSubMenu();
+      this.menu.actor.y = -10000;
+      this.menu.openClean();
+      Mainloop.idle_add(Lang.bind(this, function() {
+         this.menu.actor.y = 0;
+         this.menu.closeClean();
+      }));
    },
 
    _activeResize: function() {
@@ -9385,11 +9391,14 @@ MyApplet.prototype = {
    
             this.mainBox.set_width(monitor.width - this.menu.actor.width + this.mainBox.width);
             this.mainBox.set_height(monitor.height - panelButton - panelTop + bordersY - difference);
-            this._updateView();
+            //this._updateView();
             if((this.theme == "windows7")||(this.theme == "mint")) {
                this.controlBoxStart.visible = false;
                this.controlBoxStart.visible = true;
             }
+            Mainloop.idle_add(Lang.bind(this, function() {
+            this._updateView();
+            }));
          } else if(this.automaticSize) {
             this.mainBox.set_width(-1);
             this.mainBox.set_height(-1);
@@ -10974,9 +10983,6 @@ MyApplet.prototype = {
             this.appMenuGnome.repositionActor(this.menu.actor);
             this.appMenuGnome.shiftPosition(0, 0);
          }
-
-         
-
          //this._updateSize();
          return true;
       }
@@ -11206,44 +11212,26 @@ MyApplet.prototype = {
       if(categoryButton) {
          if(dir) {
             this._displayButtons(this._listApplications(dir.get_menu_id()));
-         } else if((categoryButton != this.recentButton)&&(categoryButton != this.placesButton)) {
+         } else if(categoryButton == this.placesButton) {
+            this._displayButtons(null, -1);
+         } else if(categoryButton == this.recentButton) {
+            this._displayButtons(null, null, -1);
+         } else {//all
             this._displayButtons(this._listApplications(null));
          }
          this.openGnomeMenu(categoryButton.actor);
       }
-      this.closeApplicationsContextMenus(null, false);
+      this.closeApplicationsContextMenus(false);
    },
 
-   closeApplicationsContextMenus: function(excludeApp, animate) {
-      for(var app in this._applicationsButtons) {
-         if((app!=excludeApp)&&(this._applicationsButtons[app].menu)&&(this._applicationsButtons[app].menu.isOpen)) {
-            if(animate)
-               this._applicationsButtons[app].toggleMenu();
-            else
-               this._applicationsButtons[app].closeMenu();
-         }
+   closeApplicationsContextMenus: function(animate) {
+      if((this._previousContextMenuOpen)&&(this._previousContextMenuOpen.menu)&&(this._previousContextMenuOpen.menu.isOpen)) {
+         if(animate)
+            this._previousContextMenuOpen.toggleMenu();
+         else
+            this._previousContextMenuOpen.closeMenu();
       }
-      for(var app in this._favoritesButtons) {
-         if((app!=excludeApp)&&(this._favoritesButtons[app].menu)&&(this._favoritesButtons[app].menu.isOpen)) {
-            if(animate)
-               this._favoritesButtons[app].toggleMenu();
-            else
-               this._favoritesButtons[app].closeMenu();
-         }
-      }
-      for(var app in this._placesButtons) {
-         if((app!=excludeApp)&&(this._placesButtons[app].menu)&&(this._placesButtons[app].menu.isOpen)) {
-            if(animate)
-               this._placesButtons[app].toggleMenu();
-            else
-               this._placesButtons[app].closeMenu();
-         }
-      }
-      if(this.accessibleBox)
-         this.accessibleBox.closeContextMenus(excludeApp, animate);
-      if(this.placesObj)
-         this.placesObj.closeAllContextMenu(null, animate);
-      //this._updateSize();
+      this._previousContextMenuOpen = null;
    },
 
    _displayButtons: function(appCategory, places, recent, apps, autocompletes, search) {
@@ -11251,85 +11239,60 @@ MyApplet.prototype = {
       if(appCategory) {
          if(appCategory == "all") {
             for(let i = 0; i < this._applicationsButtons.length; i++) {
-               this._applicationsButtons[i].actor.visible = true;//.show();
                this.visibleAppButtons.push(this._applicationsButtons[i]);
             }
          } else {
             for(let i = 0; i < this._applicationsButtons.length; i++) {
                if(this._applicationsButtons[i].category.indexOf(appCategory) != -1) {
-                  this._applicationsButtons[i].actor.visible = true;//.show();
                   this.visibleAppButtons.push(this._applicationsButtons[i]);
-               } else {
-                  if(this._applicationsButtons[i].actor.visible) {
-                     this._applicationsButtons[i].actor.visible = false;//.hide();
-                  }
                }
             }
          }
       } else if(apps) {
          for(let i = 0; i < this._applicationsButtons.length; i++) {
             if(apps.indexOf(this._applicationsButtons[i].name) != -1) {
-               this._applicationsButtons[i].actor.visible = true;//.show();
                this.visibleAppButtons.push(this._applicationsButtons[i]);
-            } else {
-               this._applicationsButtons[i].actor.visible = false;//.hide();
             }
-         }
-      } else {
-         for(let i = 0; i < this._applicationsButtons.length; i++) {
-            this._applicationsButtons[i].actor.visible = false;//.hide();
          }
       }
       if(places) {
          if(places == -1) {
             for(let i = 0; i < this._placesButtons.length; i++) {
-               this._placesButtons[i].actor.visible = true;//.show();
                this.visibleAppButtons.push(this._placesButtons[i]);
             }
          } else {
             for(let i = 0; i < this._placesButtons.length; i++) {
                if(places.indexOf(this._placesButtons[i].button_name) != -1) {
-                  this._placesButtons[i].actor.visible = true;//.show();
                   this.visibleAppButtons.push(this._placesButtons[i]);
-               } else {
-                  this._placesButtons[i].actor.visible = false;//.hide();
                }
             }
-         }
-      } else {
-         for(let i = 0; i < this._placesButtons.length; i++) {
-            this._placesButtons[i].actor.visible = false;//.hide();
          }
       }
       if(recent) {
          if(recent == -1) {
             for(let i = 0; i < this._recentButtons.length; i++) {
-               this._recentButtons[i].actor.visible = true;//.show();
                this.visibleAppButtons.push(this._recentButtons[i]);
             }
          } else {
             for(let i = 0; i < this._recentButtons.length; i++) {
                if(recent.indexOf(this._recentButtons[i].button_name) != -1) {
-                  this._recentButtons[i].actor.visible = true;//.show();
                   this.visibleAppButtons.push(this._recentButtons[i]);
-               } else {
-                  this._recentButtons[i].actor.visible = false;//.hide();
                }
             }
          }
-      } else {
-         for(let i = 0; i < this._recentButtons.length; i++) {
-            this._recentButtons[i].actor.visible = false;//.hide();
-         }
       }
 
-      for(indexT in this._transientButtons) {
-         let parentTrans = this._transientButtons[indexT].actor.get_parent();
-         if(parentTrans)
-            parentTrans.remove_actor(this._transientButtons[indexT].actor);
-         this._transientButtons[indexT].actor.destroy();
+      if(this._transientButtons.length > 0) {
+         let parentTrans;
+         for(indexT in this._transientButtons) {
+            parentTrans = this._transientButtons[indexT].actor.get_parent();
+            if(parentTrans)
+               parentTrans.remove_actor(this._transientButtons[indexT].actor);
+            this._transientButtons[indexT].actor.destroy();
+         }
+         this._transientButtons = new Array();
       }
-      this._transientButtons = new Array();
+
       if(autocompletes) {
          let viewBox;
          for(let i = 0; i < autocompletes.length; i++) {
@@ -11346,9 +11309,8 @@ MyApplet.prototype = {
             button.actor.realize();
          }
       }
-      this.visibleSearchButtons = new Array();
       if(search) {
-         this.searchAppSeparator.actor.show();
+         this.visibleSearchButtons = new Array();
          for(let i = 0; i < this._searchItems.length; i++) {
             this._searchItems[i].actor.visible = true;
             this.visibleSearchButtons.push(this._searchItems[i]);
@@ -11356,11 +11318,16 @@ MyApplet.prototype = {
             if(!(this._searchItems[i] instanceof PopupMenu.PopupSeparatorMenuItem))
                this._searchItems[i].setString(search);
          }
-      } else {
-         this.searchAppSeparator.actor.hide();
+         if(this.visibleSearchButtons.length > 0)
+            this.searchAppSeparator.actor.show();
+         else
+            this.searchAppSeparator.actor.hide();
+      } else if(this.visibleSearchButtons) {
          for(let i in this._searchItems) {
             this._searchItems[i].actor.hide();
          }
+         this.searchAppSeparator.actor.hide();
+         this.visibleSearchButtons = null;
       }
       if(this.enablePackageSearch) {
          this.pkg.updateButtonStatus(this.iconAppSize, this.textButtonWidth, this.appButtonDescription, this.iconView, this._applicationsBoxWidth);
@@ -11584,7 +11551,7 @@ MyApplet.prototype = {
          this._allAppsCategoryButton.actor.connect('leave-event', Lang.bind(this, function () {
             this._previousSelectedActor = this._allAppsCategoryButton.actor;
             this._allAppsCategoryButton.isHovered = false;
-            this._select_category(null, null);
+            //this._select_category(null, null);
          }));
          //this.categoriesBox.add_actor(this._allAppsCategoryButton.actor);
          this._categoryButtons.push(this._allAppsCategoryButton);
@@ -11641,7 +11608,7 @@ MyApplet.prototype = {
                         }
                      }
                      categoryButton.isHovered = false;
-                     this._select_category(null, null);
+                    // this._select_category(null, null);
                   }));
                  // this.categoriesBox.add_actor(categoryButton.actor);
                   this._categoryButtons.push(categoryButton);
@@ -11735,7 +11702,10 @@ MyApplet.prototype = {
                            this._clearPrevCatSelection(this.placesButton.actor);
                            this.placesButton.actor.set_style_class_name('menu-category-button-selected');
                            this.placesButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
-                           this._displayButtons(null, -1);
+                           this._select_category(null, this.placesButton);
+                        } else {
+                           this.placesButton.actor.set_style_class_name('menu-category-button');
+                           this.placesButton.actor.add_style_class_name('menu-category-button-' + this.theme);
                         }
                      }
                   });
@@ -11743,9 +11713,9 @@ MyApplet.prototype = {
                   this._clearPrevCatSelection(this.placesButton.actor);
                   this.placesButton.actor.set_style_class_name('menu-category-button-selected');
                   this.placesButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
-                  this._displayButtons(null, -1);
+                  this._select_category(null, this.placesButton);
                }
-               this._select_category(null, this.placesButton);
+
             }
          }));
          this.placesButton.actor.connect('leave-event', Lang.bind(this, function () {
@@ -11761,7 +11731,7 @@ MyApplet.prototype = {
                }
             }
             this.placesButton.isHovered = false;
-            this._select_category(null, null);
+            //this._select_category(null, null);
          }));
          this._categoryButtons.push(this.placesButton);
          this.placesButton.setVertical(!this.categoriesBox.get_vertical());
@@ -11807,7 +11777,10 @@ MyApplet.prototype = {
                            this._clearPrevCatSelection(this.recentButton.actor);
                            this.recentButton.actor.set_style_class_name('menu-category-button-selected');
                            this.recentButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
-                           this._displayButtons(null, null, -1);
+                           this._select_category(null, this.recentButton);
+                        } else {
+                           this.recentButton.actor.set_style_class_name('menu-category-button');
+                           this.recentButton.actor.add_style_class_name('menu-category-button-' + this.theme);
                         }
                      }
                   });
@@ -11815,9 +11788,9 @@ MyApplet.prototype = {
                   this._clearPrevCatSelection(this.recentButton.actor);
                   this.recentButton.actor.set_style_class_name('menu-category-button-selected');
                   this.recentButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
-                  this._displayButtons(null, null, -1);
+                  this._select_category(null, this.recentButton);
                }
-               this._select_category(null, this.recentButton);
+
             }
          }));
          this.recentButton.actor.connect('leave-event', Lang.bind(this, function () {  
@@ -11833,7 +11806,7 @@ MyApplet.prototype = {
                }
             }
             this.recentButton.isHovered = false;
-            this._select_category(null, null);
+           // this._select_category(null, null);
          }));
 
          this.categoriesBox.get_child_at_index(0).get_child_at_index(0).add_actor(this.recentButton.actor);
@@ -11905,7 +11878,6 @@ MyApplet.prototype = {
    _addEnterEvent: function(button, callback) {
       let _callback = Lang.bind(this, function() {
          try {
-            this.cancelUpdate = true;
             if(this.lastActor != button.actor) {
                this.lastActor = button.actor;
                let parent = button.actor.get_parent()
@@ -12010,12 +11982,15 @@ MyApplet.prototype = {
    _initialDisplay: function() {
       if(!this.displayed) {
          this._findOrientation();
-         let n = Math.min(this._applicationsButtons.length, INITIAL_BUTTON_LOAD);
+         for(let i = 0; i < this._applicationsButtons.length; i++) {
+            this._applicationsButtons[i].actor.show();
+         }
+        /* let n = Math.min(this._applicationsButtons.length, INITIAL_BUTTON_LOAD);
          for(let i = 0; i < n; i++) {
             this._applicationsButtons[i].actor.show();
          }
-         Mainloop.idle_add(Lang.bind(this, this._initial_cat_selection, n));
-         this.displayed = true;
+         Mainloop.idle_add(Lang.bind(this, this._initial_cat_selection, n));*/
+
          if(!this.fullScreen) {
             let monitor = Main.layoutManager.findMonitorForActor(this.actor);
             let maxHeigth = monitor.height - this._processPanelSize(true) - this._processPanelSize(false);
@@ -12027,9 +12002,15 @@ MyApplet.prototype = {
             this._setFullScreen();
          }
          let minWidth = this._minimalWidth();
-         if(this.width < minWidth) {
-            Mainloop.idle_add(Lang.bind(this, this._updateSize));
-         }
+         //if(this.width < minWidth) {
+         //   Mainloop.idle_add(Lang.bind(this, this._updateSize));
+         //}
+         this._updateSize();
+        /* Mainloop.idle_add(Lang.bind(this, function() {
+            this.menu.actor.x = 0;
+            this.menu.close();
+         }));*/
+        this.displayed = true;
       }
    },
 
@@ -12040,16 +12021,18 @@ MyApplet.prototype = {
          this._selectedItemIndex = null;
          this._activeContainer = null;
          this._activeActor = null;
-         this._initialDisplay();
+
          this._allAppsCategoryButton.actor.set_style_class_name('menu-category-button-selected');
          this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
          this.selectedAppBox.setDateTimeVisible(this.showTimeDate);
          this.repositionGnomeCategory();
          global.stage.set_key_focus(this.searchEntry);
+         this._initialDisplay();
       }
       else {
          this.actor.remove_style_pseudo_class('active');
          if(this.searchActive) {
+            this._select_category(null, this._allAppsCategoryButton);
             this.resetSearch();
          }
          if(this.bttChanger) 
@@ -12061,7 +12044,7 @@ MyApplet.prototype = {
          this._previousTreeItemIndex = null;
          this._previousTreeSelectedActor = null;
          this._previousSelectedActor = null;
-         this.closeApplicationsContextMenus(null, false);
+         //this.closeApplicationsContextMenus(false);
          this._clearAllSelections(false);
          // this._refreshFavs();
          // if(this.accessibleBox)
