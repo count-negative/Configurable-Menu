@@ -538,7 +538,7 @@ PackageInstallerWrapper.prototype = {
       try {
          let btt;
          for(let i = this.listButtons.length; i < this.pakages.length; i++) {
-            if(this.parent.cancelUpdate) break;
+            //if(this.parent.cancelUpdate) break;
             btt = new PackageItem(this.parent.menu, this, this.pakages[i], this.gIconInstaller, this.iconSize, this.textWidth, this.appDesc, this.vertical, this.appWidth);
             btt.actor.realize();
             this.listButtons.push(btt);
@@ -546,7 +546,7 @@ PackageInstallerWrapper.prototype = {
             this.parent._addEnterEvent(btt, Lang.bind(this, this._appEnterEvent, btt));
          }
          for(let i = 0; i < this.pakages.length; i++) {
-            if(this.parent.cancelUpdate) break;
+            //if(this.parent.cancelUpdate) break;
             this.listButtons[i].updateData(this.pakages[i], this.iconSize, this.textWidth, this.appDesc, this.vertical, this.appWidth);
          }
          this.actorSeparator.visible = (this.pakages.length > 0);
@@ -560,17 +560,18 @@ PackageInstallerWrapper.prototype = {
          this._createButtons();
          let viewBox = this.actorSearchBox.get_children();
          let currValue, falseActor;
-         for(let i = 0; i < this.pakages.length; i += this.parent.iconViewCount) {
-            if(this.parent.cancelUpdate) break;
-            for(let j = 0; j < this.parent.iconViewCount; j++) {
-               if(this.parent.cancelUpdate) break;
-               currValue = i + j;
-               if((currValue < this.pakages.length)&&(viewBox[j])) {
+         for(let i = 0; i < this.pakages.length; i += viewBox.length) {
+            //if(this.parent.cancelUpdate) break;
+            currValue = i;
+            for(let j = 0; j < viewBox.length; j++) {
+               //if(this.parent.cancelUpdate) break;
+               if(currValue < this.pakages.length) {
                   viewBox[j].add_actor(this.listButtons[currValue].actor);
                   falseActor = new St.BoxLayout();
                   falseActor.hide();
                   viewBox[j].add_actor(falseActor);
                }
+               currValue++;
             }
          }
          this._makeVisible();
@@ -582,11 +583,11 @@ PackageInstallerWrapper.prototype = {
    _makeVisible: function() {
       Mainloop.idle_add(Lang.bind(this, function() {
          for(let i = 0; i < this.pakages.length; i++) {
-            if(this.parent.cancelUpdate) break;
+            //if(this.parent.cancelUpdate) break;
             this.listButtons[i].actor.visible = true;
          }
          for(let i = this.pakages.length; i < this.listButtons.length; i++) {
-            if(this.parent.cancelUpdate) break;
+            //if(this.parent.cancelUpdate) break;
             this.listButtons[i].actor.visible = false;
          }
       }));
@@ -596,13 +597,11 @@ PackageInstallerWrapper.prototype = {
       let appBox = this.actorSearchBox.get_children();
       let appItem;
       for(let i = 0; i < appBox.length; i++) {
-         if(this.parent.cancelUpdate) break;
+         //if(this.parent.cancelUpdate) break;
          appItem = appBox[i].get_children();
-         if(appItem) {
-            for(let j = 0; j < appItem.length; j++) {
-               if(this.parent.cancelUpdate) break;
-               appBox[i].remove_actor(appItem[j]);
-            }
+         for(let j = 0; j < appItem.length; j++) {
+            //if(this.parent.cancelUpdate) break;
+            appBox[i].remove_actor(appItem[j]);
          }
       }
    },
@@ -8432,42 +8431,7 @@ MyApplet.prototype = {
    _putFocus: function() {
       global.stage.set_key_focus(this.fav_actor);
    },
-/*
-   _getAppVisibleButtons: function() {
-      let visibleAppButtons = new Array();
-      for(let i = 0; i < this._applicationsButtons.length; i++) {
-         if(this._applicationsButtons[i].actor.visible) {
-            visibleAppButtons.push(this._applicationsButtons[i]);
-         }
-      }
-      for(let i = 0; i < this._placesButtons.length; i++) {
-         if(this._placesButtons[i].actor.visible) {
-            visibleAppButtons.push(this._placesButtons[i]);
-         }
-      }
-      for(let i = 0; i < this._recentButtons.length; i++) {
-         if(this._recentButtons[i].actor.visible) {
-            visibleAppButtons.push(this._recentButtons[i]);
-         }
-      }
-      for(let i = 0; i < this._transientButtons.length; i++) {
-         if(this._transientButtons[i].actor.visible) {
-            visibleAppButtons.push(this._transientButtons[i]);
-         }
-      }
-      return visibleAppButtons;
-   },
 
-   _getSearchVisibleButtons: function() {
-      let visibleAppButtons = new Array();
-      for(let i = 0; i < this._searchItems.length; i++) {
-         if(this._searchItems[i].actor.visible) {
-            visibleAppButtons.push(this._searchItems[i]);
-         }
-      }
-      return visibleAppButtons;
-   },
-*/
    _updateAppPrefNumIcons: function() {
       this.aviableWidth = this.applicationsScrollBox.actor.get_allocation_box().x2-this.applicationsScrollBox.actor.get_allocation_box().x1 - 42;
       if((this.aviableWidth > 0)&&(this._applicationsBoxWidth > 0)) {// + 42
@@ -8481,27 +8445,25 @@ MyApplet.prototype = {
    },
 
   _updateAppNumColumms: function() {
-      let newViewBox;
       let internalCat = this.applicationsBox.get_children();
-      let numberColumms, appBox;
+      let appBox, newViewBox;
       for(let i = 0; i < internalCat.length; i++) {
-         if(this.cancelUpdate) break;
+         //if(this.cancelUpdate) break;
          if(!(internalCat[i]._delegate instanceof PopupMenu.PopupSeparatorMenuItem)) {
             appBox = internalCat[i].get_children();
-            numberColumms = appBox.length;
-            for(let j = numberColumms; j < this.iconViewCount; j++) {
-               if(this.cancelUpdate) break;
+            for(let j = appBox.length; j < this.iconViewCount; j++) {
+               //if(this.cancelUpdate) break;
                newViewBox = new St.BoxLayout({ vertical: true, width: (this._applicationsBoxWidth) });
                internalCat[i].add(newViewBox, { x_fill: false, y_fill: true, x_align: St.Align.START, y_align: St.Align.START, expand: true });
             }
-            for(let j = 0; j < appBox.length; j++) {
-                if(this.cancelUpdate) break;
-                appBox[j].set_width(this._applicationsBoxWidth);
-            }
             for(let j = this.iconViewCount; j < appBox.length; j++) {
-               if(this.cancelUpdate) break;
+               //if(this.cancelUpdate) break;
                internalCat[i].remove_actor(appBox[j]);
                appBox[j].destroy();
+            }
+            for(let j = 0; j < appBox.length; j++) {
+                //if(this.cancelUpdate) break;
+                appBox[j].set_width(this._applicationsBoxWidth);
             }
          }  
       }
@@ -8617,7 +8579,7 @@ MyApplet.prototype = {
    },
 
    _updateView: function() {
-      this.cancelUpdate = false;
+      //this.cancelUpdate = false;
       this._updateAppPrefNumIcons();
       this._clearView();
       this._updateAppNumColumms();
@@ -8625,12 +8587,12 @@ MyApplet.prototype = {
          this.pkg.updateView();
          let currValue, falseActor;
          let viewBox = this.standarAppBox.get_children();
-         for(let i = 0; i < this.visibleAppButtons.length; i += this.iconViewCount) {
-            if(this.cancelUpdate) break;
-            for(let j = 0; j < this.iconViewCount; j++) {
-               if(this.cancelUpdate) break;
-               currValue = i + j;
-               if((currValue < this.visibleAppButtons.length)&&(viewBox[j])) {
+         for(let i = 0; i < this.visibleAppButtons.length; i += viewBox.length) {
+            //if(this.cancelUpdate) break;
+            currValue = i;
+            for(let j = 0; j < viewBox.length; j++) {
+               //if(this.cancelUpdate) break;
+               if(currValue < this.visibleAppButtons.length) {
                   viewBox[j].add_actor(this.visibleAppButtons[currValue].actor);   
                   if(this.visibleAppButtons[currValue].menu)
                      viewBox[j].add_actor(this.visibleAppButtons[currValue].menu.actor);
@@ -8640,15 +8602,16 @@ MyApplet.prototype = {
                      viewBox[j].add_actor(falseActor);
                   }
                }
+               currValue++;
             }
          }
          viewBox = this.searchAppBox.get_children();
-         for(let i = 0; i < this.visibleSearchButtons.length; i += this.iconViewCount) {
-            if(this.cancelUpdate) break;
-            for(let j = 0; j < this.iconViewCount; j++) {
-               if(this.cancelUpdate) break;
-               currValue = i + j;
-               if((currValue < this.visibleSearchButtons.length)&&(viewBox[j])) {
+         for(let i = 0; i < this.visibleSearchButtons.length; i += viewBox.length) {
+            //if(this.cancelUpdate) break;
+            currValue = i;
+            for(let j = 0; j < viewBox.length; j++) {
+               //if(this.cancelUpdate) break;
+               if(currValue < this.visibleSearchButtons.length) {
                   viewBox[j].add_actor(this.visibleSearchButtons[currValue].actor);   
                   if(this.visibleSearchButtons[currValue].menu)
                      viewBox[j].add_actor(this.visibleSearchButtons[currValue].menu.actor);
@@ -8658,9 +8621,9 @@ MyApplet.prototype = {
                      viewBox[j].add_actor(falseActor);
                   }
                }
+               currValue++;
             }
          }
-
       } catch(e) {
         Main.notify("Error10", e.message);
       }
@@ -8671,24 +8634,20 @@ MyApplet.prototype = {
       let appBox = this.standarAppBox.get_children();
       let appItem;
       for(let i = 0; i < appBox.length; i++) {
-         if(this.cancelUpdate) break;
+         //if(this.cancelUpdate) break;
          appItem = appBox[i].get_children();
-         if(appItem) {
-            for(let j = 0; j < appItem.length; j++) {
-               if(this.cancelUpdate) break;
-               appBox[i].remove_actor(appItem[j]);
-            }
+         for(let j = 0; j < appItem.length; j++) {
+            //if(this.cancelUpdate) break;
+            appBox[i].remove_actor(appItem[j]);
          }
       }
       appBox = this.searchAppBox.get_children();
       for(let i = 0; i < appBox.length; i++) {
-         if(this.cancelUpdate) break;
+         //if(this.cancelUpdate) break;
          appItem = appBox[i].get_children();
-         if(appItem) {
-            for(let j = 0; j < appItem.length; j++) {
-               if(this.cancelUpdate) break;
-               appBox[i].remove_actor(appItem[j]);
-            }
+         for(let j = 0; j < appItem.length; j++) {
+            //if(this.cancelUpdate) break;
+            appBox[i].remove_actor(appItem[j]);
          }
       }
    },
