@@ -9934,6 +9934,7 @@ MyApplet.prototype = {
                this.idSignalTextChange = this.searchEntryText.connect('text-changed', Lang.bind(this, this._onSearchTextChanged));
          }));
          this.searchEntryText.connect('key-focus-out', Lang.bind(this, function(actor) {
+            //this.menuIsOpening = true;
             if(this.idSignalTextChange > 0)
                this.searchEntryText.disconnect(this.idSignalTextChange);
             this.idSignalTextChange = 0;
@@ -11001,6 +11002,7 @@ MyApplet.prototype = {
             }
             this.menu.repositionActor(actor);
             this._activeContainer = null;
+            this.closeApplicationsContextMenus(false);
             //select the display;
             if(this.appletMenu.getActorForName("Main") == actor) {
                this._activeGnomeMenu(actor);
@@ -11552,6 +11554,7 @@ MyApplet.prototype = {
             this._previousSelectedActor = this._allAppsCategoryButton.actor;
             this._allAppsCategoryButton.isHovered = false;
             //this._select_category(null, null);
+            this.lastActor = null;
          }));
          //this.categoriesBox.add_actor(this._allAppsCategoryButton.actor);
          this._categoryButtons.push(this._allAppsCategoryButton);
@@ -11608,6 +11611,7 @@ MyApplet.prototype = {
                         }
                      }
                      categoryButton.isHovered = false;
+                     this.lastActor = null;
                     // this._select_category(null, null);
                   }));
                  // this.categoriesBox.add_actor(categoryButton.actor);
@@ -11731,6 +11735,7 @@ MyApplet.prototype = {
                }
             }
             this.placesButton.isHovered = false;
+            this.lastActor = null;
             //this._select_category(null, null);
          }));
          this._categoryButtons.push(this.placesButton);
@@ -11806,6 +11811,7 @@ MyApplet.prototype = {
                }
             }
             this.recentButton.isHovered = false;
+            this.lastActor = null;
            // this._select_category(null, null);
          }));
 
