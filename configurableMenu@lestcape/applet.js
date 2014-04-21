@@ -1370,6 +1370,7 @@ GnoMenuBox.prototype = {
    _createActionButtons: function() {
       this._actionButtons = new Array();
       let button = new SystemButton(this.parent, null, "emblem-favorite", _("Favorites"), _("Favorites"), this.hover, this.selectedAppBox, this.iconSize, true);
+      //let button = new CategoryButtonExtended(_("Favorites"), this.iconSize, true);
       button.actor.connect('enter-event', Lang.bind(this, this._onEnterEvent));
       button.actor.connect('leave-event', Lang.bind(this, this._onLeaveEvent));
       //button.setAction(Lang.bind(this, this._changeSelectedButton));
@@ -1513,18 +1514,12 @@ GnoMenuBox.prototype = {
    },
 
    _onEnterEvent: function(actor) {
-      this._gnoMenuSelected = -1;
-      for(let i = 0; i < this._actionButtons.length; i++) {
-         if(this._actionButtons[i].actor == actor) {
-            this._gnoMenuSelected = i;
-         } else {
-            this._setStyleActive(this._actionButtons[i], false);
-         }
-      }
+      this._gnoMenuSelected = this._actionButtons.indexOf(actor._delegate);
       if(this._gnoMenuSelected != -1) {
-         this._setStyleActive(this._actionButtons[this._gnoMenuSelected], true);
-         this.callBackFun(this._actionButtons[this._gnoMenuSelected].title);
-
+         this._setStyleActive(actor._delegate, true);
+         this.callBackFun(actor._delegate.title);
+         if((actor != this.favorites.actor)&&(this.favorites.actor.style_class.indexOf("-selected")))
+            this._setStyleActive(this.favorites, false);
       }
    },
 
@@ -1571,8 +1566,7 @@ GnoMenuBox.prototype = {
    },
 
    _onLeaveEvent: function(actor) {
-      //this._onEnterEvent(null)
-      //this.actor.add_style_class_name('menu-gno-button');
+      this._setStyleActive(actor._delegate, false);
    },
 
    showFavorites: function(showFavorites) {
@@ -3762,42 +3756,52 @@ HoverIcon.prototype = {
    },
 
    refresh: function (icon) {
-      if((icon)&&(this.icon)) {
-         this._removeIcon();
-         this.icon.set_icon_name(icon);
-         this.addActor(this.icon, 0);
-      } else
-         this.refreshFace();
+      if(this.actor.visible) {
+         if((icon)&&(this.icon)) {
+            this._removeIcon();
+            this.icon.set_icon_name(icon);
+            this.addActor(this.icon, 0);
+         } else
+            this.refreshFace();
+      }
    },
 
    refreshApp: function (app) {
-      this._removeIcon();
-      this.lastApp = app.create_icon_texture(this.iconSize);
-      if(this.lastApp) {
-         this.addActor(this.lastApp, 0);
+      if(this.actor.visible) {
+         this._removeIcon();
+         this.lastApp = app.create_icon_texture(this.iconSize);
+         if(this.lastApp) {
+            this.addActor(this.lastApp, 0);
+         }
       }
    },
 
    refreshPlace: function (place) {
-      this._removeIcon();
-      this.lastApp = place.iconFactory(this.iconSize);
-      if(this.lastApp) {
-         this.addActor(this.lastApp, 0);
+      if(this.actor.visible) {
+         this._removeIcon();
+         this.lastApp = place.iconFactory(this.iconSize);
+         if(this.lastApp) {
+            this.addActor(this.lastApp, 0);
+         }
       }
    },
 
    refreshFile: function (file) {
-      this._removeIcon();
-      this.lastApp = file.createIcon(this.iconSize);
-      if(this.lastApp) {
-         this.addActor(this.lastApp, 0);
+      if(this.actor.visible) {
+         this._removeIcon();
+         this.lastApp = file.createIcon(this.iconSize);
+         if(this.lastApp) {
+            this.addActor(this.lastApp, 0);
+         }
       }
    },
 
    refreshFace: function () {
-      this._removeIcon();
-      if(this._userIcon) {
-         this.addActor(this._userIcon, 0);
+      if(this.actor.visible) {
+         this._removeIcon();
+         if(this._userIcon) {
+            this.addActor(this._userIcon, 0);
+         }
       }
    },
 
@@ -4699,6 +4703,7 @@ SystemButton.prototype = {
       this.actor = new St.BoxLayout({ style_class:'menu-category-button', reactive: true, track_hover: true });
       this.popupButton = new SystemPopupButtom(parent, parentScroll, icon, title, description, iconSize, haveText);
       this.actor.add(this.popupButton.actor, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.actor._delegate = this;
    },
 
    setIconSymbolic: function(symbolic) {
@@ -5684,7 +5689,7 @@ CategoryButtonExtended.prototype = {
         
       this.label = new St.Label({ style_class: 'menu-category-button-label' });
       this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;//END;
       this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
       this.container = new St.BoxLayout();
       this.textBox = new St.BoxLayout({ vertical: false });
@@ -5697,16 +5702,17 @@ CategoryButtonExtended.prototype = {
          this.icon.realize();
       }
       this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: true, y_fill: false, expand: true });
-      this.addActor(this.container, { expand: true, span: 1, align: St.Align.END});
+      //this.addActor(this.container, { expand: true, align: St.Align.END});
       
       this.label.realize();
       this.setIconVisible(iconVisible);
-      this.internalActor = this.actor;
+      this.actor.destroy();
       this.actor = new St.BoxLayout({ vertical: false, reactive: true, track_hover: true });
-      this.actor.add(this.internalActor, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      //this.actor.add(this.internalActor, { x_fill: false, y_fill: true, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.actor.add(this.container, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+
       this.actor.set_style_class_name('menu-category-button');
       this.actor.add_style_class_name('menu-category-button-' + this.theme);
-      this.internalActor.set_style_class_name('');
       this.actor._delegate = this;
    },
 
@@ -5736,7 +5742,7 @@ CategoryButtonExtended.prototype = {
 
    setArrowVisible: function(visible, orientation) {
      // Main.notify("visible:" + visible);
-      this.actor.remove_actor(this.internalActor);
+      this.actor.remove_actor(this.container);
       let parentArrow = this.arrowIcon.get_parent();
       if(parentArrow)
          parentArrow.remove_actor(this.arrowIcon);
@@ -5744,15 +5750,15 @@ CategoryButtonExtended.prototype = {
       if(visible) {
          if(orientation == St.Side.RIGHT) {
             this.arrowIcon.set_icon_name('media-playback-start');
-            this.actor.add(this.internalActor, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+            this.actor.add(this.container, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
             this.actor.add(this.arrowIcon, { x_fill: false, expand: false, x_align: St.Align.END });
          } else if(orientation == St.Side.LEFT) {
             this.arrowIcon.set_icon_name('media-playback-start-rtl');
             this.actor.add(this.arrowIcon, { x_fill: false, expand: false, x_align: St.Align.END });
-            this.actor.add(this.internalActor, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+            this.actor.add(this.container, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
          }
       } else {
-         this.actor.add(this.internalActor, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+         this.actor.add(this.container, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
       }
    },
 
@@ -11042,7 +11048,8 @@ MyApplet.prototype = {
                this._activeGnomeMenu(actor);
                //this.searchEntry.visible = false;
                this.categoriesIncludes = new Array();
-               this.categoriesIncludes.push("Recently");
+               if(this.RecentManager._infosByTimestamp.length != 0)
+                  this.categoriesIncludes.push("Recently");
                this.powerBox.actor.visible = false;
                this.endVerticalBox.visible = false;
                this.hover.actor.visible = this.showHoverIcon;
@@ -11086,14 +11093,16 @@ MyApplet.prototype = {
    appMenuGnomeClose: function() {
       if(this.appMenuGnome) {
          if(this.appMenuGnome.isOpen) {
+            this.lastActor = null;
             this.appMenuGnome.close();
          }
       }
    },
 
    _activeGnomeMenu: function(actor) {
-      if(this.appletMenu)
+      if(this.appletMenu) {
          this.appletMenu.activeCategoryActor(actor);
+      }
    },
 
    onLeaveMenuGnome: function() {
@@ -11190,16 +11199,17 @@ MyApplet.prototype = {
    },
 
    _clearPrevCatSelection: function(actor) {
-      if(this._previousTreeSelectedActor && this._previousTreeSelectedActor != actor) {
-         this._previousTreeSelectedActor.set_style_class_name('menu-category-button');
-         this._previousTreeSelectedActor.add_style_class_name('menu-category-button-' + this.theme);
-         if(this._previousTreeSelectedActor._delegate) {
-            this._previousTreeSelectedActor._delegate.emit('leave-event');
-         }
-
-         if(actor !== undefined) {
-            this._previousVisibleIndex = null;
-            this._previousTreeSelectedActor = actor;
+      if(this._previousTreeSelectedActor) {
+         if(this._previousTreeSelectedActor != actor) {
+            this._previousTreeSelectedActor.set_style_class_name('menu-category-button');
+            this._previousTreeSelectedActor.add_style_class_name('menu-category-button-' + this.theme);
+            if(this._previousTreeSelectedActor._delegate) {
+               this._previousTreeSelectedActor._delegate.emit('leave-event');
+            }
+            if(actor !== undefined) {
+               this._previousVisibleIndex = null;
+               this._previousTreeSelectedActor = actor;
+            }
          }
       } else {
          for(let i = 0; i < this._categoryButtons.length; i++) {
@@ -11209,8 +11219,99 @@ MyApplet.prototype = {
       }
    },
 
+   makeVectorBox: function(actor) {
+      this.destroyVectorBox(actor);
+      let [catbox_x, catbox_y] = this.categoriesBox.get_transformed_position();
+      let [catbox_w, catbox_h] = this.categoriesBox.get_transformed_size();
+      let [appbox_x, appbox_y] = this.applicationsBox.get_transformed_position();
+      let [appbox_w, appbox_h] = this.applicationsBox.get_transformed_size();
+      if(catbox_y + catbox_h > appbox_y) {
+         this.topPosition = appbox_y;
+         this.bottomPosition = appbox_y + appbox_h;
+         if(catbox_x < appbox_x) {
+            this.horizontalPosition = appbox_x;
+            this.vectorOrientation = St.Side.RIGHT;
+         }
+         else {
+            this.horizontalPosition = appbox_x + appbox_w;
+            this.vectorOrientation = St.Side.LEFT;
+         }
+         this.current_motion_actor = actor;
+         this.actor_motion_id = actor.connect("motion-event", Lang.bind(this, this.maybeUpdateVectorBox));
+      }
+   },
+
+   maybeUpdateVectorBox: function() {
+      try {
+        if(this.vector_update_loop) {
+           Mainloop.source_remove(this.vector_update_loop);
+        }
+        if(this.isInsideVectorBox(false))
+           this.vector_update_loop = Mainloop.timeout_add(35, Lang.bind(this, this.updateVectorBox));
+        else {
+           this.updateVectorBox();
+        } 
+      } catch(e) {
+         Main.notify("error", e.message);
+      }
+   },
+
+   updateVectorBox: function(actor) {
+      if(this.current_motion_actor._delegate.isHovered) {
+         if((!this.catShow)&&(this.current_motion_actor)) {
+            if(this.lastedCategoryShow) {
+               this._previousTreeSelectedActor = null;
+               this._clearPrevCatSelection(null);
+               this.lastedCategoryShow = null;
+            }
+            this._clearPrevCatSelection(this.current_motion_actor);
+            this._select_category(this.current_motion_actor._delegate.category, this.current_motion_actor._delegate);
+            this.catShow = true;
+         }
+         let [mx, my, mask] = global.get_pointer();
+         this.mouseVectorX = mx;
+         this.mouseVectorY = my;
+      } else {
+         this.destroyVectorBox(actor);
+      }
+   },
+
+   destroyVectorBox: function(actor) {
+      if(this.actor_motion_id > 0 && this.current_motion_actor != null) {
+         this.current_motion_actor.disconnect(this.actor_motion_id);
+         this.actor_motion_id = 0;
+         this.current_motion_actor = null;
+      }
+      if(this.vector_update_loop) {
+         Mainloop.source_remove(this.vector_update_loop);
+         this.vector_update_loop = null;
+      }
+   },
+
+   isInsideVectorBox: function(ext) {
+      if(this.current_motion_actor) {
+         let [mx, my, mask] = global.get_pointer();
+         if((this.vectorOrientation == St.Side.RIGHT)&&(this.mouseVectorX >= mx)) {
+            return false;
+         }
+         let mouseWidth = Math.abs(this.mouseVectorX - mx);
+         let mouseHeight = Math.abs(this.mouseVectorY - my);
+         let currentHeigth;
+         if(my <= this.mouseVectorY)
+            currentHeigth = Math.abs(this.mouseVectorY - this.topPosition);
+         else
+            currentHeigth = Math.abs(this.mouseVectorY - this.bottomPosition);
+         let currentWidth = Math.abs(this.mouseVectorX - this.horizontalPosition);
+         let realHeigth = (mouseWidth*currentHeigth)/currentWidth;
+         return (realHeigth >= mouseHeight);
+      }
+      return false;
+   },
+
    _select_category: function(dir, categoryButton) {
       if(categoryButton) {
+         categoryButton.actor.set_style_class_name('menu-category-button-selected');
+         categoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
          if(dir) {
             this._displayButtons(this._listApplications(dir.get_menu_id()));
          } else if(categoryButton == this.placesButton) {
@@ -11484,7 +11585,7 @@ MyApplet.prototype = {
             this.favoritesObj.add(button.actor, button.menu, { y_align: St.Align.MIDDLE, x_align: St.Align.MIDDLE, y_fill: true, expand: true });
             //favoritesBox.actor.add(button.actor, { y_align: St.Align.MIDDLE, x_align: St.Align.MIDDLE, y_fill: false, expand: true });
             button.actor.connect('enter-event', Lang.bind(this, function() {
-               this._clearPrevCatSelection();
+               //this._clearPrevCatSelection();
                this.hover.refreshApp(button.app);
                if(button.app.get_description())
                   this.selectedAppBox.setSelectedText(button.app.get_name(), button.app.get_description().split("\n")[0]);
@@ -11525,35 +11626,37 @@ MyApplet.prototype = {
          this._allAppsCategoryButton = new CategoryButtonExtended(null, this.iconCatSize, this.showCategoriesIcons);
          this._addEnterEvent(this._allAppsCategoryButton, Lang.bind(this, function() {
             if(!this.searchActive) {
-               this.makeVectorBox(this._allAppsCategoryButton.actor);
                this._allAppsCategoryButton.isHovered = true;
                if(this.hover_delay > 0) {
                   Tweener.addTween(this, {
                      time: this.hover_delay, onComplete: function () {
+                        this._clearPrevCatSelection(this._allAppsCategoryButton.actor);
                         if(this._allAppsCategoryButton.isHovered) {
-                           this._clearPrevCatSelection(this._allAppsCategoryButton.actor);
-                           this._allAppsCategoryButton.actor.set_style_class_name('menu-category-button-selected');
-                           this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
                            this._select_category(null, this._allAppsCategoryButton);
-                        } else {
-                           this._allAppsCategoryButton.actor.set_style_class_name('menu-category-button-selected');
-                           this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
                         }
                      }
                   });
                } else {
-                  this._clearPrevCatSelection(this._allAppsCategoryButton.actor);
-                  this._allAppsCategoryButton.actor.set_style_class_name('menu-category-button-selected');
-                  this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
-                  this._select_category(null, this._allAppsCategoryButton);
+                  this.catShow = false;
+                  if(!this.isInsideVectorBox()) {
+                     if(this.lastedCategoryShow) {
+                        this._previousTreeSelectedActor = null;
+                        this._clearPrevCatSelection(null);
+                        this.lastedCategoryShow = null;
+                     }
+                     this._clearPrevCatSelection(this._allAppsCategoryButton.actor);
+                     this._select_category(null, this._allAppsCategoryButton);
+                     this.catShow = true;
+                  } else if(!this.lastedCategoryShow)
+                     this.lastedCategoryShow = this._allAppsCategoryButton;
                }
+               this.makeVectorBox(this._allAppsCategoryButton.actor);
             }
          }));
          this._allAppsCategoryButton.actor.connect('leave-event', Lang.bind(this, function () {
             this._previousSelectedActor = this._allAppsCategoryButton.actor;
             this._allAppsCategoryButton.isHovered = false;
             //this._select_category(null, null);
-            this.lastActor = null;
          }));
          //this.categoriesBox.add_actor(this._allAppsCategoryButton.actor);
          this._categoryButtons.push(this._allAppsCategoryButton);
@@ -11575,31 +11678,35 @@ MyApplet.prototype = {
                   let categoryButton = new CategoryButtonExtended(dir, this.iconCatSize, this.showCategoriesIcons);
                   this._addEnterEvent(categoryButton, Lang.bind(this, function() {
                      if(!this.searchActive) {
-                        this.makeVectorBox(categoryButton.actor);
                         categoryButton.isHovered = true;
                         if(this.hover_delay > 0) {
                            Tweener.addTween(this, {
                               time: this.hover_delay, onComplete: function () {
-                                 if(categoryButton.isHovered) {
-                                    this._clearPrevCatSelection(categoryButton.actor);
-                                    categoryButton.actor.set_style_class_name('menu-category-button-selected');
-                                    categoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
+                                 this._clearPrevCatSelection(categoryButton.actor);
+                                 if(categoryButton.isHovered) { 
                                     this._select_category(dir, categoryButton);
-                                 } else {
-                                    categoryButton.actor.set_style_class_name('menu-category-button');
-                                    categoryButton.actor.add_style_class_name('menu-category-button-' + this.theme);
                                  }
                               }
                            });
                         } else {
-                           this._clearPrevCatSelection(categoryButton.actor);
-                           categoryButton.actor.set_style_class_name('menu-category-button-selected');
-                           categoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
-                           this._select_category(dir, categoryButton);
+                           this.catShow = false;
+                           if(!this.isInsideVectorBox(true)) {
+                              if(this.lastedCategoryShow) {
+                                 this._previousTreeSelectedActor = null;
+                                 this._clearPrevCatSelection(null);
+                                 this.lastedCategoryShow = null;
+                              }
+                              this._clearPrevCatSelection(categoryButton.actor);
+                              this._select_category(dir, categoryButton);
+                              this.catShow = true;
+                           } else if(!this.lastedCategoryShow)
+                               this.lastedCategoryShow = categoryButton;
+                           this.makeVectorBox(categoryButton.actor);
                         }
                      }
                   }));
                   categoryButton.actor.connect('leave-event', Lang.bind(this, function () {
+                     //Main.notify("exit");
                      if(this._previousTreeSelectedActor === null) {
                         this._previousTreeSelectedActor = categoryButton.actor;
                      } else {
@@ -11610,7 +11717,6 @@ MyApplet.prototype = {
                         }
                      }
                      categoryButton.isHovered = false;
-                     this.lastActor = null;
                     // this._select_category(null, null);
                   }));
                  // this.categoriesBox.add_actor(categoryButton.actor);
@@ -11643,8 +11749,6 @@ MyApplet.prototype = {
             }
          }
          this._clearPrevCatSelection(this._allAppsCategoryButton.actor);
-         this._allAppsCategoryButton.actor.set_style_class_name('menu-category-button-selected');
-         this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
          this._select_category(null, this._allAppsCategoryButton);
       } catch(e) {Main.notify("errr", e.message);}
      // }));
@@ -11696,29 +11800,31 @@ MyApplet.prototype = {
          this.placesButton = new PlaceCategoryButtonExtended(null, this.iconCatSize, this.showCategoriesIcons);
          this._addEnterEvent(this.placesButton, Lang.bind(this, function() {
             if(!this.searchActive) {
-               this.makeVectorBox(this.placesButton.actor);
                this.placesButton.isHovered = true;
                if(this.hover_delay > 0) {
                   Tweener.addTween(this, {
                      time: this.hover_delay, onComplete: function () {
+                        this._clearPrevCatSelection(this.placesButton.actor);
                         if(this.placesButton.isHovered) {
-                           this._clearPrevCatSelection(this.placesButton.actor);
-                           this.placesButton.actor.set_style_class_name('menu-category-button-selected');
-                           this.placesButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
                            this._select_category(null, this.placesButton);
-                        } else {
-                           this.placesButton.actor.set_style_class_name('menu-category-button');
-                           this.placesButton.actor.add_style_class_name('menu-category-button-' + this.theme);
                         }
                      }
                   });
                } else {
-                  this._clearPrevCatSelection(this.placesButton.actor);
-                  this.placesButton.actor.set_style_class_name('menu-category-button-selected');
-                  this.placesButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
-                  this._select_category(null, this.placesButton);
+                  this.catShow = false;
+                  if(!this.isInsideVectorBox(true)) {
+                     if(this.lastedCategoryShow) {
+                        this._previousTreeSelectedActor = null;
+                        this._clearPrevCatSelection(null);
+                        this.lastedCategoryShow = null;
+                     }
+                     this._clearPrevCatSelection(this.placesButton.actor);
+                     this._select_category(null, this.placesButton);
+                     this.catShow = true;
+                  } else if(!this.lastedCategoryShow)
+                     this.lastedCategoryShow = this.placesButton;
+                  this.makeVectorBox(this.placesButton.actor);
                }
-
             }
          }));
          this.placesButton.actor.connect('leave-event', Lang.bind(this, function () {
@@ -11734,7 +11840,6 @@ MyApplet.prototype = {
                }
             }
             this.placesButton.isHovered = false;
-            this.lastActor = null;
             //this._select_category(null, null);
          }));
          this._categoryButtons.push(this.placesButton);
@@ -11772,29 +11877,31 @@ MyApplet.prototype = {
          this.recentButton = new RecentCategoryButtonExtended(null, this.iconCatSize, this.showCategoriesIcons);
          this._addEnterEvent(this.recentButton, Lang.bind(this, function() {
             if(!this.searchActive) {
-               this.makeVectorBox(this.recentButton.actor);
                this.recentButton.isHovered = true;
                if(this.hover_delay > 0) {
                   Tweener.addTween(this, {
                      time: this.hover_delay, onComplete: function () {
+                        this._clearPrevCatSelection(this.recentButton.actor);
                         if(this.recentButton.isHovered) {
-                           this._clearPrevCatSelection(this.recentButton.actor);
-                           this.recentButton.actor.set_style_class_name('menu-category-button-selected');
-                           this.recentButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
                            this._select_category(null, this.recentButton);
-                        } else {
-                           this.recentButton.actor.set_style_class_name('menu-category-button');
-                           this.recentButton.actor.add_style_class_name('menu-category-button-' + this.theme);
                         }
                      }
                   });
                } else {
-                  this._clearPrevCatSelection(this.recentButton.actor);
-                  this.recentButton.actor.set_style_class_name('menu-category-button-selected');
-                  this.recentButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
-                  this._select_category(null, this.recentButton);
+                  this.catShow = false;
+                  if(!this.isInsideVectorBox(true)) {
+                     if(this.lastedCategoryShow) {
+                        this._previousTreeSelectedActor = null;
+                        this._clearPrevCatSelection(null);
+                        this.lastedCategoryShow = null;
+                     }
+                     this._clearPrevCatSelection(this.recentButton.actor);
+                     this._select_category(null, this.recentButton);
+                     this.catShow = true;
+                  } else if(!this.lastedCategoryShow)
+                     this.lastedCategoryShow = this.recentButton;
+                  this.makeVectorBox(this.recentButton.actor);
                }
-
             }
          }));
          this.recentButton.actor.connect('leave-event', Lang.bind(this, function () {  
@@ -11810,7 +11917,7 @@ MyApplet.prototype = {
                }
             }
             this.recentButton.isHovered = false;
-            this.lastActor = null;
+            //.lastActor = null;
            // this._select_category(null, null);
          }));
 
@@ -11910,7 +12017,7 @@ MyApplet.prototype = {
                }
                if(parent === this.categoriesBox && !this.searchActive) {
                   this._previousSelectedActor = _maybePreviousActor;
-                  this._clearPrevCatSelection();
+                  //this._clearPrevCatSelection();
                }
                this._activeContainer = parent;
                this._activeActor = button.actor;
@@ -12026,7 +12133,6 @@ MyApplet.prototype = {
          this._selectedItemIndex = null;
          this._activeContainer = null;
          this._activeActor = null;
-
          this._allAppsCategoryButton.actor.set_style_class_name('menu-category-button-selected');
          this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
          this.selectedAppBox.setDateTimeVisible(this.showTimeDate);
@@ -12036,8 +12142,8 @@ MyApplet.prototype = {
       }
       else {
          this.actor.remove_style_pseudo_class('active');
-         this._select_category(null, this._allAppsCategoryButton);
          if(this.searchActive) {
+            this._select_category(null, this._allAppsCategoryButton);
             this.resetSearch();
          }
          if(this.bttChanger) 
@@ -12046,11 +12152,11 @@ MyApplet.prototype = {
          this.selectedAppBox.setSelectedText("", "");
          this.hover.refreshFace();
          this.hover.closeMenu();
+         this._clearAllSelections(false);
          this._previousTreeItemIndex = null;
          this._previousTreeSelectedActor = null;
          this._previousSelectedActor = null;
-         //this.closeApplicationsContextMenus(false);
-         this._clearAllSelections(false);
+         this.closeApplicationsContextMenus(false);
          // this._refreshFavs();
          // if(this.accessibleBox)
          //    this.accessibleBox.refreshAccessibleItems();
