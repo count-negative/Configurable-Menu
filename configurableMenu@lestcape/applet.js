@@ -7965,6 +7965,9 @@ MyApplet.prototype = {
         }
 
         if(global.display.get_is_overlay_key(keyCode, modifierState) && this.menu.isOpen) {
+           if(this.idSignalTextChange > 0)
+              this.searchEntryText.disconnect(this.idSignalTextChange);
+           this.idSignalTextChange = 0
            this.menu.close();
            return true;
         }
@@ -9319,7 +9322,6 @@ MyApplet.prototype = {
       this._refreshFavs();
       this._updateView();
       this._select_category(null, this._allAppsCategoryButton);
-      this._clearAllSelections(true);
       if(this.fullScreen) {
          if(this.controlView) {
             this.controlView.changeResizeActive(false);
@@ -9334,8 +9336,14 @@ MyApplet.prototype = {
       this.menu.actor.y = -10000;
       this.menu.openClean();
       Mainloop.idle_add(Lang.bind(this, function() {
+         this._findOrientation();
+         let minWidth = this._minimalWidth();
+         if(this.width < minWidth)
+            this._updateSize();
          this.menu.actor.y = 0;
          this.menu.closeClean();
+         this._clearAllSelections(true);
+         this.displayed = false;
       }));
    },
 
@@ -9940,6 +9948,7 @@ MyApplet.prototype = {
                this.idSignalTextChange = this.searchEntryText.connect('text-changed', Lang.bind(this, this._onSearchTextChanged));
          }));
          this.searchEntryText.connect('key-focus-out', Lang.bind(this, function(actor) {
+            this.menuIsOpening = true;
             if(this.idSignalTextChange > 0)
                this.searchEntryText.disconnect(this.idSignalTextChange);
             this.idSignalTextChange = 0;
@@ -12093,15 +12102,11 @@ MyApplet.prototype = {
 
    _initialDisplay: function() {
       if(!this.displayed) {
-         this._findOrientation();
-         for(let i = 0; i < this._applicationsButtons.length; i++) {
+         this.initButtonLoad  = Math.min(this._applicationsButtons.length, INITIAL_BUTTON_LOAD);
+         for(let i = 0; i < this.initButtonLoad; i++) {
             this._applicationsButtons[i].actor.show();
          }
-        /* let n = Math.min(this._applicationsButtons.length, INITIAL_BUTTON_LOAD);
-         for(let i = 0; i < n; i++) {
-            this._applicationsButtons[i].actor.show();
-         }
-         Mainloop.idle_add(Lang.bind(this, this._initial_cat_selection, n));*/
+         Mainloop.idle_add(Lang.bind(this, this._initial_cat_selection, this.initButtonLoad));
 
          if(!this.fullScreen) {
             let monitor = Main.layoutManager.findMonitorForActor(this.actor);
@@ -12113,22 +12118,19 @@ MyApplet.prototype = {
          } else {						
             this._setFullScreen();
          }
-         let minWidth = this._minimalWidth();
-         //if(this.width < minWidth) {
-         //   Mainloop.idle_add(Lang.bind(this, this._updateSize));
-         //}
-         this._updateSize();
-        /* Mainloop.idle_add(Lang.bind(this, function() {
-            this.menu.actor.x = 0;
-            this.menu.close();
-         }));*/
-        this.displayed = true;
+         /*let minWidth = this._minimalWidth();
+         if(this.width < minWidth) {
+            Mainloop.idle_add(Lang.bind(this, this._updateSize));
+         }*/
+         this.displayed = true;
       }
    },
 
    _onOpenStateChanged: function(menu, open) {
       if(open) {
          this.menuIsOpening = true;
+         this._initialDisplay();
+         global.stage.set_key_focus(this.searchEntry);
          this.actor.add_style_pseudo_class('active');
          this._selectedItemIndex = null;
          this._activeContainer = null;
@@ -12137,14 +12139,15 @@ MyApplet.prototype = {
          this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
          this.selectedAppBox.setDateTimeVisible(this.showTimeDate);
          this.repositionGnomeCategory();
-         global.stage.set_key_focus(this.searchEntry);
-         this._initialDisplay();
       }
       else {
          this.actor.remove_style_pseudo_class('active');
-         if(this.searchActive) {
-            this._select_category(null, this._allAppsCategoryButton);
-            this.resetSearch();
+         this._select_category(null, this._allAppsCategoryButton);
+         if(this.searchActive) {    
+            this.searchEntry.set_text("");
+            this._previousSearchPattern = "";
+            this.searchActive = false;
+            this._setCategoriesButtonActive(true);
          }
          if(this.bttChanger) 
             this.bttChanger.activateSelected(_("All Applications"));
