@@ -1,6 +1,6 @@
-Cinnamon Applet: Configurable Menu Version: v0.9-Beta
+Cinnamon Applet: Configurable Menu Version: v1.0-Beta
 
-Last version release date: 12 April 2014
+Last version release date: 22 April 2014
 ***
 Authors: [Lester Carballo Pérez](https://github.com/lestcape) and [Garibaldo](https://github.com/Garibaldo).
 
@@ -18,6 +18,7 @@ Author of language translation:
 - English:   Garibaldo (https://github.com/Garibaldo) and Lester Carballo Pérez(lestcape@gmail.com)
 - Spanish:   Lester Carballo Pérez(lestcape@gmail.com)
 - Portugese(Br): Eliermi Cunha Junior(jpegrande@gmail.com)
+- French(Fr):
 
 --------------
 ![](https://raw.github.com/wiki/lestcape/Configurable-Menu/img/Capture.png)
@@ -65,6 +66,10 @@ You can found more information about Cinnamon Installer on the [Cinnamon Install
 Change log
 --------------
 See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/Change-Log).
+
+1.0-Beta
+   - Improve the menu to working more faster on cinnamon 2.2
+   - Redefine the way to prevent accidental category change when you try to access the applications.
 
 0.9-Beta
    - Improved the menu speed.

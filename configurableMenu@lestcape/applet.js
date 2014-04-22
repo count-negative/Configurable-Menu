@@ -1,5 +1,5 @@
-//Cinnamon Applet: Configurable Menu version v0.9-Beta
-//Release Date: 12 April 2014
+//Cinnamon Applet: Configurable Menu version v1.0-Beta
+//Release Date: 22 April 2014
 //
 //Authors: Lester Carballo Pérez(https://github.com/lestcape) and Garibaldo(https://github.com/Garibaldo).
 //
@@ -1427,7 +1427,7 @@ GnoMenuBox.prototype = {
               break;
       }
       for(let i = 0; i < this._actionButtons.length; i++) {
-         this.itemsBox.add(this._actionButtons[i].actor, { x_fill: false, y_fill: false, x_align: xAling, y_align: yAling, expand: true });
+         this.itemsBox.add(this._actionButtons[i].actor, { x_fill: true, y_fill: false, x_align: xAling, y_align: yAling, expand: true });
          this._setStyleActive(this._actionButtons[i], false);
       }
       this._setStyleActive(this.favorites, true);
@@ -4695,94 +4695,16 @@ function SystemButton(parent, parentScroll, icon, title, description, hoverIcon,
 }
 
 SystemButton.prototype = {
+   __proto__: GenericApplicationButtonExtended.prototype,
+
    _init: function(parent, parentScroll, icon, title, description, hoverIcon, selectedAppBox, iconSize, haveText) {
+      GenericApplicationButtonExtended.prototype._init.call(this, parent, parentScroll);
       this.title = title;
       this.description = description;
       this.hoverIcon = hoverIcon;
       this.selectedAppBox = selectedAppBox;
+      this.actor.destroy();
       this.actor = new St.BoxLayout({ style_class:'menu-category-button', reactive: true, track_hover: true });
-      this.popupButton = new SystemPopupButtom(parent, parentScroll, icon, title, description, iconSize, haveText);
-      this.actor.add(this.popupButton.actor, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-      this.actor._delegate = this;
-   },
-
-   setIconSymbolic: function(symbolic) {
-      this.popupButton.setIconSymbolic(symbolic);
-   },
-
-   setIconVisible: function(haveIcon) {
-      this.popupButton.setIconVisible(haveIcon);
-   },
-
-   setTheme: function(theme) {
-      this.theme = theme;
-      this.actor.set_style_class_name('menu-category-button');
-      this.actor.add_style_class_name('menu-system-button-' + this.theme);
-   },
-
-   setTextVisible: function(haveText) {
-      this.popupButton.setTextVisible(haveText);
-   },
-
-   setVertical: function(vertical) {
-      let parentPopup = this.popupButton.actor.get_parent();
-      if(parentPopup)
-         parentPopup.remove_actor(this.popupButton.actor);
-      if(vertical)
-         this.actor.add(this.popupButton.actor, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
-      else
-         this.actor.add(this.popupButton.actor, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
-       this.popupButton.setVertical(vertical);
-   },
-
-   setIconSize: function(iconSize) {
-      this.popupButton.setIconSize(iconSize);
-   },
-
-   setAction: function(actionCallBack) {
-      this.actionCallBack = actionCallBack;
-      this.actor.connect('button-press-event', Lang.bind(this, this.executeAction));
-   },
-
-   executeAction: function(actor, event) {
-      if((this.actionCallBack)&&((!event)||(event.get_button()==1))) {
-         this.setActive(false);
-         this.actionCallBack();
-      }
-   },
-
-   setActive: function(active) {
-      this.popupButton.setActive(active);
-      this.active = active;
-      if(this.active) {
-         this.actor.set_style_class_name('menu-category-button-selected');
-         if(this.theme)
-            this.actor.add_style_class_name('menu-system-button-' + this.theme + '-selected');
-         this.hoverIcon.refresh(this.popupButton.icon);
-         this.selectedAppBox.setSelectedText(this.title, this.description);
-         this.actor.add_style_pseudo_class('active');
-      }
-      else {
-         this.actor.set_style_class_name('menu-category-button');
-         if(this.theme)
-            this.actor.add_style_class_name('menu-system-button-' + this.theme);
-         this.hoverIcon.refreshFace();
-         this.selectedAppBox.setSelectedText("", "");
-         this.actor.remove_style_pseudo_class('active');
-      }
-   }
-};
-
-function SystemPopupButtom(parent, parentScroll, icon, title, description, iconSize, haveText) {
-   this._init(parent, parentScroll, icon, title, description, iconSize, haveText);
-}
-
-SystemPopupButtom.prototype = {
-   __proto__: GenericApplicationButtonExtended.prototype,
-
-   _init: function(parent, parentScroll, icon, title, description, iconSize, haveText) {
-      GenericApplicationButtonExtended.prototype._init.call(this, parent, parentScroll);
-      this.actor.set_style_class_name('');
       this.iconSize = iconSize;
       this.icon = icon;
       this.title = title;
@@ -4798,16 +4720,17 @@ SystemPopupButtom.prototype = {
 
       this.label = new St.Label({ text: this.title, style_class: 'menu-application-button-label' });
       this.label.clutter_text.line_wrap_mode = Pango.WrapMode.CHAR;//WORD_CHAR;
-      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.END;//NONE;
+      this.label.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;//END;
       this.label.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
       this.textBox = new St.BoxLayout({ vertical: false });
       this.textBox.add(this.label, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
       this.setTextVisible(false);
       this.setIconVisible(true);
       this.container.add_actor(this.textBox);
-
-      this.addActor(this.container);
       this.label.realize();
+
+      this.actor.add(this.container, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      this.actor._delegate = this;
    },
 
    setIconSymbolic: function(symbolic) {
@@ -4825,12 +4748,23 @@ SystemPopupButtom.prototype = {
       }
    },
 
+   setTheme: function(theme) {
+      this.theme = theme;
+      this.actor.set_style_class_name('menu-category-button');
+      this.actor.add_style_class_name('menu-system-button-' + this.theme);
+   },
+
    setTextVisible: function(haveText) {
       this.textBox.visible = haveText;
    },
 
    setVertical: function(vertical) {
-      this.container.set_vertical(vertical);
+      this.actor.remove_actor(this.container);
+      if(vertical)
+         this.actor.add(this.container, { x_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: true });
+      else
+         this.actor.add(this.container, { x_align: St.Align.START, x_fill: false, y_fill: false, expand: true });
+       this.container.set_vertical(vertical);
    },
 
    setIconSize: function(iconSize) {
@@ -4841,8 +4775,36 @@ SystemPopupButtom.prototype = {
       }
    },
 
+   setAction: function(actionCallBack) {
+      this.actionCallBack = actionCallBack;
+      this.actor.connect('button-press-event', Lang.bind(this, this.executeAction));
+   },
+
+   executeAction: function(actor, event) {
+      if((this.actionCallBack)&&((!event)||(event.get_button()==1))) {
+         this.setActive(false);
+         this.actionCallBack();
+      }
+   },
+
    setActive: function(active) {
       this.active = active;
+      if(this.active) {
+         this.actor.set_style_class_name('menu-category-button-selected');
+         if(this.theme)
+            this.actor.add_style_class_name('menu-system-button-' + this.theme + '-selected');
+         this.hoverIcon.refresh(this.icon);
+         this.selectedAppBox.setSelectedText(this.title, this.description);
+         this.actor.add_style_pseudo_class('active');
+      }
+      else {
+         this.actor.set_style_class_name('menu-category-button');
+         if(this.theme)
+            this.actor.add_style_class_name('menu-system-button-' + this.theme);
+         this.hoverIcon.refreshFace();
+         this.selectedAppBox.setSelectedText("", "");
+         this.actor.remove_style_pseudo_class('active');
+      }
    }
 };
 
@@ -10781,7 +10743,7 @@ MyApplet.prototype = {
             //global.stage.set_key_focus(this.searchEntry);
          }
       }
-      this._updateSize();
+      //this._updateSize();
    },
 
    _onPanelMintChange: function(selected) {
