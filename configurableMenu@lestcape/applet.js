@@ -3512,11 +3512,14 @@ VisibleChildIteratorExtended.prototype = {
    getRightVisible: function(cur_child) {
       let rowIndex = cur_child.get_parent().get_children().indexOf(cur_child);
       let colIndex = cur_child.get_parent().get_parent().get_children().indexOf(cur_child.get_parent());
-      let right_item;
+      let right_item = null;
+      let childr;
       if(colIndex == this._numberView - 1)
          right_item = cur_child.get_parent().get_parent().get_child_at_index(0).get_child_at_index(rowIndex);
       else {
-         right_item = cur_child.get_parent().get_parent().get_child_at_index(colIndex + 1).get_child_at_index(rowIndex);
+         childr = cur_child.get_parent().get_parent().get_child_at_index(colIndex + 1);
+         if(childr)
+             right_item = childr.get_child_at_index(rowIndex);
          if(!right_item)
             right_item = right_item = cur_child.get_parent().get_parent().get_child_at_index(0).get_child_at_index(rowIndex);
       }
@@ -11945,6 +11948,7 @@ MyApplet.prototype = {
       applicationButton.actor.style_class = "menu-application-button";
       this.selectedAppBox.setSelectedText("", "");
       this.hover.refreshFace();
+      this.lastActor = null;
    },
 
    _appEnterEvent: function(applicationButton) {
