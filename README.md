@@ -15,10 +15,10 @@ Special thanks to:
 --------------
 Author of language translation:
 --------------
-- English:   Garibaldo (https://github.com/Garibaldo) and Lester Carballo Pérez(lestcape@gmail.com)
-- Spanish:   Lester Carballo Pérez(lestcape@gmail.com)
-- Portugese(Br): Eliermi Cunha Junior(jpegrande@gmail.com)
-- French(Fr):
+- English(En):       Garibaldo (https://github.com/Garibaldo) and Lester Carballo Pérez(lestcape@gmail.com)
+- Spanish(Es):       Lester Carballo Pérez(lestcape@gmail.com)
+- Portugese(Pt_Br):  Eliermi Cunha Junior(jpegrande@gmail.com)
+- French(Fr):        Dupo(dupop35@yahoo.fr)
 
 --------------
 ![](https://raw.github.com/wiki/lestcape/Configurable-Menu/img/Capture.png)
@@ -70,6 +70,7 @@ See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/C
 1.0-Beta
    - Improve the menu to working more faster on cinnamon 2.2
    - Redefine the way to prevent accidental category change when you try to access the applications.
+   - Was added French language(Fr).
 
 0.9-Beta
    - Improved the menu speed.
