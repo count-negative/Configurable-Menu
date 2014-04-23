@@ -2633,8 +2633,10 @@ PowerBox.prototype = {
       //this.parent.favoritesScrollBox.setAutoScrolling(this.autoscroll_enabled);
       this.powerSelected = this.indexOf(actor);
       this._powerButtons[this.powerSelected].setActive(true);
-      if(this.parent.appMenuGnome)
+      if(this.parent.appMenuGnome) {
          this.parent.appMenuGnome.close();
+         this.parent._clearPrevCatSelection();
+      }
    },
 
    _onLeaveEvent: function(actor, event) {
@@ -5874,6 +5876,13 @@ ConfigurablePointer.prototype = {
       }
    },
 
+
+   _maxPanelSize: function() {
+      if(!Main.panel2)
+         return Main.panel.actor.height;
+      return Math.max(Main.panel2.actor.height, Main.panel.actor.height);
+   },
+
    _fixCorner: function(x, y, sourceActor, sourceAllocation, monitor, gap, borderWidth) {
       if((this.fixScreen)||(this.fixCorner)) {
          let [ax, ay] = sourceActor.get_transformed_position();
@@ -5982,8 +5991,8 @@ try {
       case St.Side.RIGHT:
          resY = sourceCenterY - (halfMargin + (natHeight - margin) * alignment);
 
-         resY = Math.max(resY, monitor.y + 10);
-         resY = Math.min(resY, monitor.y + monitor.height - (10 + natHeight));
+         resY = Math.max(resY, monitor.y + this._maxPanelSize());
+         resY = Math.min(resY, monitor.y + monitor.height - (this._maxPanelSize() + natHeight));
 
          this.setArrowOrigin(sourceCenterY - resY);
          break;
@@ -7079,6 +7088,7 @@ PlacesGnome.prototype = {
             this.selectedAppBox.setSelectedText(button.app.get_name(), button.app.get_description());
             this.hover.refreshPlace(button.place);
             this.parent.appMenuGnomeClose();
+            this.parent._clearPrevCatSelection();
          }));
          button.actor.connect('leave-event', Lang.bind(this, function() {
             button.actor.style_class = "menu-category-button";
@@ -9310,6 +9320,14 @@ MyApplet.prototype = {
       this._alignSubMenu();
       this.menu.actor.y = -10000;
       this.menu.openClean();
+     /* if(this.appMenuGnome) {
+         //this.appMenuGnome.open();
+         //this.onCategorieGnomeChange(this.appletMenu.getActorForName("Main"));
+         this.menu.openClean();
+         //this.openGnomeMenu(this._allAppsCategoryButton.actor)
+      } else {
+         this.menu.openClean();
+      }*/
       Mainloop.idle_add(Lang.bind(this, function() {
          this._findOrientation();
          let minWidth = this._minimalWidth();
@@ -9859,6 +9877,13 @@ MyApplet.prototype = {
       return panelHeight;
    },
 
+   _disconnectSearch: function() {
+      this.menuIsOpening = true;
+      if(this.idSignalTextChange > 0)
+         this.searchEntryText.disconnect(this.idSignalTextChange);
+      this.idSignalTextChange = 0;
+   },
+
    _display: function() {
       try {
          this.minimalWidth = -1;
@@ -9922,11 +9947,9 @@ MyApplet.prototype = {
                this.idSignalTextChange = this.searchEntryText.connect('text-changed', Lang.bind(this, this._onSearchTextChanged));
          }));
          this.searchEntryText.connect('key-focus-out', Lang.bind(this, function(actor) {
-            this.menuIsOpening = true;
-            if(this.idSignalTextChange > 0)
-               this.searchEntryText.disconnect(this.idSignalTextChange);
-            this.idSignalTextChange = 0;
+            this._disconnectSearch();
          }));
+
          this._previousSearchPattern = "";
 
          this.searchName = new St.Label({ style_class: 'menu-selected-app-title', text: _("Filter:"), visible: false });
@@ -11200,6 +11223,7 @@ MyApplet.prototype = {
             this._categoryButtons[i].actor.add_style_class_name('menu-category-button-' + this.theme);
          }
       }
+      this.lastActor = null;
    },
 
    makeVectorBox: function(actor) {
@@ -12118,7 +12142,8 @@ MyApplet.prototype = {
       else {
          this.actor.remove_style_pseudo_class('active');
          this._select_category(null, this._allAppsCategoryButton);
-         if(this.searchActive) {    
+         if(this.searchActive) {
+            this._disconnectSearch()
             this.searchEntry.set_text("");
             this._previousSearchPattern = "";
             this.searchActive = false;
