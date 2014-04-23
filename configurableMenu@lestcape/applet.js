@@ -5903,7 +5903,9 @@ ConfigurablePointer.prototype = {
          if(this._arrowSide == St.Side.TOP) {
             this._yOffset = -this.themeNode.get_length('border-top') - gap + borderWidth;
          } else if(this._arrowSide == St.Side.BOTTOM) {
-            this._yOffset = this.themeNode.get_length('border-bottom') + gap + 3;
+            this._yOffset = this.themeNode.get_length('border-bottom') + gap;
+            if(this.fixScreen)
+               this._yOffset += 3;
          }
          // Main.notify("x:" + x + " x1:" + sourceAllocation.x1 + " x2:" + sourceAllocation.x2 + " main:" + (monitor.x - monitor.width));
          //  Main.notify("y:" + y + " y1:" + sourceAllocation.y1 + " y2:" + sourceAllocation.y2 + " main:" + (monitor.x - monitor.height)); 
@@ -5971,7 +5973,6 @@ try {
       case St.Side.TOP:
       case St.Side.BOTTOM:
          resX = sourceCenterX - (halfMargin + (natWidth - margin) * alignment);
-
          resX = Math.max(resX, monitor.x + 10);
          resX = Math.min(resX, monitor.x + monitor.width - (10 + natWidth));
          this.setArrowOrigin(sourceCenterX - resX);
@@ -5994,9 +5995,8 @@ try {
          [success, x, y] = parent.transform_stage_point(resX, resY);
          parent = parent.get_parent();
       }
-
+      //Main.notify("fixScreen" + this.fixScreen + " fixCorner" + this.fixCorner)
       this._fixCorner(x, y, sourceActor, sourceAllocation, monitor, gap, borderWidth);
-
       this._xPosition = x;
       this._yPosition = y;
       this._shiftActor();
@@ -6360,7 +6360,6 @@ ConfigurableMenu.prototype = {
 
    openClean: function(animate) {
       Applet.AppletPopupMenu.prototype.open.call(this, animate);
-      this.repositionActor(this.sourceActor);
    },
 
    closeClean: function(animate) {
@@ -6370,14 +6369,19 @@ ConfigurableMenu.prototype = {
    open: function(animate) {
       /*if(this.subMenu)
          this.subMenu.close();*/
-      this.openClean(animate);
-      this._applyEffectOnOpen(animate);
+      if(!this.isOpen) {
+         this.openClean(animate);
+         this.repositionActor(this.sourceActor);
+         this._applyEffectOnOpen(animate);
+      }
    },
 
    close: function(animate) {
       /*if(this.subMenu)
          this.subMenu.close();*/
-      this._applyEffectOnClose(animate);
+      if(this.isOpen) {
+         this._applyEffectOnClose(animate);
+      }
    },
 
    _applyEffectOnOpen: function(animate) {
@@ -8564,9 +8568,7 @@ MyApplet.prototype = {
    },
 
    _updateView: function() {
-      this._updateAppPrefNumIcons()
       this._clearView();
-      this._updateAppNumColumms();
       try {
          this.pkg.updateView();
          let currValue, falseActor;
@@ -8630,6 +8632,8 @@ MyApplet.prototype = {
             }
          }
       }
+      this._updateAppPrefNumIcons();
+      this._updateAppNumColumms();
    },
 
    _update_autoscroll: function() {
@@ -9382,7 +9386,7 @@ MyApplet.prototype = {
                this.controlBoxStart.visible = true;
             }
             Mainloop.idle_add(Lang.bind(this, function() {
-            this._updateView();
+               this._updateView();
             }));
          } else if(this.automaticSize) {
             this.mainBox.set_width(-1);
@@ -9406,7 +9410,7 @@ MyApplet.prototype = {
             this.width = this.mainBox.get_width();
             this.mainBox.set_width(this.width);
          } else {
-            let difference = this.menu.actor.get_height() - this.mainBox.get_height();
+            let difference = 2*(this.menu.actor.get_width() - this.mainBox.get_width());
             if(this.width > this.mainBox.get_width()) {
                if(this.width > monitor.width - difference)
                   this.width = monitor.width - difference;
@@ -9426,11 +9430,12 @@ MyApplet.prototype = {
                         this.mainBox.set_width(this.width);
                         this._updateView();
                      }
-                    // this.minimalWidth = minWidth;
+                     //this.minimalWidth = minWidth;
                   }));
                }
             }
-            let maxHeigth = monitor.height - this._processPanelSize(true) - this._processPanelSize(false);
+            difference = this.menu.actor.get_height() - this.mainBox.get_height();
+            let maxHeigth = monitor.height - this._processPanelSize(true) - this._processPanelSize(false) - difference;
             if(this.height > this.mainBox.get_height()) {
                if(this.height > maxHeigth)
                   this.height = maxHeigth;
@@ -9438,16 +9443,12 @@ MyApplet.prototype = {
             } else {
                if(this.height > this.minimalHeight) {
                   this.mainBox.set_height(this.height);
-                  this._clearView();
-                  Mainloop.idle_add(Lang.bind(this, function() {//checking correct height and revert if it's needed.
-                     let minHeight = this._minimalHeight();
-                     if(this.height < minHeight) {
-                        this.height = minHeight;
-                        this.mainBox.set_height(this.height);
-                        this._updateView();
-                     }
-                     this.minimalHeight = minHeight;
-                  }));
+                  let minHeight = this._minimalHeight();
+                  if(this.height < minHeight) {
+                     this.height = minHeight;
+                     this.mainBox.set_height(this.height);
+                  }
+                  this.minimalHeight = minHeight;
                } else {
                   this.height = this.minimalHeight;
                   this.mainBox.set_height(this.height);
@@ -9572,7 +9573,8 @@ MyApplet.prototype = {
 
    _updateMenuSection: function() {
       if(this.menu) {
-         this.menu.close();
+         if(this.menu.isOpen)
+            this.menu.closeClean();
          this.menuManager.removeMenu(this.menu);
          this.menu.destroy();
       }
@@ -9872,7 +9874,8 @@ MyApplet.prototype = {
          this.actor_motion_id = 0;
          this.vector_update_loop = null;
          this.current_motion_actor = null;
-         this.menu.close();
+         if(this.menu.isOpen)
+            this.menu.closeClean();
          this.menu.removeAll();
          let section = new PopupMenu.PopupMenuSection();
          this.menu.addMenuItem(section);     
