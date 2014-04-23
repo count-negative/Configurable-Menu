@@ -5878,11 +5878,11 @@ ConfigurablePointer.prototype = {
       if((this.fixScreen)||(this.fixCorner)) {
          let [ax, ay] = sourceActor.get_transformed_position();
          if((this._arrowSide == St.Side.TOP)||(this._arrowSide == St.Side.BOTTOM)) {
-            if(sourceAllocation.x1 < monitor.width/2) {
+            if(sourceAllocation.x1 < monitor.x + monitor.width/2) {
                if((this.fixScreen)||(Math.abs(monitor.x - sourceAllocation.x1) < 10))
-                  this._xOffset = -x;
-               else if(this.fixCorner)
                   this._xOffset = -x + ax;
+               else
+                  this._xOffset = 0;
             } else {
                if((this.fixScreen)||(Math.abs(monitor.x + monitor.width - sourceAllocation.x2) < 10))
                   this._xOffset = -x + monitor.x + monitor.width - this.actor.width;
@@ -6455,6 +6455,9 @@ ConfigurableMenu.prototype = {
 
   _effectHideHorizontalOpen: function() {
       let [startX, ay] = this.sourceActor.get_transformed_position();
+      let monitor = Main.layoutManager.primaryMonitor;
+      if(startX > monitor.x + monitor.width/2)
+         startX += this.sourceActor.width;
       Tweener.addTween(this.actor,
       {
          x: startX,
@@ -6476,6 +6479,9 @@ ConfigurableMenu.prototype = {
 
    _effectHideHorizontalClose: function() {
       let [startX, ay] = this.sourceActor.get_transformed_position();
+      let monitor = Main.layoutManager.primaryMonitor;
+      if(startX > monitor.x + monitor.width/2)
+         startX += this.sourceActor.width;
       Tweener.addTween(this.actor,
       {
          x: startX,
@@ -6548,13 +6554,13 @@ ConfigurableMenu.prototype = {
    },
 
    _effectScaleOpen: function() {
-      let [ax, ay] = this.sourceActor.get_transformed_position();
-      let startX = ax;
+      let monitor = Main.layoutManager.primaryMonitor;
+      let [startX, ay] = this.sourceActor.get_transformed_position();
       let startY = this.sourceActor.height;
-      if(this._arrowSide == St.Side.BOTTOM) {
-         let monitor = Main.layoutManager.primaryMonitor;
+      if(startX > monitor.x + monitor.width/2)
+         startX += this.sourceActor.width;
+      if(this._arrowSide == St.Side.BOTTOM)
          startY =  monitor.height - startY;
-      }
       Tweener.addTween(this.actor,
       {
          x: startX, y: startY,
@@ -6575,13 +6581,13 @@ ConfigurableMenu.prototype = {
    },
 
    _effectScaleClose: function() {
-      let [ax, ay] = this.sourceActor.get_transformed_position();
-      let startX = ax;
+      let monitor = Main.layoutManager.primaryMonitor;
+      let [startX, ay] = this.sourceActor.get_transformed_position();
       let startY = this.sourceActor.height;
-      if(this._arrowSide == St.Side.BOTTOM) {
-         let monitor = Main.layoutManager.primaryMonitor;
+      if(startX > monitor.x + monitor.width/2)
+         startX += this.sourceActor.width;
+      if(this._arrowSide == St.Side.BOTTOM)
          startY =  monitor.height - startY;
-      }
       Tweener.addTween(this.actor,
       {
          x: startX, y: startY,
