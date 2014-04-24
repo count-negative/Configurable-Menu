@@ -68,9 +68,13 @@ Change log
 See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/Change-Log).
 
 1.0-Beta
-   - Improve the menu to working more faster on cinnamon 2.2
-   - Redefine the way to prevent accidental category change when you try to access the applications.
-   - Was added French language(Fr).
+   - The menu was improved to working more faster on cinnamon 2.2.
+   - The way to prevent accidental category change when you try to access the applications was  redefined.
+   - Several Internal change to support cinnamon 2.0 and cinnamon 2.2 at the same time with good performance.
+   - Horizontal, dragons and gnomenu layous working now a little more faster.
+   - Was added French language(Fr) thanks Dupo.
+   - In multimonitor system was fixed a bug to displayed the menu.
+   - Minor corrections.
 
 0.9-Beta
    - Improved the menu speed.
