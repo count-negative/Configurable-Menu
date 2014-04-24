@@ -11,6 +11,7 @@ Special thanks to:
 
 - [Bernard](https://github.com/zagortenay333) (Help adding support to the Cinnamon themes).
 - Eliermi Cunha Junior(jpegrande@gmail.com) (Help finding errors, promotion and several more things).
+- mtwebster            (https://github.com/mtwebster)     Help increasing the speed of Configurable Menu in Cinnamon 2.2.
 
 --------------
 Author of language translation:
