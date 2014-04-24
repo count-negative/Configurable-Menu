@@ -1,5 +1,5 @@
 //Cinnamon Applet: Configurable Menu version v1.0-Beta
-//Release Date: 22 April 2014
+//Release Date: 24 April 2014
 //
 //Authors: Lester Carballo Pérez(https://github.com/lestcape) and Garibaldo(https://github.com/Garibaldo).
 //
@@ -56,6 +56,7 @@ const AppletPath = imports.ui.appletManager.applets['configurableMenu@lestcape']
 const CinnamonMenu = AppletPath.cinnamonMenu;
 const BoxPointer = imports.ui.boxpointer;
 const Gettext = imports.gettext;
+var APIMenu;
 try {
    APIMenu = imports.gi.CMenu;
 } catch(e) {
@@ -5888,10 +5889,10 @@ ConfigurablePointer.prototype = {
          let [ax, ay] = sourceActor.get_transformed_position();
          if((this._arrowSide == St.Side.TOP)||(this._arrowSide == St.Side.BOTTOM)) {
             if(sourceAllocation.x1 < monitor.x + monitor.width/2) {
-               if((this.fixScreen)||(Math.abs(monitor.x - sourceAllocation.x1) < 10))
-                  this._xOffset = -x + ax;
+               if(this.fixScreen)
+                  this._xOffset = -x;
                else
-                  this._xOffset = 0;
+                  this._xOffset = -x + ax;
             } else {
                if((this.fixScreen)||(Math.abs(monitor.x + monitor.width - sourceAllocation.x2) < 10))
                   this._xOffset = -x + monitor.x + monitor.width - this.actor.width;
@@ -7396,9 +7397,9 @@ MyApplet.prototype = {
          this._pathCompleter.set_dirs_only(false);
          this.lastAcResults = new Array();
 
+         this._packageInstallerCheck();
          this._updateConfig();
          this._updateComplete();
-         this._packageInstallerCheck();
       }
       catch (e) {
          Main.notify("ErrorMain:", e.message);
@@ -9318,8 +9319,8 @@ MyApplet.prototype = {
          this._activeResize();
       }
       this._alignSubMenu();
-      this.menu.actor.y = -10000;
-      this.menu.openClean();
+      //this.menu.actor.y = -10000;
+     // this.menu.openClean();
      /* if(this.appMenuGnome) {
          //this.appMenuGnome.open();
          //this.onCategorieGnomeChange(this.appletMenu.getActorForName("Main"));
@@ -9330,13 +9331,18 @@ MyApplet.prototype = {
       }*/
       Mainloop.idle_add(Lang.bind(this, function() {
          this._findOrientation();
+         this.menu.actor.y = -10000;
+         this.menu.openClean();
+
          let minWidth = this._minimalWidth();
          if(this.width < minWidth)
             this._updateSize();
-         this.menu.actor.y = 0;
-         this.menu.closeClean();
-         this._clearAllSelections(true);
-         this.displayed = false;
+         Mainloop.idle_add(Lang.bind(this, function() {
+            this.menu.actor.y = 0;
+            this.menu.closeClean();
+            this._clearAllSelections(true);
+            this.displayed = false;
+         }));
       }));
    },
 
@@ -9730,7 +9736,7 @@ MyApplet.prototype = {
          let monitor = Main.layoutManager.findMonitorForActor(this.actor);
          let [ax, ay] = this.actor.get_transformed_position();
          this.popupOrientation = St.Side.RIGHT;
-         if(ax < monitor.width/2)
+         if(ax < monitor.x + monitor.width/2)
             this.popupOrientation = St.Side.LEFT;
          if(this.theme == "classicGnome")
            this._setVisibleArrowCat();

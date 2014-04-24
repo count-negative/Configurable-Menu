@@ -1,5 +1,6 @@
 const Applet = imports.ui.applet;
 const Mainloop = imports.mainloop;
+const CMenu;
 try {
    CMenu = imports.gi.CMenu;
 } catch(e) {
