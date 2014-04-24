@@ -2216,11 +2216,12 @@ ButtonChangerBox.prototype = {
         this.labels = labels;
         this.selected = selected;
         this.callBackOnSelectedChange = callBackOnSelectedChange;
-        if(this.label.get_parent() == this.actor)
-           this.removeActor(this.label);
+        let parentT = this.label.get_parent();
+        if(parentT == this.actor) this.removeActor(this.label);
+        if(parentT != null) parentT.remove_actor(this.label);
         this.label.set_style_class_name('menu-selected-app-title');
         
-        let parentT = this._triangle.get_parent();
+        parentT = this._triangle.get_parent();
         if(parentT == this.actor) this.removeActor(this._triangle);
         else if(parentT != null) parentT.remove_actor(this._triangle);
         //this._triangle = new St.Label();
@@ -7397,9 +7398,10 @@ MyApplet.prototype = {
          this._pathCompleter.set_dirs_only(false);
          this.lastAcResults = new Array();
 
-         this._packageInstallerCheck();
          this._updateConfig();
+         this._packageInstallerCheck();
          this._updateComplete();
+
       }
       catch (e) {
          Main.notify("ErrorMain:", e.message);
@@ -9308,35 +9310,19 @@ MyApplet.prototype = {
       this._refreshFavs();
       this._updateView();
       this._select_category(null, this._allAppsCategoryButton);
-      if(this.fullScreen) {
-         if(this.controlView) {
-            this.controlView.changeResizeActive(false);
-            this.controlView.changeFullScreen(this.fullScreen);
-         }
-         this._setVisiblePointer(false);
-         this.menu.fixToCorner(true);
-      } else if(this.controlingSize) {
-         this._activeResize();
-      }
       this._alignSubMenu();
-      //this.menu.actor.y = -10000;
-     // this.menu.openClean();
-     /* if(this.appMenuGnome) {
-         //this.appMenuGnome.open();
-         //this.onCategorieGnomeChange(this.appletMenu.getActorForName("Main"));
-         this.menu.openClean();
-         //this.openGnomeMenu(this._allAppsCategoryButton.actor)
-      } else {
-         this.menu.openClean();
-      }*/
       Mainloop.idle_add(Lang.bind(this, function() {
          this._findOrientation();
          this.menu.actor.y = -10000;
          this.menu.openClean();
-
          let minWidth = this._minimalWidth();
-         if(this.width < minWidth)
+         if(this.fullScreen) {
+            this._setFullScreen(this.fullScreen);
+         } else if(this.controlingSize) {
+            this._activeResize();
+         } else if(this.width < minWidth) {
             this._updateSize();
+         }
          Mainloop.idle_add(Lang.bind(this, function() {
             this.menu.actor.y = 0;
             this.menu.closeClean();
@@ -9386,6 +9372,7 @@ MyApplet.prototype = {
 
    _updateSize: function() {
       if((this.mainBox)&&(this.displayed)) {
+         let oldColumn = this.iconViewCount;
          let monitor = Main.layoutManager.findMonitorForActor(this.actor);
          if(this.fullScreen) {
             let panelTop = this._processPanelSize(false);
@@ -9481,6 +9468,15 @@ MyApplet.prototype = {
             this._updateView();
          }
          this._updateSubMenuSize();
+         if(oldColumn != this.iconViewCount) {
+            this._clearAllSelections();
+            this._activeContainer = null;
+            this._activeActor = null;
+            this._selectedItemIndex = null;
+            this._previousTreeItemIndex = null;
+            this._previousTreeSelectedActor = null;
+            this._previousSelectedActor = null;
+         }
       }
    },
 
@@ -11105,7 +11101,7 @@ MyApplet.prototype = {
    appMenuGnomeClose: function() {
       if(this.appMenuGnome) {
          if(this.appMenuGnome.isOpen) {
-            this.lastActor = null;
+            //this.lastActor = null;
             this.appMenuGnome.close();
          }
       }
@@ -11229,7 +11225,7 @@ MyApplet.prototype = {
             this._categoryButtons[i].actor.add_style_class_name('menu-category-button-' + this.theme);
          }
       }
-      this.lastActor = null;
+     // this.lastActor = null;
    },
 
    makeVectorBox: function(actor) {
@@ -11534,6 +11530,7 @@ MyApplet.prototype = {
          this._selectedItemIndex = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
          this._activeContainer = this.applicationsBox;
          if(item_actor && item_actor != this.searchEntry) {
+            //this.lastActor = null;
             item_actor._delegate.emit('enter-event');
          }
       }
@@ -11987,7 +11984,7 @@ MyApplet.prototype = {
       applicationButton.actor.style_class = "menu-application-button";
       this.selectedAppBox.setSelectedText("", "");
       this.hover.refreshFace();
-      this.lastActor = null;
+      //this.lastActor = null;
    },
 
    _appEnterEvent: function(applicationButton) {
@@ -12004,8 +12001,8 @@ MyApplet.prototype = {
    _addEnterEvent: function(button, callback) {
       let _callback = Lang.bind(this, function() {
          try {
-            if(this.lastActor != button.actor) {
-               this.lastActor = button.actor;
+            //if(this.lastActor != button.actor) {
+              // this.lastActor = button.actor;
                let parent = button.actor.get_parent()
                if(parent)
                   parent = parent.get_parent();
@@ -12041,7 +12038,7 @@ MyApplet.prototype = {
                   this._selectedRowIndex = this._activeContainer._vis_iter.getInternalIndexOfChild(this._activeActor);
                }
                callback();
-            }
+           // }
          } catch(e) {
             Main.notify("Error on addEnterEvent", e.message);
          }
