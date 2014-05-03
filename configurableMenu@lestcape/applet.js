@@ -2203,125 +2203,129 @@ SelectedAppBox.prototype = {
 };
 
 function ButtonChangerBox(parent, icon, iconSize, labels, selected, callBackOnSelectedChange) {
-    this._init(parent, icon, iconSize, labels, selected, callBackOnSelectedChange);
+   this._init(parent, icon, iconSize, labels, selected, callBackOnSelectedChange);
 }
 
 ButtonChangerBox.prototype = {
-    __proto__: PopupMenu.PopupSubMenuMenuItem.prototype,
+   __proto__: PopupMenu.PopupSubMenuMenuItem.prototype,
 
-    _init: function (parent, icon, iconSize, labels, selected, callBackOnSelectedChange) {
-        PopupMenu.PopupSubMenuMenuItem.prototype._init.call(this, labels[selected]);
-        this.theme = "";
-        this.visible = true;
-        this.actor.set_style_class_name('');
-        this.actor.reactive = true;
-        this.box = new St.BoxLayout({ style_class: 'menu-category-button', reactive: true, track_hover: true });
-        this.parent = parent;
-        this.labels = labels;
-        this.selected = selected;
-        this.callBackOnSelectedChange = callBackOnSelectedChange;
-        let parentT = this.label.get_parent();
-        if(parentT == this.actor) this.removeActor(this.label);
-        if(parentT != null) parentT.remove_actor(this.label);
-        this.label.set_style_class_name('menu-selected-app-title');
-        
-        parentT = this._triangle.get_parent();
-        if(parentT == this.actor) this.removeActor(this._triangle);
-        else if(parentT != null) parentT.remove_actor(this._triangle);
-        //this._triangle = new St.Label();
-        
-        this.icon = new St.Icon({ style_class: 'popup-menu-icon', icon_type: St.IconType.FULLCOLOR, icon_name: icon, icon_size: iconSize });
-        this.label.realize();
-	this.box.add(this.label, {x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE });
-        if(this.icon) {
-	   this.box.add(this.icon, {x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE });
-           this.icon.realize();
-        }
-        this.addActor(this.box);
-        this.box.connect('enter-event', Lang.bind(this, function() {
-           this.setActive(true);
-        }));
-        this.box.connect('leave-event', Lang.bind(this, function() {
-           this.setActive(false); 
-        }));
-    },
+   _init: function (parent, icon, iconSize, labels, selected, callBackOnSelectedChange) {
+      PopupMenu.PopupSubMenuMenuItem.prototype._init.call(this, labels[selected]);
+      this.theme = "";
+      this.visible = true;
+      this.actor.set_style_class_name('');
+      this.actor.reactive = true;
+      this.box = new St.BoxLayout({ style_class: 'menu-category-button', reactive: true, track_hover: true });
+      this.parent = parent;
+      this.labels = labels;
+      this.selected = selected;
+      this.callBackOnSelectedChange = callBackOnSelectedChange;
+      let parentT = this.label.get_parent();
+      if(parentT == this.actor) this.removeActor(this.label);
+      if(parentT != null) parentT.remove_actor(this.label);
+      this.label.set_style_class_name('menu-selected-app-title');
 
-    setIconSize: function(iconSize) {
+      parentT = this._triangle.get_parent();
+      if(parentT == this.actor) this.removeActor(this._triangle);
+      else if(parentT != null) parentT.remove_actor(this._triangle);
+      //this._triangle = new St.Label();
+
+      this.icon = new St.Icon({ style_class: 'popup-menu-icon', icon_type: St.IconType.FULLCOLOR, icon_name: icon, icon_size: iconSize });
+      this.label.realize();
+      this.box.add(this.label, {x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE });
+      if(this.icon) {
+         this.box.add(this.icon, {x_fill: false, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE });
+         this.icon.realize();
+      }
+      this.addActor(this.box);
+      this.box.connect('enter-event', Lang.bind(this, function() {
+         this.setActive(true);
+      }));
+      this.box.connect('leave-event', Lang.bind(this, function() {
+         this.setActive(false); 
+      }));
+   },
+
+   setIconSize: function(iconSize) {
       if(this.icon)
          this.icon.set_icon_size(iconSize);
-    },
+   },
 
-    setTextVisible: function(visible) {
-       this.label.visible = visible;
-    },
+   setTextVisible: function(visible) {
+      this.label.visible = visible;
+   },
 
-    setTheme: function(theme) {
-       this.theme = '-' + theme;
-       this.box.set_style_class_name('menu-category-button');
-       this.box.add_style_class_name('menu-swap-button-' + this.theme);
-    },
+   setTheme: function(theme) {
+      this.theme = '-' + theme;
+      this.box.set_style_class_name('menu-category-button');
+      this.box.add_style_class_name('menu-swap-button-' + this.theme);
+   },
 
-    setActive: function(active) {
-       if(this.active != active) {
-          this.active = active;
-          if(!this.parent.actorResize) {
-             if(active) {
-                global.set_cursor(Cinnamon.Cursor.POINTING_HAND);
-                this.box.set_style_class_name('menu-category-button-selected');
-                this.box.add_style_class_name('menu-swap-button' + this.theme + '-selected');
-             }
-             else {
-                global.unset_cursor();
-                this.box.set_style_class_name('menu-category-button');
-                this.box.add_style_class_name('menu-swap-button' + this.theme);
-             }
-          }
-          this.emit('active-changed', active);
-       }
-    },
+   setActive: function(active) {
+      if(this.active != active) {
+         this.active = active;
+         if(!this.parent.actorResize) {
+            if(active) {
+               global.set_cursor(Cinnamon.Cursor.POINTING_HAND);
+               this.box.set_style_class_name('menu-category-button-selected');
+               this.box.add_style_class_name('menu-swap-button' + this.theme + '-selected');
+            }
+            else {
+               global.unset_cursor();
+               this.box.set_style_class_name('menu-category-button');
+               this.box.add_style_class_name('menu-swap-button' + this.theme);
+            }
+         }
+         this.emit('active-changed', active);
+      }
+   },
  
-    _onButtonReleaseEvent: function(actor, event) {
-       if(event.get_button() == 1) {
-          this.setActive(false);
-          this.activateNext();
-          Mainloop.idle_add(Lang.bind(this, function() {
-             let [mx, my] = event.get_coords();
-             let [ax, ay] = actor.get_transformed_position();
-             let aw = actor.get_width();
-             let ah = actor.get_height();
-             if((mx > ax)&&(mx < ax + aw)&&(my > ay)&&(my < ay + ah))
-                this.setActive(true);
-          }));
-        }
-        //PopupMenu.PopupSubMenuMenuItem.prototype._onButtonReleaseEvent.call(actor, event);
-    },
+   _onButtonReleaseEvent: function(actor, event) {
+      if(!this.parent.pressed) {
+         if(event.get_button() == 1) {
+            this.setActive(false);
+            this.activateNext();
+            Mainloop.idle_add(Lang.bind(this, function() {
+               let [mx, my] = event.get_coords();
+               let [ax, ay] = actor.get_transformed_position();
+               let aw = actor.get_width();
+               let ah = actor.get_height();
+               if((mx > ax)&&(mx < ax + aw)&&(my > ay)&&(my < ay + ah))
+                  this.setActive(true);
+            }));
+         }
+         //PopupMenu.PopupSubMenuMenuItem.prototype._onButtonReleaseEvent.call(actor, event);
+      }
+      this.parent.pressed = false;
+      return true;
+   },
 
-    activateNext: function() {
-       if(this.selected >= this.labels.length - 1)
-          this.selected = 0;
-       else
-          this.selected ++;
-       this.activateIndex(this.selected);
-    },
+   activateNext: function() {
+      if(this.selected >= this.labels.length - 1)
+         this.selected = 0;
+      else
+         this.selected ++;
+      this.activateIndex(this.selected);
+   },
 
-    getSelected: function() {
-       return this.labels[this.selected];
-    },
+   getSelected: function() {
+      return this.labels[this.selected];
+   },
 
-    activateSelected: function(selected) {
-       let index = this.labels.indexOf(selected);
-       if((index != -1)&&(index != this.selected)) {
-          this.activateIndex(index);
-       }
-    },
+   activateSelected: function(selected) {
+      let index = this.labels.indexOf(selected);
+      if((index != -1)&&(index != this.selected)) {
+         this.activateIndex(index);
+      }
+   },
 
-    activateIndex: function(index) {
-       this.selected = index;
-       this.label.set_text(this.labels[this.selected]);
-       if(this.callBackOnSelectedChange) {
-          this.callBackOnSelectedChange(this.labels[this.selected]);
-       }
-    }
+   activateIndex: function(index) {
+      this.selected = index;
+      this.label.set_text(this.labels[this.selected]);
+      if(this.callBackOnSelectedChange) {
+         this.callBackOnSelectedChange(this.labels[this.selected]);
+      }
+   }
 };
 
 function PowerBox(parent, theme, iconSize, hover, selectedAppBox) {
@@ -3240,26 +3244,29 @@ GenericApplicationButtonExtended.prototype = {
    },
 
    _onButtonReleaseEvent: function (actor, event) {
-      if(event.get_button()==1) {
-         this.activate(event);
-      }
-      if(event.get_button()==3) {
-         if(this.withMenu) {
-            if(!this.menu.isOpen) {
-               this.parent.closeApplicationsContextMenus(true);
-               this.actor.get_parent().set_height(200);
-               this.toggleMenu();
-               this.parent._previousContextMenuOpen = this;
-               this.actor.get_parent().set_height(-1);
-               this.parent._updateSize();
-            } else {
-               this.toggleMenu();
-               Mainloop.idle_add(Lang.bind(this, function() {
+      if(!this.parent.pressed) {
+         if(event.get_button()==1) {
+            this.activate(event);
+         }
+         if(event.get_button()==3) {
+            if(this.withMenu) {
+               if(!this.menu.isOpen) {
+                  this.parent.closeApplicationsContextMenus(true);
+                  this.actor.get_parent().set_height(200);
+                  this.toggleMenu();
+                  this.parent._previousContextMenuOpen = this;
+                  this.actor.get_parent().set_height(-1);
                   this.parent._updateSize();
-               }));
+               } else {
+                  this.toggleMenu();
+                  Mainloop.idle_add(Lang.bind(this, function() {
+                     this.parent._updateSize();
+                  }));
+               }
             }
          }
       }
+      this.parent.pressed = false;
       return true;
    },
     
@@ -4999,18 +5006,21 @@ PlaceButtonAccessibleExtended.prototype = {
    },
 
    _onButtonReleaseEvent: function (actor, event) {
-      if(event.get_button()==1) {
-         this.activate(event);
-      }
-      if(event.get_button()==3) {
-         if((this.withMenu) && (!this.menu.isOpen)) {
-            this.parent.closeApplicationsContextMenus(true);
-            this.parent._previousContextMenuOpen = this;
-         } else {
-            this.editText(false);
+      if(!this.parent.pressed) {
+         if(event.get_button()==1) {
+            this.activate(event);
          }
-         this.toggleMenu();
-      }  
+         if(event.get_button()==3) {
+            if((this.withMenu) && (!this.menu.isOpen)) {
+               this.parent.closeApplicationsContextMenus(true);
+               this.parent._previousContextMenuOpen = this;
+            } else {
+               this.editText(false);
+            }
+            this.toggleMenu();
+         }
+      }
+      this.parent.pressed = false;
       return true;
    },
 
@@ -5247,29 +5257,32 @@ PlaceButtonExtended.prototype = {
     
    getDragActor: function() {
       let icon_size = this.iconSize;
-     // if(this.iconSizeDrag < this.iconSize)
-     //    icon_size = this.iconSizeDrag;
+      // if(this.iconSizeDrag < this.iconSize)
+      //    icon_size = this.iconSizeDrag;
       return this.app.create_icon_texture(icon_size);
-    },
+   },
 
-    // Returns the original actor that should align with the actor
-    // we show as the item is being dragged.
-    getDragActorSource: function() {
-       return this.actor;
-    },
+   // Returns the original actor that should align with the actor
+   // we show as the item is being dragged.
+   getDragActorSource: function() {
+      return this.actor;
+   },
 
-    _onButtonReleaseEvent: function (actor, event) {
-      if(event.get_button()==1) {
-         this.activate(event);
-      }
-      if(event.get_button()==3) {
-         if((this.withMenu) && (!this.menu.isOpen)) {
-            this.parent.closeApplicationsContextMenus(true);
-            this.parent._previousContextMenuOpen = this;
+   _onButtonReleaseEvent: function (actor, event) {
+      if(!this.parent.pressed) {
+         if(event.get_button()==1) {
+            this.activate(event);
          }
-         //Main.notify("nnoo " + this.withMenu);
-         this.toggleMenu();
-      }  
+         if(event.get_button()==3) {
+            if((this.withMenu) && (!this.menu.isOpen)) {
+               this.parent.closeApplicationsContextMenus(true);
+               this.parent._previousContextMenuOpen = this;
+            }
+            //Main.notify("nnoo " + this.withMenu);
+            this.toggleMenu();
+         }
+      }
+      this.parent.pressed = false;
       return true;
    },
 
@@ -5312,12 +5325,16 @@ RecentButtonExtended.prototype = {
    },
 
    _onButtonReleaseEvent: function(actor, event) {
-      if(event.get_button() == 1) {
-         //This is new on 2.2
-         //this.file.launch();
-         Gio.app_info_launch_default_for_uri(this.file.uri, global.create_app_launch_context());
-         this.parent.menu.close();
+      if(!this.parent.pressed) {
+         if(event.get_button() == 1) {
+            //This is new on 2.2
+            //this.file.launch();
+            Gio.app_info_launch_default_for_uri(this.file.uri, global.create_app_launch_context());
+            this.parent.menu.close();
+         }
       }
+      this.parent.pressed = false;
+      return true;
    },
 
    activate: function(event) {
@@ -9579,6 +9596,7 @@ MyApplet.prototype = {
    },
 
    _onButtonReleaseEvent: function(actor, event) {
+      this.pressed = false;
       if((this._draggable)&&(!this._draggable.inhibit))
          return false;
       if(!this.activateOnPress)
@@ -9589,8 +9607,10 @@ MyApplet.prototype = {
    _onButtonPressEvent: function(actor, event) {
       if((this._draggable)&&(!this._draggable.inhibit))
          return false;
-      if(this.activateOnPress)
+      if(this.activateOnPress) {
+         this.pressed = true;
          this._menuEventClicked(actor, event);
+      }
       return true;
    },
 
@@ -9717,6 +9737,7 @@ MyApplet.prototype = {
           this._applet_context_menu.close();
        }
        this._disableResize();
+       this.pressed = false;
       } catch(e) {
          Main.notify("Error Menu", e.message);
       }
@@ -12197,6 +12218,7 @@ MyApplet.prototype = {
             this.categoriesScrollBox.scrollToActor(this._allAppsCategoryButton.actor);
             this.destroyVectorBox();
             this.menuManager._onMenuOpenState(menu, open);
+            this.pressed = false;
          }));
       }
       return true;
