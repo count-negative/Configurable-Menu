@@ -11,17 +11,17 @@ Special thanks to:
 
 - [Bernard](https://github.com/zagortenay333) (Help adding support to the Cinnamon themes).
 - Eliermi Cunha Junior(jpegrande@gmail.com) (Help finding errors, promotion and several more things).
-- mtwebster            (https://github.com/mtwebster)     Help increasing the speed of Configurable Menu in Cinnamon 2.2.
+- [mtwebster](https://github.com/mtwebster)  (Help increasing the speed of Configurable Menu in Cinnamon 2.2).
 
 --------------
 Author of language translation:
 --------------
 - English(En):       [Garibaldo](https://github.com/Garibaldo) and [Lester Carballo Pérez](https://github.com/lestcape)
 - Spanish(Es):       [Lester Carballo Pérez](https://github.com/lestcape)
-- Portugese(Pt_Br):  [Eliermi Cunha Junior](jpegrande@gmail.com)
-- French(Fr):        [Dupo](dupop35@yahoo.fr)
-- Chinese(Zh_Cn):    [Highwind](highwindmx@126.com)
-- Czech(Cs_Cz):      [Satapouch](http://www.linux-mint-czech.cz/)
+- Portugese(Pt_Br):  Eliermi Cunha Junior(jpegrande@gmail.com)
+- French(Fr):        Dupo(dupop35@yahoo.fr)
+- Chinese(Zh_Cn):    Highwind(highwindmx@126.com)
+- Czech(Cs_Cz):      Satapouch(http://www.linux-mint-czech.cz/)
 
 --------------
 ![](https://raw.github.com/wiki/lestcape/Configurable-Menu/img/Capture.png)
