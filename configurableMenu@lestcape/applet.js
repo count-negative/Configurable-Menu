@@ -1505,6 +1505,8 @@ GnoMenuBox.prototype = {
    },
 
    setSelected: function(selected) {
+      if(this._gnoMenuSelected != -1)
+         this._onLeaveEvent(this._actionButtons[this._gnoMenuSelected].actor);
       this._gnoMenuSelected = -1;
       for(let i = 0; i < this._actionButtons.length; i++) {
          if(this._actionButtons[i].title == selected) {
@@ -10806,7 +10808,9 @@ MyApplet.prototype = {
             //global.stage.set_key_focus(this.searchEntry);
          }
       }
-      //this._updateSize();
+      let minWidth = this._minimalWidth();
+      if(this.width < minWidth)
+         this._updateSize();
    },
 
    _onPanelMintChange: function(selected) {
@@ -10819,12 +10823,13 @@ MyApplet.prototype = {
       } else {
          this.panelAppsName.set_text(_("All Applications"));
       }
-      this._clearView();
       this.operativePanel.visible = !operPanelVisible;
       this.favoritesScrollBox.actor.visible = operPanelVisible;
       this.favBoxWrapper.visible = operPanelVisible;
       this._activeContainer = null;
-      this._updateSize();
+      let minWidth = this._minimalWidth();
+      if(this.width < minWidth)
+         this._updateSize();
    },
 
    _onPanelWindowsChange: function(selected) {
@@ -10839,7 +10844,6 @@ MyApplet.prototype = {
          this.accessibleBox.takeHover(false);
          this.topBoxSwaper.add_actor(this.hover.container);
       }
-      this._clearView();
       this.powerBox.actor.visible = operPanelVisible;
       //this.hover.actor.visible = operPanelVisible;
       //this.hover.container.visible = operPanelVisible;
@@ -10853,7 +10857,9 @@ MyApplet.prototype = {
      /* if((this.showAppTitle)||(this.showAppDescription))
          this.endHorizontalBox.visible = !operPanelVisible;*/
       this._activeContainer = null;
-      this._updateSize();
+      let minWidth = this._minimalWidth();
+      if(this.width < minWidth)
+         this._updateSize();
    },
 
    loadClassicGnome: function() {
@@ -12160,6 +12166,8 @@ MyApplet.prototype = {
          this.actor.remove_style_pseudo_class('active');
          this._select_category(null, this._allAppsCategoryButton);
          this._disconnectSearch();
+         if(this.bttChanger) 
+            this.bttChanger.activateSelected(_("All Applications"));
          Mainloop.idle_add(Lang.bind(this, function() {
             if(this.searchActive) {
                this.searchEntry.set_text("");
@@ -12167,8 +12175,6 @@ MyApplet.prototype = {
                this.searchActive = false;
                this._setCategoriesButtonActive(true);
             }
-            if(this.bttChanger) 
-               this.bttChanger.activateSelected(_("All Applications"));
             this._disableResize();
             this.selectedAppBox.setSelectedText("", "");
             this.hover.refreshFace();
