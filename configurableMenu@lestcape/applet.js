@@ -8499,7 +8499,7 @@ MyApplet.prototype = {
       }
       this.pkg.updateButtonStatus(this.iconAppSize, this.textButtonWidth, this.appButtonDescription, this.iconView, this._applicationsBoxWidth);
       if(this.theme == "windows7") {
-         this.searchEntry.set_width(this._applicationsBoxWidth + 20);
+         this.searchEntry.set_width(this._applicationsBoxWidth + 42);
       }
    },
 
