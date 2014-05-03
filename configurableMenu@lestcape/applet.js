@@ -599,6 +599,8 @@ PackageInstallerWrapper.prototype = {
          for(let j = 0; j < appItem.length; j++) {
             appBox[i].remove_actor(appItem[j]);
          }
+         if(i > 0)
+            appBox[i].set_width(-1);
       }
    },
 
@@ -8582,6 +8584,8 @@ MyApplet.prototype = {
 
    _updateView: function() {
       this._clearView();
+      this._updateAppPrefNumIcons();
+      this._updateAppNumColumms();
       try {
          this.pkg.updateView();
          let currValue, falseActor;
@@ -8635,18 +8639,18 @@ MyApplet.prototype = {
          for(let j = 0; j < appItem.length; j++) {
             appBox[i].remove_actor(appItem[j]);
          }
+         if(i > 0)
+            appBox[i].set_width(-1);
       }
-      if(this.visibleSearchButtons) {
-         appBox = this.searchAppBox.get_children();
-         for(let i = 0; i < appBox.length; i++) {
-            appItem = appBox[i].get_children();
-            for(let j = 0; j < appItem.length; j++) {
-               appBox[i].remove_actor(appItem[j]);
-            }
+      appBox = this.searchAppBox.get_children();
+      for(let i = 0; i < appBox.length; i++) {
+         appItem = appBox[i].get_children();
+         for(let j = 0; j < appItem.length; j++) {
+            appBox[i].remove_actor(appItem[j]);
          }
+         if(i > 0)
+            appBox[i].set_width(-1);
       }
-      this._updateAppPrefNumIcons();
-      this._updateAppNumColumms();
    },
 
    _update_autoscroll: function() {
@@ -9312,23 +9316,37 @@ MyApplet.prototype = {
       this._select_category(null, this._allAppsCategoryButton);
       this._alignSubMenu();
       Mainloop.idle_add(Lang.bind(this, function() {
-         this._findOrientation();
-         this.menu.actor.y = -10000;
-         this.menu.openClean();
-         let minWidth = this._minimalWidth();
-         if(this.fullScreen) {
-            this._setFullScreen(this.fullScreen);
-         } else if(this.controlingSize) {
+         this._openOutScreen();
+      }));
+   },
+
+   _openOutScreen: function() {
+      this._findOrientation();
+      this.menu.actor.y = -10000;
+      this.menu.openClean();
+      if(this.fullScreen) {
+         this._setFullScreen(this.fullScreen);
+      } else {
+         let monitor = Main.layoutManager.findMonitorForActor(this.actor);
+         let maxHeigth = monitor.height - this._processPanelSize(true) - this._processPanelSize(false);
+         if(this.height > maxHeigth)
+            this.height = maxHeigth;
+         if(this.width > monitor.width)
+            this.width = monitor.width;
+
+         if(this.controlingSize) {
             this._activeResize();
-         } else if(this.width < minWidth) {
-            this._updateSize();
+         } else {
+            let minWidth = this._minimalWidth();
+            if(this.width < minWidth)
+               this._updateSize();
          }
-         Mainloop.idle_add(Lang.bind(this, function() {
-            this.menu.actor.y = 0;
-            this.menu.closeClean();
-            this._clearAllSelections(true);
-            this.displayed = false;
-         }));
+      }
+      Mainloop.idle_add(Lang.bind(this, function() {
+         this.menu.actor.y = 0;
+         this.menu.closeClean();
+         this._clearAllSelections(true);
+         this.displayed = false;
       }));
    },
 
@@ -9421,31 +9439,7 @@ MyApplet.prototype = {
             this.width = this.mainBox.get_width();
             this.mainBox.set_width(this.width);
          } else {
-            let difference = 2*(this.menu.actor.get_width() - this.mainBox.get_width());
-            if(this.width > this.mainBox.get_width()) {
-               if(this.width > monitor.width - difference)
-                  this.width = monitor.width - difference;
-               this.mainBox.set_width(this.width);
-            } else {
-               if(this.width > monitor.width - difference) {
-                  this.width = monitor.width - difference;
-                  this.mainBox.set_width(this.width);
-               }
-               else if(this.width > this.minimalWidth) {
-                  this.mainBox.set_width(this.width);
-                  this._clearView();
-                  Mainloop.idle_add(Lang.bind(this, function() {//checking correct width and revert if it's needed.
-                     let minWidth = this._minimalWidth();
-                     if(this.width < minWidth) {
-                        this.width = minWidth;
-                        this.mainBox.set_width(this.width);
-                        this._updateView();
-                     }
-                     //this.minimalWidth = minWidth;
-                  }));
-               }
-            }
-            difference = this.menu.actor.get_height() - this.mainBox.get_height();
+            let difference = this.menu.actor.get_height() - this.mainBox.get_height();
             let maxHeigth = monitor.height - this._processPanelSize(true) - this._processPanelSize(false) - difference;
             if(this.height > this.mainBox.get_height()) {
                if(this.height > maxHeigth)
@@ -9465,7 +9459,32 @@ MyApplet.prototype = {
                   this.mainBox.set_height(this.height);
                }
             }
-            this._updateView();
+            difference = 2*(this.menu.actor.get_width() - this.mainBox.get_width());
+            if(this.width > this.mainBox.get_width()) {
+               if(this.width > monitor.width - difference)
+                  this.width = monitor.width - difference;
+               this.mainBox.set_width(this.width);
+               this._updateView();
+            } else {
+               if(this.width > monitor.width - difference) {
+                  this.width = monitor.width - difference;
+                  this.mainBox.set_width(this.width);
+                  this._updateView();
+               }
+               else if(this.width > this.minimalWidth) {
+                  this.mainBox.set_width(this.width);
+                  this._clearView();
+                  Mainloop.idle_add(Lang.bind(this, function() {//checking correct width and revert if it's needed.
+                     let minWidth = this._minimalWidth();
+                     if(this.width < minWidth) {
+                        this.width = minWidth;
+                        this.mainBox.set_width(this.width);
+                     }
+                     this._updateView();
+                     //this.minimalWidth = minWidth;
+                  }));
+               }
+            }
          }
          this._updateSubMenuSize();
          if(oldColumn != this.iconViewCount) {
@@ -9813,8 +9832,8 @@ MyApplet.prototype = {
       }
       this._timeOutResize = 0;
       if(this.actorResize) {
-         this._updatePosResize();
-         this._updateSize();
+         if(this._updatePosResize())
+            this._updateSize();
          this._timeOutResize = Mainloop.timeout_add(300, Lang.bind(this, this._doResize));
       }
    },
@@ -9846,13 +9865,20 @@ MyApplet.prototype = {
                break;
          }
          if(this.actorResize == this.menu.actor) {
-            this.width = width;
-            this.height = height;
+            if((this.width != width)||(this.height != height)) {
+               this.width = width;
+               this.height = height;
+               return true;
+            }
          } else {
-            this.subMenuWidth = width;
-            this.subMenuHeight = height;
+            if((this.subMenuWidth != width)||(this.subMenuHeight != height)) {
+               this.subMenuWidth = width;
+               this.subMenuHeight = height;
+               return true;
+            }
          }
       }
+      return false;
    },
 
    _processPanelSize: function(bottomPosition) {
@@ -12109,21 +12135,6 @@ MyApplet.prototype = {
             this._applicationsButtons[i].actor.show();
          }
          Mainloop.idle_add(Lang.bind(this, this._initial_cat_selection, this.initButtonLoad));
-
-         if(!this.fullScreen) {
-            let monitor = Main.layoutManager.findMonitorForActor(this.actor);
-            let maxHeigth = monitor.height - this._processPanelSize(true) - this._processPanelSize(false);
-            if(this.height > maxHeigth)
-               this.height = maxHeigth;
-            if(this.width > monitor.width)
-               this.width = monitor.width;
-         } else {						
-            this._setFullScreen();
-         }
-         /*let minWidth = this._minimalWidth();
-         if(this.width < minWidth) {
-            Mainloop.idle_add(Lang.bind(this, this._updateSize));
-         }*/
          this.displayed = true;
       }
    },
@@ -12139,43 +12150,50 @@ MyApplet.prototype = {
          this._activeActor = null;
          this._allAppsCategoryButton.actor.set_style_class_name('menu-category-button-selected');
          this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
-         this.selectedAppBox.setDateTimeVisible(this.showTimeDate);
          this.repositionGnomeCategory();
+         Mainloop.idle_add(Lang.bind(this, function() {
+            this.selectedAppBox.setDateTimeVisible(this.showTimeDate);
+            this.menuManager._onMenuOpenState(menu, open);
+         }));
       }
       else {
          this.actor.remove_style_pseudo_class('active');
          this._select_category(null, this._allAppsCategoryButton);
-         if(this.searchActive) {
-            this._disconnectSearch()
-            this.searchEntry.set_text("");
-            this._previousSearchPattern = "";
-            this.searchActive = false;
-            this._setCategoriesButtonActive(true);
-         }
-         if(this.bttChanger) 
-            this.bttChanger.activateSelected(_("All Applications"));
-         this._disableResize();
-         this.selectedAppBox.setSelectedText("", "");
-         this.hover.refreshFace();
-         this.hover.closeMenu();
-         this._clearAllSelections(false);
-         this._previousTreeItemIndex = null;
-         this._previousTreeSelectedActor = null;
-         this._previousSelectedActor = null;
-         this.closeApplicationsContextMenus(false);
-         // this._refreshFavs();
-         // if(this.accessibleBox)
-         //    this.accessibleBox.refreshAccessibleItems();
-         if(this.gnoMenuBox)
-            this.gnoMenuBox.setSelected(_("Favorites"));
-         this.powerBox.disableSelected();
-         this.selectedAppBox.setDateTimeVisible(false);
-         this.repositionActor = null;
-         this._activeGnomeMenu();
-         this.appMenuGnomeClose();
-         this.categoriesScrollBox.scrollToActor(this._allAppsCategoryButton.actor);
-         this.destroyVectorBox();
+         this._disconnectSearch();
+         Mainloop.idle_add(Lang.bind(this, function() {
+            if(this.searchActive) {
+               this.searchEntry.set_text("");
+               this._previousSearchPattern = "";
+               this.searchActive = false;
+               this._setCategoriesButtonActive(true);
+            }
+            if(this.bttChanger) 
+               this.bttChanger.activateSelected(_("All Applications"));
+            this._disableResize();
+            this.selectedAppBox.setSelectedText("", "");
+            this.hover.refreshFace();
+            this.hover.closeMenu();
+            this._clearAllSelections(false);
+            this._previousTreeItemIndex = null;
+            this._previousTreeSelectedActor = null;
+            this._previousSelectedActor = null;
+            this.closeApplicationsContextMenus(false);
+            // this._refreshFavs();
+            // if(this.accessibleBox)
+            //    this.accessibleBox.refreshAccessibleItems();
+            if(this.gnoMenuBox)
+               this.gnoMenuBox.setSelected(_("Favorites"));
+            this.powerBox.disableSelected();
+            this.selectedAppBox.setDateTimeVisible(false);
+            this.repositionActor = null;
+            this._activeGnomeMenu();
+            this.appMenuGnomeClose();
+            this.categoriesScrollBox.scrollToActor(this._allAppsCategoryButton.actor);
+            this.destroyVectorBox();
+            this.menuManager._onMenuOpenState(menu, open);
+         }));
       }
+      return true;
    }
 };
 
