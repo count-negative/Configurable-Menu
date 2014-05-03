@@ -1,6 +1,6 @@
-Cinnamon Applet: Configurable Menu Version: v1.0-Beta
+Cinnamon Applet: Configurable Menu Version: v1.1-Beta
 
-Last version release date: 24 April 2014
+Last version release date: 03 May 2014
 ***
 Authors: [Lester Carballo Pérez](https://github.com/lestcape) and [Garibaldo](https://github.com/Garibaldo).
 
@@ -16,10 +16,12 @@ Special thanks to:
 --------------
 Author of language translation:
 --------------
-- English(En):       Garibaldo (https://github.com/Garibaldo) and Lester Carballo Pérez(lestcape@gmail.com)
-- Spanish(Es):       Lester Carballo Pérez(lestcape@gmail.com)
-- Portugese(Pt_Br):  Eliermi Cunha Junior(jpegrande@gmail.com)
-- French(Fr):        Dupo(dupop35@yahoo.fr)
+- English(En):       [Garibaldo](https://github.com/Garibaldo) and [Lester Carballo Pérez](https://github.com/lestcape)
+- Spanish(Es):       [Lester Carballo Pérez](https://github.com/lestcape)
+- Portugese(Pt_Br):  [Eliermi Cunha Junior](jpegrande@gmail.com)
+- French(Fr):        [Dupo](dupop35@yahoo.fr)
+- Chinese(Zh_Cn):    [Highwind](highwindmx@126.com)
+- Czech(Cs_Cz):      [Satapouch](http://www.linux-mint-czech.cz/)
 
 --------------
 ![](https://raw.github.com/wiki/lestcape/Configurable-Menu/img/Capture.png)
@@ -68,10 +70,14 @@ Change log
 --------------
 See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/Change-Log).
 
+1.1-Beta
+   - Was added Chinese language(Zh_Cn) thanks Highwind.
+   - Was added Czech language(Cs_Cz) thanks Satapouch.
+
 1.0-Beta
    - The menu was improved to working more faster on cinnamon 2.2.
-   - The way to prevent accidental category change when you try to access the applications was  redefined.
-   - Several Internal change to support cinnamon 2.0 and cinnamon 2.2 at the same time with good performance.
+   - The way to prevent accidental category change when you try to access the applications was redefined.
+   - Several internal change to support cinnamon 2.0 and cinnamon 2.2 at the same time with good performance.
    - Horizontal, dragons and gnomenu layous working now a little more faster.
    - Was added French language(Fr) thanks Dupo.
    - In multimonitor system was fixed a bug to displayed the menu.

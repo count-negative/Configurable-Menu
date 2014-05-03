@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-01-10 14:06-0600\n"
+"PO-Revision-Date: 2014-05-03 02:22-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
-"Language-Team: lestcape <lestcape@gmail.com>\n"
+"Language-Team: garibaldo and lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Poedit-Language: English\n"
+"X-Generator: Poedit 1.5.4\n"
+"Language: \n"
 
 #: applet.js:83 applet.js:3678 cinnamonMenu.js:536
 msgid "Execution of '%s' failed:"
@@ -34,52 +34,16 @@ msgstr ""
 msgid "Package to install %s"
 msgstr ""
 
-#: applet.js:383 applet.js:3678 cinnamonMenu.js:536
-msgid "Places"
-msgstr ""
-
-#: applet.js:384
-msgid "System"
-msgstr ""
-
-#: applet.js:961 cinnamonMenu.js:1582
-msgid "Lock screen"
-msgstr ""
-
-#: applet.js:961 cinnamonMenu.js:1583
-msgid "Lock the screen"
-msgstr ""
-
-#: applet.js:969 cinnamonMenu.js:1612
-msgid "Logout"
-msgstr ""
-
-#: applet.js:969 cinnamonMenu.js:1613
-msgid "Leave the session"
-msgstr ""
-
-#: applet.js:977 cinnamonMenu.js:1629
-msgid "Quit"
-msgstr ""
-
-#: applet.js:977 cinnamonMenu.js:1630
-msgid "Shutdown the computer"
-msgstr ""
-
-#: applet.js:1452
+#: applet.js:383 applet.js:3678 cinnamonMenu.js:536 applet.js:1452
 msgid "List View"
 msgstr ""
 
-#: applet.js:1452
-msgid "View the items in list view mode"
+#: applet.js:1455
+msgid "Grid View"
 msgstr ""
 
 #: applet.js:1455
-msgid "Icon View"
-msgstr ""
-
-#: applet.js:1455
-msgid "View the items in icon view mode"
+msgid "Show application entries in list view"
 msgstr ""
 
 #: applet.js:1459
@@ -115,35 +79,15 @@ msgid "Put the menu in full screen mode"
 msgstr ""
 
 #: applet.js:1470
-msgid "Configure..."
-msgstr ""
-
-#: applet.js:1470
 msgid "Configure the menu options"
 msgstr ""
 
-#: applet.js:1657 cinnamonMenu.js:221
-msgid "Add to panel"
-msgstr ""
-
-#: applet.js:1660 applet.js:1679 cinnamonMenu.js:224
-msgid "Add to desktop"
-msgstr ""
-
-#: applet.js:1664 cinnamonMenu.js:228
-msgid "Remove from favorites"
-msgstr ""
-
-#: applet.js:1667 cinnamonMenu.js:231
-msgid "Add to favorites"
-msgstr ""
-
 #: applet.js:1671 applet.js:1683
-msgid "Remove from accessible bar"
+msgid "Remove from accessible panel"
 msgstr ""
 
 #: applet.js:1674 applet.js:1686
-msgid "Add to accessible bar"
+msgid "Add to accessible panel"
 msgstr ""
 
 #: applet.js:1674 applet.js:1686
@@ -158,61 +102,12 @@ msgstr ""
 msgid "Default name"
 msgstr ""
 
-#: applet.js:1916
-msgid "Notifications"
-msgstr ""
-
-#: applet.js:1926
-msgid "Account Details"
-msgstr ""
-
-#: applet.js:3375 cinnamonMenu.js:473
-msgid "Clear list"
-msgstr ""
-
-#: applet.js:3617 applet.js:4658 applet.js:6100 applet.js:6131 applet.js:6163
-#: applet.js:6168 applet.js:6178 applet.js:6932 cinnamonMenu.js:511
-msgid "All Applications"
-msgstr ""
-
-#: applet.js:3734 cinnamonMenu.js:556
-msgid "Recent Files"
-msgstr ""
-
-#: applet.js:4466 cinnamonMenu.js:801
-msgid "Menu"
-msgstr ""
-
-#: applet.js:5803 cinnamonMenu.js:1737
-msgid "Type to search..."
-msgstr ""
-
 #: applet.js:5815
 msgid "Filter:"
 msgstr ""
 
 #: applet.js:5817 applet.js:6100 applet.js:6131 applet.js:6165
 msgid "Favorites"
-msgstr ""
-
-#: applet.js:6208
-msgid "Computer"
-msgstr ""
-
-#: applet.js:6209
-msgid "Home"
-msgstr ""
-
-#: applet.js:6210
-msgid "Desktop"
-msgstr ""
-
-#: applet.js:6211
-msgid "Networking"
-msgstr ""
-
-#: applet.js:6212
-msgid "Trash"
 msgstr ""
 
 #: applet.js:6213
@@ -358,10 +253,6 @@ msgstr ""
 msgid "points"
 msgstr ""
 
-#. configurableMenu@lestcape->settings-schema.json->hover-icon-border->units
-msgid "pixels"
-msgstr ""
-
 #. configurableMenu@lestcape->settings-schema.json->favorites-
 #. lines->description
 msgid "Number of favorites lines:"
@@ -420,7 +311,7 @@ msgid "Horizontal Grid"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
-msgid "Vertical"
+msgid "Vertical Only"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
@@ -436,15 +327,15 @@ msgid "Vertical Grid"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
+msgid "Horizontal Only"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Horizontal List"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Retractable"
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->power-theme->options
-msgid "Horizontal"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
@@ -473,20 +364,6 @@ msgstr ""
 msgid "Height of the menu."
 msgstr ""
 
-#. configurableMenu@lestcape->settings-schema.json->height->units
-msgid "pixels"
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->menu-editor-
-#. button->description
-msgid "Open the menu editor"
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->menu-editor-
-#. button->tooltip
-msgid "Press this button to customize your menu entries."
-msgstr ""
-
 #. configurableMenu@lestcape->settings-schema.json->app-
 #. description->description
 msgid "Application entries have description"
@@ -503,19 +380,6 @@ msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->icon-control-size->tooltip
 msgid "Set the control icon size."
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->icon-control-size->units
-msgid "pixels"
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->activate-on-
-#. hover->description
-msgid "Open the menu when I move my mouse over it"
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->activate-on-hover->tooltip
-msgid "Enable opening the menu when the mouse enters the applet."
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
@@ -569,7 +433,9 @@ msgid "Show symbolic icons on the control buttons"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->control-symbolic->tooltip
-msgid "Enable this option to show symbolic icons, on the control buttons and disable to show full color."
+msgid ""
+"Enable this option to show symbolic icons, on the control buttons and "
+"disable to show full color."
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->show-view-
@@ -587,10 +453,6 @@ msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->icon-app-size->tooltip
 msgid "Set the application icon size."
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->icon-app-size->units
-msgid "pixels"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->hover-box->description
@@ -626,10 +488,6 @@ msgstr ""
 msgid "Choose the size of separator."
 msgstr ""
 
-#. configurableMenu@lestcape->settings-schema.json->spacer-size->units
-msgid "pixels"
-msgstr ""
-
 #. configurableMenu@lestcape->settings-schema.json->time-format->description
 msgid "Time format:"
 msgstr ""
@@ -644,10 +502,6 @@ msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->width->tooltip
 msgid "Width of the menu."
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->width->units
-msgid "pixels"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->theme->description
@@ -691,11 +545,11 @@ msgid "Dragon Inverted"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
-msgid "Windows 7"
+msgid "Horizontal"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
-msgid "Horizontal"
+msgid "Windows 7"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
@@ -744,10 +598,6 @@ msgstr ""
 msgid "Set the hover icon size."
 msgstr ""
 
-#. configurableMenu@lestcape->settings-schema.json->icon-hover-size->units
-msgid "pixels"
-msgstr ""
-
 #. configurableMenu@lestcape->settings-schema.json->view-item->description
 msgid "Show application entries in grid view"
 msgstr ""
@@ -767,25 +617,13 @@ msgstr ""
 msgid "Set the maximum width of the application entry text."
 msgstr ""
 
-#. configurableMenu@lestcape->settings-schema.json->app-button-width->units
-msgid "pixels"
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->show-recent->description
-msgid "Show recent files"
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->show-recent->tooltip
-msgid "Choose whether or not to show a recent file list in the menu."
-msgstr ""
-
 #. configurableMenu@lestcape->settings-schema.json->accessible-
 #. icons->description
 msgid "Show icons on the accessible panel"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-icons->tooltip
-msgid "Choose whether or not to have icons on the accessible bar."
+msgid "Choose whether or not to have icons on the accessible panel."
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->fix-menu-
@@ -795,18 +633,6 @@ msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->fix-menu-corner->tooltip
 msgid "Choose whether or not the menu bordering the screen edge."
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->hover-delay->description
-msgid "Menu hover delay:"
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->hover-delay->tooltip
-msgid "Delay between switching categories."
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->hover-delay->units
-msgid "milliseconds"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->icon-accesible-
@@ -829,34 +655,6 @@ msgstr ""
 msgid "Set the GnoMenu icons size."
 msgstr ""
 
-#. configurableMenu@lestcape->settings-schema.json->submenu-align->description
-msgid "Align the submenu with the parent"
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->submenu-align->tooltip
-msgid "Choose whether or not to align the submenu with the parent."
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->submenu-width->description
-msgid "Submenu width:"
-msgstr "Submenu width:"
-
-#. configurableMenu@lestcape->settings-schema.json->submenu-width->tooltip
-msgid "Set the submenu width."
-msgstr "Set the submenu width."
-
-#. configurableMenu@lestcape->settings-schema.json->submenu-height->description
-msgid "Submenu height:"
-msgstr "Submenu height:"
-
-#. configurableMenu@lestcape->settings-schema.json->submenu-height->tooltip
-msgid "Set the submenu height."
-msgstr "Set the submenu height."
-
-#. configurableMenu@lestcape->settings-schema.json->icon-accesible-size->units
-msgid "pixels"
-msgstr ""
-
 #. configurableMenu@lestcape->settings-schema.json->icon-max-fav-
 #. size->description
 msgid "Maximum favorites icon size:"
@@ -866,20 +664,12 @@ msgstr ""
 msgid "Set the maximum size of the favorites icon."
 msgstr ""
 
-#. configurableMenu@lestcape->settings-schema.json->icon-max-fav-size->units
-msgid "pixels"
-msgstr ""
-
 #. configurableMenu@lestcape->settings-schema.json->icon-cat-size->description
 msgid "Category icon size:"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->icon-cat-size->tooltip
 msgid "Set the category icon size."
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->icon-cat-size->units
-msgid "pixels"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->show-time-
@@ -913,18 +703,6 @@ msgstr ""
 msgid "Set the system icons size."
 msgstr ""
 
-#. configurableMenu@lestcape->settings-schema.json->icon-power-size->units
-msgid "pixels"
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->menu-label->description
-msgid "Text"
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->menu-label->tooltip
-msgid "Enter custom text to show in the panel."
-msgstr ""
-
 #. configurableMenu@lestcape->settings-schema.json->enable-
 #. autoscroll->description
 msgid "Enable autoscrolling"
@@ -941,14 +719,6 @@ msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->show-favorites->tooltip
 msgid "Choose whether or not to show favorites on the menu."
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->show-places->description
-msgid "Show bookmarks and places"
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->show-places->tooltip
-msgid "Choose whether or not to show bookmarks and places in the menu."
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->control-box->description
@@ -997,14 +767,6 @@ msgid ""
 "menu."
 msgstr ""
 
-#. configurableMenu@lestcape->settings-schema.json->menu-icon->description
-msgid "Icon"
-msgstr ""
-
-#. configurableMenu@lestcape->settings-schema.json->menu-icon->tooltip
-msgid "Select an icon to show in the panel."
-msgstr ""
-
 #. configurableMenu@lestcape->settings-schema.json->show-box-
 #. pointer->description
 msgid "Show menu box pointer"
@@ -1040,11 +802,6 @@ msgstr ""
 msgid "Set the font size of the selected application description."
 msgstr ""
 
-#. configurableMenu@lestcape->settings-schema.json->app-description-
-#. size->units
-msgid "points"
-msgstr ""
-
 #. configurableMenu@lestcape->settings-schema.json->show-power-
 #. buttons->description
 msgid "Show system buttons"
@@ -1078,16 +835,33 @@ msgid "Show symbolic icons on the system buttons"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->power-symbolic->tooltip
-msgid "Enable this option to show symbolic icons, on the system buttons and disable to show full color."
+msgid ""
+"Enable this option to show symbolic icons, on the system buttons and disable "
+"to show full color."
 msgstr ""
 
-#. configurableMenu@lestcape->settings-schema.json->search-
-#. filesystem->description
-msgid "Enable filesystem path entry in search box"
+#. configurableMenu@lestcape->settings-schema.json->submenu-align->description
+msgid "Align the submenu with the parent"
 msgstr ""
 
-#. configurableMenu@lestcape->settings-schema.json->search-filesystem->tooltip
-msgid "Allows path entry in the menu search box."
+#. configurableMenu@lestcape->settings-schema.json->submenu-align->tooltip
+msgid "Choose whether or not to align the submenu with the parent."
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->submenu-width->description
+msgid "Submenu width:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->submenu-width->tooltip
+msgid "Set the submenu width."
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->submenu-height->description
+msgid "Submenu height:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->submenu-height->tooltip
+msgid "Set the submenu height."
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->search-web->description
@@ -1106,8 +880,8 @@ msgstr ""
 msgid "Allows web search to the wikipedia search engine."
 msgstr ""
 
-#. configurableMenu@lestcape->settings-schema.json->"search-google->description
-msgid "Enable web search with"
+#. configurableMenu@lestcape->settings-schema.json->search-google->description
+msgid "Enable web search with google"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->search-google->tooltip
@@ -1127,7 +901,9 @@ msgid "Enable the Cinnamon Installer tool"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->installer-tools->tooltip
-msgid "Allows install, uninstall and search for programs and packages(need internet connection to be download)."
+msgid ""
+"Allows install, uninstall and search for programs and packages(need internet "
+"connection to be download)."
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->installer-search->description
@@ -1147,11 +923,14 @@ msgid "Press this button to update the Cinnamon Installer tool."
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-check->description
-msgid "Enable to check for a new version of Cinnamon Installer when the menu started"
+msgid ""
+"Enable to check for a new version of Cinnamon Installer when the menu started"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-check->tooltip
-msgid "Allows to check for a new version of Cinnamon Installer when the menu started."
+msgid ""
+"Allows to check for a new version of Cinnamon Installer when the menu "
+"started."
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->installer-uninstall-button->description

@@ -8,525 +8,509 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-05-03 02:13-0600\n"
-"Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
-"Language-Team: lestcape <lestcape@gmail.com>\n"
+"PO-Revision-Date: 2014-05-03 02:15-0600\n"
+"Last-Translator: highwind <highwindmx@126.com>\n"
+"Language-Team: highwind <highwindmx@126.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: es\n"
+"Language: zh_CN\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 1.5.4\n"
 
 #: applet.js:83 applet.js:3678 cinnamonMenu.js:536
 msgid "Execution of '%s' failed:"
-msgstr "Ha fallado ejecución de '%s':"
+msgstr "执行 ‘%s’ 失败:"
 
 #: applet.js:103 applet.js:3678 cinnamonMenu.js:536
 msgid "Command not found."
-msgstr "Comando no encontrado"
+msgstr "找不到命令."
 
 #: applet.js:133 applet.js:3678 cinnamonMenu.js:536
 msgid "Package %s"
-msgstr "Paquete %s"
+msgstr "软件包 %s"
 
 #: applet.js:150 applet.js:3678 cinnamonMenu.js:536
 msgid "Package to install %s"
-msgstr "Paquete para instalar %s"
+msgstr "待安装软件包 %s"
 
 #: applet.js:383 applet.js:3678 cinnamonMenu.js:536 applet.js:1452
 msgid "List View"
-msgstr "Vista de lista"
+msgstr "列表视图"
 
 #: applet.js:1455
 msgid "Grid View"
-msgstr "Vista de cuadrícula"
+msgstr "图标视图"
 
 #: applet.js:1455
 msgid "Show application entries in list view"
-msgstr "Mostrar las entradas de applicación en vista de lista"
+msgstr "以列表视图查看"
 
 #: applet.js:1459
 msgid "Prevent resizing"
-msgstr "Prevenir el cambio de tamaño"
+msgstr "禁止调整尺寸"
 
 #: applet.js:1459
 msgid "Prevent resizing the menu"
-msgstr "Prevenir el cambio de tamaño del menú"
+msgstr "禁止调整菜单尺寸"
 
 #: applet.js:1461
 msgid "Allow resizing"
-msgstr "Permitir el cambio de tamaño"
+msgstr "允许调整尺寸"
 
 #: applet.js:1461
 msgid "Allow resizing the menu"
-msgstr "Permitir el cambio de tamaño del menú"
+msgstr "允许调整菜单尺寸"
 
 #: applet.js:1465
 msgid "Recover size"
-msgstr "Recobar el tamaño"
+msgstr "恢复尺寸"
 
 #: applet.js:1465
 msgid "Recover the normal menu size"
-msgstr "Recobrar el tamaño"
+msgstr "恢复菜单正常尺寸"
 
 #: applet.js:1467
 msgid "Full Screen"
-msgstr "Pantalla Completa"
+msgstr "全屏"
 
 #: applet.js:1467
 msgid "Put the menu in full screen mode"
-msgstr "Poner el menú en modo de pantalla completa"
+msgstr "在全屏模式显示菜单"
 
 #: applet.js:1470
 msgid "Configure the menu options"
-msgstr "Configurar las opciones del menú"
+msgstr "调整菜单选项"
 
 #: applet.js:1671 applet.js:1683
 msgid "Remove from accessible panel"
-msgstr "Quitar del panel accesible"
+msgstr "从辅助栏移除"
 
 #: applet.js:1674 applet.js:1686
 msgid "Add to accessible panel"
-msgstr "Añadir al panel accesible"
+msgstr "添加到辅助栏"
 
 #: applet.js:1674 applet.js:1686
 msgid "Save name"
-msgstr "Salvar nombre"
+msgstr "保存名称"
 
 #: applet.js:1674 applet.js:1686
 msgid "Edit name"
-msgstr "Editar nombre"
+msgstr "编辑名称"
 
 #: applet.js:1674 applet.js:1686
 msgid "Default name"
-msgstr "Nombre por defecto"
+msgstr "默认名称"
 
 #: applet.js:5815
 msgid "Filter:"
-msgstr "Filtro:"
+msgstr "过滤器:"
 
 #: applet.js:5817 applet.js:6100 applet.js:6131 applet.js:6165
 msgid "Favorites"
-msgstr "Favoritos"
+msgstr "收藏夹"
 
 #: applet.js:6213
 msgid "Search %s for %s"
-msgstr "Buscar en %s por %s"
+msgstr "在 %s 中搜索 %s"
 
 #. configurableMenu@lestcape->settings-schema.json->header-layouts->description
 msgid "Layouts:"
-msgstr "Diseños:"
+msgstr "界面:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-menu->description
 msgid "Menu:"
-msgstr "Menú:"
+msgstr "菜单:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-size->description
 msgid "Menu Size:"
-msgstr "Tamaño del Menú:"
+msgstr "菜单尺寸:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-reaction->description
 msgid "Menu Reaction:"
-msgstr "Reacción del Menú:"
+msgstr "菜单动作:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-categories->description
 msgid "Categories:"
-msgstr "Categorias:"
+msgstr "目录:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-apps->description
 msgid "Applications:"
-msgstr "Aplicaciones:"
+msgstr "应用程序:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-favorites->description
 msgid "Favorites:"
-msgstr "Favoritos:"
+msgstr "收藏夹:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-hover->description
 msgid "Hover Icon:"
-msgstr "Ícono de Visualización:"
+msgstr "掠过图标:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-system->description
 msgid "System Buttons:"
-msgstr "Botones del Sistema:"
+msgstr "系统按钮:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-control->description
 msgid "Control Buttons:"
-msgstr "Botones de Control:"
+msgstr "控制按钮:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-separators->description
 msgid "Separators:"
-msgstr "Separadores:"
+msgstr "分隔符:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-information->description
 msgid "Information Panel:"
-msgstr "Panel de información"
+msgstr "消息面板:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-accessible->description
 msgid "Accessible Panel:"
-msgstr "Panel Accessible:"
+msgstr "辅助面板:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-gnomenu->description
 msgid "GnoMenu Panel:"
-msgstr "Panel GnoMenu:"
+msgstr "Gno菜单面板:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-submenu->description
 msgid "Submenu:"
-msgstr "Submenú:"
+msgstr "子菜单:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-search->description
 msgid "General search options:"
-msgstr "Opciones generales de búsqueda:"
+msgstr "通用搜索选项:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-install->description
 msgid "Installer and uninstaller tools:"
-msgstr "Herramienta para instalar y desintalar:"
+msgstr "安装和卸载工具:"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->description
 msgid "Effect on opening and closing:"
-msgstr "Efecto sobre la apertura y cierre:"
+msgstr "打开和关闭时效果:"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->tooltip
 msgid "Select the effect on the menu opening and closing."
-msgstr "Seleccionar el efecto sobre la apertura y el cierre del menú."
+msgstr "选择菜单打开和关闭时效果."
 
 #. configurableMenu@lestcape->settings-schema.json->effect->options
 msgid "None"
-msgstr "Ninguno"
+msgstr "无效果"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->options
 msgid "Dispel"
-msgstr "Desvanecer"
+msgstr "消除"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->options
 msgid "Hide Horizontal"
-msgstr "Ocultar Horizontal"
+msgstr "水平隐藏"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->options
 msgid "Hide Vertical"
-msgstr "Ocultar Vertical"
+msgstr "垂直隐藏"
 
 #. configurableMenu@lestcape->settings-schema.json->effect-time->description
 msgid "Duration of effect:"
-msgstr "Duración del efecto:"
+msgstr "效果持续时间:"
 
 #. configurableMenu@lestcape->settings-schema.json->effect-time->tooltip
 msgid "The time on seconds to perform the effect(More time is slower)."
-msgstr ""
-"El tiempo en segundos para realizar el efecto (Más tiempo es más lento)."
+msgstr "效果展示时间（按秒计，越长越慢）."
 
 #. configurableMenu@lestcape->settings-schema.json->swap-panels->description
 msgid "Swap the top and bottom panel"
-msgstr "Intercambiar el panel superior e inferior"
+msgstr "切换顶端和底部面板"
 
 #. configurableMenu@lestcape->settings-schema.json->swap-panels->tooltip
 msgid "Choose whether or not to swap the top and bottom panel on the menu."
-msgstr ""
-"Seleccione si desea o no intercambiar el panel superior e inferior en el "
-"menú."
+msgstr "选择是否切换顶端和底部面板"
 
 #. configurableMenu@lestcape->settings-schema.json->allow-search->description
 msgid "Show search entry"
-msgstr "Mostrar la entrada de búsqueda"
+msgstr "显示搜索栏"
 
 #. configurableMenu@lestcape->settings-schema.json->allow-search->tooltip
 msgid "Choose whether or not to show search entry on the menu."
-msgstr "Elija si mostrar o no la entrada de búsqueda en el menú."
+msgstr "选择是否在菜单显示搜索栏"
 
 #. configurableMenu@lestcape->settings-schema.json->app-title-
 #. size->description
 msgid "Font size of the selected application name:"
-msgstr "Tamaño de la fuente del nombre de la aplicación seleccionada:"
+msgstr "选定应用程序字体尺寸:"
 
 #. configurableMenu@lestcape->settings-schema.json->app-title-size->tooltip
 msgid "Set the font size of the selected application name."
-msgstr ""
-"Establecer el tamaño de la fuente del nombre de la aplicación seleccionada:"
+msgstr "调整选定应用程序字体尺寸."
 
 #. configurableMenu@lestcape->settings-schema.json->menu-theme-
 #. save-button->description
 msgid "Save the layout configuration"
-msgstr "Salvar la configuración del diseño actual"
+msgstr "保存界面设置"
 
 #. configurableMenu@lestcape->settings-schema.json->menu-theme-
 #. save-button->tooltip
 msgid "Press this button to save the layout configuration."
-msgstr "Pulse este botón para salvar la configuración del diseño actual."
+msgstr "按此键保存界面设置."
 
 #. configurableMenu@lestcape->settings-schema.json->app-title-size->units
 msgid "points"
-msgstr "puntos"
+msgstr "号"
 
 #. configurableMenu@lestcape->settings-schema.json->favorites-
 #. lines->description
 msgid "Number of favorites lines:"
-msgstr "Número de favoritos:"
+msgstr "收藏夹行数:"
 
 #. configurableMenu@lestcape->settings-schema.json->favorites-lines->tooltip
 msgid "Choose the number of favorites lines."
-msgstr "Seleccione el número de lineas que tendrá sus favoritos."
+msgstr "选择收藏夹显示行数."
 
 #. configurableMenu@lestcape->settings-schema.json->favorites-lines->units
 msgid "lines"
-msgstr "lineas"
+msgstr "行"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->description
 msgid "GnoMenu buttons layout:"
-msgstr "Diseño de los botones de GnoMenu:"
+msgstr "Gno菜单界面:"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->tooltip
 msgid "Select a layout of GnoMenu buttons."
-msgstr "Seleccione un diseño de los botones de GnoMenu."
+msgstr "选择Gno菜单界面按钮."
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
 msgid "Only Icons"
-msgstr "Solo Íconos"
+msgstr "仅图标"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
 msgid "Only Text"
-msgstr "Solo Texto"
+msgstr "仅文字"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
 msgid "Grid"
-msgstr "Cuadrícula"
+msgstr "网格"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
 msgid "List"
-msgstr "Lista"
+msgstr "列表"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->description
 msgid "System buttons layout:"
-msgstr "Diseño de los botones del sistema:"
+msgstr "系统按钮界面:"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->tooltip
 msgid "Select a layout of system buttons."
-msgstr "Seleccione un diseño de los botones del sistema."
+msgstr "选择系统按钮界面:"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Retractable Text"
-msgstr "Retractable Solo Texto"
+msgstr "收缩文本"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Vertical Text"
-msgstr "Vertical Solo Texto"
+msgstr "垂直文本"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Horizontal Grid"
-msgstr "Horizontal Modo Cuadrícula"
+msgstr "水平网格"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Vertical Only"
-msgstr "Vertical"
+msgstr "垂直"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Horizontal Text"
-msgstr "Horizontal Solo Texto"
+msgstr "水平文本"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Vertical List"
-msgstr "Vertical Modo Lista"
+msgstr "垂直列表"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Vertical Grid"
-msgstr "Vertical Modo Cuadrícula"
+msgstr "垂直网格"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Horizontal List"
-msgstr "Horizontal Modo Lista"
+msgstr "水平列表"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Retractable"
-msgstr "Retractable"
+msgstr "可收缩"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Horizontal Only"
-msgstr "Horizontal"
+msgstr "水平"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. favorites->description
 msgid "Show scrolling area of favorites"
-msgstr "Mostrar el área de desplazamiento de favoritos"
+msgstr "显示收藏夹滚动区域"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-favorites->tooltip
 msgid "Choose whether or not to show the scrolling area of favorites."
-msgstr ""
-"Seleccione si desea o no mostrar el área de desplazamiento de favoritos."
+msgstr "选择是否显示收藏夹滚动区域."
 
 #. configurableMenu@lestcape->settings-schema.json->activate-on-
 #. press->description
 msgid "Open the menu when I press my mouse over it"
-msgstr "Abrir el menu cuando se presione el ratón sobre el."
+msgstr "鼠标按下后打开菜单"
 
 #. configurableMenu@lestcape->settings-schema.json->activate-on-press->tooltip
 msgid "Enable opening the menu when the mouse press over the applet."
-msgstr "Habilitar abrir el menu cuando se presione el ratón sobre el."
+msgstr "开启鼠标按下后打开菜单."
 
 #. configurableMenu@lestcape->settings-schema.json->height->description
 msgid "Menu height:"
-msgstr "Altura del menú:"
+msgstr "菜单高度:"
 
 #. configurableMenu@lestcape->settings-schema.json->height->tooltip
 msgid "Height of the menu."
-msgstr "Altura del menú."
+msgstr "菜单高度."
 
 #. configurableMenu@lestcape->settings-schema.json->app-
 #. description->description
 msgid "Application entries have description"
-msgstr "Las entradas de applicaciones tendrán descripciones"
+msgstr "显示应用程序详情"
 
 #. configurableMenu@lestcape->settings-schema.json->app-description->tooltip
 msgid "Choose whether or not to have description on application entries."
-msgstr ""
-"Seleccione si desea o no tener la descripción en las entradas del la "
-"applicación."
+msgstr "选择是否显示应用程序详情."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-control-
 #. size->description
 msgid "Control icon size:"
-msgstr "Tamaño de íconos de control:"
+msgstr "控制图标尺寸:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-control-size->tooltip
 msgid "Set the control icon size."
-msgstr "Establecer el tamaño de los íconos de control."
+msgstr "设置控制图标尺寸."
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. applications->description
 msgid "Show scrolling area of applications"
-msgstr "Mostrar el área de desplazamiento de las applicaciones"
+msgstr "显示应用程序滚动区域"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. applications->tooltip
 msgid "Choose whether or not to show the scrolling area of applications."
-msgstr ""
-"Seleccione si desea mostrar o no el área de desplazamiento de las "
-"aplicaciones."
+msgstr "选择是否显示应用程序滚动区域"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. accessible->description
 msgid "Show scrolling area of accessible panel"
-msgstr "Mostrar el área de desplazamiento del panel accesible"
+msgstr "显示辅助面板滚动区域"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-accessible->tooltip
 msgid "Choose whether or not to show the scrolling area of accessible panel."
-msgstr ""
-"Seleccione si desea mostrar o no el área de desplazamiento del panel "
-"accesible."
+msgstr "选择是否显示辅助面板滚动区域"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. gnomenu->description
 msgid "Show scrolling area of GnoMenu panel"
-msgstr "Mostrar el área de desplazamiento del panel GnoMenu"
+msgstr "显示Gno菜单面板滚动区域"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-gnomenu->tooltip
 msgid "Choose whether or not to show the scrolling area of GnoMenu panel."
-msgstr ""
-"Seleccione si desea mostrar o no el área de desplazamiento del panel GnoMenu."
+msgstr "选择是否显示Gno菜单面板滚动区域"
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. title->description
 msgid "Show name of the selected application"
-msgstr "Mostrar el nombre de la applicación seleccionada"
+msgstr "显示选定应用程序名称"
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-title->tooltip
 msgid ""
 "Choose whether or not to show the selected application name on the menu."
-msgstr ""
-"Seleccione si desea mostrar o no el nombre de la applicación seleccionada en "
-"el menú."
+msgstr "选择是否显示选定应用程序名称."
 
 #. configurableMenu@lestcape->settings-schema.json->full-screen->description
 msgid "Full screen"
-msgstr "Pantalla completa"
+msgstr "全屏"
 
 #. configurableMenu@lestcape->settings-schema.json->full-screen->tooltip
 msgid "Choose whether or not to put the menu in full screen mode."
-msgstr "Seleccione si desea o no poner el menú en modo pantalla completa."
+msgstr "选择是否以全屏模式显示菜单."
 
 #. configurableMenu@lestcape->settings-schema.json->control-symbolic->description
 msgid "Show symbolic icons on the control buttons"
-msgstr "Mostrar íconos simbólicos en los botones de control"
+msgstr "在控制菜单显示符号化图标"
 
 #. configurableMenu@lestcape->settings-schema.json->control-symbolic->tooltip
 msgid ""
 "Enable this option to show symbolic icons, on the control buttons and "
 "disable to show full color."
-msgstr ""
-"Active esta opción para mostrar los íconos simbólicos en los botones de "
-"control y desactivela para mostrarlos a todo color."
+msgstr "开启此项可在控制菜单显示符号化图标而非全彩图标"
 
 #. configurableMenu@lestcape->settings-schema.json->show-view-
 #. item->description
 msgid "Show control buttons"
-msgstr "Mostrar los botones de control"
+msgstr "显示控制按钮"
 
 #. configurableMenu@lestcape->settings-schema.json->show-view-item->tooltip
 msgid "Choose whether or not to show control buttons."
-msgstr "Seleccione si desea o no mostrar los botones de control"
+msgstr "选择是否显示控制按钮"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-app-size->description
 msgid "Application icon size:"
-msgstr "Tamaño de los íconos de las applicaciones:"
+msgstr "应用程序图标尺寸:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-app-size->tooltip
 msgid "Set the application icon size."
-msgstr "Establesca el tamaño de los íconos de las applicaciones:"
+msgstr "设置应用程序图标尺寸."
 
 #. configurableMenu@lestcape->settings-schema.json->hover-box->description
 msgid "Hover icon have a box"
-msgstr "El ícono de visualización tiene caja"
+msgstr "悬停图标有边框"
 
 #. configurableMenu@lestcape->settings-schema.json->hover-box->tooltip
 msgid "Choose whether or not to have a box on the hover icon."
-msgstr "Seleccione si desea o no tener una caja en el ícono de visualización."
+msgstr "选择是否为悬停图标设置边框"
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-
 #. box->description
 msgid "Accessible panel has a box"
-msgstr "El panel accessible tiene caja"
+msgstr "辅助面板有边框"
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-box->tooltip
 msgid "Choose whether or not to have a box on the accessible panel."
-msgstr "Seleccione si desea o no tener una caja en el panel accessible."
+msgstr "选择是否为辅助面板设置边框"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-box->description
 msgid "GnoMenu buttons have a box"
-msgstr "El panel GnoMenu tiene caja"
+msgstr "Gno菜单按钮有边框"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-box->tooltip
 msgid "Choose whether or not to have a box on the GnoMenu buttons."
-msgstr "Seleccione si desea o no tener una caja en el panel GnoMenu."
+msgstr "选择是否为Gno菜单按钮设置边框"
 
 #. configurableMenu@lestcape->settings-schema.json->spacer-size->description
 msgid "Separator size:"
-msgstr "Tamaño de separación:"
+msgstr "分隔框尺寸:"
 
 #. configurableMenu@lestcape->settings-schema.json->spacer-size->tooltip
 msgid "Choose the size of separator."
-msgstr "Establesca el tamaño de separación."
+msgstr "选择分隔框尺寸:"
 
 #. configurableMenu@lestcape->settings-schema.json->time-format->description
 msgid "Time format:"
-msgstr "Formato del tiempo:"
+msgstr "时间格式:"
 
 #. configurableMenu@lestcape->settings-schema.json->time-format->tooltip
 msgid "Choose the time format to show time on the menu."
-msgstr "Establesca el formato del tiempo para ser mostrado en el menú."
+msgstr "选择菜单上显示时间的格式."
 
 #. configurableMenu@lestcape->settings-schema.json->width->description
 msgid "Menu width:"
-msgstr "Ancho del menú:"
+msgstr "菜单宽度:"
 
 #. configurableMenu@lestcape->settings-schema.json->width->tooltip
 msgid "Width of the menu."
-msgstr "Ancho del menú."
+msgstr "菜单宽度."
 
 #. configurableMenu@lestcape->settings-schema.json->theme->description
 msgid "Menu layout:"
-msgstr "Diseño del menú:"
+msgstr "菜单界面:"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->tooltip
 msgid "Select a layout of menu."
-msgstr "Seleccione el diseño del menú."
+msgstr "选择一种菜单界面:"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Accessible"
@@ -534,11 +518,11 @@ msgstr "Accessible"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Classic"
-msgstr "Clásico"
+msgstr "Classic"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Classic Gnome"
-msgstr "Gnome Clásico"
+msgstr "Classic Gnome"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Whisker"
@@ -546,21 +530,21 @@ msgstr "Whisker"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Dragon"
-msgstr "Dragón"
+msgstr "Dragon"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Stylized"
-msgstr "Estilizado"
+msgstr "Stylized"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Accessible Inverted"
-msgstr "Accessible Invertido"
+msgstr "Accessible Inverted"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Dragon Inverted"
-msgstr "Dragón Invertido"
+msgstr "Dragon Inverted"
 
-#. configurableMenu@lestcape->settings-schema.json->theme->options
+#. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Horizontal"
 msgstr "Horizontal"
 
@@ -570,11 +554,11 @@ msgstr "Windows 7"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Mint"
-msgstr "Menta"
+msgstr "Mint"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Vampire"
-msgstr "Vampiro"
+msgstr "Vampire"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Garibaldo"
@@ -582,403 +566,377 @@ msgstr "Garibaldo"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "GnoMenu Left"
-msgstr "GnoMenu Izquierda"
+msgstr "GnoMenu Left"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "GnoMenu Right"
-msgstr "GnoMenu Derecha"
+msgstr "GnoMenu Right"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "GnoMenu Top"
-msgstr "GnoMenu Arriba"
+msgstr "GnoMenu Top"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "GnoMenu Bottom"
-msgstr "GnoMenu Abajo"
+msgstr "GnoMenu Bottom"
 
 #. configurableMenu@lestcape->settings-schema.json->show-hover-
 #. icon->description
 msgid "Show hover icon"
-msgstr "Mostrar el ícono de visualización"
+msgstr "显示悬停图标"
 
 #. configurableMenu@lestcape->settings-schema.json->show-hover-icon->tooltip
 msgid "Choose whether or not to show hover icon on the menu."
-msgstr "Seleccione si desea o no mostrar el ícono de visualización en el menú."
+msgstr "选择是否在菜单显示悬停图标."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-hover-
 #. size->description
 msgid "Hover icon size:"
-msgstr "Tamaño del ícono de visualización"
+msgstr "悬停图标尺寸:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-hover-size->tooltip
 msgid "Set the hover icon size."
-msgstr "Establesca el tamaño del ícono de visualización."
+msgstr "悬停图标尺寸:"
 
 #. configurableMenu@lestcape->settings-schema.json->view-item->description
 msgid "Show application entries in grid view"
-msgstr "Mostrar las applicaciones en vista de cuadrícula"
+msgstr "网格视图显示应用程序项"
 
 #. configurableMenu@lestcape->settings-schema.json->view-item->tooltip
 msgid ""
 "Enable show application entries in grid(icon) view and disable show "
 "application entries in list view."
-msgstr ""
-"Habilitado mostrará las applicaciones en vista de cuadrícula(ícono) y "
-"desavilitado las mostrará en vista de lista."
+msgstr "开启以网格（图标）视图而非列表视图显示应用程序项."
 
 #. configurableMenu@lestcape->settings-schema.json->app-button-
 #. width->description
 msgid "Maximum width of the application entry text:"
-msgstr "Ancho máximo del texto de las aplicaciones:"
+msgstr "应用程序项文本的最大宽度:"
 
 #. configurableMenu@lestcape->settings-schema.json->app-button-width->tooltip
 msgid "Set the maximum width of the application entry text."
-msgstr "Establesca el máximo ancho del texto de las applicaciones."
+msgstr "设置应用程序项文本的最大宽度:"
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-
 #. icons->description
 msgid "Show icons on the accessible panel"
-msgstr "Mostrar íconos en panel accessible"
+msgstr "在辅助面板显示图标"
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-icons->tooltip
 msgid "Choose whether or not to have icons on the accessible panel."
-msgstr "Seleccione si desea o no que el panel accesible se muestre con íconos."
+msgstr "选择是否在辅助面板显示图标."
 
 #. configurableMenu@lestcape->settings-schema.json->fix-menu-
 #. corner->description
 msgid "Menu bordering screen edge"
-msgstr "El menú se alinea con su esquina correspondiente"
+msgstr "菜单紧贴屏幕边缘"
 
 #. configurableMenu@lestcape->settings-schema.json->fix-menu-corner->tooltip
 msgid "Choose whether or not the menu bordering the screen edge."
-msgstr ""
-"Seleccione si desea o no que el menú se alinee con su esquina "
-"correspondiente."
+msgstr "选择是否将菜单紧贴屏幕边缘."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-accesible-
 #. size->description
 msgid "Accessible icons size:"
-msgstr "Tamaño de los íconos del panel accessible:"
+msgstr "辅助图标尺寸:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-accesible-
 #. size->tooltip
 msgid "Set the accessible icons size."
-msgstr "Establesca el tamaño de los íconos del panel accessible."
+msgstr "设置辅助图标尺寸."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-gnomenu-
 #. size->description
 msgid "GnoMenu icons size:"
-msgstr "Tamaño de los íconos del panel GnoMenu:"
+msgstr "Gno菜单图标尺寸:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-gnomenu-
 #. size->tooltip
 msgid "Set the GnoMenu icons size."
-msgstr "Establesca el tamaño de los íconos del panel GnoMenu."
+msgstr "设置Gno菜单图标尺寸."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-max-fav-
 #. size->description
 msgid "Maximum favorites icon size:"
-msgstr "Máximo tamaño de los íconos de favoritos:"
+msgstr "收藏夹图标最大尺寸:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-max-fav-size->tooltip
 msgid "Set the maximum size of the favorites icon."
-msgstr "Establesca el tamaño máximo de los íconos de favoritos."
+msgstr "设置收藏夹图标最大尺寸."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-cat-size->description
 msgid "Category icon size:"
-msgstr "Tamaño de los íconos de las categorías:"
+msgstr "目录图标尺寸:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-cat-size->tooltip
 msgid "Set the category icon size."
-msgstr "Establesca el tamaño de los íconos de las categorías."
+msgstr "设置目录图标尺寸."
 
 #. configurableMenu@lestcape->settings-schema.json->show-time-
 #. date->description
 msgid "Show time and date"
-msgstr "Mostrar fecha y hora"
+msgstr "显示时间与日期"
 
 #. configurableMenu@lestcape->settings-schema.json->show-time-date->tooltip
 msgid "Choose whether or not to show time and date on the menu."
-msgstr "Seleccione si desea o no mostrar la fecha y hora en el menú."
+msgstr "选择是否在菜单显示时间与日期"
 
 #. configurableMenu@lestcape->settings-schema.json->automatic-
 #. size->description
 msgid "Automatic size"
-msgstr "Tamaño automático"
+msgstr "自动调整尺寸"
 
 #. configurableMenu@lestcape->settings-schema.json->allow-resizing->tooltip
 msgid "Choose whether or not to allow resizing the menu."
-msgstr "Elija si desea o no permitir el cambio de tamaño del menú."
+msgstr "选择是否允许重新调整菜单尺寸."
 
 #. configurableMenu@lestcape->settings-schema.json->automatic-size->tooltip
 msgid "Choose whether or not to automatic adjust of the menu size."
-msgstr ""
-"Seleccione si desea o no que el tamaño del menú sea ajustado automáticamente."
+msgstr "选择是否自动调整菜单尺寸."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-power-
 #. size->description
 msgid "System icons size:"
-msgstr "Tamaño de los íconos del sistema:"
+msgstr "系统图标尺寸:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-power-size->tooltip
 msgid "Set the system icons size."
-msgstr "Establesca el tamaño de los íconos del sistema."
+msgstr "设置系统图标尺寸."
 
 #. configurableMenu@lestcape->settings-schema.json->enable-
 #. autoscroll->description
 msgid "Enable autoscrolling"
-msgstr "Habilitar desplazamiento automático"
+msgstr "开启自动滚动"
 
 #. configurableMenu@lestcape->settings-schema.json->enable-autoscroll->tooltip
 msgid "Choose whether or not to enable smooth autoscrolling on the menu."
-msgstr ""
-"Seleccione si desea o no habilitar el desplazamiento automático en el menú."
+msgstr "选择是否在菜单开启自动滚动."
 
 #. configurableMenu@lestcape->settings-schema.json->show-
 #. favorites->description
 msgid "Show favorites"
-msgstr "Mostrar favoritos"
+msgstr "显示收藏夹"
 
 #. configurableMenu@lestcape->settings-schema.json->show-favorites->tooltip
 msgid "Choose whether or not to show favorites on the menu."
-msgstr "Seleccione si desea o no mostrar los favoritos en el menú."
+msgstr "显示是否在菜单显示收藏夹."
 
 #. configurableMenu@lestcape->settings-schema.json->control-box->description
 msgid "Control buttons have a box"
-msgstr "Los botones de control tienen caja"
+msgstr "控制按钮有边框"
 
 #. configurableMenu@lestcape->settings-schema.json->control-box->tooltip
 msgid "Choose whether or not to have a box on the control buttons."
-msgstr "Seleccione si desea o no que los botones de control tengan caja."
+msgstr "选择是否设置控制按钮有边框."
 
 #. configurableMenu@lestcape->settings-schema.json->categories-
 #. icons->description
 msgid "Show icons on the categories"
-msgstr "Mostrar íconos en las categorías"
+msgstr "在目录上显示图标"
 
 #. configurableMenu@lestcape->settings-schema.json->categories-icons->tooltip
 msgid "Choose whether or not to have icons on the categories."
-msgstr "Seleccione si desea o no que las categorías se muentren con íconos."
+msgstr "选择是否在目录上显示图标."
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. categories->description
 msgid "Show scrolling area of categories"
-msgstr "Mostrar el área de desplazamiento de las categorías"
+msgstr "显示目录的滚动区域"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-categories->tooltip
 msgid "Choose whether or not to show the scrolling area of categories."
-msgstr ""
-"Seleccione si desea o no mostrar mostrar el área de desplazamiento de las "
-"categorías."
+msgstr "选择是否显示目录的滚动区域."
 
 #. configurableMenu@lestcape->settings-schema.json->arrow-categories->description
 msgid "Show arrow on the categories"
-msgstr "Mostrar una flecha en las categorias."
+msgstr "在目录上显示箭头"
 
 #. configurableMenu@lestcape->settings-schema.json->arrow-categories->tooltip
 msgid "Choose whether or not to show the arrow on the categories."
-msgstr ""
-"Seleccione si desea o no mostrar una flecha de indicación en las categorías."
+msgstr "选择是否在目录上显示箭头."
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. description->description
 msgid "Show description of the selected application"
-msgstr "Mostrar la descripción de la aplicación seleccionada"
+msgstr "显示所选应用程序描述"
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. description->tooltip
 msgid ""
 "Choose whether or not to show the selected application description on the "
 "menu."
-msgstr ""
-"Seleccione si desea o no mostrar la descripción de la aplicación "
-"seleccionada en el menú."
+msgstr "选择是否显示所选应用程序描述."
 
 #. configurableMenu@lestcape->settings-schema.json->show-box-
 #. pointer->description
 msgid "Show menu box pointer"
-msgstr "Mostrar el apuntador del menú"
+msgstr "显示菜单边框指针"
 
 #. configurableMenu@lestcape->settings-schema.json->show-box-pointer->tooltip
 msgid "Choose whether or not to show the menu box pointer."
-msgstr ""
-"Seleccione si desea o no mostrar el apuntador de la caja principal del menú."
+msgstr "选择是否显示菜单边框指针."
 
 #. configurableMenu@lestcape->settings-schema.json->date-format->description
 msgid "Date format:"
-msgstr "Formato de fecha:"
+msgstr "日期格式:"
 
 #. configurableMenu@lestcape->settings-schema.json->date-format->tooltip
 msgid "Choose the date format to show time on the menu."
-msgstr "Seleccione el formato de fecha para ser mostrado en el menú."
+msgstr "选择菜单上显示的日期格式."
 
 #. configurableMenu@lestcape->settings-schema.json->spacer-line->description
 msgid "Show separator line"
-msgstr "Mostrar linea en el separador"
+msgstr "显示分隔线"
 
 #. configurableMenu@lestcape->settings-schema.json->spacer-line->tooltip
 msgid "Choose whether or not to show a line on separator."
-msgstr "Seleccione si desea o no mostrar una linea en el separador."
+msgstr "选择是否显示分隔线"
 
 #. configurableMenu@lestcape->settings-schema.json->app-description-
 #. size->description
 msgid "Font size of the selected application description:"
-msgstr "Tamaño de fuente en la descripción de la aplicación seleccionada:"
+msgstr "选定应用程序描述字体尺寸:"
 
 #. configurableMenu@lestcape->settings-schema.json->app-description-
 #. size->tooltip
 msgid "Set the font size of the selected application description."
-msgstr ""
-"Seleccione el tamaño de fuente en la descripción de la aplicación "
-"seleccionada."
+msgstr "设置选定应用程序描述字体尺寸."
 
 #. configurableMenu@lestcape->settings-schema.json->show-power-
 #. buttons->description
 msgid "Show system buttons"
-msgstr "Mostrar los botones del sistema"
+msgstr "显示系统按钮"
 
 #. configurableMenu@lestcape->settings-schema.json->show-power-
 #. buttons->tooltip
 msgid "Choose whether or not to show system buttons on the menu."
-msgstr "Seleccione si desea o no mostrar los botones del sistema en el menú."
+msgstr "选择是否在菜单显示系统按钮."
 
 #. configurableMenu@lestcape->settings-schema.json->show-removable-
 #. drives->description
 msgid "Show removable drives on the accessible panel"
-msgstr "Mostrar las unidades extraíbles en el panel accessible"
+msgstr "在辅助面板显示可移动磁盘"
 
 #. configurableMenu@lestcape->settings-schema.json->show-removable-
 #. drives->tooltip
 msgid "Choose whether or not to show removable drives on the accessible panel."
-msgstr ""
-"Seleccione si desea o no mostrar las unidades extraíbles en el panel "
-"accessible."
+msgstr "选择是否在辅助面板显示可移动磁盘"
 
 #. configurableMenu@lestcape->settings-schema.json->power-box->description
 msgid "System buttons have a box"
-msgstr "Los botones del sistema tienen caja"
+msgstr "系统按钮周围显示边框"
 
 #. configurableMenu@lestcape->settings-schema.json->power-box->tooltip
 msgid "Choose whether or not to have a box on the system buttons."
-msgstr "Seleccione si desea o no que los botones del sistema tengan caja."
+msgstr "选择是否在系统按钮周围显示边框."
 
 #. configurableMenu@lestcape->settings-schema.json->power-symbolic->description
 msgid "Show symbolic icons on the system buttons"
-msgstr "Mostrar íconos simbólicos en los botones del sistema"
+msgstr "在系统按钮显示符号化按钮"
 
 #. configurableMenu@lestcape->settings-schema.json->power-symbolic->tooltip
 msgid ""
 "Enable this option to show symbolic icons, on the system buttons and disable "
 "to show full color."
-msgstr ""
-"Active esta opción para mostrar los íconos simbólicos en los botones del "
-"sistema y desactivela para mostrarlos a todo color."
+msgstr "开启此项可在系统按钮显示符号化图标而非全彩图标."
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-align->description
 msgid "Align the submenu with the parent"
-msgstr "Alinear el submenú con el padre"
+msgstr "子菜单与父菜单对齐"
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-align->tooltip
 msgid "Choose whether or not to align the submenu with the parent."
-msgstr "Elija si desea o no alinear el submenú con el padre."
+msgstr "选择是否将子菜单与父菜单对齐."
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-width->description
 msgid "Submenu width:"
-msgstr "Ancho del submenú"
+msgstr "子菜单宽度:"
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-width->tooltip
 msgid "Set the submenu width."
-msgstr "Ajuste el ancho de submenú."
+msgstr "设置子菜单宽度."
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-height->description
 msgid "Submenu height:"
-msgstr "Alto del submenú"
+msgstr "子菜单高度:"
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-height->tooltip
 msgid "Set the submenu height."
-msgstr "Ajuste el alto del submenú."
+msgstr "设置子菜单高度."
 
 #. configurableMenu@lestcape->settings-schema.json->search-web->description
 msgid "Enable web search"
-msgstr "Habilitar búsqueda en la web"
+msgstr "开启网络搜索"
 
 #. configurableMenu@lestcape->settings-schema.json->search-web->tooltip
 msgid "Allows the web search with the selected search engines."
-msgstr ""
-"Permitir la búsqueda en la web con los motores de búsqueda seleccionados."
+msgstr "允许使用选定的检索引擎."
 
 #. configurableMenu@lestcape->settings-schema.json->search-wikipedia->description
 msgid "Enable web search with wikipedia"
-msgstr "Habilitar la búsqueda web con wikipedia"
+msgstr "开启wikipedia检索引擎"
 
 #. configurableMenu@lestcape->settings-schema.json->search-wikipedia->tooltip
 msgid "Allows web search to the wikipedia search engine."
-msgstr "Permitir la búsqueda en la web al motor de búsqueda wikipedia."
+msgstr "允许使用wikipedia检索引擎."
 
 #. configurableMenu@lestcape->settings-schema.json->search-google->description
 msgid "Enable web search with google"
-msgstr "Habilitar búsqueda en la web con google"
+msgstr "Enable web search with google"
 
 #. configurableMenu@lestcape->settings-schema.json->search-google->tooltip
 msgid "Allows web search to the google search engine."
-msgstr "Permitir la búsqueda en la web al motor de búsqueda google."
+msgstr "允许使用google检索引擎."
 
 #. configurableMenu@lestcape->settings-schema.json->search-duckduckgo->description
 msgid "Enable web search with duckduckgo"
-msgstr "Habilitar búsqueda en la web con duckduckgo"
+msgstr "开启duckduckgo检索引擎"
 
 #. configurableMenu@lestcape->settings-schema.json->search-duckduckgo->tooltip
 msgid "Allows web search to the duckduckgo search engine."
-msgstr "Permitir la búsqueda en la web al motor de búsqueda duckduckgo."
+msgstr "允许使用duckduckgo检索引擎"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-tools->description
 msgid "Enable the Cinnamon Installer tool"
-msgstr "Activar la herramienta Cinnamon Installer"
+msgstr "开启Cinnamon安装工具"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-tools->tooltip
 msgid ""
 "Allows install, uninstall and search for programs and packages(need internet "
 "connection to be download)."
-msgstr ""
-"Permite instalar, desinstalar, buscar programas y paquetes (necesita "
-"conexión a Internet para ser descargado)."
+msgstr "允许安装，卸载和检索软件（需要网络连接）."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-search->description
 msgid "Enable to search for packages"
-msgstr "Habilitar la búsqueda de paquetes"
+msgstr "开启检索新的软件包"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-search->tooltip
 msgid "Allows search for new packages on the repository."
-msgstr "Permite la búsqueda de nuevos paquetes en el repositorio."
+msgstr "允许在软件库中检索新的软件包."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-button->description
 msgid "Update the Cinnamon Installer tool"
-msgstr "Actualización de la herramienta Cinnamon Installer"
+msgstr "更新Cinnamon安装工具"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-button->tooltip
 msgid "Press this button to update the Cinnamon Installer tool."
-msgstr "Presione este botón para actualizar la herramienta Cinnamon Installer."
+msgstr "按此键更新Cinnamon安装工具."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-check->description
 msgid ""
 "Enable to check for a new version of Cinnamon Installer when the menu started"
-msgstr ""
-"Habilitar para comprobar si hay una nueva versión de la Cinnamon Installer "
-"cuando se inicie el menú"
+msgstr "开启在菜单启动时检查有无新版本Cinnamon安装工具"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-check->tooltip
 msgid ""
 "Allows to check for a new version of Cinnamon Installer when the menu "
 "started."
-msgstr ""
-"Permite comprobar si hay una nueva versión de la Cinnamon Installer cuando "
-"se inicie el menú."
+msgstr "允许菜单启动时检查有无新版本Cinnamon安装工具."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-uninstall-button->description
 msgid "Uninstall the Cinnamon Installer tool"
-msgstr "Desinstalar la herramienta Cinnamon Installer"
+msgstr "按此键卸载Cinnamon安装工具"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-uninstall-button->tooltip
 msgid "Press this button to uninstall the Cinnamon Installer tool."
-msgstr ""
-"Presione este botón para desinstalar la herramienta Cinnamon Installer."
+msgstr "按此键卸载Cinnamon安装工具."

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-04-12 02:41-0600\n"
+"PO-Revision-Date: 2014-05-03 02:13-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: garibaldo and lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -311,7 +311,7 @@ msgid "Horizontal Grid"
 msgstr "Horizontal Grid"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
-msgid "Vertical"
+msgid "Vertical Only"
 msgstr "Vertical"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
@@ -327,16 +327,16 @@ msgid "Vertical Grid"
 msgstr "Vertical Grid"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
+msgid "Horizontal Only"
+msgstr "Horizontal"
+
+#. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Horizontal List"
 msgstr "Horizontal List"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Retractable"
 msgstr "Retractable"
-
-#. configurableMenu@lestcape->settings-schema.json->power-theme->options
-msgid "Horizontal"
-msgstr "Horizontal"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. favorites->description
@@ -546,6 +546,10 @@ msgstr "Accessible Inverted"
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Dragon Inverted"
 msgstr "Dragon Inverted"
+
+#. configurableMenu@lestcape->settings-schema.json->theme->options
+msgid "Horizontal"
+msgstr "Horizontal"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Windows 7"
@@ -904,7 +908,7 @@ msgstr "Allows web search to the duckduckgo search engine."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-tools->description
 msgid "Enable the Cinnamon Installer tool"
-msgstr ""
+msgstr "Enable the Cinnamon Installer tool"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-tools->tooltip
 msgid ""

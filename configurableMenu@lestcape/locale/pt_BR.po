@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-04-12 08:52-0600\n"
+"PO-Revision-Date: 2014-05-03 02:14-0600\n"
 "Last-Translator: Eliermi Cunha Junior <jpegrande@gmailcom>\n"
 "Language-Team: Eliermi Cunha Junior <jpegrande@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -312,7 +312,7 @@ msgid "Horizontal Grid"
 msgstr "Grade horizontal"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
-msgid "Vertical"
+msgid "Vertical Only"
 msgstr "Vertical"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
@@ -336,7 +336,7 @@ msgid "Retractable"
 msgstr "Retrátil"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
-msgid "Horizontal"
+msgid "Horizontal Only"
 msgstr "Horizontal"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
@@ -546,6 +546,10 @@ msgstr "Acessível invertido"
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Dragon Inverted"
 msgstr "Dragão invertido"
+
+#. configurableMenu@lestcape->settings-schema.json->theme->options
+msgid "Horizontal"
+msgstr "Horizontal"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Windows 7"

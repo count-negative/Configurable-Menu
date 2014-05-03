@@ -8,537 +8,524 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-05-03 02:13-0600\n"
-"Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
-"Language-Team: lestcape <lestcape@gmail.com>\n"
+"PO-Revision-Date: 2014-05-03 02:12-0600\n"
+"Last-Translator: Libor Schejbal <libor.schejbal@gmail.com>\n"
+"Language-Team: Libor Schejbal <libor.schejbal@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: es\n"
+"Language: cs_Cz\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 1.5.4\n"
 
 #: applet.js:83 applet.js:3678 cinnamonMenu.js:536
 msgid "Execution of '%s' failed:"
-msgstr "Ha fallado ejecución de '%s':"
+msgstr "Operace pro '%s' selhala:"
 
 #: applet.js:103 applet.js:3678 cinnamonMenu.js:536
 msgid "Command not found."
-msgstr "Comando no encontrado"
+msgstr "Příkaz nebyl nalezen."
 
 #: applet.js:133 applet.js:3678 cinnamonMenu.js:536
 msgid "Package %s"
-msgstr "Paquete %s"
+msgstr "Balíček %s"
 
 #: applet.js:150 applet.js:3678 cinnamonMenu.js:536
 msgid "Package to install %s"
-msgstr "Paquete para instalar %s"
+msgstr "Balíček pro instalaci %s"
 
-#: applet.js:383 applet.js:3678 cinnamonMenu.js:536 applet.js:1452
+#: applet.js:1452
 msgid "List View"
-msgstr "Vista de lista"
+msgstr "Zobrazit seznam"
 
 #: applet.js:1455
 msgid "Grid View"
-msgstr "Vista de cuadrícula"
+msgstr ""
 
 #: applet.js:1455
 msgid "Show application entries in list view"
-msgstr "Mostrar las entradas de applicación en vista de lista"
+msgstr ""
 
 #: applet.js:1459
 msgid "Prevent resizing"
-msgstr "Prevenir el cambio de tamaño"
+msgstr "Zamezit změně velikosti"
 
 #: applet.js:1459
 msgid "Prevent resizing the menu"
-msgstr "Prevenir el cambio de tamaño del menú"
+msgstr "Zamezit změně velikosti Menu"
 
 #: applet.js:1461
 msgid "Allow resizing"
-msgstr "Permitir el cambio de tamaño"
+msgstr "Povolit změnu velikosti"
 
 #: applet.js:1461
 msgid "Allow resizing the menu"
-msgstr "Permitir el cambio de tamaño del menú"
+msgstr "Povolit změnu velikosti Menu"
 
 #: applet.js:1465
 msgid "Recover size"
-msgstr "Recobar el tamaño"
+msgstr "Obnovení velikosti"
 
 #: applet.js:1465
 msgid "Recover the normal menu size"
-msgstr "Recobrar el tamaño"
+msgstr "Obnovení velikosti Menu na normální"
 
 #: applet.js:1467
 msgid "Full Screen"
-msgstr "Pantalla Completa"
+msgstr "Celá obrazovka"
 
 #: applet.js:1467
 msgid "Put the menu in full screen mode"
-msgstr "Poner el menú en modo de pantalla completa"
+msgstr "Vložit nabídku v režimu celé obrazovky"
 
 #: applet.js:1470
 msgid "Configure the menu options"
-msgstr "Configurar las opciones del menú"
+msgstr "Konfigurace nastavení Menu"
 
 #: applet.js:1671 applet.js:1683
 msgid "Remove from accessible panel"
-msgstr "Quitar del panel accesible"
+msgstr ""
 
 #: applet.js:1674 applet.js:1686
 msgid "Add to accessible panel"
-msgstr "Añadir al panel accesible"
+msgstr ""
 
 #: applet.js:1674 applet.js:1686
 msgid "Save name"
-msgstr "Salvar nombre"
+msgstr "Uložit název"
 
 #: applet.js:1674 applet.js:1686
 msgid "Edit name"
-msgstr "Editar nombre"
+msgstr "Upravit název"
 
 #: applet.js:1674 applet.js:1686
 msgid "Default name"
-msgstr "Nombre por defecto"
+msgstr "Výchozí název"
 
 #: applet.js:5815
 msgid "Filter:"
-msgstr "Filtro:"
+msgstr "Filtr:"
 
 #: applet.js:5817 applet.js:6100 applet.js:6131 applet.js:6165
 msgid "Favorites"
-msgstr "Favoritos"
+msgstr "Oblíbené"
 
 #: applet.js:6213
 msgid "Search %s for %s"
-msgstr "Buscar en %s por %s"
+msgstr "Hledání %s pro %s"
 
 #. configurableMenu@lestcape->settings-schema.json->header-layouts->description
 msgid "Layouts:"
-msgstr "Diseños:"
+msgstr "Rozložení:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-menu->description
 msgid "Menu:"
-msgstr "Menú:"
+msgstr "Menu:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-size->description
 msgid "Menu Size:"
-msgstr "Tamaño del Menú:"
+msgstr "Velikost Menu"
 
 #. configurableMenu@lestcape->settings-schema.json->header-reaction->description
 msgid "Menu Reaction:"
-msgstr "Reacción del Menú:"
+msgstr "Reakce Menu"
 
 #. configurableMenu@lestcape->settings-schema.json->header-categories->description
 msgid "Categories:"
-msgstr "Categorias:"
+msgstr "Kategorie:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-apps->description
 msgid "Applications:"
-msgstr "Aplicaciones:"
+msgstr "Aplikace:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-favorites->description
 msgid "Favorites:"
-msgstr "Favoritos:"
+msgstr "Oblíbené:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-hover->description
 msgid "Hover Icon:"
-msgstr "Ícono de Visualización:"
+msgstr "Najetí na ikonu:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-system->description
 msgid "System Buttons:"
-msgstr "Botones del Sistema:"
+msgstr "Systémová tlačítka"
 
 #. configurableMenu@lestcape->settings-schema.json->header-control->description
 msgid "Control Buttons:"
-msgstr "Botones de Control:"
+msgstr "Ovládací tlačítka:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-separators->description
 msgid "Separators:"
-msgstr "Separadores:"
+msgstr "Oddělovače:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-information->description
 msgid "Information Panel:"
-msgstr "Panel de información"
+msgstr "Informační panel:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-accessible->description
 msgid "Accessible Panel:"
-msgstr "Panel Accessible:"
+msgstr "Dostupný panel:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-gnomenu->description
 msgid "GnoMenu Panel:"
-msgstr "Panel GnoMenu:"
+msgstr "Panel Gnomenu:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-submenu->description
 msgid "Submenu:"
-msgstr "Submenú:"
+msgstr "Podmenu:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-search->description
 msgid "General search options:"
-msgstr "Opciones generales de búsqueda:"
+msgstr "Obecné možnosti vyhledávání:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-install->description
 msgid "Installer and uninstaller tools:"
-msgstr "Herramienta para instalar y desintalar:"
+msgstr "Instalační a odinstalační nástroje:"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->description
 msgid "Effect on opening and closing:"
-msgstr "Efecto sobre la apertura y cierre:"
+msgstr "Efekt při otevření a zavření:"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->tooltip
 msgid "Select the effect on the menu opening and closing."
-msgstr "Seleccionar el efecto sobre la apertura y el cierre del menú."
+msgstr "Vyberte efekt při otevření a zavření"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->options
 msgid "None"
-msgstr "Ninguno"
+msgstr "Žádný"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->options
 msgid "Dispel"
-msgstr "Desvanecer"
+msgstr "Rozptýlení"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->options
 msgid "Hide Horizontal"
-msgstr "Ocultar Horizontal"
+msgstr "Skrýt horizontálně"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->options
 msgid "Hide Vertical"
-msgstr "Ocultar Vertical"
+msgstr "Skrýt vertikálně"
 
 #. configurableMenu@lestcape->settings-schema.json->effect-time->description
 msgid "Duration of effect:"
-msgstr "Duración del efecto:"
+msgstr "Doba trvání efektu:"
 
 #. configurableMenu@lestcape->settings-schema.json->effect-time->tooltip
 msgid "The time on seconds to perform the effect(More time is slower)."
 msgstr ""
-"El tiempo en segundos para realizar el efecto (Más tiempo es más lento)."
+"Doba v sekundách, po kterou bude efekt  vykonáván (čím větší, tím pomalejší)."
 
 #. configurableMenu@lestcape->settings-schema.json->swap-panels->description
 msgid "Swap the top and bottom panel"
-msgstr "Intercambiar el panel superior e inferior"
+msgstr "Zaměnit horní a spodní panel"
 
 #. configurableMenu@lestcape->settings-schema.json->swap-panels->tooltip
 msgid "Choose whether or not to swap the top and bottom panel on the menu."
-msgstr ""
-"Seleccione si desea o no intercambiar el panel superior e inferior en el "
-"menú."
+msgstr "Zvolte, zda chcete vyměnit horní a spodní panel v nabídce."
 
 #. configurableMenu@lestcape->settings-schema.json->allow-search->description
 msgid "Show search entry"
-msgstr "Mostrar la entrada de búsqueda"
+msgstr "Zobrazit pole pro vyhledávání"
 
 #. configurableMenu@lestcape->settings-schema.json->allow-search->tooltip
 msgid "Choose whether or not to show search entry on the menu."
-msgstr "Elija si mostrar o no la entrada de búsqueda en el menú."
+msgstr "Zvolte, zda chcete zobrazit pole pro vyhledávání v nabídce."
 
 #. configurableMenu@lestcape->settings-schema.json->app-title-
 #. size->description
 msgid "Font size of the selected application name:"
-msgstr "Tamaño de la fuente del nombre de la aplicación seleccionada:"
+msgstr "Velikost písma vybraného názvu aplikace:"
 
 #. configurableMenu@lestcape->settings-schema.json->app-title-size->tooltip
 msgid "Set the font size of the selected application name."
-msgstr ""
-"Establecer el tamaño de la fuente del nombre de la aplicación seleccionada:"
+msgstr "Nastavte velikost písma vybraného názvu aplikace."
 
 #. configurableMenu@lestcape->settings-schema.json->menu-theme-
 #. save-button->description
 msgid "Save the layout configuration"
-msgstr "Salvar la configuración del diseño actual"
+msgstr "Uložit nastavení layoutu."
 
 #. configurableMenu@lestcape->settings-schema.json->menu-theme-
 #. save-button->tooltip
 msgid "Press this button to save the layout configuration."
-msgstr "Pulse este botón para salvar la configuración del diseño actual."
+msgstr "Stiskněte toto tlačítko pro uložení nastavení layoutu."
 
 #. configurableMenu@lestcape->settings-schema.json->app-title-size->units
 msgid "points"
-msgstr "puntos"
+msgstr "místa"
 
 #. configurableMenu@lestcape->settings-schema.json->favorites-
 #. lines->description
 msgid "Number of favorites lines:"
-msgstr "Número de favoritos:"
+msgstr "Číslo řádku v Oblíbených"
 
 #. configurableMenu@lestcape->settings-schema.json->favorites-lines->tooltip
 msgid "Choose the number of favorites lines."
-msgstr "Seleccione el número de lineas que tendrá sus favoritos."
+msgstr "Zvolte číslo řádku v Oblíbených."
 
 #. configurableMenu@lestcape->settings-schema.json->favorites-lines->units
 msgid "lines"
-msgstr "lineas"
+msgstr "řádky"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->description
 msgid "GnoMenu buttons layout:"
-msgstr "Diseño de los botones de GnoMenu:"
+msgstr "Rozložení tlačítek v Gnomenu"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->tooltip
 msgid "Select a layout of GnoMenu buttons."
-msgstr "Seleccione un diseño de los botones de GnoMenu."
+msgstr "Vyberte rozložení tlačítek v Gnomenu."
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
 msgid "Only Icons"
-msgstr "Solo Íconos"
+msgstr "Jen ikony"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
 msgid "Only Text"
-msgstr "Solo Texto"
+msgstr "Jen text"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
 msgid "Grid"
-msgstr "Cuadrícula"
+msgstr "Mřížka"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
 msgid "List"
-msgstr "Lista"
+msgstr "Seznam"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->description
 msgid "System buttons layout:"
-msgstr "Diseño de los botones del sistema:"
+msgstr "Rozložení systémových tlačítek"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->tooltip
 msgid "Select a layout of system buttons."
-msgstr "Seleccione un diseño de los botones del sistema."
+msgstr "Vyberte rozložení systémových tlačítek"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Retractable Text"
-msgstr "Retractable Solo Texto"
+msgstr "Vysouvací text"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Vertical Text"
-msgstr "Vertical Solo Texto"
+msgstr "Vertikální text"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Horizontal Grid"
-msgstr "Horizontal Modo Cuadrícula"
+msgstr "Horizontální mřížka"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Vertical Only"
-msgstr "Vertical"
+msgstr "Vertikální"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Horizontal Text"
-msgstr "Horizontal Solo Texto"
+msgstr "Horizontální text"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Vertical List"
-msgstr "Vertical Modo Lista"
+msgstr "Vertikální seznam"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Vertical Grid"
-msgstr "Vertical Modo Cuadrícula"
-
-#. configurableMenu@lestcape->settings-schema.json->power-theme->options
-msgid "Horizontal List"
-msgstr "Horizontal Modo Lista"
-
-#. configurableMenu@lestcape->settings-schema.json->power-theme->options
-msgid "Retractable"
-msgstr "Retractable"
+msgstr "Vertikální mřížka"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Horizontal Only"
-msgstr "Horizontal"
+msgstr "Vodorovné"
+
+#. configurableMenu@lestcape->settings-schema.json->power-theme->options
+msgid "Horizontal List"
+msgstr "Horizontální seznam"
+
+#. configurableMenu@lestcape->settings-schema.json->power-theme->options
+msgid "Retractable"
+msgstr "Vysouvací"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. favorites->description
 msgid "Show scrolling area of favorites"
-msgstr "Mostrar el área de desplazamiento de favoritos"
+msgstr "Zobrazit rolovací oblast v Oblíbených"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-favorites->tooltip
 msgid "Choose whether or not to show the scrolling area of favorites."
-msgstr ""
-"Seleccione si desea o no mostrar el área de desplazamiento de favoritos."
+msgstr "Zvolte, zda chcete zobrazit rolovací oblast v Oblíbených."
 
 #. configurableMenu@lestcape->settings-schema.json->activate-on-
 #. press->description
 msgid "Open the menu when I press my mouse over it"
-msgstr "Abrir el menu cuando se presione el ratón sobre el."
+msgstr "Otevřít nabídku po stisknutí tlačítka myši"
 
 #. configurableMenu@lestcape->settings-schema.json->activate-on-press->tooltip
 msgid "Enable opening the menu when the mouse press over the applet."
-msgstr "Habilitar abrir el menu cuando se presione el ratón sobre el."
+msgstr "Otevře nabídku stisknutím tlačítka myši na appletu."
 
 #. configurableMenu@lestcape->settings-schema.json->height->description
 msgid "Menu height:"
-msgstr "Altura del menú:"
+msgstr "Výška Menu"
 
 #. configurableMenu@lestcape->settings-schema.json->height->tooltip
 msgid "Height of the menu."
-msgstr "Altura del menú."
+msgstr "Nastavení výšky Menu."
 
 #. configurableMenu@lestcape->settings-schema.json->app-
 #. description->description
 msgid "Application entries have description"
-msgstr "Las entradas de applicaciones tendrán descripciones"
+msgstr "Položky aplikací mají popis"
 
 #. configurableMenu@lestcape->settings-schema.json->app-description->tooltip
 msgid "Choose whether or not to have description on application entries."
-msgstr ""
-"Seleccione si desea o no tener la descripción en las entradas del la "
-"applicación."
+msgstr "Zvolte, zda mít či nemít popisky u jednotlivých položek aplikací."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-control-
 #. size->description
 msgid "Control icon size:"
-msgstr "Tamaño de íconos de control:"
+msgstr "Velikost ovládacích ikon:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-control-size->tooltip
 msgid "Set the control icon size."
-msgstr "Establecer el tamaño de los íconos de control."
+msgstr "Nastavte si velikost ovládacích ikon."
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. applications->description
 msgid "Show scrolling area of applications"
-msgstr "Mostrar el área de desplazamiento de las applicaciones"
+msgstr "Zobrazit rolovací oblasti v aplikacích"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. applications->tooltip
 msgid "Choose whether or not to show the scrolling area of applications."
-msgstr ""
-"Seleccione si desea mostrar o no el área de desplazamiento de las "
-"aplicaciones."
+msgstr "Zvolte, zda chcete zobrazit rolovací oblast v aplikacích."
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. accessible->description
 msgid "Show scrolling area of accessible panel"
-msgstr "Mostrar el área de desplazamiento del panel accesible"
+msgstr "Zobrazit rolovací oblast v dostupném panelu"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-accessible->tooltip
 msgid "Choose whether or not to show the scrolling area of accessible panel."
-msgstr ""
-"Seleccione si desea mostrar o no el área de desplazamiento del panel "
-"accesible."
+msgstr "Zvolte, zda chcete zobrazit rolovací oblast v dostupném panelu."
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. gnomenu->description
 msgid "Show scrolling area of GnoMenu panel"
-msgstr "Mostrar el área de desplazamiento del panel GnoMenu"
+msgstr "Zobrazit rolovací oblast V Gnomenu"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-gnomenu->tooltip
 msgid "Choose whether or not to show the scrolling area of GnoMenu panel."
-msgstr ""
-"Seleccione si desea mostrar o no el área de desplazamiento del panel GnoMenu."
+msgstr "Zvolte, zda chcete zobrazit rolovací oblast v Gnomenu"
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. title->description
 msgid "Show name of the selected application"
-msgstr "Mostrar el nombre de la applicación seleccionada"
+msgstr "Zobrazit název vybrané aplikace"
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-title->tooltip
 msgid ""
 "Choose whether or not to show the selected application name on the menu."
-msgstr ""
-"Seleccione si desea mostrar o no el nombre de la applicación seleccionada en "
-"el menú."
+msgstr "Zvolte, zda chcete zobrazit název vybrané aplikace v nabídce"
 
 #. configurableMenu@lestcape->settings-schema.json->full-screen->description
 msgid "Full screen"
-msgstr "Pantalla completa"
+msgstr "Celá obrazovka"
 
 #. configurableMenu@lestcape->settings-schema.json->full-screen->tooltip
 msgid "Choose whether or not to put the menu in full screen mode."
-msgstr "Seleccione si desea o no poner el menú en modo pantalla completa."
+msgstr "Zvolte, zda chcete nabídku zobrazit v režimu celé obrazovky."
 
 #. configurableMenu@lestcape->settings-schema.json->control-symbolic->description
 msgid "Show symbolic icons on the control buttons"
-msgstr "Mostrar íconos simbólicos en los botones de control"
+msgstr "Zobrazit symbolické ikony v ovládacích tlačítkách"
 
 #. configurableMenu@lestcape->settings-schema.json->control-symbolic->tooltip
 msgid ""
 "Enable this option to show symbolic icons, on the control buttons and "
 "disable to show full color."
 msgstr ""
-"Active esta opción para mostrar los íconos simbólicos en los botones de "
-"control y desactivela para mostrarlos a todo color."
+"Povolte tuto volbu pro zobrazení symbolických ikon na ovládacích tlačítkách "
+"a vypnutí plnobarevného zobrazení."
 
 #. configurableMenu@lestcape->settings-schema.json->show-view-
 #. item->description
 msgid "Show control buttons"
-msgstr "Mostrar los botones de control"
+msgstr "Zobrazit ovládací tlačítka"
 
 #. configurableMenu@lestcape->settings-schema.json->show-view-item->tooltip
 msgid "Choose whether or not to show control buttons."
-msgstr "Seleccione si desea o no mostrar los botones de control"
+msgstr "Zvolte, zda se mají zobrazovat ovládací tlačítka."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-app-size->description
 msgid "Application icon size:"
-msgstr "Tamaño de los íconos de las applicaciones:"
+msgstr "Velikost ikon aplikací:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-app-size->tooltip
 msgid "Set the application icon size."
-msgstr "Establesca el tamaño de los íconos de las applicaciones:"
+msgstr "Zadejte velikost ikon aplikací."
 
 #. configurableMenu@lestcape->settings-schema.json->hover-box->description
 msgid "Hover icon have a box"
-msgstr "El ícono de visualización tiene caja"
+msgstr "Při umístění ukazatele myši zobrazit box"
 
 #. configurableMenu@lestcape->settings-schema.json->hover-box->tooltip
 msgid "Choose whether or not to have a box on the hover icon."
-msgstr "Seleccione si desea o no tener una caja en el ícono de visualización."
+msgstr "Zvolte, zda chcete zobrazit box při najetí na ikonu."
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-
 #. box->description
 msgid "Accessible panel has a box"
-msgstr "El panel accessible tiene caja"
+msgstr "Zobrazit box pro dostupný panel"
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-box->tooltip
 msgid "Choose whether or not to have a box on the accessible panel."
-msgstr "Seleccione si desea o no tener una caja en el panel accessible."
+msgstr "Zvolte, zda chcete zobrazovat box na dostupném panelu"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-box->description
 msgid "GnoMenu buttons have a box"
-msgstr "El panel GnoMenu tiene caja"
+msgstr "Zobrazit tlačítko Gnomenu v boxu"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-box->tooltip
 msgid "Choose whether or not to have a box on the GnoMenu buttons."
-msgstr "Seleccione si desea o no tener una caja en el panel GnoMenu."
+msgstr "Zvolte, zda chcete zobrazit tlačítko Gnomenu v boxu."
 
 #. configurableMenu@lestcape->settings-schema.json->spacer-size->description
 msgid "Separator size:"
-msgstr "Tamaño de separación:"
+msgstr "Velikost oddělovače"
 
 #. configurableMenu@lestcape->settings-schema.json->spacer-size->tooltip
 msgid "Choose the size of separator."
-msgstr "Establesca el tamaño de separación."
+msgstr "Zvolte, velikost oddělovače"
 
 #. configurableMenu@lestcape->settings-schema.json->time-format->description
 msgid "Time format:"
-msgstr "Formato del tiempo:"
+msgstr "Formát času:"
 
 #. configurableMenu@lestcape->settings-schema.json->time-format->tooltip
 msgid "Choose the time format to show time on the menu."
-msgstr "Establesca el formato del tiempo para ser mostrado en el menú."
+msgstr "Zvolte formát času, jaký se bude zobrazovat v nabídce"
 
 #. configurableMenu@lestcape->settings-schema.json->width->description
 msgid "Menu width:"
-msgstr "Ancho del menú:"
+msgstr "Šířka Menu"
 
 #. configurableMenu@lestcape->settings-schema.json->width->tooltip
 msgid "Width of the menu."
-msgstr "Ancho del menú."
+msgstr "Nastavení šířky Menu."
 
 #. configurableMenu@lestcape->settings-schema.json->theme->description
 msgid "Menu layout:"
-msgstr "Diseño del menú:"
+msgstr "Rozložení Menu"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->tooltip
 msgid "Select a layout of menu."
-msgstr "Seleccione el diseño del menú."
+msgstr "Vyberte si rozložení nabídky."
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Accessible"
-msgstr "Accessible"
+msgstr "Přizpůsobitelné"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Classic"
-msgstr "Clásico"
+msgstr "Klasické"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Classic Gnome"
-msgstr "Gnome Clásico"
+msgstr "Klasické Gnome"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Whisker"
@@ -546,23 +533,23 @@ msgstr "Whisker"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Dragon"
-msgstr "Dragón"
+msgstr "Dragon"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Stylized"
-msgstr "Estilizado"
+msgstr "Stylizované"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Accessible Inverted"
-msgstr "Accessible Invertido"
+msgstr "Inverzní přizpůsobitelné"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Dragon Inverted"
-msgstr "Dragón Invertido"
+msgstr "Inverzní Dragon"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Horizontal"
-msgstr "Horizontal"
+msgstr "Vodorovné"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Windows 7"
@@ -570,11 +557,11 @@ msgstr "Windows 7"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Mint"
-msgstr "Menta"
+msgstr "Mint"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Vampire"
-msgstr "Vampiro"
+msgstr "Vampír"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Garibaldo"
@@ -582,403 +569,382 @@ msgstr "Garibaldo"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "GnoMenu Left"
-msgstr "GnoMenu Izquierda"
+msgstr "GnoMenu levé"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "GnoMenu Right"
-msgstr "GnoMenu Derecha"
+msgstr "GnoMenu pravé"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "GnoMenu Top"
-msgstr "GnoMenu Arriba"
+msgstr "GnoMenu horní"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "GnoMenu Bottom"
-msgstr "GnoMenu Abajo"
+msgstr "GnoMenu spodní"
 
 #. configurableMenu@lestcape->settings-schema.json->show-hover-
 #. icon->description
 msgid "Show hover icon"
-msgstr "Mostrar el ícono de visualización"
+msgstr "Zobrazit ikony při najetí"
 
 #. configurableMenu@lestcape->settings-schema.json->show-hover-icon->tooltip
 msgid "Choose whether or not to show hover icon on the menu."
-msgstr "Seleccione si desea o no mostrar el ícono de visualización en el menú."
+msgstr "Zvolte, zda chcete zobrazit ikony nabídce při najetí myši."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-hover-
 #. size->description
 msgid "Hover icon size:"
-msgstr "Tamaño del ícono de visualización"
+msgstr "Velikost ikony při najetí:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-hover-size->tooltip
 msgid "Set the hover icon size."
-msgstr "Establesca el tamaño del ícono de visualización."
+msgstr "Zadejte velikost ikony při najetí myši."
 
 #. configurableMenu@lestcape->settings-schema.json->view-item->description
 msgid "Show application entries in grid view"
-msgstr "Mostrar las applicaciones en vista de cuadrícula"
+msgstr "Zobrazit položky aplikací v mřížce"
 
 #. configurableMenu@lestcape->settings-schema.json->view-item->tooltip
 msgid ""
 "Enable show application entries in grid(icon) view and disable show "
 "application entries in list view."
 msgstr ""
-"Habilitado mostrará las applicaciones en vista de cuadrícula(ícono) y "
-"desavilitado las mostrará en vista de lista."
+"Povolit zobrazení aplikací v mřížce (ikony) a zakázat zobrazení položek "
+"aplikací v seznamu."
 
 #. configurableMenu@lestcape->settings-schema.json->app-button-
 #. width->description
 msgid "Maximum width of the application entry text:"
-msgstr "Ancho máximo del texto de las aplicaciones:"
+msgstr "Maximální šířka textu položky aplikace"
 
 #. configurableMenu@lestcape->settings-schema.json->app-button-width->tooltip
 msgid "Set the maximum width of the application entry text."
-msgstr "Establesca el máximo ancho del texto de las applicaciones."
+msgstr "Zadejte maximální šířku textu u položky aplikace."
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-
 #. icons->description
 msgid "Show icons on the accessible panel"
-msgstr "Mostrar íconos en panel accessible"
+msgstr "Zobrazit ikony na hlavním panelu"
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-icons->tooltip
 msgid "Choose whether or not to have icons on the accessible panel."
-msgstr "Seleccione si desea o no que el panel accesible se muestre con íconos."
+msgstr "Choose whether or not to have icons on the accessible panel."
 
 #. configurableMenu@lestcape->settings-schema.json->fix-menu-
 #. corner->description
 msgid "Menu bordering screen edge"
-msgstr "El menú se alinea con su esquina correspondiente"
+msgstr "Menu hraničí s okrajem obrazovky"
 
 #. configurableMenu@lestcape->settings-schema.json->fix-menu-corner->tooltip
 msgid "Choose whether or not the menu bordering the screen edge."
-msgstr ""
-"Seleccione si desea o no que el menú se alinee con su esquina "
-"correspondiente."
+msgstr "Zvolte, zda má nabídka hraničit s okrajem obrazovky."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-accesible-
 #. size->description
 msgid "Accessible icons size:"
-msgstr "Tamaño de los íconos del panel accessible:"
+msgstr "Přizpůsobitelná velikost ikon:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-accesible-
 #. size->tooltip
 msgid "Set the accessible icons size."
-msgstr "Establesca el tamaño de los íconos del panel accessible."
+msgstr "Nastavte si velikost přizpůsobitelných ikon."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-gnomenu-
 #. size->description
 msgid "GnoMenu icons size:"
-msgstr "Tamaño de los íconos del panel GnoMenu:"
+msgstr "Velikost ikon GnoMenu:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-gnomenu-
 #. size->tooltip
 msgid "Set the GnoMenu icons size."
-msgstr "Establesca el tamaño de los íconos del panel GnoMenu."
+msgstr "Nastavte si velikost ikon v GnoMenu"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-max-fav-
 #. size->description
 msgid "Maximum favorites icon size:"
-msgstr "Máximo tamaño de los íconos de favoritos:"
+msgstr "Maximální velikost ikon v Oblíbených:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-max-fav-size->tooltip
 msgid "Set the maximum size of the favorites icon."
-msgstr "Establesca el tamaño máximo de los íconos de favoritos."
+msgstr "Nastavte si maximální velikost ikon v Oblíbených."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-cat-size->description
 msgid "Category icon size:"
-msgstr "Tamaño de los íconos de las categorías:"
+msgstr "Velikost ikon v kategoriích:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-cat-size->tooltip
 msgid "Set the category icon size."
-msgstr "Establesca el tamaño de los íconos de las categorías."
+msgstr "Nastavte si velikost ikon v kategoriích."
 
 #. configurableMenu@lestcape->settings-schema.json->show-time-
 #. date->description
 msgid "Show time and date"
-msgstr "Mostrar fecha y hora"
+msgstr "Zobrazit datum a čas"
 
 #. configurableMenu@lestcape->settings-schema.json->show-time-date->tooltip
 msgid "Choose whether or not to show time and date on the menu."
-msgstr "Seleccione si desea o no mostrar la fecha y hora en el menú."
+msgstr "Zvolte, zda se má či nemá zobrazovat datum a čas v nabídce."
 
 #. configurableMenu@lestcape->settings-schema.json->automatic-
 #. size->description
 msgid "Automatic size"
-msgstr "Tamaño automático"
+msgstr "Automatická velikost"
 
 #. configurableMenu@lestcape->settings-schema.json->allow-resizing->tooltip
 msgid "Choose whether or not to allow resizing the menu."
-msgstr "Elija si desea o no permitir el cambio de tamaño del menú."
+msgstr "Zvolte, zda chcete povolit změnu velikosti menu."
 
 #. configurableMenu@lestcape->settings-schema.json->automatic-size->tooltip
 msgid "Choose whether or not to automatic adjust of the menu size."
-msgstr ""
-"Seleccione si desea o no que el tamaño del menú sea ajustado automáticamente."
+msgstr "Zvolte, zda se má nebo nemá automaticky nastavit velikosti nabídky."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-power-
 #. size->description
 msgid "System icons size:"
-msgstr "Tamaño de los íconos del sistema:"
+msgstr "Velikost systémových ikon:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-power-size->tooltip
 msgid "Set the system icons size."
-msgstr "Establesca el tamaño de los íconos del sistema."
+msgstr "Nastavte si velikost systémových ikon."
 
 #. configurableMenu@lestcape->settings-schema.json->enable-
 #. autoscroll->description
 msgid "Enable autoscrolling"
-msgstr "Habilitar desplazamiento automático"
+msgstr "Zapnout autorolování"
 
 #. configurableMenu@lestcape->settings-schema.json->enable-autoscroll->tooltip
 msgid "Choose whether or not to enable smooth autoscrolling on the menu."
-msgstr ""
-"Seleccione si desea o no habilitar el desplazamiento automático en el menú."
+msgstr "Zvolte, zda chcete umožnit plynulé autorolování v nabídce."
 
 #. configurableMenu@lestcape->settings-schema.json->show-
 #. favorites->description
 msgid "Show favorites"
-msgstr "Mostrar favoritos"
+msgstr "Zobrazit Oblíbené"
 
 #. configurableMenu@lestcape->settings-schema.json->show-favorites->tooltip
 msgid "Choose whether or not to show favorites on the menu."
-msgstr "Seleccione si desea o no mostrar los favoritos en el menú."
+msgstr "Zvolte, zda zobrazit či nikoliv Oblíbené položky v nabídce."
 
 #. configurableMenu@lestcape->settings-schema.json->control-box->description
 msgid "Control buttons have a box"
-msgstr "Los botones de control tienen caja"
+msgstr "Ovládací tlačítka mají box"
 
 #. configurableMenu@lestcape->settings-schema.json->control-box->tooltip
 msgid "Choose whether or not to have a box on the control buttons."
-msgstr "Seleccione si desea o no que los botones de control tengan caja."
+msgstr "Zvolte, zda mají či nemají být ovládací tlačítka v boxu."
 
 #. configurableMenu@lestcape->settings-schema.json->categories-
 #. icons->description
 msgid "Show icons on the categories"
-msgstr "Mostrar íconos en las categorías"
+msgstr "Zobrazit ikony v kategoriích"
 
 #. configurableMenu@lestcape->settings-schema.json->categories-icons->tooltip
 msgid "Choose whether or not to have icons on the categories."
-msgstr "Seleccione si desea o no que las categorías se muentren con íconos."
+msgstr "Zvolte, zda se mají či nemají zobrazovat ikony v kategorích."
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. categories->description
 msgid "Show scrolling area of categories"
-msgstr "Mostrar el área de desplazamiento de las categorías"
+msgstr "Zobrazit rolovací prostor v kategoriích"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-categories->tooltip
 msgid "Choose whether or not to show the scrolling area of categories."
-msgstr ""
-"Seleccione si desea o no mostrar mostrar el área de desplazamiento de las "
-"categorías."
+msgstr "Zvolte, zda se má či nemá zobrazit rolovací prostor v kategoriích."
 
 #. configurableMenu@lestcape->settings-schema.json->arrow-categories->description
 msgid "Show arrow on the categories"
-msgstr "Mostrar una flecha en las categorias."
+msgstr "Zobrazit šipky v kategoriích"
 
 #. configurableMenu@lestcape->settings-schema.json->arrow-categories->tooltip
 msgid "Choose whether or not to show the arrow on the categories."
-msgstr ""
-"Seleccione si desea o no mostrar una flecha de indicación en las categorías."
+msgstr "Zvolte, zda se mají či nemají zobrazovat šipky v kategoriích."
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. description->description
 msgid "Show description of the selected application"
-msgstr "Mostrar la descripción de la aplicación seleccionada"
+msgstr "Zobrazit popis vybrané aplikace"
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. description->tooltip
 msgid ""
 "Choose whether or not to show the selected application description on the "
 "menu."
-msgstr ""
-"Seleccione si desea o no mostrar la descripción de la aplicación "
-"seleccionada en el menú."
+msgstr "Zvolte, zda chcete zobrazovat popis u vybraných aplikací v nabídce."
 
 #. configurableMenu@lestcape->settings-schema.json->show-box-
 #. pointer->description
 msgid "Show menu box pointer"
-msgstr "Mostrar el apuntador del menú"
+msgstr "Zobrazit kurzor v boxech v menu"
 
 #. configurableMenu@lestcape->settings-schema.json->show-box-pointer->tooltip
 msgid "Choose whether or not to show the menu box pointer."
-msgstr ""
-"Seleccione si desea o no mostrar el apuntador de la caja principal del menú."
+msgstr "Zvolte, zda chcete zobrazovat kurzor v boxech nabídky."
 
 #. configurableMenu@lestcape->settings-schema.json->date-format->description
 msgid "Date format:"
-msgstr "Formato de fecha:"
+msgstr "Formát data:"
 
 #. configurableMenu@lestcape->settings-schema.json->date-format->tooltip
 msgid "Choose the date format to show time on the menu."
-msgstr "Seleccione el formato de fecha para ser mostrado en el menú."
+msgstr "Zvolte, jaký formát data chcete zobrazovat v nabídce."
 
 #. configurableMenu@lestcape->settings-schema.json->spacer-line->description
 msgid "Show separator line"
-msgstr "Mostrar linea en el separador"
+msgstr "Zobrazit oddělovač"
 
 #. configurableMenu@lestcape->settings-schema.json->spacer-line->tooltip
 msgid "Choose whether or not to show a line on separator."
-msgstr "Seleccione si desea o no mostrar una linea en el separador."
+msgstr "Zvolte, zda se má či nemá zobrazovat oddělovač."
 
 #. configurableMenu@lestcape->settings-schema.json->app-description-
 #. size->description
 msgid "Font size of the selected application description:"
-msgstr "Tamaño de fuente en la descripción de la aplicación seleccionada:"
+msgstr "Velikost písma u vybraného popisu aplikace:"
 
 #. configurableMenu@lestcape->settings-schema.json->app-description-
 #. size->tooltip
 msgid "Set the font size of the selected application description."
-msgstr ""
-"Seleccione el tamaño de fuente en la descripción de la aplicación "
-"seleccionada."
+msgstr "Nastavte velikost písma u vybraného popisu aplikace."
 
 #. configurableMenu@lestcape->settings-schema.json->show-power-
 #. buttons->description
 msgid "Show system buttons"
-msgstr "Mostrar los botones del sistema"
+msgstr "Zobrazit systémová tlačítka"
 
 #. configurableMenu@lestcape->settings-schema.json->show-power-
 #. buttons->tooltip
 msgid "Choose whether or not to show system buttons on the menu."
-msgstr "Seleccione si desea o no mostrar los botones del sistema en el menú."
+msgstr "Zvolte, zda se v nabídce mají či nemají zobrazovat systémová tlačítka."
 
 #. configurableMenu@lestcape->settings-schema.json->show-removable-
 #. drives->description
 msgid "Show removable drives on the accessible panel"
-msgstr "Mostrar las unidades extraíbles en el panel accessible"
+msgstr "Zobrazit odpojitelná média na hlavním panelu"
 
 #. configurableMenu@lestcape->settings-schema.json->show-removable-
 #. drives->tooltip
 msgid "Choose whether or not to show removable drives on the accessible panel."
 msgstr ""
-"Seleccione si desea o no mostrar las unidades extraíbles en el panel "
-"accessible."
+"Zvolte, zde se mají či nemají na hlavním panelu zobrazovat odpojitelná média."
 
 #. configurableMenu@lestcape->settings-schema.json->power-box->description
 msgid "System buttons have a box"
-msgstr "Los botones del sistema tienen caja"
+msgstr "Systémová tlačítka v boxu"
 
 #. configurableMenu@lestcape->settings-schema.json->power-box->tooltip
 msgid "Choose whether or not to have a box on the system buttons."
-msgstr "Seleccione si desea o no que los botones del sistema tengan caja."
+msgstr "Zvolte, zde se systémová tlačítka mají či nemají zobrazovat v boxu."
 
 #. configurableMenu@lestcape->settings-schema.json->power-symbolic->description
 msgid "Show symbolic icons on the system buttons"
-msgstr "Mostrar íconos simbólicos en los botones del sistema"
+msgstr "Zobrazit symbolické ikony na systémových tlačítkách"
 
 #. configurableMenu@lestcape->settings-schema.json->power-symbolic->tooltip
 msgid ""
 "Enable this option to show symbolic icons, on the system buttons and disable "
 "to show full color."
-msgstr ""
-"Active esta opción para mostrar los íconos simbólicos en los botones del "
-"sistema y desactivela para mostrarlos a todo color."
+msgstr "Zapne zobrazení symbolických ikon a vypne zobrazení plnobarevných."
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-align->description
 msgid "Align the submenu with the parent"
-msgstr "Alinear el submenú con el padre"
+msgstr "Zarovnání podmenu se základním."
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-align->tooltip
 msgid "Choose whether or not to align the submenu with the parent."
-msgstr "Elija si desea o no alinear el submenú con el padre."
+msgstr "Zvolte, zda se má či nemá zarovnat podmenu se základním."
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-width->description
 msgid "Submenu width:"
-msgstr "Ancho del submenú"
+msgstr "Šířka submenu:"
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-width->tooltip
 msgid "Set the submenu width."
-msgstr "Ajuste el ancho de submenú."
+msgstr "Nastavte šířku submenu."
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-height->description
 msgid "Submenu height:"
-msgstr "Alto del submenú"
+msgstr "Výška submenu:"
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-height->tooltip
 msgid "Set the submenu height."
-msgstr "Ajuste el alto del submenú."
+msgstr "Nastavte výšku submenu."
 
 #. configurableMenu@lestcape->settings-schema.json->search-web->description
 msgid "Enable web search"
-msgstr "Habilitar búsqueda en la web"
+msgstr "Zapnout vyhledávání na webu"
 
 #. configurableMenu@lestcape->settings-schema.json->search-web->tooltip
 msgid "Allows the web search with the selected search engines."
-msgstr ""
-"Permitir la búsqueda en la web con los motores de búsqueda seleccionados."
+msgstr "Umožňuje vyhledávání na webu pomocí vybraného vyhledávače."
 
 #. configurableMenu@lestcape->settings-schema.json->search-wikipedia->description
 msgid "Enable web search with wikipedia"
-msgstr "Habilitar la búsqueda web con wikipedia"
+msgstr "Zapnout webové vyhledávání na wikipedii"
 
 #. configurableMenu@lestcape->settings-schema.json->search-wikipedia->tooltip
 msgid "Allows web search to the wikipedia search engine."
-msgstr "Permitir la búsqueda en la web al motor de búsqueda wikipedia."
+msgstr "Umožňuje vyhledávání na webu pro vyhledávač na wikipedii."
 
-#. configurableMenu@lestcape->settings-schema.json->search-google->description
+#. configurableMenu@lestcape->settings-schema.json->"search-google->description
 msgid "Enable web search with google"
-msgstr "Habilitar búsqueda en la web con google"
+msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->search-google->tooltip
 msgid "Allows web search to the google search engine."
-msgstr "Permitir la búsqueda en la web al motor de búsqueda google."
+msgstr "Umožňuje vyhledávání na webu pomocí vyhledávače Google."
 
 #. configurableMenu@lestcape->settings-schema.json->search-duckduckgo->description
 msgid "Enable web search with duckduckgo"
-msgstr "Habilitar búsqueda en la web con duckduckgo"
+msgstr "Povolit vyhledávání na webu pomocí duckduckgo"
 
 #. configurableMenu@lestcape->settings-schema.json->search-duckduckgo->tooltip
 msgid "Allows web search to the duckduckgo search engine."
-msgstr "Permitir la búsqueda en la web al motor de búsqueda duckduckgo."
+msgstr "Umožňuje vyhledávání na webu pomocí vyhledávače duckduckgo."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-tools->description
 msgid "Enable the Cinnamon Installer tool"
-msgstr "Activar la herramienta Cinnamon Installer"
+msgstr "Zapnout nástroj Cinnamon Installer"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-tools->tooltip
 msgid ""
 "Allows install, uninstall and search for programs and packages(need internet "
 "connection to be download)."
 msgstr ""
-"Permite instalar, desinstalar, buscar programas y paquetes (necesita "
-"conexión a Internet para ser descargado)."
+"Umožňuje nainstalovat, odinstalovat a hledat programy a balíčky (pro stažení "
+"je potřeba připojení k internetu)."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-search->description
 msgid "Enable to search for packages"
-msgstr "Habilitar la búsqueda de paquetes"
+msgstr "Povolit hledání balíčků"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-search->tooltip
 msgid "Allows search for new packages on the repository."
-msgstr "Permite la búsqueda de nuevos paquetes en el repositorio."
+msgstr "Umožňuje hledání nových balíčků v repozitářích"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-button->description
 msgid "Update the Cinnamon Installer tool"
-msgstr "Actualización de la herramienta Cinnamon Installer"
+msgstr "Aktualizovat nástroj Cinnamon Installer"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-button->tooltip
 msgid "Press this button to update the Cinnamon Installer tool."
-msgstr "Presione este botón para actualizar la herramienta Cinnamon Installer."
+msgstr "Stiskněte toto tlačítko pro aktualizaci nástroje Cinnamon Installer."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-check->description
 msgid ""
 "Enable to check for a new version of Cinnamon Installer when the menu started"
-msgstr ""
-"Habilitar para comprobar si hay una nueva versión de la Cinnamon Installer "
-"cuando se inicie el menú"
+msgstr "Povolit kontrolu nové verze Cinnamon Installeru při startu Menu"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-check->tooltip
 msgid ""
 "Allows to check for a new version of Cinnamon Installer when the menu "
 "started."
-msgstr ""
-"Permite comprobar si hay una nueva versión de la Cinnamon Installer cuando "
-"se inicie el menú."
+msgstr "Umožňuje zkontrolovat novou verzi Cinnamon Installeru při startu Menu."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-uninstall-button->description
 msgid "Uninstall the Cinnamon Installer tool"
-msgstr "Desinstalar la herramienta Cinnamon Installer"
+msgstr "Odinstalovat nástroj Cinnamon Installer"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-uninstall-button->tooltip
 msgid "Press this button to uninstall the Cinnamon Installer tool."
-msgstr ""
-"Presione este botón para desinstalar la herramienta Cinnamon Installer."
+msgstr "Klikněte na toto tlačítko pro odinstalaci nástroje Cinnamon Installer."
