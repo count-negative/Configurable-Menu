@@ -9458,6 +9458,9 @@ MyApplet.prototype = {
             this.width = this.mainBox.get_width();
             this.mainBox.set_width(this.width);
          } else {
+            //if(this.bttChanger)
+            //   this.bttChanger.activateSelected(_("Favorites"));
+               //this.bttChanger.activateSelected(_("All Applications"));
             let difference = this.menu.actor.get_height() - this.mainBox.get_height();
             let maxHeigth = monitor.height - this._processPanelSize(true) - this._processPanelSize(false) - difference;
             if(this.height > this.mainBox.get_height()) {
@@ -9484,13 +9487,20 @@ MyApplet.prototype = {
                   this.width = monitor.width - difference;
                this.mainBox.set_width(this.width);
                this._updateView();
-            } else {
-               if(this.width > monitor.width - difference) {
+            } else if(this.width > monitor.width - difference) {
                   this.width = monitor.width - difference;
                   this.mainBox.set_width(this.width);
                   this._updateView();
-               }
-               else if(this.width > this.minimalWidth) {
+            }
+            else if(this.width > this.minimalWidth) {
+               if(((!this.bttChanger)&&(this.iconViewCount == 1))||
+                  ((this.bttChanger)&&(this.bttChanger.getSelected() != _("All Applications")))) {
+                  this.mainBox.set_width(this.width);
+                  this._clearView();
+                  this.width = this._minimalWidth();
+                  this.mainBox.set_width(this.width);
+                  this._updateView();
+               } else {
                   this.mainBox.set_width(this.width);
                   this._clearView();
                   Mainloop.idle_add(Lang.bind(this, function() {//checking correct width and revert if it's needed.
@@ -9589,10 +9599,13 @@ MyApplet.prototype = {
 
    _minimalWidth: function() {
       let width = this.extendedBox.get_allocation_box().x2 - this.extendedBox.get_allocation_box().x1;
+      if((this.bttChanger)&&(this.bttChanger.getSelected() == _("All Applications"))) {
+         width = (this.favoritesLinesNumber)*this._applicationsBoxWidth + 82;
+      }
       if((this.accessibleBox)&&(this.accessibleBox.actor.visible))
          width += this.accessibleBox.actor.get_width();
 
-      return width// width;
+      return width;
    },
 
    _onButtonReleaseEvent: function(actor, event) {
@@ -10574,7 +10587,6 @@ MyApplet.prototype = {
       this.betterPanel.add_actor(this.separatorTop.actor);
       this.betterPanel.add(this.operativePanelExpanded, { x_fill: true, y_fill: true, y_align: St.Align.MIDDLE, expand: true });
       this.betterPanel.add_actor(this.separatorBottom.actor);
-      this.betterPanel.add(this.operativePanelExpanded, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.operativePanelExpanded.add(this.favBoxWrapper, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.operativePanelExpanded.add(this.operativePanel, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.operativePanel.visible = false;
