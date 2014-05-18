@@ -1134,27 +1134,29 @@ ScrollItemsBox.prototype = {
    },
 
    scrollToActor: function(actor) {
-    try {
-      if(this.vertical) {
-         var current_scroll_value = this.scroll.get_vscroll_bar().get_adjustment().get_value();
-         var box_height = this.actor.get_allocation_box().y2-this.actor.get_allocation_box().y1;
-         var new_scroll_value = current_scroll_value;
-         let hActor = this._getAllocationActor(actor, 0);
-         if (current_scroll_value > hActor-10) new_scroll_value = hActor-10;
-         if (box_height+current_scroll_value < hActor + actor.get_height()+10) new_scroll_value = hActor + actor.get_height()-box_height+10;
-         if (new_scroll_value!=current_scroll_value) this.scroll.get_vscroll_bar().get_adjustment().set_value(new_scroll_value);
-   // Main.notify("finish" + new_scroll_value);
-      } else {
-         var current_scroll_value = this.scroll.get_hscroll_bar().get_adjustment().get_value();
-         var box_width = this.actor.get_allocation_box().x2-this.actor.get_allocation_box().x1;
-         var new_scroll_value = current_scroll_value;
-         if (current_scroll_value > actor.get_allocation_box().x1-10) new_scroll_value = actor.get_allocation_box().x1-10;
-         if (box_width+current_scroll_value < actor.get_allocation_box().x2+40) new_scroll_value = actor.get_allocation_box().x2-box_width+40;
-         if (new_scroll_value!=current_scroll_value) this.scroll.get_hscroll_bar().get_adjustment().set_value(new_scroll_value);
-      }
-     } catch(e) {
+      try {
+         if(actor) {
+            if(this.vertical) {
+               var current_scroll_value = this.scroll.get_vscroll_bar().get_adjustment().get_value();
+               var box_height = this.actor.get_allocation_box().y2-this.actor.get_allocation_box().y1;
+               var new_scroll_value = current_scroll_value;
+               let hActor = this._getAllocationActor(actor, 0);
+               if (current_scroll_value > hActor-10) new_scroll_value = hActor-10;
+               if (box_height+current_scroll_value < hActor + actor.get_height()+10) new_scroll_value = hActor + actor.get_height()-box_height+10;
+               if (new_scroll_value!=current_scroll_value) this.scroll.get_vscroll_bar().get_adjustment().set_value(new_scroll_value);
+               // Main.notify("finish" + new_scroll_value);
+            } else {
+               var current_scroll_value = this.scroll.get_hscroll_bar().get_adjustment().get_value();
+               var box_width = this.actor.get_allocation_box().x2-this.actor.get_allocation_box().x1;
+               var new_scroll_value = current_scroll_value;
+               if (current_scroll_value > actor.get_allocation_box().x1-10) new_scroll_value = actor.get_allocation_box().x1-10;
+               if (box_width+current_scroll_value < actor.get_allocation_box().x2+40) new_scroll_value = actor.get_allocation_box().x2-box_width+40;
+               if (new_scroll_value!=current_scroll_value) this.scroll.get_hscroll_bar().get_adjustment().set_value(new_scroll_value);
+            }
+         }
+      } catch(e) {
         Main.notify("ScrollError", e.message);
-     }
+      }
    },
 
    _getAllocationActor: function(actor, currHeight) {
@@ -8164,7 +8166,7 @@ MyApplet.prototype = {
          item_actor = (this._previousTreeSelectedActor) ? this._previousTreeSelectedActor : this.catBoxIter.getFirstVisible();
          index = this.catBoxIter.getAbsoluteIndexOfChild(item_actor);
          this._previousTreeSelectedActor = item_actor;
-         this.categoriesScrollBox.scrollToActor(item_actor._delegate.actor);
+         this.categoriesScrollBox.scrollToActor(item_actor);
          this.hover.refreshFace();
          this.selectedAppBox.setSelectedText("", "");
       }
@@ -8229,7 +8231,7 @@ MyApplet.prototype = {
                this._previousTreeSelectedActor._delegate.isHovered = false;
                item_actor = this.catBoxIter.getPrevVisible(this._activeActor);
                index = this.catBoxIter.getAbsoluteIndexOfChild(item_actor);
-               this.categoriesScrollBox.scrollToActor(item_actor._delegate.actor);
+               this.categoriesScrollBox.scrollToActor(item_actor);
             }
             else if(symbol == Clutter.KEY_Down) {
                this._previousTreeSelectedActor = this.catBoxIter.getAppAt(0, 0, index);
@@ -8237,7 +8239,7 @@ MyApplet.prototype = {
                item_actor = this.catBoxIter.getNextVisible(this._activeActor);
                index = this.catBoxIter.getAbsoluteIndexOfChild(item_actor);
                this._previousTreeSelectedActor._delegate.emit('leave-event');
-               this.categoriesScrollBox.scrollToActor(item_actor._delegate.actor);
+               this.categoriesScrollBox.scrollToActor(item_actor);
             }
             else if(symbol == scapeKey) {// && (this._activeContainer !== this.applicationsBox)
                if(this._previousVisibleIndex !== null) {
@@ -8254,14 +8256,14 @@ MyApplet.prototype = {
                item_actor = this.catBoxIter.getNextVisible(this._activeActor);
                index = this.catBoxIter.getAbsoluteIndexOfChild(item_actor);
                this._previousTreeSelectedActor._delegate.emit('leave-event');
-               this.categoriesScrollBox.scrollToActor(item_actor._delegate.actor);
+               this.categoriesScrollBox.scrollToActor(item_actor);
             }
             else if(symbol == Clutter.KEY_Left) {
                this._previousTreeSelectedActor = this.catBoxIter.getAppAt(0, 0, index);
                this._previousTreeSelectedActor._delegate.isHovered = false;
                item_actor = this.catBoxIter.getPrevVisible(this._activeActor);
                index = this.catBoxIter.getAbsoluteIndexOfChild(item_actor);
-               this.categoriesScrollBox.scrollToActor(item_actor._delegate.actor);
+               this.categoriesScrollBox.scrollToActor(item_actor);
             }
             else if(symbol == scapeKey) {// && (this._activeContainer !== this.applicationsBox)
                if(this._previousVisibleIndex !== null) {
@@ -9347,11 +9349,13 @@ MyApplet.prototype = {
 
    _openOutScreen: function() {
       this._findOrientation();
-      this.menu.actor.y = -10000;
+      this.menu.actor.y = 10000;
+      this.fullScreenInit = false;
       this.menu.openClean();
-      if(this.fullScreen) {
+      /*if(this.fullScreen) {
          this._setFullScreen(this.fullScreen);
-      } else {
+      } else {*/
+      if(!this.fullScreen) {
          let monitor = Main.layoutManager.findMonitorForActor(this.actor);
          let maxHeigth = monitor.height - this._processPanelSize(true) - this._processPanelSize(false);
          if(this.height > maxHeigth)
@@ -9392,8 +9396,9 @@ MyApplet.prototype = {
    _setFullScreen: function() {
      if(this.appMenuGnome) {
          this.appMenuGnomeClose();
-         this.appMenuGnome.fixToScreen(this.fullScreen);
-         if(!this.fullScreen)
+         if(this.fullScreen)
+            this.appMenuGnome.fixToScreen(this.fullScreen);
+         else
             this.appMenuGnome.fixToScreen(this.subMenuAlign);
       }
       if(this.controlView)
@@ -9504,27 +9509,33 @@ MyApplet.prototype = {
                } else {
                   this.mainBox.set_width(this.width);
                   this._clearView();
-                  Mainloop.idle_add(Lang.bind(this, function() {//checking correct width and revert if it's needed.
-                     let minWidth = this._minimalWidth();
-                     if(this.width < minWidth) {
-                        this.width = minWidth;
-                        this.mainBox.set_width(this.width);
-                     }
-                     this._updateView();
-                     //this.minimalWidth = minWidth;
-                  }));
+                  let minWidth = this._minimalWidth();
+                  if(this.width < minWidth) {
+                     this.width = minWidth;
+                     this.mainBox.set_width(this.width);
+                  }
+                  this._updateView();
+                  //this.minimalWidth = minWidth;
                }
             }
          }
          this._updateSubMenuSize();
          if(oldColumn != this.iconViewCount) {
-            this._clearAllSelections();
-            this._activeContainer = null;
-            this._activeActor = null;
-            this._selectedItemIndex = null;
-            this._previousTreeItemIndex = null;
-            this._previousTreeSelectedActor = null;
-            this._previousSelectedActor = null;
+            //this._selectedRowIndex = 0;
+            if(this._previousTreeSelectedActor)
+               this._previousTreeSelectedActor._delegate.emit('enter-event');
+            if(!this._selectedCategoryIndex)
+               this._selectedCategoryIndex = 0;
+            this._previousSelectedActor = this.appBoxIter.getAppAt(this._selectedCategoryIndex, this._selectedItemIndex, 0);
+            let item_actor = (this._previousTreeSelectedActor) ? this._previousTreeSelectedActor : this.catBoxIter.getFirstVisible();
+            this._selectedItemIndex = this.catBoxIter.getAbsoluteIndexOfChild(item_actor);
+            this._previousTreeSelectedActor = item_actor;
+            this.categoriesScrollBox.scrollToActor(item_actor);
+            this.hover.refreshFace();
+            this.selectedAppBox.setSelectedText("", "");
+            if(item_actor._delegate) {
+               item_actor._delegate.emit('enter-event');
+            }
          }
       }
    },
@@ -9919,7 +9930,7 @@ MyApplet.prototype = {
    },
 
    _processPanelSize: function(bottomPosition) {
-      let panelHeight;
+      let panelHeight = 0;
       if(bottomPosition) {
          if(!Main.panel2) {
             if(this.orientation == St.Side.BOTTOM)
@@ -12199,6 +12210,16 @@ MyApplet.prototype = {
          }
          Mainloop.idle_add(Lang.bind(this, this._initial_cat_selection, this.initButtonLoad));
          this.displayed = true;
+         if((this.fullScreen)&&(!this.fullScreenInit)) {
+            try {
+               this._setFullScreen(this.fullScreen);
+            } catch(e) {
+               //Main.notify("Error Init", e.message);
+            }
+            this.fullScreenInit = true;
+            this._clearAllSelections(true);
+            this.displayed = false;
+         }
       }
    },
 
