@@ -9398,6 +9398,8 @@ MyApplet.prototype = {
          this._setVisiblePointer(false);
          this.menu.fixToScreen(true);
       } else {
+         this.mainBox.set_width(this.width);
+         this.mainBox.set_height(this.height);
          this._setVisiblePointer(this.showBoxPointer);
          this.menu.fixToCorner(this.fixMenuCorner);
          if(this.appMenuGnome)
@@ -9428,14 +9430,7 @@ MyApplet.prototype = {
    
             this.mainBox.set_width(monitor.width - this.menu.actor.width + this.mainBox.width);
             this.mainBox.set_height(monitor.height - panelButton - panelTop + bordersY - difference);
-            //this._updateView();
-            if((this.theme == "windows7")||(this.theme == "mint")) {
-               this.controlBoxStart.visible = false;
-               this.controlBoxStart.visible = true;
-            }
-            Mainloop.idle_add(Lang.bind(this, function() {
-               this._updateView();
-            }));
+            this._updateView();
          } else if(this.automaticSize) {
             this.mainBox.set_width(-1);
             this.mainBox.set_height(-1);
@@ -10887,8 +10882,6 @@ MyApplet.prototype = {
       this.favBoxWrapper.visible = operPanelVisible;
       this.favoritesScrollBox.actor.visible = operPanelVisible;
       this.favBoxWrapper.visible = operPanelVisible;
-     /* if((this.showAppTitle)||(this.showAppDescription))
-         this.endHorizontalBox.visible = !operPanelVisible;*/
       this._activeContainer = null;
       let minWidth = this._minimalWidth();
       if(this.width < minWidth)
