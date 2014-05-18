@@ -1496,8 +1496,8 @@ GnoMenuBox.prototype = {
    },
 
    disableSelected: function() {
+      this._setStyleActive(this._actionButtons[this._gnoMenuSelected], false);
       this._gnoMenuSelected = 0;
-      this._onEnterEvent(this._actionButtons[0].actor);
    },
 
    getSelected: function() {
@@ -1505,27 +1505,21 @@ GnoMenuBox.prototype = {
    },
 
    setSelected: function(selected) {
-      if(this._gnoMenuSelected != -1)
-         this._onLeaveEvent(this._actionButtons[this._gnoMenuSelected].actor);
-      this._gnoMenuSelected = -1;
+      this._onLeaveEvent(this._actionButtons[this._gnoMenuSelected].actor);
       for(let i = 0; i < this._actionButtons.length; i++) {
          if(this._actionButtons[i].title == selected) {
             this._gnoMenuSelected = i;
             break;
          }
       }
-      if(this._gnoMenuSelected != -1)
-         this._onEnterEvent(this._actionButtons[this._gnoMenuSelected].actor);
+      this._onEnterEvent(this._actionButtons[this._gnoMenuSelected].actor);
    },
 
    _onEnterEvent: function(actor) {
+      this.disableSelected();
       this._gnoMenuSelected = this._actionButtons.indexOf(actor._delegate);
-      if(this._gnoMenuSelected != -1) {
-         this._setStyleActive(actor._delegate, true);
-         this.callBackFun(actor._delegate.title);
-         if((actor != this.favorites.actor)&&(this.favorites.actor.style_class.indexOf("-selected")))
-            this._setStyleActive(this.favorites, false);
-      }
+      this._setStyleActive(actor._delegate, true);
+      this.callBackFun(actor._delegate.title);
    },
 
    _setStyleActive: function(button, active) {
@@ -1571,6 +1565,7 @@ GnoMenuBox.prototype = {
    },
 
    _onLeaveEvent: function(actor) {
+      this._gnoMenuSelected = 0;
       this._setStyleActive(actor._delegate, false);
    },
 
@@ -1648,7 +1643,7 @@ GnoMenuBox.prototype = {
    },
 
    navegateGnoMenuBox: function(symbol, actor) {
-      if((this._gnoMenuSelected != -1)&&(this._gnoMenuSelected < this._actionButtons.length)) {
+      if(this._gnoMenuSelected < this._actionButtons.length) {
          let changerPos = this._gnoMenuSelected;
          this.disableSelected();
          if((symbol == Clutter.KEY_Up) || (symbol == Clutter.KEY_Left)) {
@@ -7164,7 +7159,8 @@ PlacesGnome.prototype = {
             if(mounts[i].isRemovable()) {
                drive = new DriveMenu(this.parent, this.selectedAppBox, this.hover, mounts[i], this.iconSize, true);
                drive.actor.connect('enter-event', Lang.bind(this, function() {
-                   this.parent.appMenuGnomeClose();
+                  this.parent.appMenuGnomeClose();
+                  this.parent._clearPrevCatSelection();
                   //drive.actor.style_class = "menu-category-button-selected";
                   //this.selectedAppBox.setSelectedText(button.app.get_name(), button.app.get_description());
                   //this.hover.refreshPlace(button.place);
