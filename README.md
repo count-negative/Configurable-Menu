@@ -1,6 +1,6 @@
 Cinnamon Applet: Configurable Menu Version: v1.1-Beta
 
-Last version release date: 17 May 2014
+Last version release date: 18 May 2014
 ***
 Authors: [Lester Carballo Pérez](https://github.com/lestcape) and [Garibaldo](https://github.com/Garibaldo).
 
@@ -80,9 +80,11 @@ See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/C
    - Was added Czech language(Cs_Cz) thanks Satapouch.
    - Fixed some problems on resize and full screen.
    - Fixed some problem on change the view of Apps/Favorites on the Mint and Windows7 layouts.
-   - Improved the speed on some cases...
+   - Improved the speed on some cases, and prevent an error that cause a delay on the menu opening, of about 400 mileseconds.
    - Do not allow mouse release over Apps when the menu opening on mouse pressed.
-   - Fix the translation duplicate key.
+   - Fixed the translation of the duplicate key Horizontal.
+   - Fixed a problem on keyboard navegation on the categories.
+   - Fixed the option of delay the changes of the categories, that cause a simultaneously selecting of several categories.
    - Minor corrections.
 
 1.0-Beta

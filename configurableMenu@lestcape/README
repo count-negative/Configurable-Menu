@@ -1,6 +1,6 @@
 Cinnamon Applet: Configurable Menu Version: v1.1-Beta
 
-Last version release date: 06 May 2014
+Last version release date: 18 May 2014
 ***
 Authors: Lester Carballo Pérez (https://github.com/lestcape) and Garibaldo (https://github.com/Garibaldo).
 Contact: lestcape@gmail.com
@@ -51,6 +51,9 @@ Here you can find interesting information about Configurable Menu.
    - New languages           : https://github.com/lestcape/Configurable-Menu/wiki/Add-new-languages
    - Install nightly build   : https://github.com/lestcape/Configurable-Menu/wiki/Install-Nightly-Build
 
+Warning:
+--------------
+After install Configurable Menu 1.1 or higher and if you have installed an older version, please delete the file, /home/USER/.cinnamon/configs/configurableMenu@lestcape  and then restart cinnamon, to allow display correctly the system buttons. This only a thing that need to be done when some key was changed, not always. Sorry for the inconvenients.
 
 Cinnamon Installer
 --------------
@@ -73,6 +76,14 @@ See a complete Change log : https://github.com/lestcape/Configurable-Menu/wiki/C
 1.1-Beta
    - Was added Chinese language(Zh_Cn) thanks Highwind.
    - Was added Czech language(Cs_Cz) thanks Satapouch.
+   - Fixed some problems on resize and full screen.
+   - Fixed some problem on change the view of Apps/Favorites on the Mint and Windows7 layouts.
+   - Improved the speed on some cases, and prevent an error that cause a delay on the menu opening, of about 400 mileseconds.
+   - Do not allow mouse release over Apps when the menu opening on mouse pressed.
+   - Fixed the translation of the duplicate key Horizontal.
+   - Fixed a problem on keyboard navegation on the categories.
+   - Fixed the option of delay the changes of the categories, that cause a simultaneously selecting of several categories.
+   - Minor corrections.
 
 1.0-Beta
    - The menu was improved to working more faster on cinnamon 2.2.

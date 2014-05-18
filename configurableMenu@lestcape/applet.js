@@ -1,5 +1,5 @@
 //Cinnamon Applet: Configurable Menu version v1.1-Beta
-//Release Date: 17 May 2014
+//Release Date: 18 May 2014
 //
 //Authors: Lester Carballo Pérez(https://github.com/lestcape) and Garibaldo(https://github.com/Garibaldo).
 //
@@ -7957,6 +7957,7 @@ MyApplet.prototype = {
 
    _onMenuKeyPress: function(actor, event) {
       try {
+        this.destroyVectorBox();
         let symbol = event.get_key_symbol();
         let item_actor;
         this.appBoxIter.reloadVisible();
@@ -8680,6 +8681,15 @@ MyApplet.prototype = {
          this.accessibleBox.setAutoScrolling(this.autoscroll_enabled);
       if(this.gnoMenuBox)
          this.gnoMenuBox.setAutoScrolling(this.autoscroll_enabled);
+   },
+
+   _stopAutoscroll: function() {
+      if(this.autoscroll_enabled) {
+         this.autoscroll_enabled = false;
+         this._update_autoscroll();
+         this.autoscroll_enabled = true;
+         this._update_autoscroll();
+      }
    },
 
    _updateSeparators: function() {
@@ -11313,7 +11323,7 @@ MyApplet.prototype = {
         if(this.vector_update_loop) {
            Mainloop.source_remove(this.vector_update_loop);
         }
-        if(this.isInsideVectorBox(false))
+        if(this.isInsideVectorBox())
            this.vector_update_loop = Mainloop.timeout_add(35, Lang.bind(this, this.updateVectorBox));
         else {
            this.updateVectorBox();
@@ -11355,7 +11365,7 @@ MyApplet.prototype = {
       }
    },
 
-   isInsideVectorBox: function(ext) {
+   isInsideVectorBox: function() {
       if(this.current_motion_actor) {
          let [mx, my, mask] = global.get_pointer();
          if((this.vectorOrientation == St.Side.RIGHT)&&(this.mouseVectorX >= mx)) {
@@ -11723,8 +11733,9 @@ MyApplet.prototype = {
                      this.catShow = true;
                   } else if(!this.lastedCategoryShow)
                      this.lastedCategoryShow = this._allAppsCategoryButton;
+                  this.makeVectorBox(this._allAppsCategoryButton.actor);
                }
-               this.makeVectorBox(this._allAppsCategoryButton.actor);
+
             }
          }));
          this._allAppsCategoryButton.actor.connect('leave-event', Lang.bind(this, function () {
@@ -11770,7 +11781,7 @@ MyApplet.prototype = {
                            });
                         } else {
                            this.catShow = false;
-                           if(!this.isInsideVectorBox(true)) {
+                           if(!this.isInsideVectorBox()) {
                               if(this.lastedCategoryShow) {
                                  this._previousTreeSelectedActor = null;
                                  this._clearPrevCatSelection(null);
@@ -11898,7 +11909,7 @@ MyApplet.prototype = {
                   });
                } else {
                   this.catShow = false;
-                  if(!this.isInsideVectorBox(true)) {
+                  if(!this.isInsideVectorBox()) {
                      if(this.lastedCategoryShow) {
                         this._previousTreeSelectedActor = null;
                         this._clearPrevCatSelection(null);
@@ -11981,7 +11992,7 @@ MyApplet.prototype = {
                   });
                } else {
                   this.catShow = false;
-                  if(!this.isInsideVectorBox(true)) {
+                  if(!this.isInsideVectorBox()) {
                      if(this.lastedCategoryShow) {
                         this._previousTreeSelectedActor = null;
                         this._clearPrevCatSelection(null);
@@ -12208,14 +12219,15 @@ MyApplet.prototype = {
          this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
          this.repositionGnomeCategory();
          Mainloop.idle_add(Lang.bind(this, function() {
+            global.stage.set_key_focus(this.searchEntry);
             this.selectedAppBox.setDateTimeVisible(this.showTimeDate);
             this.menuManager._onMenuOpenState(menu, open);
          }));
       }
       else {
          this.actor.remove_style_pseudo_class('active');
-         this._select_category(null, this._allAppsCategoryButton);
          this._disconnectSearch();
+         this._select_category(null, this._allAppsCategoryButton);
          if(this.bttChanger) 
             this.bttChanger.activateSelected(_("All Applications"));
          Mainloop.idle_add(Lang.bind(this, function() {
@@ -12248,6 +12260,7 @@ MyApplet.prototype = {
             this.destroyVectorBox();
             this.menuManager._onMenuOpenState(menu, open);
             this.pressed = false;
+            this._stopAutoscroll();
          }));
       }
       return true;
