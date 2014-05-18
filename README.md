@@ -1,6 +1,6 @@
 Cinnamon Applet: Configurable Menu Version: v1.1-Beta
 
-Last version release date: 06 May 2014
+Last version release date: 17 May 2014
 ***
 Authors: [Lester Carballo Pérez](https://github.com/lestcape) and [Garibaldo](https://github.com/Garibaldo).
 
@@ -44,6 +44,11 @@ This latest version brings a lot of cool new stuff, like:
 A more detail list can be found [here](https://github.com/lestcape/Configurable-Menu/wiki/Some-features).
 And much more coming...
 
+Warning:
+--------------
+After install Configurable Menu 1.1 or higher and if you have installed an older version, please delete the file, /home/USER/.cinnamon/configs/configurableMenu@lestcape  and then restart cinnamon, to allow display correctly the system buttons. This only a thing that need to be done when some key was changed, not always. Sorry for the inconvenients.
+
+
 This applet not longer has support for Arch Linux.
 --------------
 The comunity of Arch Linux do not want that I or other Cinnamon developer, publish about Cinnamon, and receive the users feedback (necessary on the developing any app). When the comunity of Arch Linux, want to be open to the free software world, sure that I want to support Arch Linux again...
@@ -73,6 +78,12 @@ See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/C
 1.1-Beta
    - Was added Chinese language(Zh_Cn) thanks Highwind.
    - Was added Czech language(Cs_Cz) thanks Satapouch.
+   - Fixed some problems on resize and full screen.
+   - Fixed some problem on change the view of Apps/Favorites on the Mint and Windows7 layouts.
+   - Improved the speed on some cases...
+   - Do not allow mouse release over Apps when the menu opening on mouse pressed.
+   - Fix the translation duplicate key.
+   - Minor corrections.
 
 1.0-Beta
    - The menu was improved to working more faster on cinnamon 2.2.

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-05-03 02:15-0600\n"
+"PO-Revision-Date: 2014-05-17 21:58-0600\n"
 "Last-Translator: highwind <highwindmx@126.com>\n"
 "Language-Team: highwind <highwindmx@126.com>\n"
 "MIME-Version: 1.0\n"
@@ -311,7 +311,7 @@ msgid "Horizontal Grid"
 msgstr "水平网格"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
-msgid "Vertical Only"
+msgid "Vertical Icon"
 msgstr "垂直"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
@@ -335,7 +335,7 @@ msgid "Retractable"
 msgstr "可收缩"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
-msgid "Horizontal Only"
+msgid "Horizontal Icon"
 msgstr "水平"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-

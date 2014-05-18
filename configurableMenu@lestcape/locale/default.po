@@ -311,7 +311,7 @@ msgid "Horizontal Grid"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
-msgid "Vertical Only"
+msgid "Vertical Icon"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
@@ -327,7 +327,7 @@ msgid "Vertical Grid"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
-msgid "Horizontal Only"
+msgid "Horizontal Icon"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
