@@ -9281,6 +9281,9 @@ MyApplet.prototype = {
          this.separatorBottom.setLineVisible(this.showSeparatorLine);
          this.separatorBottom.setSpace(this.separatorSize);
       }
+      if(this.appMenuGnome) {
+         this.appletMenu.getActorForName("Favorites").visible = this.showFavorites;
+      }
       this.favoritesScrollBox.actor.visible = this.showFavorites;
       this.favBoxWrapper.visible = this.showFavorites;
       this.selectedAppBox.setTitleVisible(this.showAppTitle);
