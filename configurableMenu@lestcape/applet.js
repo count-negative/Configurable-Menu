@@ -6533,7 +6533,7 @@ ConfigurableMenu.prototype = {
       /*if(this.subMenu)
          this.subMenu.close();*/
       if(this.isOpen) {
-         this._applyEffectOnClose(animate);
+         this._applyEffectOnClose(false);
       }
    },
 
@@ -9906,7 +9906,7 @@ MyApplet.prototype = {
    _onMenuButtonRelease: function(actor, event) {
       try {
        if((event.get_button() == 3)&&(!this.actorResize)) {
-          if(this.appMenu.isOpen) {
+          if((this.appMenu)&&(this.appMenu.isOpen)) {
              this.onEnterMenuGnome();
              this.appMenu.close();
           }
