@@ -1,4 +1,4 @@
-Cinnamon Applet: Configurable Menu Version: v1.1-Beta
+Cinnamon Applet: Configurable Menu Version: v1.2-Beta
 
 Last version release date: 25 May 2014
 ***
