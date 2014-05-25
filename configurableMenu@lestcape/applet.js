@@ -6523,9 +6523,9 @@ ConfigurableMenu.prototype = {
       /*if(this.subMenu)
          this.subMenu.close();*/
       if(!this.isOpen) {
-         this.openClean(animate);
+         this.openClean();
          this.repositionActor(this.sourceActor);
-         this._applyEffectOnOpen(animate);
+         this._applyEffectOnOpen();
       }
    },
 
@@ -6533,7 +6533,7 @@ ConfigurableMenu.prototype = {
       /*if(this.subMenu)
          this.subMenu.close();*/
       if(this.isOpen) {
-         this._applyEffectOnClose(false);
+         this._applyEffectOnClose();
       }
    },
 
@@ -9488,12 +9488,16 @@ MyApplet.prototype = {
    },
 
    _openOutScreen: function() {
-      this.menu.actor.y = 10000;
+      this.menu.actor.x = -10000;
       this.fullScreenInit = false;
       this.menu.openClean();
       /*if(this.fullScreen) {
          this._setFullScreen(this.fullScreen);
       } else {*/
+      if(this.appMenu) {
+         this.appMenu.actor.x = -10000;//the menu blinding...
+         this.appMenu.open();
+      }
       if(!this.fullScreen) {
          let monitor = Main.layoutManager.findMonitorForActor(this.actor);
          let maxHeigth = monitor.height - this._processPanelSize(true) - this._processPanelSize(false);
@@ -9511,11 +9515,19 @@ MyApplet.prototype = {
          }
       }
       Mainloop.idle_add(Lang.bind(this, function() {
+         if(this.bttChanger) 
+            this.bttChanger.activateSelected(_("Favorites"));
+         if(this.gnoMenuBox)
+            this.gnoMenuBox.setSelected(_("All Applications"));
          this._findOrientation();
-         this.menu.actor.y = 0;
          this.menu.closeClean();
+         this.menu.actor.x = 0;
          this._clearAllSelections(true);
          this.displayed = false;
+         Mainloop.idle_add(Lang.bind(this, function() {
+            if(this.appMenu)
+               this.appMenu.actor.x = 0;
+         }));
       }));
    },
 
@@ -11053,8 +11065,9 @@ MyApplet.prototype = {
          }
       }
       let minWidth = this._minimalWidth();
-      if(this.width < minWidth)
+      if(this.width < minWidth) {
          this._updateSize();
+      }
    },
 
    _onPanelMintChange: function(selected) {
