@@ -9771,7 +9771,7 @@ MyApplet.prototype = {
    },
 
    _onButtonReleaseEvent: function(actor, event) {
-      this.parent._disableResize();
+      this._disableResize();
       if((this._draggable)&&(!this._draggable.inhibit))
          return false;
       if(!this.activateOnPress)
