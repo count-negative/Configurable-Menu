@@ -757,12 +757,12 @@ msgstr "选择是否在目录上显示箭头."
 
 #. configurableMenu@lestcape->settings-schema.json->arrow-categories-selected->description
 msgid "Only show arrow when selected category"
-msgstr ""
+msgstr "选择菜单目录时仅显示箭头"
 
 #. configurableMenu@lestcape->settings-schema.json->arrow-categories-selected->tooltip
 msgid ""
 "Choose whether or not to only show the arrow when selected the category."
-msgstr ""
+msgstr "是否在选择菜单目录时仅显示箭头"
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. description->description
