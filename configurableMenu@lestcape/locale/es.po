@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-05-17 21:58-0600\n"
+"PO-Revision-Date: 2014-05-25 09:02-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -773,12 +773,23 @@ msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->arrow-categories->description
 msgid "Show arrow on the categories"
-msgstr "Mostrar una flecha en las categorias."
+msgstr "Mostrar una flecha en las categorias"
 
 #. configurableMenu@lestcape->settings-schema.json->arrow-categories->tooltip
 msgid "Choose whether or not to show the arrow on the categories."
 msgstr ""
 "Seleccione si desea o no mostrar una flecha de indicación en las categorías."
+
+#. configurableMenu@lestcape->settings-schema.json->arrow-categories-selected->description
+msgid "Only show arrow when selected category"
+msgstr "Mostrar la flecha sólo cuando se selecciona la categoría"
+
+#. configurableMenu@lestcape->settings-schema.json->arrow-categories-selected->tooltip
+msgid ""
+"Choose whether or not to only show the arrow when selected the category."
+msgstr ""
+"Seleccione si desea o no mostrar la flecha sólo cuando se selecciona la "
+"categoría."
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. description->description

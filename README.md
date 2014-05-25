@@ -1,6 +1,6 @@
 Cinnamon Applet: Configurable Menu Version: v1.1-Beta
 
-Last version release date: 18 May 2014
+Last version release date: 25 May 2014
 ***
 Authors: [Lester Carballo Pérez](https://github.com/lestcape) and [Garibaldo](https://github.com/Garibaldo).
 
@@ -74,6 +74,13 @@ You can found more information about Cinnamon Installer on the [Cinnamon Install
 Change log
 --------------
 See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/Change-Log).
+
+1.2-Beta
+   - Was added kicker Menu layout.
+   - Fixed several bugs on Gnome Classic layout.
+   - Blocked the opening of applications, when the menu is resized.
+   - Allow only show the arrow on the category when selected the category.
+   - Improve on the resize option.
 
 1.1-Beta
    - Was added Chinese language(Zh_Cn) thanks Highwind.

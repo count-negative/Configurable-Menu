@@ -755,6 +755,14 @@ msgstr ""
 msgid "Choose whether or not to show the arrow on the categories."
 msgstr ""
 
+#. configurableMenu@lestcape->settings-schema.json->arrow-categories-selected->description
+msgid "Only show arrow when selected category"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->arrow-categories-selected->tooltip
+msgid "Choose whether or not to only show the arrow when selected the category."
+msgstr ""
+
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. description->description
 msgid "Show description of the selected application"
