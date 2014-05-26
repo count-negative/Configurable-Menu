@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-05-25 09:02-0600\n"
+"PO-Revision-Date: 2014-05-26 09:54-0600\n"
 "Last-Translator: Eliermi Cunha Junior <jpegrande@gmailcom>\n"
 "Language-Team: Eliermi Cunha Junior <jpegrande@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -532,6 +532,10 @@ msgid "Whisker"
 msgstr "Whisker"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
+msgid "Kicker"
+msgstr "Kicker"
+
+#. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Dragon"
 msgstr "Dragão"
 
@@ -762,12 +766,13 @@ msgstr "Escolha mostrar ou não flecha em categorias."
 
 #. configurableMenu@lestcape->settings-schema.json->arrow-categories-selected->description
 msgid "Only show arrow when selected category"
-msgstr ""
+msgstr " Mostrar seta somente quando selecionada categoria"
 
 #. configurableMenu@lestcape->settings-schema.json->arrow-categories-selected->tooltip
 msgid ""
 "Choose whether or not to only show the arrow when selected the category."
 msgstr ""
+"Escolha se quer ou não mostrar apenas a seta quando selecionada a categoria."
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. description->description

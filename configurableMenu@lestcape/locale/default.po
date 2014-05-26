@@ -529,6 +529,10 @@ msgid "Whisker"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
+msgid "Kicker"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Dragon"
 msgstr ""
 

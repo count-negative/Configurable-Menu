@@ -1,5 +1,5 @@
 //Cinnamon Applet: Configurable Menu version v1.2-Beta
-//Release Date: 25 May 2014
+//Release Date: 26 May 2014
 //
 //Authors: Lester Carballo Pérez(https://github.com/lestcape) and Garibaldo(https://github.com/Garibaldo).
 //
@@ -1177,90 +1177,50 @@ function DriveMenu(parent, selectedAppBox, hover, place, iconSize, iconVisible) 
 }
 
 DriveMenu.prototype = {
-   _init: function(parent, selectedAppBox, hover, place, iconSize, iconVisible) {
-      this.drive = new DriveMenuItems(parent, place, iconSize, iconVisible);
-      this.app = this.drive.app;
-      this.selectedAppBox = selectedAppBox;
-      this.hover = hover;
-      this.actor = new St.BoxLayout({ style_class: 'menu-application-button', vertical: false, reactive: true, track_hover: true });
-      this.actor.add_style_class_name('menu-removable-button');
-      this.actor.connect('enter-event', Lang.bind(this, this._onKeyFocusIn));
-      this.actor.connect('leave-event', Lang.bind(this, this._onKeyFocusOut));
-      this.actor.connect('key-focus-in', Lang.bind(this, this._onKeyFocusIn));
-      this.actor.connect('key-focus-out', Lang.bind(this, this._onKeyFocusOut));
-      this.actor.add(this.drive.actor, { x_align: St.Align.START, y_align: St.Align.MIDDLE, x_fill: true, y_fill: false, expand: true });
-      this.actor.add(this.drive.ejectButton, { x_align: St.Align.END, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
-   },
-
-   _onKeyFocusIn: function(actor) {
-      this.setActive(true);
-   },
-
-   _onKeyFocusOut: function(actor) {
-      this.setActive(false);
-   },
-
-   setActive: function(active) {
-      if(active) {
-         this.actor.set_style_class_name('menu-application-button-selected');
-         this.actor.add_style_class_name('menu-removable-button-selected');
-         this.selectedAppBox.setSelectedText(this.drive.app.get_name(), this.drive.app.get_description().split("\n")[0]);
-         this.hover.refreshApp(this.app);
-      }
-      else {
-         this.actor.set_style_class_name('menu-application-button');
-         this.actor.add_style_class_name('menu-removable-button');
-         this.selectedAppBox.setSelectedText("", "");
-         this.hover.refreshFace();
-      }
-   },
-
-   setIconVisible: function(iconVisible) {
-      this.drive.setIconVisible(iconVisible);
-   },
-
-   setIconSize: function(iconSize) {
-      this.drive.setIconSize(iconSize);
-   }
-};
-
-function DriveMenuItems(parent, place, iconSize, iconVisible) {
-   this._init(parent, place, iconSize, iconVisible);
-}
-
-DriveMenuItems.prototype = {
    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
 
-   _init: function(parent, place, iconSize, iconVisible) {
+   _init: function(parent, selectedAppBox, hover, place, iconSize, iconVisible) {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false, sensitive: false, focusOnHover: false});
-
-      this.actor.set_style_class_name('');
       this.place = place;
       this.iconSize = iconSize;
       this.parent = parent;
+      this.selectedAppBox = selectedAppBox;
+      this.hover = hover;
 
-      this._createAppWrapper(this.place);
+      this.actor.destroy();
+      this.actor = new St.BoxLayout({ style_class: 'menu-application-button', vertical: false, reactive: true, track_hover: true });
+      this.actor.connect('button-release-event', Lang.bind(this, this._onButtonReleaseEvent));
+      this.actor.connect('key-press-event', Lang.bind(this, this._onKeyPressEvent));
+      this.actor.connect('notify::hover', Lang.bind(this, this._onHoverChanged));
+      this.actor.connect('key-focus-in', Lang.bind(this, this._onKeyFocusIn));
+      this.actor.connect('key-focus-out', Lang.bind(this, this._onKeyFocusOut));
+
+
+      this.app = this._createAppWrapper(this.place);
 
       this.container = new St.BoxLayout({ vertical: false });
 
-      this.icon = this.place.iconFactory(this.iconSize);
+      this.icon = this.app.create_icon_texture(this.iconSize);
       if(this.icon) { 
-         this.container.add(this.icon, { x_align: St.Align.START, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+         this.container.add(this.icon, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: false });
          this.icon.realize();
       }
 
       this.label = new St.Label({ style_class: 'menu-application-button-label', text: place.name });
-      this.container.add(this.label, { x_align: St.Align.START, y_align: St.Align.MIDDLE, x_fill: true, y_fill: false, expand: true });
+      this.container.add(this.label, { x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
 
       let ejectIcon = new St.Icon({ icon_name: 'media-eject', icon_type: St.IconType.SYMBOLIC, style_class: 'popup-menu-icon' });
       this.ejectButton = new St.Button({ style_class: 'menu-eject-button', child: ejectIcon });
       this.ejectButton.connect('clicked', Lang.bind(this, this._eject));
       this.ejectButton.connect('enter-event', Lang.bind(this, this._ejectEnterEvent));
       this.ejectButton.connect('leave-event', Lang.bind(this, this._ejectLeaveEvent));
-      this.addActor(this.container);
+      this.actor.add(this.container, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.actor.add(this.ejectButton, { x_fill: false, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+
       this.setIconVisible(iconVisible);
       this.label.realize();
       this.actor._delegate = this;
+      
 
    },
 
@@ -1304,6 +1264,21 @@ DriveMenuItems.prototype = {
          this.place.launch();
       PopupMenu.PopupBaseMenuItem.prototype.activate.call(this, event);
       this.parent.menu.close();
+   },
+
+   setActive: function(active) {
+      if(active) {
+         this.actor.set_style_class_name('menu-application-button-selected');
+         this.actor.add_style_class_name('menu-removable-button-selected');
+         this.selectedAppBox.setSelectedText(this.app.get_name(), this.app.get_description().split("\n")[0]);
+         this.hover.refreshApp(this.app);
+      }
+      else {
+         this.actor.set_style_class_name('menu-application-button');
+         this.actor.add_style_class_name('menu-removable-button');
+         this.selectedAppBox.setSelectedText("", "");
+         this.hover.refreshFace();
+      }
    },
 
    _createAppWrapper: function(place) {
@@ -1758,7 +1733,6 @@ AccessibleBox.prototype = {
             for(let i = 0; i < mounts.length; i++) {
                if(mounts[i].isRemovable()) {
                   drive = new DriveMenu(this.parent, this.selectedAppBox, this.hover, mounts[i], this.iconSize, this.iconsVisible);
-                  //drive.container.set_width(this.actor.get_width()-40);
                   this.itemsDevices.add_actor(drive.actor);
                   this._staticButtons.push(drive);
                   any = true;
@@ -1968,10 +1942,11 @@ AccessibleBox.prototype = {
       if(app) {
          //Main.notify("Fue:" + appsName[app.get_id()]);
          let item = new FavoritesButtonExtended(this.parent, this.scrollActor, this.vertical, true, app, appsName[app.get_id()],
-                                                4, this.iconSize, true, this.textButtonWidth, this.appButtonDescription);
+                                                4, this.iconSize, true, this.textButtonWidth, this.appButtonDescription, this._applicationsBoxWidth);
          item.actor.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
          item.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
          item.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, item));
+         item.actor.set_style_class_name('menu-application-button');
          this.itemsSystem.add_actor(item.actor);
          //if(item.menu)
             this.itemsSystem.add_actor(item.menu.actor);
@@ -1987,10 +1962,7 @@ AccessibleBox.prototype = {
    disableSelected: function() {
       if((this._staticSelected != -1)&&(this._staticSelected < this._staticButtons.length)) {
          let selectedBtt = this._staticButtons[this._staticSelected];
-         if(!(selectedBtt instanceof FavoritesButtonExtended))
-            selectedBtt.actor.style_class = "menu-application-button";
-         else
-            selectedBtt.actor.remove_style_pseudo_class('hover');
+         selectedBtt.actor.style_class = "menu-application-button";
       }
       this.selectedAppBox.setSelectedText("", "");
       this.hover.refreshFace();
@@ -1999,10 +1971,7 @@ AccessibleBox.prototype = {
    activeSelected: function() {
       if((this._staticSelected != -1)&&(this._staticSelected < this._staticButtons.length)) {
          let selectedBtt = this._staticButtons[this._staticSelected];
-         if(!(selectedBtt instanceof FavoritesButtonExtended))
-            selectedBtt.actor.style_class = "menu-application-button-selected";
-         else
-            selectedBtt.actor.add_style_pseudo_class('hover');
+         selectedBtt.actor.style_class = "menu-application-button-selected";
          if(selectedBtt.app.get_description())
             this.selectedAppBox.setSelectedText(selectedBtt.app.get_name(), selectedBtt.app.get_description().split("\n")[0]);
          else
@@ -2521,7 +2490,7 @@ PowerBox.prototype = {
       this.activeBar = new St.BoxLayout({ vertical: false });
       this.separator = new St.BoxLayout({ vertical: true });
       this.separator.style = "padding-left: "+(this.iconSize)+"px;margin:auto;";
-      this.bttChanger = new ButtonChangerBox(this, "forward", this.iconSize, ["Show Down", "Options"], 0, Lang.bind(this, this._onPowerChange));
+      this.bttChanger = new ButtonChangerBox(this.parent, "forward", this.iconSize, ["Show Down", "Options"], 0, Lang.bind(this, this._onPowerChange));
       this.bttChanger.setTextVisible(false);
       this.activeBar.add(this._powerButtons[2].actor, { x_fill: false, x_align: aling });
       this.activeBar.add(this.bttChanger.actor, { x_fill: true, x_align: aling });
@@ -3066,73 +3035,9 @@ ApplicationContextMenuItemExtended.prototype = {
       this.addActor(this.label);
    },
 
-   execCommandAsRoot: function(command) {
-      if(GLib.find_program_in_path("pkexec")) {
-         return this.execCommand("sh -c 'pkexec sh -c \"" + command + "\"'");
-      }
-      else if(GLib.find_program_in_path("gksu")) {
-         return this.execCommand("gksu \"sh -c '" + command + "'\"");
-      }
-      else if(GLib.find_program_in_path("kdesu")) {
-         return this.execCommand("kdesu -c \"sh -c '" + command + "'\"");
-      }
-      else {
-         let icon = new St.Icon({ icon_name: 'error',
-                                  icon_type: St.IconType.FULLCOLOR,
-                                  icon_size: 36 });
-         Main.criticalNotify(_("Failed of Drives Manager:"), _("You don't have any GUI program to get root permissions."), icon);
-      }
-      return false;
-   },
-
-   execCommand: function(command) {
-      try {
-         let [success, argv] = GLib.shell_parse_argv(command);
-         this._trySpawnAsync(argv);
-         return true;
-      } catch (e) {
-         let title = _("Execution of '%s' failed:").format(command);
-         Main.notifyError(title, e.message);
-      }
-      return false;
-   },
-
-   _trySpawnAsync: function(argv) {
-      try {   
-         GLib.spawn_async(null, argv, null,
-            GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.STDOUT_TO_DEV_NULL  | GLib.SpawnFlags.STDERR_TO_DEV_NULL,
-            null, null);
-      } catch (err) {
-         if (err.code == GLib.SpawnError.G_SPAWN_ERROR_NOENT) {
-            err.message = _("Command not found.");
-         } else {
-            // The exception from gjs contains an error string like:
-            //   Error invoking GLib.spawn_command_line_async: Failed to
-            //   execute child process "foo" (No such file or directory)
-            // We are only interested in the part in the parentheses. (And
-            // we can't pattern match the text, since it gets localized.)
-            err.message = err.message.replace(/.*\((.+)\)/, '$1');
-         }
-         throw err;
-      }
-   },
-
    activate: function (event) {
       let needClose = false;
       switch (this._action) {
-       /* case "open_as_root":
-            let command = "";
-            if(this._appButton.app.isPlace)
-               command = this._appButton.app.get_description();
-            else {
-               let file = Gio.file_new_for_path(this._appButton.app.get_app_info().get_filename());
-               let destFile = Gio.file_new_for_path("/tmp/"+this._appButton.app.get_id());
-               Main.notify("" + file.get_path() + " "+ destFile.get_path());
-               file.copy(destFile, 0, null, function(){});
-               Util.spawnCommandLine("chmod +x \""+destFile.get_path()+"\"");
-               this.execCommandAsRoot(destFile.get_path());
-            }
-            break;*/
          case "add_to_panel":
             try {
                let winListApplet = imports.ui.appletManager.applets['WindowListGroup@jake.phy@gmail.com'];
@@ -3235,6 +3140,7 @@ ApplicationContextMenuItemExtended.prototype = {
                if((this._appButton instanceof FavoritesButtonExtended)&&
                   (this._appButton.scrollActor != this._appButton.parent.favoritesScrollBox)) {
                   this._appButton.setDefaultText();
+                  return true;
                }
             }
             } catch (e) {Main.notify("access", e.message);}
@@ -3250,6 +3156,7 @@ ApplicationContextMenuItemExtended.prototype = {
                if((this._appButton instanceof FavoritesButtonExtended)&&
                   (this._appButton.scrollActor != this._appButton.parent.favoritesScrollBox)&&(this._appButton.nameEntry.visible)) {
                   this._appButton.editText(false);
+                  return true;
                }
             }
             } catch (e) {Main.notify("access", e.message);}
@@ -3267,7 +3174,7 @@ ApplicationContextMenuItemExtended.prototype = {
       this._appButton.toggleMenu();
       if(needClose)
          this._appButton.parent.menu.close();
-      return false;
+      return true;
    }
 };
 
@@ -3313,17 +3220,25 @@ GenericApplicationButtonExtended.prototype = {
             if(this.withMenu) {
                if(!this.menu.isOpen) {
                   this.parent.closeApplicationsContextMenus(true);
-                  this.actor.get_parent().set_height(200);
+                  if(this.parent.appMenu) {
+                     let box = this.actor.get_parent();
+                     let boxH = box.get_height();
+                     let monitor = Main.layoutManager.findMonitorForActor(box);
+                     if(boxH > monitor.height - 100)
+                        boxH = monitor.height - 100;
+                     box.set_height(boxH);
+                  }
                   this.toggleMenu();
                   this.parent._previousContextMenuOpen = this;
-                  this.actor.get_parent().set_height(-1);
-                  this.parent._updateSize();
+                  if(this.parent.appMenu) {
+                     this.actor.get_parent().set_height(-1);
+                  }
                } else {
                   this.toggleMenu();
-                  Mainloop.idle_add(Lang.bind(this, function() {
-                     this.parent._updateSize();
-                  }));
                }
+               let minWidth = this.parent._minimalWidth();
+               if(this.parent.width < minWidth)
+                  this.parent._updateSize();
             }
          }
       }
@@ -3351,10 +3266,6 @@ GenericApplicationButtonExtended.prototype = {
             this.menu.box.remove_actor(children[i]);
          }
          let menuItem;
-        /* if(GLib.find_program_in_path("pkexec")) {
-            menuItem = new ApplicationContextMenuItemExtended(this, _("Open as root"), "open_as_root");
-            this.menu.addMenuItem(menuItem);
-         }*/
          if(!this.app.isPlace) {
             menuItem = new ApplicationContextMenuItemExtended(this, _("Add to panel"), "add_to_panel");
             this.menu.addMenuItem(menuItem);
@@ -5526,14 +5437,14 @@ RecentClearButtonExtended.prototype = {
    }
 };
 
-function FavoritesButtonExtended(parent, parentScroll, vertical, displayVertical, app, alterText, nbFavorites, iconSize, allowName, appWidth, appDesc, appWidth) {
-   this._init(parent, parentScroll, vertical, displayVertical, app, alterText, nbFavorites, iconSize, allowName, appWidth, appDesc, appWidth);
+function FavoritesButtonExtended(parent, parentScroll, vertical, displayVertical, app, alterText, nbFavorites, iconSize, allowName, appTextWidth, appDesc, appWidth) {
+   this._init(parent, parentScroll, vertical, displayVertical, app, alterText, nbFavorites, iconSize, allowName, appTextWidth, appDesc, appWidth);
 }
 
 FavoritesButtonExtended.prototype = {
    __proto__: GenericApplicationButtonExtended.prototype,
     
-   _init: function(parent, parentScroll, vertical, displayVertical, app, alterName, nbFavorites, iconSize, allowName, appWidth, appDesc, appWidth) {
+   _init: function(parent, parentScroll, vertical, displayVertical, app, alterName, nbFavorites, iconSize, allowName, appTextWidth, appDesc, appWidth) {
       GenericApplicationButtonExtended.prototype._init.call(this, parent, parentScroll, app, true);
       this.iconSize = iconSize;
       this.displayVertical = displayVertical;
@@ -5575,7 +5486,7 @@ FavoritesButtonExtended.prototype = {
          this.labelDesc.visible = false;
 
          this.textBox = new St.BoxLayout({ vertical: true });
-         this.setTextMaxWidth(appWidth);
+         this.setTextMaxWidth(appTextWidth);
          this.setAppDescriptionVisible(appDesc);
          this.container.add(this.textBox, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
          this.setVertical(vertical);
@@ -5680,7 +5591,7 @@ FavoritesButtonExtended.prototype = {
 
    setVertical: function(vertical) {
       this.container.set_vertical(vertical);
-      this.setTextMaxWidth( this.textWidth);
+      this.setTextMaxWidth(this.textWidth);
       if(this.allowName) {      
          let parentL = this.labelName.get_parent();
          if(parentL) parentL.remove_actor(this.labelName);
@@ -8425,6 +8336,7 @@ MyApplet.prototype = {
             return true;
          }
       }
+      return true;
    },
 
    _navegateFavBox: function(symbol, actor) {
@@ -10060,8 +9972,7 @@ MyApplet.prototype = {
          Mainloop.source_remove(this._timeOutResize);
       }
       this._timeOutResize = 0;
-      let relativeSide = this.actorResize._delegate._boxPointer.relativeSide;
-      if((this.actorResize)&&(this.relativeSide == relativeSide)) {
+      if((this.actorResize)&&(this.relativeSide == this.actorResize._delegate._boxPointer.relativeSide)) {
          if(this._updatePosResize())
             this._updateSize();
          this._timeOutResize = Mainloop.timeout_add(300, Lang.bind(this, this._doResize));
@@ -10158,6 +10069,8 @@ MyApplet.prototype = {
             panelHeight = Main.panel.actor.height;
          }
       }
+      if(!panelHeight)
+         panelHeight = 0;
       return panelHeight;
    },
 
