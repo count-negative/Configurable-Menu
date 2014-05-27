@@ -548,7 +548,7 @@ msgstr "Accessible Inverted"
 msgid "Dragon Inverted"
 msgstr "Dragon Inverted"
 
-#. configurableMenu@lestcape->settings-schema.json->power-theme->options
+#. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Horizontal"
 msgstr "Horizontal"
 
@@ -895,7 +895,7 @@ msgstr "允许使用wikipedia检索引擎."
 
 #. configurableMenu@lestcape->settings-schema.json->search-google->description
 msgid "Enable web search with google"
-msgstr "Enable web search with google"
+msgstr "开启Google检索引擎"
 
 #. configurableMenu@lestcape->settings-schema.json->search-google->tooltip
 msgid "Allows web search to the google search engine."
