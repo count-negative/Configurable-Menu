@@ -2069,6 +2069,7 @@ SelectedAppBox.prototype = {
       this.appDescriptionSize = 6;
       this.appTitleSize = 15;
       this.timeOutDateTime = 0;
+      this.boxHeightChange = true;
       this.actor = new St.BoxLayout({ style_class: 'menu-selected-app-box', vertical: true });
       this.appTitle = new St.Label({ style_class: 'menu-selected-app-title', text: "" });
       this.appDescription = new St.Label({ style_class: 'menu-selected-app-description', text: "" });
@@ -2076,6 +2077,8 @@ SelectedAppBox.prototype = {
       this.actor.add_actor(this.appDescription);
      // this.setAlign(St.Align.START);
       this.setDateTimeVisible(activeDateTime);
+      this.appTitle.connect('allocation_changed', Lang.bind(this, this._onAllocationChanged));
+      this.appDescription.connect('allocation_changed', Lang.bind(this, this._onAllocationChanged));
    },
 
    setAlign: function(align) {
@@ -2107,11 +2110,13 @@ SelectedAppBox.prototype = {
    setTitleSize: function(size) {
       this.appTitleSize = size;
       this.appTitle.style="font-size: " + this.appTitleSize + "pt";
+      this._validateVisible();
    },
 
    setDescriptionSize: function(size) {
       this.appDescriptionSize = size;
       this.appDescription.style="font-size: " + this.appDescriptionSize + "pt";
+      this._validateVisible();
    },
 
    setDateFormat: function(format) {
@@ -2156,6 +2161,24 @@ SelectedAppBox.prototype = {
          this.actor.visible = true;
       else
          this.actor.visible = false;
+      this.boxHeightChange = true;
+      this._onAllocationChanged();
+   },
+
+   _onAllocationChanged: function(actor, event) {
+      let heightBox = this.actor.get_height();
+      let heightLabels = 0;
+      if(this.appTitle.visible)
+         heightLabels += this.appTitle.get_height();
+      if(this.appDescription.visible)
+         heightLabels += this.appDescription.get_height();
+      if((this.boxHeightChange)||(Math.abs(heightBox - heightLabels) > 10)) {
+         if(global.ui_scale)
+            this.actor.set_height(heightLabels);
+         else
+            this.actor.set_height(heightLabels);
+         this.boxHeightChange = false;
+      }
    },
 
    _refrech: function() {
@@ -3249,6 +3272,16 @@ GenericApplicationButtonExtended.prototype = {
    activate: function(event) {
       this.unhighlight(); 
       this.app.open_new_window(-1);
+      try {
+         if(!this.app.isPlace) {
+         let val = this.parent.appsUsage[this.app.get_id()];
+         if(!val) val = 0;
+         this.parent.appsUsage[this.app.get_id()] = val + 1;
+         this.parent.setAppsUsage(this.parent.appsUsage);
+         }
+      } catch(e) {
+         Main.notify(e.message);
+      }
       this.parent.menu.close();
    },
     
@@ -7386,6 +7419,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "list-places-names", "stringPlacesNames", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "list-apps", "stringApps", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "list-apps-names", "stringAppsNames", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "list-apps-usage", "stringAppsUsage", null, null);
 
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "submenu-width", "subMenuWidth", this._updateSubMenuSize, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "submenu-height", "subMenuHeight", this._updateSubMenuSize, null);
@@ -7557,6 +7591,7 @@ MyApplet.prototype = {
       this._readAccessiblePlacesNames();
       this._readAccessibleApps();
       this._readAccessibleAppsNames();
+      this._readAppsUsage();
       this._createArrayOfThemes();
       this._updateValues();
    },
@@ -7593,7 +7628,7 @@ MyApplet.prototype = {
          for(let key in new_json) {
             if(new_json[key]["type"] == "generic") {
                if((new_json[key] != "list-places")&&(new_json[key] != "list-apps")&&
-                  (new_json[key] != "list-places-names")&&(new_json[key] != "list-apps-names")) {
+                  (new_json[key] != "list-places-names")&&(new_json[key] != "list-apps-names")&&(new_json[key] != "list-apps-usage")) {
                   newSettings[key] = new_json[key]["default"];
                }
             }
@@ -7732,6 +7767,36 @@ MyApplet.prototype = {
          }
       }
    },
+
+   _readAppsUsage: function() {
+      let appsNamesList = this.stringAppsUsage.split(";;");
+      this.appsUsage = new Array();
+      let property, value;
+      let appSys = Cinnamon.AppSystem.get_default();
+      for(let i = 0; i < appsNamesList.length; i++) {
+         property = appsNamesList[i].split("::");
+         if((property[0] != "")&&(property[1] != "")&&(appSys.lookup_app(property[0]))) {
+            try {
+               value = parseInt(property[1]);
+               this.appsUsage[property[0]] = value;
+            } catch(e){}//exclude only the app do not report any thing.
+         }
+      }
+   },
+
+   setAppsUsage: function(listAppsUsage) {
+      let result = "";
+      this.appsNames = new Array();
+      let appSys = Cinnamon.AppSystem.get_default();
+      for(let id in listAppsUsage) {
+         if((id != "")&&(listAppsUsage[id].toString() != "")&&(appSys.lookup_app(id))) {
+            this.appsNames[id] = listAppsUsage[id].toString();
+            result += id+"::"+listAppsUsage[id].toString() + ";;";
+         }
+      }
+      this.stringAppsUsage = result.substring(0, result.length - 2);//commit
+   },
+
 
    _isBookmarks: function(bookmark) {
       let listBookmarks = this._listBookmarks();
@@ -12450,6 +12515,7 @@ MyApplet.prototype = {
          this.actor.remove_style_pseudo_class('active');
          this._disconnectSearch();
          this._select_category(null, this._allAppsCategoryButton);
+         this.appMenuClose();
          if(this.bttChanger) 
             this.bttChanger.activateSelected(_("All Applications"));
          Mainloop.idle_add(Lang.bind(this, function() {
@@ -12477,7 +12543,6 @@ MyApplet.prototype = {
             this.selectedAppBox.setDateTimeVisible(false);
             this.repositionActor = null;
             this._activeGnomeMenu();
-            this.appMenuClose();
             this.categoriesScrollBox.scrollToActor(this._allAppsCategoryButton.actor);
             this.destroyVectorBox();
             this.menuManager._onMenuOpenState(menu, open);
