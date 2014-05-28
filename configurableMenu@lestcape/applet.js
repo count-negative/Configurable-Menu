@@ -2174,7 +2174,7 @@ SelectedAppBox.prototype = {
          heightLabels += this.appDescription.get_height();
       if((this.boxHeightChange)||(Math.abs(heightBox - heightLabels) > 10)) {
          if(global.ui_scale)
-            this.actor.set_height(heightLabels);
+            this.actor.set_height(heightLabels * global.ui_scale);
          else
             this.actor.set_height(heightLabels);
          this.boxHeightChange = false;
@@ -5982,16 +5982,25 @@ ConfigurablePointer.prototype = {
    },
 
    _shiftActor : function() {
-        // Since the position of the BoxPointer depends on the allocated size
-        // of the BoxPointer and the position of the source actor, trying
-        // to position the BoxPoiner via the x/y properties will result in
-        // allocation loops and warnings. Instead we do the positioning via
-        // the anchor point, which is independent of allocation, and leave
-        // x == y == 0.
-        this.actor.set_anchor_point(-(Math.floor(this._xPosition + this.shiftX + this._xOffset)),
-                                    -(Math.floor(this._yPosition + this.shiftY + this._yOffset)));
-        this._border.queue_repaint();
-    },
+      // Since the position of the BoxPointer depends on the allocated size
+      // of the BoxPointer and the position of the source actor, trying
+      // to position the BoxPoiner via the x/y properties will result in
+      // allocation loops and warnings. Instead we do the positioning via
+      // the anchor point, which is independent of allocation, and leave
+      // x == y == 0.
+      this.actor.set_anchor_point(-(Math.floor(this._xPosition + this.shiftX + this._xOffset)),
+                                  -(Math.floor(this._yPosition + this.shiftY + this._yOffset)));
+      this._border.queue_repaint();
+   },
+
+   _getTopMenu: function(actor) {
+      while(actor) {
+         if(actor._delegate && actor._delegate instanceof ConfigurableMenu)
+            return actor._delegate;
+         actor = actor.get_parent();
+      }
+      return null;
+   },
 
    _reposition: function(sourceActor, alignment) {
 try {
@@ -6048,9 +6057,13 @@ try {
       case St.Side.LEFT:
       case St.Side.RIGHT:
          resY = sourceCenterY - (halfMargin + (natHeight - margin) * alignment);
-
          resY = Math.max(resY, monitor.y + this._maxPanelSize());
-         resY = Math.min(resY, monitor.y + monitor.height - (this._maxPanelSize() + natHeight));
+         let m = this._getTopMenu(sourceActor);
+         if((!Main.panel2)&&(m)&&(m._arrowSide == St.Side.TOP)) {
+            resY = Math.min(resY, monitor.y + monitor.height - (natHeight));
+         } else {
+            resY = Math.min(resY, monitor.y + monitor.height - (this._maxPanelSize() + natHeight));
+         }
 
          this.setArrowOrigin(sourceCenterY - resY);
          break;
