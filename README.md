@@ -1,6 +1,6 @@
-Cinnamon Applet: Configurable Menu Version: v1.2-Beta
+Cinnamon Applet: Configurable Menu Version: v1.3-Beta
 
-Last version release date: 25 May 2014
+Last version release date: 29 May 2014
 ***
 Authors: [Lester Carballo Pérez](https://github.com/lestcape) and [Garibaldo](https://github.com/Garibaldo).
 
@@ -22,6 +22,7 @@ Author of language translation:
 - French(Fr):        Dupo(dupop35@yahoo.fr)
 - Chinese(Zh_Cn):    Highwind(highwindmx@126.com)
 - Czech(Cs_Cz):      Satapouch(http://www.linux-mint-czech.cz/)
+- Slovak(sk_SK):    Benji(http://sk.gravatar.com/sawwer/)
 
 --------------
 ![](https://raw.github.com/wiki/lestcape/Configurable-Menu/img/Capture.png)
@@ -74,6 +75,14 @@ You can found more information about Cinnamon Installer on the [Cinnamon Install
 Change log
 --------------
 See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/Change-Log).
+
+1.3-Beta
+   - Was added Slovak language(Sk_SK) thanks Benji.
+   - Resolved problem on mini-shake from some locales.
+   - Do not allow the open the popupmenu over the Cinnamon panels.
+   - Improve the speed of close the popupmenu.
+   - Improve the alignment of applications and places in the accessible panel.
+   - Add feature to count the number of usages of the applications(only if application is called from the menu).
 
 1.2-Beta
    - Was added kicker Menu layout.
