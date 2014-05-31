@@ -7493,6 +7493,7 @@ MyApplet.prototype = {
 
          global.display.connect('overlay-key', Lang.bind(this, function() {
             try {
+               global.stage.set_key_focus(this.searchEntry);
                this.menu.toggle_with_options(false);
             }
             catch(e) {
@@ -8100,7 +8101,6 @@ MyApplet.prototype = {
         /* check for a keybinding and quit early, otherwise we get a double hit
            of the keybinding callback */
         let action = global.display.get_keybinding_action(keyCode, modifierState);
-
         if(action == Meta.KeyBindingAction.CUSTOM) {
            return true;
         }
@@ -8111,11 +8111,7 @@ MyApplet.prototype = {
               this.menu.close();
               return true;
            }
-           else {
-              global.stage.set_key_focus(this.searchEntry);
-              return true;
-           }
-        } 
+        }
         if((this.appletMenu)&&(actor == this.appletMenu.actor)) {
            return this._navegateAppletMenu(symbol, actor);
         } else if(actor._delegate instanceof FavoritesButtonExtended) {
