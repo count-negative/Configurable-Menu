@@ -377,7 +377,7 @@ PackageInstallerWrapper.prototype = {
    },
 
    enableDefaultInstaller: function(enable) {
-      if(enable)
+      if((enable)&&(GLib.find_program_in_path("gksu")))
          this._canCinnamonUninstallApps = GLib.file_test(this.pathCinnamonDefaultUninstall, GLib.FileTest.EXISTS);
       else
          this._canCinnamonUninstallApps = false; 
