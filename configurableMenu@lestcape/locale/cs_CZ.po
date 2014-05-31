@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-05-26 09:53-0600\n"
+"PO-Revision-Date: 2014-05-30 18:05-0600\n"
 "Last-Translator: Libor Schejbal <libor.schejbal@gmail.com>\n"
 "Language-Team: Libor Schejbal <libor.schejbal@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -960,3 +960,11 @@ msgstr "Odinstalovat nástroj Cinnamon Installer"
 #. configurableMenu@lestcape->settings-schema.json->installer-uninstall-button->tooltip
 msgid "Press this button to uninstall the Cinnamon Installer tool."
 msgstr "Stiskněte toto tlačítko pro aktualizaci nástroje Cinnamon Installer."
+
+#. configurableMenu@lestcape->settings-schema.json->installer-default->description
+msgid "Enable the default Cinnamon packages manager tools"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->installer-default->tooltip
+msgid "Allows the use of the default packages manager(only if it's available)."
+msgstr ""

@@ -365,8 +365,8 @@ PackageInstallerWrapper.prototype = {
       this.pythonVer = "python3";
       this.kitInstaller = null;
       //this._tryToConectedPackageKit();
-      //this.pathCinnamonDefaultUninstall = "/usr/bin/cinnamon-remove-application";
-      //this._canCinnamonUninstallApps = GLib.file_test(this.pathCinnamonDefaultUninstall, GLib.FileTest.EXISTS);
+      this.pathCinnamonDefaultUninstall = "/usr/bin/cinnamon-remove-application";
+      this._canCinnamonUninstallApps = false;
       this.pathToLocalUpdater = GLib.get_home_dir() + "/.local/share/cinnamon/applets/" + this.parent.uuid + "/pkg_updater/Updater.py";
       this.pathToRemoteUpdater = GLib.get_home_dir() + "/.local/share/Cinnamon-Installer/Cinnamon-Installer/Updater.py";
       this.pathToPKG = GLib.get_home_dir() + "/.local/share/Cinnamon-Installer/Cinnamon-Installer.py";
@@ -374,6 +374,17 @@ PackageInstallerWrapper.prototype = {
       this.gIconInstaller = new Gio.FileIcon({ file: Gio.file_new_for_path(this.pathToPkgIcon) });
       this.listButtons = new Array();
       this.pakages = [];
+   },
+
+   enableDefaultInstaller: function(enable) {
+      if(enable)
+         this._canCinnamonUninstallApps = GLib.file_test(this.pathCinnamonDefaultUninstall, GLib.FileTest.EXISTS);
+      else
+         this._canCinnamonUninstallApps = false; 
+   },
+
+   canCinnamonUninstallApps: function() {
+      return this._canCinnamonUninstallApps;
    },
 
    _tryToConectedPackageKit: function() {
@@ -500,16 +511,16 @@ PackageInstallerWrapper.prototype = {
       let length = programId.length;
       if(programId.substring(length-8, length) == ".desktop") {
          let programName = programId.substring(0, length-8);
-         let query = this.pythonVer + " " + this.pathToPKG + " --uprogram " + programName.toLowerCase();
-         this._execCommand(query);
-         // This will be used to uninstall app, if cinnamon add a good tools...
-         /*if(this._canCinnamonUninstallApps) {
+         if(this._canCinnamonUninstallApps) {// This will be used to uninstall app, if cinnamon add a good tools...
             let fileName = GLib.find_program_in_path(programName);
             if(fileName) {
                this._execCommand("gksu -m '" + _("Please provide your password to uninstall this application") +
-                                 "' " + this.pathCinnamonDefaultUninstall " '" + fileName+ "'");
+                                 "' " + this.pathCinnamonDefaultUninstall + " '" + fileName+ "'");
             }
-         }*/
+         } else {
+            let query = this.pythonVer + " " + this.pathToPKG + " --uprogram " + programName.toLowerCase();
+            this._execCommand(query);
+         }
       }
    },
 
@@ -3322,7 +3333,7 @@ GenericApplicationButtonExtended.prototype = {
                   this.menu.addMenuItem(menuItem);
                }
             }
-            if(this.parent.enableInstaller) {
+            if((this.parent.enableInstaller)||(this.parent.pkg.canCinnamonUninstallApps())) {
                menuItem = new ApplicationContextMenuItemExtended(this, _("Uninstall"), "uninstall_app");
                this.menu.addMenuItem(menuItem);
             }
@@ -7447,6 +7458,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "installer-tools", "enableInstaller", this._packageInstallerChanged, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "installer-search", "enablePackageSearch", this._packageSearchChanged, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "installer-update-check", "enableCheckUpdate", this._packageInstallerCheck, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "installer-default", "enableDefaultInstaller", this._packageInstallerDefault, null);
 
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "classic", "stringClassic", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "classicGnome", "stringClassicGnome", null, null);
@@ -7504,8 +7516,8 @@ MyApplet.prototype = {
 
          this._updateConfig();
          this._packageInstallerCheck();
+         this._packageInstallerDefault();
          this._updateComplete();
-
       }
       catch (e) {
          Main.notify("ErrorMain:", e.message);
@@ -10410,6 +10422,10 @@ MyApplet.prototype = {
          this.pkg.checkForUpdate();
    },
 
+   _packageInstallerDefault: function() {
+      this.pkg.enableDefaultInstaller(this.enableDefaultInstaller);
+   },
+
    _updateInstaller: function() {
       this.pkg.executeUpdater("--qupdate gui");
    },
@@ -12560,6 +12576,7 @@ MyApplet.prototype = {
             this.destroyVectorBox();
             this.menuManager._onMenuOpenState(menu, open);
             this._stopAutoscroll();
+            global.stage.set_key_focus(this.searchEntry);
          }));
       }
       return true;

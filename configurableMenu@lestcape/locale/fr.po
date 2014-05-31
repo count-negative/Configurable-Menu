@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-05-26 09:54-0600\n"
+"PO-Revision-Date: 2014-05-30 18:06-0600\n"
 "Last-Translator: Dupo <dupop35@yahoo.fr>\n"
 "Language-Team: Dupo <dupop35@yahoo.fr>\n"
 "MIME-Version: 1.0\n"
@@ -355,7 +355,7 @@ msgstr "Ouvrir le menu lorsque j'appuie dessus avec ma souris"
 
 #. configurableMenu@lestcape->settings-schema.json->activate-on-press->tooltip
 msgid "Enable opening the menu when the mouse press over the applet."
-msgstr "Activer l'ouverture du menu lors d'un clic sur l'appliquette."
+msgstr "Activer l'ouverture du menu lors d'un clic sur l'applet."
 
 #. configurableMenu@lestcape->settings-schema.json->height->description
 msgid "Menu height:"
@@ -766,12 +766,13 @@ msgstr "Afficher ou non la flèche sur les catégories."
 
 #. configurableMenu@lestcape->settings-schema.json->arrow-categories-selected->description
 msgid "Only show arrow when selected category"
-msgstr ""
+msgstr "Afficher uniquement la flèche lorsque la catégorie est sélectionnée"
 
 #. configurableMenu@lestcape->settings-schema.json->arrow-categories-selected->tooltip
 msgid ""
 "Choose whether or not to only show the arrow when selected the category."
 msgstr ""
+"Afficher uniquement ou non la flèche lorsque la catégorie est sélectionnée."
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. description->description
@@ -970,3 +971,11 @@ msgstr "Désinstaller l'outil d'installation de Cinnamon"
 msgid "Press this button to uninstall the Cinnamon Installer tool."
 msgstr ""
 "Appuyez sur ce bouton pour désinstaller l'outil d'installation de Cinnamon."
+
+#. configurableMenu@lestcape->settings-schema.json->installer-default->description
+msgid "Enable the default Cinnamon packages manager tools"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->installer-default->tooltip
+msgid "Allows the use of the default packages manager(only if it's available)."
+msgstr ""

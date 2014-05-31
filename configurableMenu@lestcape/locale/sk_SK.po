@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-05-29 15:05-0600\n"
+"PO-Revision-Date: 2014-05-30 18:06-0600\n"
 "Last-Translator: Roman Beňo <romanbeno273@gmail.com>\n"
 "Language-Team: Roman Beňo <romanbeno273@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -779,12 +779,13 @@ msgstr "Zvoľte či chcete aby sa zobrazovali šípky pri kategóriách alebo ni
 
 #. configurableMenu@lestcape->settings-schema.json->arrow-categories-selected->description
 msgid "Only show arrow when selected category"
-msgstr ""
+msgstr "Zobrazovať šípku iba pri výbere kategórie"
 
 #. configurableMenu@lestcape->settings-schema.json->arrow-categories-selected->tooltip
 msgid ""
 "Choose whether or not to only show the arrow when selected the category."
 msgstr ""
+"Zvoľte či chcete aby sa zobrazovala šípka iba pri výbere kategórie alebo nie."
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. description->description
@@ -984,3 +985,11 @@ msgstr "Odinštalovať nástroj Cinnamon Installer"
 #. configurableMenu@lestcape->settings-schema.json->installer-uninstall-button->tooltip
 msgid "Press this button to uninstall the Cinnamon Installer tool."
 msgstr "Stlačte toto tlačidlo pre odinštalovanie nástroja Cinnamon Installer."
+
+#. configurableMenu@lestcape->settings-schema.json->installer-default->description
+msgid "Enable the default Cinnamon packages manager tools"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->installer-default->tooltip
+msgid "Allows the use of the default packages manager(only if it's available)."
+msgstr ""
