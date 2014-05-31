@@ -8105,13 +8105,17 @@ MyApplet.prototype = {
            return true;
         }
 
-        if(global.display.get_is_overlay_key(keyCode, modifierState) && this.menu.isOpen) {
-           if(this.idSignalTextChange > 0)
-              this.searchEntryText.disconnect(this.idSignalTextChange);
-           this.idSignalTextChange = 0
-           this.menu.close();
-           return true;
-        }
+        if(global.display.get_is_overlay_key(keyCode, modifierState)) {
+           if(this.menu.isOpen) {
+              this._disconnectSearch();
+              this.menu.close();
+              return true;
+           }
+           else {
+              global.stage.set_key_focus(this.searchEntry);
+              return true;
+           }
+        } 
         if((this.appletMenu)&&(actor == this.appletMenu.actor)) {
            return this._navegateAppletMenu(symbol, actor);
         } else if(actor._delegate instanceof FavoritesButtonExtended) {
@@ -9805,9 +9809,8 @@ MyApplet.prototype = {
 
    _menuEventClicked: function(actor, event) {
       if(event.get_button() == 1) {
-         if(this.idSignalTextChange > 0)
-            this.searchEntryText.disconnect(this.idSignalTextChange);
-         this.idSignalTextChange = 0;
+         if(this.menu.isOpen)
+            this._disconnectSearch();
          if(this._applet_context_menu.isOpen) {
             this._applet_context_menu.toggle(); 
          }
