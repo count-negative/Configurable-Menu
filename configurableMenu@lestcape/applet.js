@@ -12546,7 +12546,6 @@ MyApplet.prototype = {
       if(open) {
          this.menuIsOpening = true;
          this._initialDisplay();
-         this.menuManager._onMenuOpenState(menu, open);
          global.stage.set_key_focus(this.searchEntry);
          this.actor.add_style_pseudo_class('active');
          this._selectedItemIndex = null;
@@ -12556,8 +12555,11 @@ MyApplet.prototype = {
          this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
          this._allAppsCategoryButton.setArrowVisible(true);
          this.repositionGnomeCategory();
+         global.stage_input_mode = Cinnamon.StageInputMode.FOCUSED;
          Mainloop.idle_add(Lang.bind(this, function() {
             this.selectedAppBox.setDateTimeVisible(this.showTimeDate);
+            this.menuManager._onMenuOpenState(menu, open);
+            global.stage.set_key_focus(this.searchEntry);
          }));
       }
       else {
