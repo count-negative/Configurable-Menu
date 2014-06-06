@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-06-06 03:51-0600\n"
+"PO-Revision-Date: 2014-06-06 15:01-0600\n"
 "Last-Translator: highwind <highwindmx@126.com>\n"
 "Language-Team: highwind <highwindmx@126.com>\n"
 "MIME-Version: 1.0\n"
@@ -735,13 +735,13 @@ msgstr "选择是否设置控制按钮有边框."
 
 #. configurableMenu@lestcape->settings-schema.json->categories-hover->description
 msgid "Open the category when I move my mouse over it"
-msgstr ""
+msgstr "鼠标掠过时打开目录"
 
 #. configurableMenu@lestcape->settings-schema.json->categories-hover->tooltip
 msgid ""
 "Choose whether or not to open the category when the mouse move over it, "
 "otherwise need the mouse click."
-msgstr ""
+msgstr "选择是否在鼠标掠过时打开目录，否则需鼠标点击"
 
 #. configurableMenu@lestcape->settings-schema.json->categories-
 #. icons->description
@@ -966,8 +966,8 @@ msgstr "按此键卸载Cinnamon安装工具."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-default->description
 msgid "Enable the default Cinnamon packages manager tools"
-msgstr ""
+msgstr "开启Cinnamon默认的软件包管理工具"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-default->tooltip
 msgid "Allows the use of the default packages manager(only if it's available)."
-msgstr ""
+msgstr "允许使用默认的软件包管理器（当可用时）"

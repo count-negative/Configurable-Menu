@@ -3254,25 +3254,35 @@ GenericApplicationButtonExtended.prototype = {
             if(this.withMenu) {
                if(!this.menu.isOpen) {
                   this.parent.closeApplicationsContextMenus(true);
-                  if(this.parent.appMenu) {
-                     let box = this.actor.get_parent();
+                  let box = this.actor.get_parent();
+                  if((this.parent.appMenu)&&(this.parent.applicationsBox == box.get_parent().get_parent())) {
                      let boxH = box.get_height();
                      let monitor = Main.layoutManager.findMonitorForActor(box);
                      if(boxH > monitor.height - 100)
                         boxH = monitor.height - 100;
                      box.set_height(boxH);
+                     this.widthC = null;
+                     this.toggleMenu();
+                     if(this.parent.appMenu) {
+                        this.actor.get_parent().set_height(-1);
+                     }
+                     this.parent._updateSubMenuSize();
+                  } else {
+                     this.widthC = this.parent.mainBox.get_width();
+                     this.toggleMenu();
+                     this.parent._updateSize();
                   }
-                  this.toggleMenu();
                   this.parent._previousContextMenuOpen = this;
-                  if(this.parent.appMenu) {
-                     this.actor.get_parent().set_height(-1);
-                  }
                } else {
                   this.toggleMenu();
+                  if(this.widthC) {
+                     this.parent.mainBox.set_width(this.widthC);
+                     this.parent.width = this.widthC;
+                     Mainloop.idle_add(Lang.bind(this, function() {
+                        this.parent._updateView();
+                     }));
+                  }
                }
-               let minWidth = this.parent._minimalWidth();
-               if(this.parent.width < minWidth)
-                  this.parent._updateSize();
             }
          }
       }
@@ -12567,7 +12577,8 @@ MyApplet.prototype = {
          }
       });
       if((button instanceof CategoryButtonExtended)&&(!this.categoriesHover)) {
-         button.actor.connect('button-release-event', Lang.bind(this, function() {
+         button.actor.connect('button-press-event', Lang.bind(this, function() {
+            this.pressed = true;
             //this._previousTreeSelectedActor = null;
             this._clearPrevCatSelection(null);
             //this.lastedCategoryShow = null;

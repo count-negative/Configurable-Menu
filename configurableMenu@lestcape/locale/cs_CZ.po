@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-06-06 03:50-0600\n"
+"PO-Revision-Date: 2014-06-06 15:02-0600\n"
 "Last-Translator: Satapouch <libor.schejbal@gmail.com>\n"
 "Language-Team: Libor Schejbal <libor.schejbal@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -739,13 +739,15 @@ msgstr "Zvolte, zda mají či nemají být ovládací tlačítka v poli."
 
 #. configurableMenu@lestcape->settings-schema.json->categories-hover->description
 msgid "Open the category when I move my mouse over it"
-msgstr ""
+msgstr "Otevřít položky podmenu při pohnutí kurzoru myši"
 
 #. configurableMenu@lestcape->settings-schema.json->categories-hover->tooltip
 msgid ""
 "Choose whether or not to open the category when the mouse move over it, "
 "otherwise need the mouse click."
 msgstr ""
+"Zvolte, zda chcete otevřít položky podmenu pohybem kurzoru myši, jinak je "
+"třeba kliknutí tlačítkem myši."
 
 #. configurableMenu@lestcape->settings-schema.json->categories-
 #. icons->description

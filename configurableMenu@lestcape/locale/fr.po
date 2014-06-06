@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-06-06 03:50-0600\n"
+"PO-Revision-Date: 2014-06-06 15:02-0600\n"
 "Last-Translator: Dupo <dupop35@yahoo.fr>\n"
 "Language-Team: Dupo <dupop35@yahoo.fr>\n"
 "MIME-Version: 1.0\n"
@@ -740,13 +740,15 @@ msgstr "Afficher ou non un cadre autour des boutons de contrôle."
 
 #. configurableMenu@lestcape->settings-schema.json->categories-hover->description
 msgid "Open the category when I move my mouse over it"
-msgstr ""
+msgstr "Ouvrir la catégorie lorsque je déplace ma souris dessus"
 
 #. configurableMenu@lestcape->settings-schema.json->categories-hover->tooltip
 msgid ""
 "Choose whether or not to open the category when the mouse move over it, "
 "otherwise need the mouse click."
 msgstr ""
+"Ouvrir ou non la catégorie lorsque la souris se déplace dessus, sinon en "
+"utilisant le clic de souris."
 
 #. configurableMenu@lestcape->settings-schema.json->categories-
 #. icons->description

@@ -83,6 +83,9 @@ See a complete Change log : https://github.com/lestcape/Configurable-Menu/wiki/C
    - Add feature to count the number of usages of the applications(only if application is called from the menu).
    - Allows the use of the default Cinnamon packages manager(only if it's available).
    - Allow open the categories on mouse hover or on mouse click.
+   - Added "windows" effect on the menu opening and closing.
+   - Fixed some bugs on the context menu opening and closing.
+   - Fixed some bugs on the menu resize.
 
 1.2-Beta
    - Was added kicker Menu layout.
