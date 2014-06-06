@@ -7495,13 +7495,9 @@ MyApplet.prototype = {
          global.display.connect('overlay-key', Lang.bind(this, function() {
             try {
                global.stage.set_key_focus(this.searchEntry);
-               if(this.actor.hover) {
-                  Mainloop.idle_add(Lang.bind(this, function() {
-                     this.menu.toggle_with_options(false);
-                  }));
-               } else {
+               Mainloop.idle_add(Lang.bind(this, function() {
                   this.menu.toggle_with_options(false);
-               }
+               }));
                return true;
             }
             catch(e) {
