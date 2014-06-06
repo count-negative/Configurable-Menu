@@ -7495,11 +7495,19 @@ MyApplet.prototype = {
          global.display.connect('overlay-key', Lang.bind(this, function() {
             try {
                global.stage.set_key_focus(this.searchEntry);
-               this.menu.toggle_with_options(false);
+               if(this.actor.hover) {
+                  Mainloop.idle_add(Lang.bind(this, function() {
+                     this.menu.toggle_with_options(false);
+                  }));
+               } else {
+                  this.menu.toggle_with_options(false);
+               }
+               return true;
             }
             catch(e) {
                global.logError(e);
             }
+            return false;
          }));
          Main.placesManager.connect('places-updated', Lang.bind(this, this._refreshPlacesAndRecent));
          Main.themeManager.connect('theme-set', Lang.bind(this, this._onChangeCinnamonTheme));//this._updateIconAndLabel));cinnamon 2.2
@@ -12555,7 +12563,6 @@ MyApplet.prototype = {
          this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
          this._allAppsCategoryButton.setArrowVisible(true);
          this.repositionGnomeCategory();
-         global.stage_input_mode = Cinnamon.StageInputMode.FOCUSED;
          Mainloop.idle_add(Lang.bind(this, function() {
             this.selectedAppBox.setDateTimeVisible(this.showTimeDate);
             this.menuManager._onMenuOpenState(menu, open);
