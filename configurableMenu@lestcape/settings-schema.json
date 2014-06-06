@@ -28,7 +28,7 @@
             "Stylized": "stylized",
             "Dragon": "dragon",
             "Dragon Inverted": "dragonInverted",
-            "Horizontal": "horizontal",
+            "Luz Helena": "luzHelena",
             "Accessible": "accessible",
             "Accessible Inverted": "accessibleInverted",
             "Mint": "mint",
@@ -855,7 +855,7 @@
         "type": "generic",
         "default": "power-theme::horizontal-grid;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;allow-search::true;;swap-panels::false;;categories-hover::true;;hover-delay::0;;enable-autoscroll::true;;show-view-item::false;;control-symbolic::false;;power-symbolic::false;;view-item::false;;activate-on-press::true;;hover-box::false;;control-box::false;;power-box::false;;accessible-box::false;;gnomenu-box::false;;show-removable-drives::false;;accessible-icons::true;;categories-icons::true;;app-button-width::300;;app-description::false;;icon-app-size::28;;icon-cat-size::32;;icon-max-fav-size::32;;icon-power-size::32;;icon-control-size::22;;icon-hover-size::68;;icon-accessible-size::22;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::1;;show-hover-icon::false;;show-power-buttons::true;;show-time-date::false;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;allow-resizing::true;;full-screen::false;;width::1483.0000038146973;;height::771.000244140625;;scroll-favorites::false;;scroll-categories::true;;arrow-categories::false;;arrow-categories-selected::false;;scroll-applications::true;;scroll-accessible::true;;scroll-gnomenu::false;;spacer-line::false;;spacer-size::10;;show-box-pointer::true;;fix-menu-corner::false"
     },
-    "horizontal": {
+    "luzHelena": {
         "type": "generic",
         "default": "power-theme::horizontal-icon;;gnomenu-buttons-theme::icon;;show-recent::true;;show-places::true;;activate-on-hover::false;;menu-icon::/usr/share/cinnamon/theme/menu.png;;menu-label::Menu;;allow-search::true;;swap-panels::true;;categories-hover::true;;hover-delay::0;;enable-autoscroll::true;;show-view-item::false;;control-symbolic::false;;power-symbolic::false;;view-item::false;;activate-on-press::true;;hover-box::false;;control-box::false;;power-box::false;;accessible-box::false;;gnomenu-box::false;;show-removable-drives::false;;accessible-icons::true;;categories-icons::true;;app-button-width::300;;app-description::false;;icon-app-size::30;;icon-cat-size::32;;icon-max-fav-size::32;;icon-power-size::28;;icon-control-size::22;;icon-hover-size::68;;icon-accessible-size::22;;icon-gnomenu-size::80;;show-favorites::true;;favorites-lines::1;;show-hover-icon::false;;show-power-buttons::true;;show-time-date::false;;time-format::%H:%M;;date-format::%A,%e %B;;show-app-title::true;;app-title-size::10;;show-app-description::true;;app-description-size::8;;automatic-size::false;;allow-resizing::false;;full-screen::true;;width::700;;height::500;;scroll-favorites::false;;scroll-categories::true;;arrow-categories::false;;arrow-categories-selected::false;;scroll-applications::true;;scroll-accessible::true;;scroll-gnomenu::false;;spacer-line::false;;spacer-size::10;;show-box-pointer::false;;fix-menu-corner::true"
     },

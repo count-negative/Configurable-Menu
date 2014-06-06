@@ -7593,7 +7593,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "stylized", "stringStylized", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "dragon", "stringDragon", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "dragonInverted", "stringDragonInverted", null, null);
-         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "horizontal", "stringHorizontal", null, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "luzHelena", "stringLuzHelena", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "accessible", "stringAccessible", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "accessibleInverted", "stringAccessibleInverted", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "mint", "stringMint", null, null);
@@ -7805,7 +7805,7 @@ MyApplet.prototype = {
       this.themes["stylized"] = this.stringStylized;
       this.themes["dragon"] = this.stringDragon;
       this.themes["dragonInverted"] = this.stringDragonInverted;
-      this.themes["horizontal"] = this.stringHorizontal;
+      this.themes["luzHelena"] = this.stringLuzHelena;
       this.themes["accessible"] = this.stringAccessible;
       this.themes["accessibleInverted"] = this.stringAccessibleInverted;
       this.themes["mint"] = this.stringMint;
@@ -7853,8 +7853,8 @@ MyApplet.prototype = {
          case "dragonInverted"     :
             this.stringDragonInverted = this.themes["dragonInverted"];
             break;
-         case "horizontal"         :
-            this.stringHorizontal = this.themes["horizontal"];
+         case "luzHelena"          :
+            this.stringLuzHelena = this.themes["luzHelena"];
             break;
          case "accessible"         :
             this.stringAccessible = this.themes["accessible"];
@@ -8315,7 +8315,7 @@ MyApplet.prototype = {
    _getApplicationScapeKey: function() {
       if((this.theme == "whisker")||(this.theme == "gnomenuRight"))
          return Clutter.KEY_Right;
-      if((this.theme == "gnomenuTop")||(this.theme == "horizontal")||(this.theme == "dragon")||(this.theme == "dragonInverted"))
+      if((this.theme == "gnomenuTop")||(this.theme == "luzHelena")||(this.theme == "dragon")||(this.theme == "dragonInverted"))
          return Clutter.KEY_Up;
       if(this.theme == "gnomenuBottom")
          return Clutter.KEY_Down;
@@ -8325,7 +8325,7 @@ MyApplet.prototype = {
    _getCategoryScapeKey: function() {
       if(this.theme == "whisker")
          return Clutter.KEY_Left;
-      if((this.theme == "gnomenuTop")||(this.theme == "horizontal")||(this.theme == "dragon")||(this.theme == "dragonInverted"))
+      if((this.theme == "gnomenuTop")||(this.theme == "luzHelena")||(this.theme == "dragon")||(this.theme == "dragonInverted"))
          return Clutter.KEY_Down;
       if(this.theme == "gnomenuBottom")
          return Clutter.KEY_Up;
@@ -10486,8 +10486,8 @@ MyApplet.prototype = {
             case "dragonInverted" :
                           this.loadDragonInverted(); 
                           break;
-            case "horizontal"     :
-                          this.loadHorizontal(); 
+            case "luzHelena"      :
+                          this.loadLuzHelena(); 
                           break;
             case "accessible"     :
                           this.loadAccessible(); 
@@ -10834,7 +10834,7 @@ MyApplet.prototype = {
       this.operativePanelExpanded.set_style_class_name('menu-operative-box');
    },
 
-   loadHorizontal: function() {
+   loadLuzHelena: function() {
       this.selectedAppBox.setAlign(St.Align.START);
       this.operativePanel.set_vertical(true);
       this.categoriesBox.set_vertical(false);

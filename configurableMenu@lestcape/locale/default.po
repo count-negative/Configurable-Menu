@@ -549,7 +549,7 @@ msgid "Dragon Inverted"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
-msgid "Horizontal"
+msgid "Luz Helena"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options

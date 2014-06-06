@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-06-06 15:02-0600\n"
+"PO-Revision-Date: 2014-06-06 15:51-0600\n"
 "Last-Translator: Dupo <dupop35@yahoo.fr>\n"
 "Language-Team: Dupo <dupop35@yahoo.fr>\n"
 "MIME-Version: 1.0\n"
@@ -552,8 +552,8 @@ msgid "Dragon Inverted"
 msgstr "Dragon inversé"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
-msgid "Horizontal"
-msgstr "Horizontal"
+msgid "Luz Helena"
+msgstr "Luz Helena"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Windows 7"
