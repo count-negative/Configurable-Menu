@@ -733,9 +733,17 @@ msgstr ""
 msgid "Choose whether or not to have a box on the control buttons."
 msgstr ""
 
-#. configurableMenu@lestcape->settings-schema.json->categories-
-#. icons->description
-msgid "Show icons on the categories"
+#. configurableMenu@lestcape->settings-schema.json->categories-hover->description
+msgid "Open the category when I move my mouse over it"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->categories-hover->tooltip
+msgid "Choose whether or not to open the category when the mouse move over it, otherwise need the mouse click."
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->scroll-
+#. categories->description
+msgid "Show scrolling area of categories"
 msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->categories-icons->tooltip

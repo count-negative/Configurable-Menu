@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-05-30 18:06-0600\n"
+"PO-Revision-Date: 2014-06-06 03:51-0600\n"
 "Last-Translator: highwind <highwindmx@126.com>\n"
 "Language-Team: highwind <highwindmx@126.com>\n"
 "MIME-Version: 1.0\n"
@@ -732,6 +732,16 @@ msgstr "控制按钮有边框"
 #. configurableMenu@lestcape->settings-schema.json->control-box->tooltip
 msgid "Choose whether or not to have a box on the control buttons."
 msgstr "选择是否设置控制按钮有边框."
+
+#. configurableMenu@lestcape->settings-schema.json->categories-hover->description
+msgid "Open the category when I move my mouse over it"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->categories-hover->tooltip
+msgid ""
+"Choose whether or not to open the category when the mouse move over it, "
+"otherwise need the mouse click."
+msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->categories-
 #. icons->description

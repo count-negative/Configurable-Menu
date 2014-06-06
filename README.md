@@ -1,6 +1,6 @@
 Cinnamon Applet: Configurable Menu Version: v1.3-Beta
 
-Last version release date: 30 May 2014
+Last version release date: 06 June 2014
 ***
 Authors: [Lester Carballo Pérez](https://github.com/lestcape) and [Garibaldo](https://github.com/Garibaldo).
 
@@ -84,6 +84,7 @@ See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/C
    - Improve the alignment of applications and places in the accessible panel.
    - Add feature to count the number of usages of the applications(only if application is called from the menu).
    - Allows the use of the default Cinnamon packages manager(only if it's available).
+   - Allow open the categories on mouse hover or on mouse click.
 
 1.2-Beta
    - Was added kicker Menu layout.

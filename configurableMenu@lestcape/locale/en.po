@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-05-30 18:06-0600\n"
+"PO-Revision-Date: 2014-06-06 03:50-0600\n"
 "Last-Translator: Lester Carballo Pérez <lestcape@gmail.com>\n"
 "Language-Team: garibaldo and lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -737,6 +737,18 @@ msgstr "Control buttons have a box"
 #. configurableMenu@lestcape->settings-schema.json->control-box->tooltip
 msgid "Choose whether or not to have a box on the control buttons."
 msgstr "Choose whether or not to have a box on the control buttons."
+
+#. configurableMenu@lestcape->settings-schema.json->categories-hover->description
+msgid "Open the category when I move my mouse over it"
+msgstr "Open the category when I move my mouse over it"
+
+#. configurableMenu@lestcape->settings-schema.json->categories-hover->tooltip
+msgid ""
+"Choose whether or not to open the category when the mouse move over it, "
+"otherwise need the mouse click."
+msgstr ""
+"Choose whether or not to open the category when the mouse move over it, "
+"otherwise need the mouse click."
 
 #. configurableMenu@lestcape->settings-schema.json->categories-
 #. icons->description

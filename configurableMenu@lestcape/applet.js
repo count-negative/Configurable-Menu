@@ -1,5 +1,5 @@
-//Cinnamon Applet: Configurable Menu version v1.2-Beta
-//Release Date: 26 May 2014
+//Cinnamon Applet: Configurable Menu version v1.3-Beta
+//Release Date: 06 June 2014
 //
 //Authors: Lester Carballo Pérez(https://github.com/lestcape) and Garibaldo(https://github.com/Garibaldo).
 //
@@ -7369,6 +7369,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "effect", "effect", this._onEffectChange, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "effect-time", "effectTime", this._onEffectTimeChange, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "swap-panels", "swapPanels", this._onSwapPanel, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "categories-hover", "categoriesHover", this._onCategoriesOpenChange, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "hover-delay", "hover_delay_ms", this._update_hover_delay, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "enable-autoscroll", "autoscroll_enabled", this._update_autoscroll, null);
 
@@ -7987,6 +7988,7 @@ MyApplet.prototype = {
      // themeProperties["search-filesystem"] = (themeProperties["search-filesystem"] === 'true');
       themeProperties["swap-panels"] = (themeProperties["swap-panels"] === 'true');
       themeProperties["activate-on-hover"] = (themeProperties["activate-on-hover"] === 'true');
+      themeProperties["categories-hover"] = (themeProperties["categories-hover"] === 'true');
       themeProperties["hover-delay"] = parseInt(themeProperties["hover-delay"]);
       themeProperties["enable-autoscroll"] = (themeProperties["enable-autoscroll"] === 'true');
       themeProperties["show-view-item"] = (themeProperties["show-view-item"] === 'true');
@@ -8859,6 +8861,15 @@ MyApplet.prototype = {
       }
    },
 
+   _onCategoriesOpenChange: function() {
+      this._refreshApps();
+      this._updateAppButtonDesc();
+      this._updateTextButtonWidth();
+      this._setAppIconDirection();
+      this._updateAppSize();
+      this._updateSize();
+   },
+
    _setIconMaxFavSize: function() {
       this._refreshFavs();
       this._updateSize();
@@ -9236,6 +9247,7 @@ MyApplet.prototype = {
       this.showSearhEntry = confTheme["allow-search"];
       //this.searchFilesystem = confTheme["search-filesystem"];
       this.swapPanels = confTheme["swap-panels"];
+      this.categoriesHover = confTheme["categories-hover"];
       this.hover_delay_ms = confTheme["hover-delay"];
       this.autoscroll_enabled = confTheme["enable-autoscroll"];
       this.showView = confTheme["show-view-item"];
@@ -9303,6 +9315,7 @@ MyApplet.prototype = {
       confTheme["allow-search"] = this.showSearhEntry;
      // confTheme["search-filesystem"] = this.searchFilesystem;
       confTheme["swap-panels"] = this.swapPanels;
+      confTheme["categories-hover"] = this.categoriesHover;
       confTheme["hover-delay"] = this.hover_delay_ms;
       confTheme["enable-autoscroll"] = this.autoscroll_enabled;
 
@@ -9918,17 +9931,17 @@ MyApplet.prototype = {
 
    _onMenuButtonRelease: function(actor, event) {
       try {
-       if((event.get_button() == 3)&&(!this.actorResize)) {
-          if((this.appMenu)&&(this.appMenu.isOpen)) {
-             this.onEnterMenuGnome();
-             this.appMenu.close();
-          }
-          this._applet_context_menu.reparentMenu(this.menu, this.popupOrientation);
-          this._applet_context_menu.toggle();
-       } else {
-          this._applet_context_menu.close();
-       }
-       this._disableResize();
+         if((event.get_button() == 3)&&(!this.actorResize)) {
+            if((this.appMenu)&&(this.appMenu.isOpen)) {
+               this.onEnterMenuGnome();
+               this.appMenuClose();
+            }
+            this._applet_context_menu.reparentMenu(this.menu, this.popupOrientation);
+            this._applet_context_menu.toggle();
+         } else if(this._applet_context_menu.isOpen) {
+            this._applet_context_menu.close();
+         }
+         this._disableResize();
       } catch(e) {
          Main.notify("Error Menu", e.message);
       }
@@ -9979,7 +9992,7 @@ MyApplet.prototype = {
       if(this._isInsideMenu(mx, my, ax, ay, aw, ah)) {
          if(this._correctPlaceResize(actor, mx, my, ax, ay, aw, ah)) {
             if((this.appMenu)&&(this.appMenu.actor != actor)&&(this.appMenu.isOpen))
-               this.appMenu.close();
+               this.appMenuClose();
             this.pressed = true;
             this.actorResize = actor;
             this._findMouseDeltha();
@@ -12440,8 +12453,17 @@ MyApplet.prototype = {
             Main.notify("Error on addEnterEvent", e.message);
          }
       });
-      button.connect('enter-event', _callback);
-      button.actor.connect('enter-event', _callback);
+      if((button instanceof CategoryButtonExtended)&&(!this.categoriesHover)) {
+         button.actor.connect('button-press-event', Lang.bind(this, function() {
+            //this._previousTreeSelectedActor = null;
+            this._clearPrevCatSelection(null);
+            //this.lastedCategoryShow = null;
+            _callback();
+         }));
+      } else {
+         button.connect('enter-event', _callback);
+         button.actor.connect('enter-event', _callback);
+      }
    },
 
    _loadCategory: function(dir, top_dir) {
@@ -12524,6 +12546,7 @@ MyApplet.prototype = {
       if(open) {
          this.menuIsOpening = true;
          this._initialDisplay();
+         this.menuManager._onMenuOpenState(menu, open);
          global.stage.set_key_focus(this.searchEntry);
          this.actor.add_style_pseudo_class('active');
          this._selectedItemIndex = null;
@@ -12534,9 +12557,7 @@ MyApplet.prototype = {
          this._allAppsCategoryButton.setArrowVisible(true);
          this.repositionGnomeCategory();
          Mainloop.idle_add(Lang.bind(this, function() {
-            global.stage.set_key_focus(this.searchEntry);
             this.selectedAppBox.setDateTimeVisible(this.showTimeDate);
-            this.menuManager._onMenuOpenState(menu, open);
          }));
       }
       else {
@@ -12575,7 +12596,6 @@ MyApplet.prototype = {
             this.destroyVectorBox();
             this.menuManager._onMenuOpenState(menu, open);
             this._stopAutoscroll();
-            global.stage.set_key_focus(this.searchEntry);
          }));
       }
       return true;
