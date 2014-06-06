@@ -6522,6 +6522,9 @@ ConfigurableMenu.prototype = {
          case "scale" :
             this._effectScaleOpen();
             break;
+         case "windows":
+            this._effectWindowsOpen();
+            break;
       }
    },
 
@@ -6539,8 +6542,11 @@ ConfigurableMenu.prototype = {
          case "hideVertical":
             this._effectHideVerticalClose();
             break;
-         case "scale":
+         case "scale" :
             this._effectScaleClose();
+            break;
+         case "windows":
+            this._effectWindowsClose();
             break;
       }
    },
@@ -6574,6 +6580,109 @@ ConfigurableMenu.prototype = {
          transition: 'easeInSine',
          onComplete: Lang.bind(this, function() {
             Applet.AppletPopupMenu.prototype.close.call(this, false);
+         })
+      });
+   },
+/*
+   _effectGetOutOpen: function() {
+      let [startX, ay] = this.sourceActor.get_transformed_position();
+      let monitor = Main.layoutManager.primaryMonitor;
+      if(startX > monitor.x + monitor.width/2)
+          startX = monitor.x + monitor.width + 3*this.actor.width/2;
+      else
+          startX = 0;
+      Tweener.addTween(this.actor,
+      {
+         x: startX,
+         time: 0,
+        // rotation_angle_x: -90,
+         rotation_angle_y: 180,
+         //rotation_angle_z: 90,
+         transition: 'easeOutQuad',
+         onComplete: Lang.bind(this, function() {
+            Tweener.addTween(this.actor,
+            {
+                x: 0,
+                //rotation_angle_x: 0,
+                rotation_angle_y: 0,
+                //rotation_angle_z: 0,
+                time: this.effectTime
+            })
+         })
+      });
+   },
+
+   _effectGetOutClose: function() {
+      let [startX, ay] = this.sourceActor.get_transformed_position();
+      let monitor = Main.layoutManager.primaryMonitor;
+      if(startX > monitor.x + monitor.width/2)
+          startX = monitor.x + monitor.width + 3*this.actor.width/2;
+      else
+          startX = 0;
+      Tweener.addTween(this.actor,
+      {
+         x: startX,
+         rotation_angle_y: 180,
+         time: this.effectTime,
+         transition: 'easeOutQuad',
+         onComplete: Lang.bind(this, function() {
+            
+            Applet.AppletPopupMenu.prototype.close.call(this, false);
+            Tweener.addTween(this.actor,
+            {
+                x: 0,
+                rotation_angle_y: 0,
+                time: 0
+            })
+         })
+      });
+   },*/
+
+   _effectWindowsOpen: function() {
+     let [startX, ay] = this.sourceActor.get_transformed_position();
+      let monitor = Main.layoutManager.primaryMonitor;
+      if(startX > monitor.x + monitor.width/2)
+          startX = monitor.x + monitor.width + 3*this.actor.width/2;
+      else
+          startX = 0;
+      Tweener.addTween(this.actor,
+      {
+         x: startX,
+         time: 0,
+         rotation_angle_y: 180,
+         transition: 'easeOutQuad',
+         onComplete: Lang.bind(this, function() {
+            Tweener.addTween(this.actor,
+            {
+                x: 0,
+                rotation_angle_y: 0,
+                time: this.effectTime
+            })
+         })
+      });
+   },
+
+   _effectWindowsClose: function() {
+      let [startX, ay] = this.sourceActor.get_transformed_position();
+      let monitor = Main.layoutManager.primaryMonitor;
+      if(startX > monitor.x + monitor.width/2)
+          startX = monitor.x + monitor.width + 3*this.actor.width/2;
+      else
+          startX = 0;
+      Tweener.addTween(this.actor,
+      {
+         x: startX,
+         rotation_angle_y: 180,
+         time: this.effectTime,
+         transition: 'easeOutQuad',
+         onComplete: Lang.bind(this, function() {
+            Applet.AppletPopupMenu.prototype.close.call(this, false);
+            Tweener.addTween(this.actor,
+            {
+                x: 0,
+                rotation_angle_y: 0,
+                time: 0
+            })
          })
       });
    },
@@ -8273,8 +8382,8 @@ MyApplet.prototype = {
          this._activeContainer = this.applicationsBox;
         // this._previousSelectedActor = this.applicationsBox.get_child_at_index(0).get_child_at_index(0);
          this._previousSelectedActor = this.appBoxIter.getAppAt(0, 0, 0);
-         this._previousTreeSelectedActor._delegate.emit('enter-event');
-
+         if(this._previousTreeSelectedActor)
+            this._previousTreeSelectedActor._delegate.emit('enter-event');
          item_actor = this.appBoxIter.getFirstVisible();
          this._selectedItemIndex = this.appBoxIter.getAbsoluteIndexOfChild(item_actor);
          this._selectedCategoryIndex = this.appBoxIter.getCategoryIndexOfChild(item_actor);
@@ -9596,13 +9705,13 @@ MyApplet.prototype = {
          let oldColumn = this.iconViewCount;
          let monitor = Main.layoutManager.findMonitorForActor(this.actor);
          if(this.fullScreen) {
-            let panelTop = this._processPanelSize(false);
+            let panelTop3 = this._processPanelSize(false);
             let panelButton = this._processPanelSize(true);
             //Main.notify("panelTop:" + panelTop + " panelButton:" + panelButton);
             let themeNode = this.menu.getCurrentMenuThemeNode();
             let difference = this.menu.actor.get_height() - this.mainBox.get_height();
             if(difference < 0) {
-               this.mainBox.set_height(monitor.height - panelButton - panelTop - 40);
+               this.mainBox.set_height(monitor.height - panelButton - panelTop3 - 40);
                this.mainBox.set_width(monitor.width);
             }
             difference = this.menu.actor.get_height() - this.mainBox.get_height();
@@ -9611,7 +9720,7 @@ MyApplet.prototype = {
                bordersY+= 2;*/
    
             this.mainBox.set_width(monitor.width - this.menu.actor.width + this.mainBox.width);
-            this.mainBox.set_height(monitor.height - panelButton - panelTop + bordersY - difference);
+            this.mainBox.set_height(monitor.height - panelButton - panelTop3 + bordersY - difference);
             this._updateView();
          } else if(this.automaticSize) {
             this.mainBox.set_width(-1);
@@ -9692,21 +9801,17 @@ MyApplet.prototype = {
          }
          this._updateSubMenuSize();
          if(oldColumn != this.iconViewCount) {
-            //this._selectedRowIndex = 0;
-            if(this._previousTreeSelectedActor)
-               this._previousTreeSelectedActor._delegate.emit('enter-event');
-            if(!this._selectedCategoryIndex)
-               this._selectedCategoryIndex = 0;
-            this._previousSelectedActor = this.appBoxIter.getAppAt(this._selectedCategoryIndex, this._selectedItemIndex, 0);
-            let item_actor = (this._previousTreeSelectedActor) ? this._previousTreeSelectedActor : this.catBoxIter.getFirstVisible();
-            this._selectedItemIndex = this.catBoxIter.getAbsoluteIndexOfChild(item_actor);
-            this._previousTreeSelectedActor = item_actor;
-            this.categoriesScrollBox.scrollToActor(item_actor);
-            this.hover.refreshFace();
-            this.selectedAppBox.setSelectedText("", "");
-            if(item_actor._delegate) {
-               item_actor._delegate.emit('enter-event');
-            }
+            let prev = this._previousTreeSelectedActor;
+            this._clearAllSelections(false);
+            this._previousTreeItemIndex = null;
+            this._previousSelectedActor = null;
+            this._selectedItemIndex = null;
+            this._activeContainer = null;
+            this._activeActor = null;
+            this._previousTreeSelectedActor = this._allAppsCategoryButton.actor;
+            this._previousTreeSelectedActor.set_style_class_name('menu-category-button-selected');
+            this._previousTreeSelectedActor.add_style_class_name('menu-category-button-selected-' + this.theme);
+            this._previousTreeSelectedActor._delegate.emit('enter-event');
          }
       }
    },
@@ -9719,10 +9824,10 @@ MyApplet.prototype = {
             let panelTop = this._processPanelSize(false);
             let panelButton = this._processPanelSize(true);
             let bordersY = themeNode.get_length('border-bottom') + themeNode.get_length('border-top') + themeNode.get_length('-boxpointer-gap');
-            this.mainBox.set_width(-1);
+            //this.mainBox.set_width(-1);
             Mainloop.idle_add(Lang.bind(this, function() {
                let minWidth = this._minimalWidth();
-               this.mainBox.set_width(minWidth);
+               //this.mainBox.set_width(minWidth);
                this.appMenu.actor.set_width(monitor.width - minWidth - 3*themeNode.get_length('-arrow-border-width'));
                this.appMenu.actor.set_height(monitor.height - panelButton - panelTop + bordersY);
             }));
@@ -10156,27 +10261,31 @@ MyApplet.prototype = {
 
    _processPanelSize: function(bottomPosition) {
       let panelHeight = 0;
-      if(bottomPosition) {
-         if(!Main.panel2) {
-            if(this.orientation == St.Side.BOTTOM)
-                panelHeight = Main.panel.actor.height;
-            else
-                panelHeight = 0;
+      try {
+         if(bottomPosition) {
+            if(!Main.panel2) {
+               if(this.orientation == St.Side.BOTTOM)
+                  panelHeight = Main.panel.actor.height;
+               else
+                  panelHeight = 0;
+            } else {
+               panelHeight = Main.panel2.actor.height;
+            }
          } else {
-            panelHeight = Main.panel2.actor.height;
+            if(!Main.panel2) {
+               if(this.orientation == St.Side.BOTTOM)
+                  panelHeight = 0;
+               else
+                  panelHeight = Main.panel.actor.height;
+            } else {
+               panelHeight = Main.panel.actor.height;
+            }
          }
-      } else {
-         if(!Main.panel2) {
-            if(this.orientation == St.Side.BOTTOM)
-                panelHeight = 0;
-            else
-                panelHeight = Main.panel.actor.height;
-         } else {
-            panelHeight = Main.panel.actor.height;
-         }
-      }
-      if(!panelHeight)
+         if(!panelHeight)
+            panelHeight = 0;
+      } catch(e) {
          panelHeight = 0;
+      }
       return panelHeight;
    },
 
@@ -12458,16 +12567,16 @@ MyApplet.prototype = {
          }
       });
       if((button instanceof CategoryButtonExtended)&&(!this.categoriesHover)) {
-         button.actor.connect('button-press-event', Lang.bind(this, function() {
+         button.actor.connect('button-release-event', Lang.bind(this, function() {
             //this._previousTreeSelectedActor = null;
             this._clearPrevCatSelection(null);
             //this.lastedCategoryShow = null;
             _callback();
          }));
       } else {
-         button.connect('enter-event', _callback);
          button.actor.connect('enter-event', _callback);
       }
+      button.connect('enter-event', _callback);
    },
 
    _loadCategory: function(dir, top_dir) {
@@ -12557,6 +12666,7 @@ MyApplet.prototype = {
          this._activeActor = null;
          this._allAppsCategoryButton.actor.set_style_class_name('menu-category-button-selected');
          this._allAppsCategoryButton.actor.add_style_class_name('menu-category-button-selected-' + this.theme);
+         this._previousTreeSelectedActor = this._allAppsCategoryButton.actor;
          this._allAppsCategoryButton.setArrowVisible(true);
          this.repositionGnomeCategory();
          Mainloop.idle_add(Lang.bind(this, function() {

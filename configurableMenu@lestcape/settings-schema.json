@@ -73,7 +73,8 @@
             "Dispel": "dispel",
             "Hide Horizontal": "hideHorizontal",
             "Hide Vertical": "hideVertical",
-            "Scale": "scale"
+            "Scale": "scale",
+            "Windows": "windows"
         }
     },
     "effect-time": {
