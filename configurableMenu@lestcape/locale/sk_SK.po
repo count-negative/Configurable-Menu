@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-06-06 15:51-0600\n"
+"PO-Revision-Date: 2014-06-08 23:38-0600\n"
 "Last-Translator: Roman Beňo <romanbeno273@gmail.com>\n"
 "Language-Team: Roman Beňo <romanbeno273@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -752,13 +752,15 @@ msgstr "Zvoľte či chcete aby ovládacie tlačidlá mali boxy alebo nie."
 
 #. configurableMenu@lestcape->settings-schema.json->categories-hover->description
 msgid "Open the category when I move my mouse over it"
-msgstr ""
+msgstr "Otvoráť kategórie pri prechode myšou ponad ne"
 
 #. configurableMenu@lestcape->settings-schema.json->categories-hover->tooltip
 msgid ""
 "Choose whether or not to open the category when the mouse move over it, "
 "otherwise need the mouse click."
 msgstr ""
+"Zvoľte či chcete aby sa kategórie otvárali pri prechode myšou ponad ne alebo "
+"nie (vtedy bude potrebné kliknutie)."
 
 #. configurableMenu@lestcape->settings-schema.json->categories-
 #. icons->description
@@ -954,7 +956,7 @@ msgid ""
 "Allows install, uninstall and search for programs and packages(need internet "
 "connection to be download)."
 msgstr ""
-"Umožní inštalovávať, odinštalovávať a vyhľadávať programy aj balíčky(na "
+"Umožní inštalovať, odinštalovať a vyhľadávať programy aj balíčky (na "
 "stiahnutie je potrebné internetové pripojenie)."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-search->description
@@ -998,8 +1000,8 @@ msgstr "Stlačte toto tlačidlo pre odinštalovanie nástroja Cinnamon Installer
 
 #. configurableMenu@lestcape->settings-schema.json->installer-default->description
 msgid "Enable the default Cinnamon packages manager tools"
-msgstr ""
+msgstr "Povoliť východzie nástroje pre správu balíčkov Cinnamonu"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-default->tooltip
 msgid "Allows the use of the default packages manager(only if it's available)."
-msgstr ""
+msgstr "Umožní používať východzieho správcu balíčkov (iba ak je k dispozícii)."

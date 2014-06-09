@@ -3274,14 +3274,7 @@ GenericApplicationButtonExtended.prototype = {
                   }
                   this.parent._previousContextMenuOpen = this;
                } else {
-                  this.toggleMenu();
-                  if(this.widthC) {
-                     this.parent.mainBox.set_width(this.widthC);
-                     this.parent.width = this.widthC;
-                     Mainloop.idle_add(Lang.bind(this, function() {
-                        this.parent._updateView();
-                     }));
-                  }
+                  this.closeMenu();
                }
             }
          }
@@ -3308,6 +3301,13 @@ GenericApplicationButtonExtended.prototype = {
     
    closeMenu: function() {
       if(this.withMenu) {
+         if(this.widthC) {
+            this.parent._clearView();
+            this.parent.mainBox.set_width(this.widthC);
+            this.parent.width = this.widthC;
+            this.widthC = null;
+            this.parent._updateView();
+         }
          this.menu.close();
       }
    },
