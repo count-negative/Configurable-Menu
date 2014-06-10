@@ -9782,32 +9782,30 @@ MyApplet.prototype = {
                if(this.width > monitor.width - difference)
                   this.width = monitor.width - difference;
                this.mainBox.set_width(this.width);
-               this._updateView();
             } else if(this.width > monitor.width - difference) {
                   this.width = monitor.width - difference;
                   this.mainBox.set_width(this.width);
-                  this._updateView();
             }
             else if(this.width > this.minimalWidth) {
                if((!this.appMenu)&&(((!this.bttChanger)&&(this.iconViewCount == 1))||
                   ((this.bttChanger)&&(this.bttChanger.getSelected() != _("All Applications"))))) {
-                  this.mainBox.set_width(this.width);
                   this._clearView();
+                  this.mainBox.set_width(this.width);
                   this.width = this._minimalWidth();
                   this.mainBox.set_width(this.width);
-                  this._updateView();
                } else {
-                  this.mainBox.set_width(this.width);
                   this._clearView();
+                  this.mainBox.set_width(this.width);
+
                   let minWidth = this._minimalWidth();
                   if(this.width < minWidth) {
                      this.width = minWidth;
                      this.mainBox.set_width(this.width);
                   }
-                  this._updateView();
                   //this.minimalWidth = minWidth;
                }
             }
+            this._updateView();
          }
          this._updateSubMenuSize();
          if(oldColumn != this.iconViewCount) {
@@ -9937,12 +9935,14 @@ MyApplet.prototype = {
 
    _menuEventClicked: function(actor, event) {
       if(event.get_button() == 1) {
-         if(this.menu.isOpen)
+         if(this.menu.isOpen) {
             this._disconnectSearch();
+         }
+         this.on_applet_clicked(event)
          if(this._applet_context_menu.isOpen) {
+            global.stage.set_key_focus(this.searchEntry);
             this._applet_context_menu.toggle(); 
          }
-         this.on_applet_clicked(event);            
       }
       if(event.get_button() == 3) {         
          if(this._applet_context_menu._getMenuItems().length > 0) {
@@ -9951,6 +9951,16 @@ MyApplet.prototype = {
          }
       }
    },
+
+   //on_applet_clicked: function(event) {
+       // let t = new Date().getTime();
+       //global.stage.set_key_focus(this.searchEntry);
+       //Mainloop.idle_add(Lang.bind(this, function() {
+       //   this.menu.toggle_with_options(false);
+       //}));
+       // let f = new Date().getTime();
+       // log("time is: " + (f - t).toString());
+    //},
 
    _updateMenuSection: function() {
       if(this.menu) {
@@ -10656,7 +10666,7 @@ MyApplet.prototype = {
       this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal-icon", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.changeTopBoxUp.add(this.hover.container, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      this.changeTopBoxUp.add(this.powerBox.actor, { x_fill: false, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
+      this.changeTopBoxUp.add(this.powerBox.actor, { x_fill: false, y_fill: false, x_align: St.Align.END, y_align: St.Align.START, expand: true });
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.rightPane.add_actor(this.separatorTop.actor);
@@ -10835,7 +10845,6 @@ MyApplet.prototype = {
    },
 
    loadLuzHelena: function() {
-      this.selectedAppBox.setAlign(St.Align.START);
       this.operativePanel.set_vertical(true);
       this.categoriesBox.set_vertical(false);
       this.categoriesWrapper.set_vertical(false);
@@ -10843,7 +10852,8 @@ MyApplet.prototype = {
       this.operativePanel.add(this.categoriesWrapper, { x_fill: true, y_fill: true, expand: false });
       this.applicationsScrollBox = new ScrollItemsBox(this, this.applicationsBox, true, St.Align.START);
       this.changeTopBoxUp.add(this.hover.container, {x_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
-      this.changeTopBoxUp.add(this.selectedAppBox.actor, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.changeTopBoxUp.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
+      this.selectedAppBox.setAlign(St.Align.START);
       this.favoritesObj = new FavoritesBoxExtended(this, false, this.favoritesLinesNumber);
       this.categoriesScrollBox = new ScrollItemsBox(this, this.categoriesBox, false, St.Align.START);
       this.favoritesScrollBox = new ScrollItemsBox(this, this.favoritesBox, false, St.Align.START);
@@ -12100,7 +12110,7 @@ MyApplet.prototype = {
                                                      this.allowFavName, this.textButtonWidth, this.appButtonDescription, this._applicationsBoxWidth);
             // + 3 because we're adding 3 system buttons at the bottom
             this._favoritesButtons[app] = button;
-            this.favoritesObj.add(button.actor, button.menu, { y_align: St.Align.MIDDLE, x_align: St.Align.MIDDLE, y_fill: true, expand: true });
+            this.favoritesObj.add(button.actor, button.menu, { x_align: St.Align.START, y_align: St.Align.MIDDLE, x_fill: true, y_fill: true, expand: true });
             //favoritesBox.actor.add(button.actor, { y_align: St.Align.MIDDLE, x_align: St.Align.MIDDLE, y_fill: false, expand: true });
             button.actor.connect('enter-event', Lang.bind(this, function() {
                //this._clearPrevCatSelection();
