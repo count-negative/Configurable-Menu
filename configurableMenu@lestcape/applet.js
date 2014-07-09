@@ -1299,13 +1299,15 @@ DriveMenu.prototype = {
             place.launch();
          },
          get_description: function() {
-            if(place.id.indexOf("bookmark:") == -1)
-               return place.id.slice(13);
             try {
+               if(place.id.indexOf("bookmark:") == -1)
+                  return decodeURIComponent(place.id.slice(13));
                return decodeURIComponent(place.id.slice(16));
             } catch(e) {
-               Main.notify("Error on decode, the encode of the bookmark are unsupported", e.message);
+               Main.notify("Error on decode, the encode of the text are unsupported", e.message);
             }
+            if(place.id.indexOf("bookmark:") == -1)
+               return place.id.slice(13);
             return place.id.slice(16);
          },
          get_name: function() {
@@ -4547,7 +4549,6 @@ TransientButtonExtended.prototype = {
    _init: function(parent, parentScroll, pathOrCommand, iconSize, vertical, appWidth, appdesc) {
       GenericApplicationButtonExtended.prototype._init.call(this, parent, parentScroll, this._createAppWrapper(pathOrCommand), false);
       this.iconSize = iconSize;
-      let displayPath = pathOrCommand;
       if(pathOrCommand.charAt(0) == '~') {
          pathOrCommand = pathOrCommand.slice(1);
          pathOrCommand = GLib.get_home_dir() + pathOrCommand;
@@ -4587,7 +4588,7 @@ TransientButtonExtended.prototype = {
 
       
 
-      this.labelName = new St.Label({ text: displayPath, style_class: 'menu-application-button-label' });
+      this.labelName = new St.Label({ text: this.app.get_description(), style_class: 'menu-application-button-label' });
       this.labelDesc = new St.Label({ style_class: 'menu-application-button-label' });
       this.labelDesc.visible = false;
       this.container = new St.BoxLayout();
@@ -4703,6 +4704,11 @@ TransientButtonExtended.prototype = {
          get_app_info: function() {
             this.appInfo = {
                get_filename: function() {
+                  try {
+                     return decodeURIComponent(pathOrCommand);
+                  } catch(e) {
+                     Main.notify("Error on decode, the encode of the text are unsupported", e.message);
+                  }
                   return pathOrCommand;
                }
             };
@@ -4712,6 +4718,11 @@ TransientButtonExtended.prototype = {
             return -1;
          },
          get_description: function() {
+            try {
+               return decodeURIComponent(pathOrCommand);
+            } catch(e) {
+               Main.notify("Error on decode, the encode of the text are unsupported", e.message);
+            }
             return pathOrCommand;
          },
          get_name: function() {
@@ -5181,13 +5192,15 @@ PlaceButtonAccessibleExtended.prototype = {
          get_app_info: function() {
             this.appInfo = {
                get_filename: function() {
-                  if(place.id.indexOf("bookmark:") == -1)
-                     return place.id.slice(13);
                   try {
+                     if(place.id.indexOf("bookmark:") == -1)
+                        return decodeURIComponent(place.id.slice(13));
                      return decodeURIComponent(place.id.slice(16));
                   } catch(e) {
-                     Main.notify("Error on decode, the encode of the bookmark are unsupported", e.message);
+                     Main.notify("Error on decode, the encode of the text are unsupported", e.message);
                   }
+                  if(place.id.indexOf("bookmark:") == -1)
+                     return place.id.slice(13);
                   return place.id.slice(16);
                }
             };
@@ -5203,13 +5216,15 @@ PlaceButtonAccessibleExtended.prototype = {
             return place.id;
          },
          get_description: function() {
-            if(place.id.indexOf("bookmark:") == -1)
-               return place.id.slice(13);
             try {
+               if(place.id.indexOf("bookmark:") == -1)
+                  return decodeURIComponent(place.id.slice(13));
                return decodeURIComponent(place.id.slice(16));
             } catch(e) {
-               Main.notify("Error on decode, the encode of the bookmark are unsupported", e.message);
+               Main.notify("Error on decode, the encode of the text are unsupported", e.message);
             }
+            if(place.id.indexOf("bookmark:") == -1)
+               return place.id.slice(13);
             return place.id.slice(16);
          },
          get_name: function() {
@@ -5384,10 +5399,25 @@ RecentButtonExtended.prototype = {
       this.textWidth = maxWidth;
    },
 
+   getName: function() {
+      return this.button_name;
+   },
+
+   getDescription: function() {
+      return this.labelDesc.get_text();
+   },
+
    setAppDescriptionVisible: function(visible) {
       this.labelDesc.visible = visible;
-      if(this.file.uri.slice(7))
-         this.labelDesc.set_text(this.file.uri.slice(7));
+      let text = this.file.uri.slice(7);
+      try {
+         if(text)
+            this.labelDesc.set_text(decodeURIComponent(text));
+      } catch(e) {
+         Main.notify("Error on decode, the encode of the text are unsupported", e.message);
+         if(text)
+            this.labelDesc.set_text(text);
+      }
    },
 
    setVertical: function(vertical) {
@@ -12525,7 +12555,7 @@ MyApplet.prototype = {
             this._addEnterEvent(button, Lang.bind(this, function() {
                this._clearPrevAppSelection(button.actor);
                button.actor.style_class = "menu-application-button-selected";
-               this.selectedAppBox.setSelectedText(button.button_name, "");
+               this.selectedAppBox.setSelectedText(button.getName(), "");
                this.hover.refresh("edit-clear");
             }));
             button.actor.connect('leave-event', Lang.bind(this, function() {
@@ -12545,7 +12575,7 @@ MyApplet.prototype = {
             this._addEnterEvent(button, Lang.bind(this, function() {
                this._clearPrevAppSelection(button.actor);
                button.actor.style_class = "menu-application-button-selected";
-               this.selectedAppBox.setSelectedText(button.button_name, button.file.uri.slice(7));
+               this.selectedAppBox.setSelectedText(button.getName(), button.getDescription());
                this.hover.refreshFile(button.file);
             }));
             button.actor.connect('leave-event', Lang.bind(this, function() {
