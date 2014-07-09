@@ -1,6 +1,6 @@
-Cinnamon Applet: Configurable Menu Version: v1.3-Beta
+Cinnamon Applet: Configurable Menu Version: v1.4-Beta
 
-Last version release date: 06 June 2014
+Last version release date: 09 July 2014
 ***
 Authors: [Lester Carballo Pérez](https://github.com/lestcape) and [Garibaldo](https://github.com/Garibaldo).
 
@@ -22,7 +22,8 @@ Author of language translation:
 - French(Fr):        Dupo(dupop35@yahoo.fr)
 - Chinese(Zh_Cn):    Highwind(highwindmx@126.com)
 - Czech(Cs_Cz):      Satapouch(http://www.linux-mint-czech.cz/)
-- Slovak(sk_SK):    Benji(http://sk.gravatar.com/sawwer/)
+- Slovak(sk_SK):     Benji(http://sk.gravatar.com/sawwer/)
+- German(de_DE):     Uli(email@kiot.eu)
 
 --------------
 ![](https://raw.github.com/wiki/lestcape/Configurable-Menu/img/Capture.png)
@@ -75,6 +76,12 @@ You can found more information about Cinnamon Installer on the [Cinnamon Install
 Change log
 --------------
 See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/Change-Log).
+
+1.4-Beta
+   - Was added German language(DE_DE) thanks Uli.
+   - Partially implemented the resize options to be more consistent(need more work).
+   - Fixed, the problem with the menu icon highlighted in the cinnamon theme.
+   - Changed the way of close context menu, to recover the menu size in more cases.
 
 1.3-Beta
    - Was added Slovak language(Sk_SK) thanks Benji.

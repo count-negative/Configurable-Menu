@@ -1,5 +1,5 @@
-//Cinnamon Applet: Configurable Menu version v1.3-Beta
-//Release Date: 06 June 2014
+//Cinnamon Applet: Configurable Menu version v1.4-Beta
+//Release Date: 09 July 2014
 //
 //Authors: Lester Carballo Pérez(https://github.com/lestcape) and Garibaldo(https://github.com/Garibaldo).
 //
@@ -1489,7 +1489,7 @@ GnoMenuBox.prototype = {
    },
 
    getSelected: function() {
-      return this._actionButtons[this._gnoMenuSelected];
+      return this._actionButtons[this._gnoMenuSelected].title;
    },
 
    setSelected: function(selected) {
@@ -1553,7 +1553,6 @@ GnoMenuBox.prototype = {
    },
 
    _onLeaveEvent: function(actor) {
-      this._gnoMenuSelected = 0;
       this._setStyleActive(actor._delegate, false);
    },
 
@@ -3268,7 +3267,7 @@ GenericApplicationButtonExtended.prototype = {
                      }
                      this.parent._updateSubMenuSize();
                   } else {
-                     this.widthC = this.parent.mainBox.get_width();
+                     this.widthC = this.parent.menu.actor.get_width();
                      this.toggleMenu();
                      this.parent._updateSize();
                   }
@@ -3303,7 +3302,7 @@ GenericApplicationButtonExtended.prototype = {
       if(this.withMenu) {
          if(this.widthC) {
             this.parent._clearView();
-            this.parent.mainBox.set_width(this.widthC);
+            this.parent.menu.actor.set_width(this.widthC);
             this.parent.width = this.widthC;
             this.widthC = null;
             this.parent._updateView();
@@ -7012,6 +7011,8 @@ GnomeCategoryButton.prototype = {
       this._scaleMode = global.settings.get_boolean('panel-scale-text-icons') && global.settings.get_boolean('panel-resizable');
       this.actor = new St.BoxLayout({ style_class: 'applet-box', reactive: true, track_hover: true });
       this.actor.add_style_class_name('menu-applet-category-box');
+      this.actor.connect('enter-event', Lang.bind(this, this._changeHover, true));
+      this.actor.connect('leave-event', Lang.bind(this, this._changeHover, false));
       this._applet_icon_box = new St.Bin();
       this.actor.add(this._applet_icon_box, { y_align: St.Align.MIDDLE, y_fill: false });
       this._applet_label = new St.Label({ reactive: true, track_hover: true, style_class: 'applet-label'});
@@ -7023,9 +7024,23 @@ GnomeCategoryButton.prototype = {
       this.actor._delegate = this;
    },
 
-   handleDragOver : function(source, actor, x, y, time) {
+   _changeHover: function(actor, event, hover) {
+      if(hover) {
+         if(this._applet_icon)
+            this._applet_icon.add_style_pseudo_class('hover');
+         this._applet_label.add_style_pseudo_class('hover');
+      } else {
+         if(this._applet_icon)
+            this._applet_icon.remove_style_pseudo_class('hover');
+         this._applet_label.remove_style_pseudo_class('hover');
+      }
+   },
+
+   handleDragOver: function(source, actor, x, y, time) {
       if(!this.parent.menu.isOpen)
          this.parent.menu.open();
+      if(this._applet_icon)
+         this._applet_icon.add_style_pseudo_class('hover');
       this.parent.onCategorieGnomeChange(this.actor);
       return DND.DragMotionResult.NO_DROP;
    },
@@ -7158,6 +7173,20 @@ ConfigurableAppletMenu.prototype = {
       this.rootGnomeCat.add(this.parent._applet_icon_box, { y_align: St.Align.MIDDLE, y_fill: false });
       this.rootGnomeCat.add(this.parent._applet_label, { y_align: St.Align.MIDDLE, y_fill: false });
       this.actor.add(this.rootGnomeCat, { y_align: St.Align.MIDDLE, y_fill: true, expand: true });
+      this.rootGnomeCat.connect('enter-event', Lang.bind(this, this._changeHover, true));
+      this.rootGnomeCat.connect('leave-event', Lang.bind(this, this._changeHover, false));
+   },
+
+   _changeHover: function(actor, event, hover) {
+      if(hover) {
+         if(this.parent._applet_icon)
+            this.parent._applet_icon.add_style_pseudo_class('hover');
+         this.parent._applet_label.add_style_pseudo_class('hover');
+      } else {
+         if(this.parent._applet_icon)
+            this.parent._applet_icon.remove_style_pseudo_class('hover');
+         this.parent._applet_label.remove_style_pseudo_class('hover');
+      }
    },
 
    addCategory: function(category) {
@@ -7449,6 +7478,8 @@ MyApplet.prototype = {
          this.minimalHeight = -1;
          this._timeOutSettings = 0;
          this.idWaitingGnome = 0;
+         this.idAppletEnter = 0;
+         this.idAppletLeave = 0;
          this._searchItems = [];
          this.pkg = new PackageInstallerWrapper(this);
 
@@ -7647,6 +7678,18 @@ MyApplet.prototype = {
       catch (e) {
          Main.notify("ErrorMain:", e.message);
          global.logError(e);
+      }
+   },
+
+   _changeHover: function(actor, event, hover) {
+      if(hover) {
+         if(this._applet_icon)
+            this._applet_icon.add_style_pseudo_class('hover');
+         this._applet_label.add_style_pseudo_class('hover');
+      } else {
+         if(this._applet_icon)
+            this._applet_icon.remove_style_pseudo_class('hover');
+         this._applet_label.remove_style_pseudo_class('hover');
       }
    },
 
@@ -8209,7 +8252,7 @@ MyApplet.prototype = {
       this.separatorTop.actor.visible = true;
       this.separatorMiddle.actor.visible = true;
       this.separatorBottom.actor.visible = true;
-      this._updateSize();
+      Mainloop.idle_add(Lang.bind(this, this._updateSize));
    },
 
    _onMenuKeyPress: function(actor, event) {
@@ -9541,7 +9584,7 @@ MyApplet.prototype = {
       this._setVisibleScrollGnoMenu();
       this._setVisibleArrowCat();
 
-      this.mainBox.set_width(this.width);
+      this.menu.actor.set_width(this.width);
       this.mainBox.set_height(this.height);
 
       if(this.separatorMiddle) {
@@ -9623,6 +9666,21 @@ MyApplet.prototype = {
       Mainloop.idle_add(Lang.bind(this, function() {
          this._openOutScreen();
       }));
+      if(!this.appletMenu) {
+         if(this.idAppletEnter == 0)
+            this.idAppletEnter = this.actor.connect('enter-event', Lang.bind(this, this._changeHover, true));
+         if(this.idAppletLeave == 0)
+               this.idAppletLeave = this.actor.connect('leave-event', Lang.bind(this, this._changeHover, false));
+      } else {
+         if(this.idAppletEnter > 0) {
+            this.actor.disconnect(this.idAppletEnter);
+            this.idAppletEnter = 0;
+         }
+         if(this.idAppletLeave > 0) {
+            this.actor.disconnect(this.idAppletLeave);
+            this.idAppletLeave = 0;
+         }
+      }
    },
 
    _openOutScreen: function() {
@@ -9699,7 +9757,7 @@ MyApplet.prototype = {
          this._setVisiblePointer(false);
          this.menu.fixToScreen(true);
       } else {
-         this.mainBox.set_width(this.width);
+         this.menu.actor.set_width(this.width);
          this.mainBox.set_height(this.height);
          this._setVisiblePointer(this.showBoxPointer);
          this.menu.fixToCorner(this.fixMenuCorner);
@@ -9715,48 +9773,36 @@ MyApplet.prototype = {
          let oldColumn = this.iconViewCount;
          let monitor = Main.layoutManager.findMonitorForActor(this.actor);
          if(this.fullScreen) {
-            let panelTop3 = this._processPanelSize(false);
+            let panelTop = this._processPanelSize(false);
             let panelButton = this._processPanelSize(true);
             //Main.notify("panelTop:" + panelTop + " panelButton:" + panelButton);
             let themeNode = this.menu.getCurrentMenuThemeNode();
             let difference = this.menu.actor.get_height() - this.mainBox.get_height();
             if(difference < 0) {
-               this.mainBox.set_height(monitor.height - panelButton - panelTop3 - 40);
-               this.mainBox.set_width(monitor.width);
+               this.mainBox.set_height(monitor.height - panelButton - panelTop - 40);
+               this.menu.actor.set_width(this.width);
             }
             difference = this.menu.actor.get_height() - this.mainBox.get_height();
             let bordersY = themeNode.get_length('border-bottom') + themeNode.get_length('border-top') + themeNode.get_length('-boxpointer-gap');
-           /* if(panelTop == 0)
-               bordersY+= 2;*/
-   
-            this.mainBox.set_width(monitor.width - this.menu.actor.width + this.mainBox.width);
-            this.mainBox.set_height(monitor.height - panelButton - panelTop3 + bordersY - difference);
+            if(!this.appMenu)
+               this.menu.actor.set_width(monitor.width);
+            this.mainBox.set_height(monitor.height - panelButton - panelTop + bordersY - difference);
             this._updateView();
          } else if(this.automaticSize) {
-            this.mainBox.set_width(-1);
+            this.menu.actor.set_width(-1);
             this.mainBox.set_height(-1);
             this._clearView();
             if((this.bttChanger)||(this.gnoMenuBox)) {
-               let operPanelVisible = this.operativePanel.visible;
-               this.operativePanel.visible = true;
-               this.favoritesScrollBox.actor.visible = false;
-               this.favBoxWrapper.visible = false;
                this.height = this.mainBox.get_height();
                this.mainBox.set_height(this.height);
-               this.operativePanel.visible = operPanelVisible;
-               this.favoritesScrollBox.actor.visible = !operPanelVisible;
-               this.favBoxWrapper.visible = !operPanelVisible;
             } else {
                this.height = this.mainBox.get_height();
                this.mainBox.set_height(this.height);
             }
             this._updateView();
-            this.width = this.mainBox.get_width();
-            this.mainBox.set_width(this.width);
+            this.width = this.menu.actor.get_width();
+            this.menu.actor.set_width(this.width);
          } else {
-            //if(this.bttChanger)
-            //   this.bttChanger.activateSelected(_("Favorites"));
-               //this.bttChanger.activateSelected(_("All Applications"));
             let difference = this.menu.actor.get_height() - this.mainBox.get_height();
             let maxHeigth = monitor.height - this._processPanelSize(true) - this._processPanelSize(false) - difference;
             if(this.height > this.mainBox.get_height()) {
@@ -9777,35 +9823,27 @@ MyApplet.prototype = {
                   this.mainBox.set_height(this.height);
                }
             }
-            difference = 2*(this.menu.actor.get_width() - this.mainBox.get_width());
-            if(this.width > this.mainBox.get_width()) {
-               if(this.width > monitor.width - difference)
-                  this.width = monitor.width - difference;
-               this.mainBox.set_width(this.width);
-            } else if(this.width > monitor.width - difference) {
-                  this.width = monitor.width - difference;
-                  this.mainBox.set_width(this.width);
+            if(this.width > monitor.width) {
+               this.width = monitor.width;
+               this.menu.actor.set_width(this.width);
+               this._updateView();
             }
-            else if(this.width > this.minimalWidth) {
-               if((!this.appMenu)&&(((!this.bttChanger)&&(this.iconViewCount == 1))||
-                  ((this.bttChanger)&&(this.bttChanger.getSelected() != _("All Applications"))))) {
-                  this._clearView();
-                  this.mainBox.set_width(this.width);
-                  this.width = this._minimalWidth();
-                  this.mainBox.set_width(this.width);
-               } else {
-                  this._clearView();
-                  this.mainBox.set_width(this.width);
-
-                  let minWidth = this._minimalWidth();
-                  if(this.width < minWidth) {
-                     this.width = minWidth;
-                     this.mainBox.set_width(this.width);
-                  }
-                  //this.minimalWidth = minWidth;
+            else if(this.width > this.menu.actor.get_width()) {
+               if(this.width > monitor.width)
+                  this.width = monitor.width;
+               this.menu.actor.set_width(this.width);
+               this._updateView();
+            } else if(this.width > this.minimalWidth) {
+               this._clearView();
+               this.menu.actor.set_width(this.width);
+               let minWidth = this._minimalWidth();
+               if(this.width < minWidth) {
+                  this.width = minWidth;
+                  this.menu.actor.set_width(this.width);
                }
+               this._updateView();
+               //this.minimalWidth = minWidth;
             }
-            this._updateView();
          }
          this._updateSubMenuSize();
          if(oldColumn != this.iconViewCount) {
@@ -9832,10 +9870,10 @@ MyApplet.prototype = {
             let panelTop = this._processPanelSize(false);
             let panelButton = this._processPanelSize(true);
             let bordersY = themeNode.get_length('border-bottom') + themeNode.get_length('border-top') + themeNode.get_length('-boxpointer-gap');
-            //this.mainBox.set_width(-1);
+            //this.menu.actor.set_width(-1);
             Mainloop.idle_add(Lang.bind(this, function() {
                let minWidth = this._minimalWidth();
-               //this.mainBox.set_width(minWidth);
+               this.menu.actor.set_width(minWidth);
                this.appMenu.actor.set_width(monitor.width - minWidth - 3*themeNode.get_length('-arrow-border-width'));
                this.appMenu.actor.set_height(monitor.height - panelButton - panelTop + bordersY);
             }));
@@ -9898,20 +9936,23 @@ MyApplet.prototype = {
    },
 
    _minimalWidth: function() {
-     /* let [minWidth, minHeight, natWidth, natHeight] = this.extendedBox.get_preferred_size();
-      return minWidth;
-      */
-      let width = this.extendedBox.get_allocation_box().x2 - this.extendedBox.get_allocation_box().x1;
-      if((this.bttChanger)&&(this.bttChanger.getSelected() == _("All Applications"))) {
-         width = (this.favoritesLinesNumber)*this._applicationsBoxWidth + 82;
-      } else if(this.appMenu) {
+      let diff = 24;
+      let textVisible = this.selectedAppBox.actor.visible;
+      this.selectedAppBox.actor.visible = false;
+      let width = 0;//this.extendedBox.get_allocation_box().x2 - this.extendedBox.get_allocation_box().x1;
+      if(this.appMenu) {
+         let [minWidth, minHeight, natWidth, natHeight] = this.standardBox.get_preferred_size();
+         width = minWidth;
+      } else /*if((this.bttChanger)&&(this.bttChanger.getSelected() == _("All Applications")) ||
+                ((this.gnoMenuBox)&&(this.gnoMenuBox.getSelected() == _("Favorites"))))*/ {
          let [minWidth, minHeight, natWidth, natHeight] = this.extendedBox.get_preferred_size();
-         width = minWidth + 30;
+         width = minWidth;
       }
       if((this.accessibleBox)&&(this.accessibleBox.actor.visible))
          width += this.accessibleBox.actor.get_width();
 
-      return width;
+      this.selectedAppBox.actor.visible = textVisible;
+      return width + diff;
    },
 
    _onButtonReleaseEvent: function(actor, event) {
@@ -10139,7 +10180,7 @@ MyApplet.prototype = {
          this.mouseDx = 0;
          this.mouseDy = 0;
             this._updatePosResize();
-         this.mouseDx = this.width - this.mainBox.get_width();
+         this.mouseDx = this.width - this.menu.actor.get_width();
          this.mouseDy = this.height - this.mainBox.get_height();
       }
    },
@@ -10443,7 +10484,7 @@ MyApplet.prototype = {
          this.mainBox = new St.BoxLayout({ vertical: false });
          this.menuBox = new St.BoxLayout({ vertical: false, style_class: 'menu-main-box'});
          this.menuBox.add_style_class_name('menu-main-box-' + this.theme);
-         this.menuBox.add_actor(this.mainBox);
+         this.menuBox.add(this.mainBox, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
 
 
          this.extendedBox = new St.BoxLayout({ vertical: true });
@@ -10538,7 +10579,7 @@ MyApplet.prototype = {
          this.signalKeyPowerID = 0;
          this._update_autoscroll();
          
-         section.actor.add_actor(this.menuBox);
+         section.actor.add(this.menuBox, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
 
       } catch(e) {
          Main.notify("ErrorDisplay:", e.message);
@@ -10666,7 +10707,7 @@ MyApplet.prototype = {
       this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.powerBox = new PowerBox(this, "horizontal-icon", this.iconPowerSize, this.hover, this.selectedAppBox);
       this.changeTopBoxUp.add(this.hover.container, { x_fill: false, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      this.changeTopBoxUp.add(this.powerBox.actor, { x_fill: false, y_fill: false, x_align: St.Align.END, y_align: St.Align.START, expand: true });
+      this.changeTopBoxUp.add(this.powerBox.actor, { x_fill: false, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.betterPanel.add(this.favBoxWrapper, { y_align: St.Align.MIDDLE, y_fill: true, expand: false });
       this.standardBox.add(this.rightPane, { span: 2, x_fill: true, expand: true });
       this.rightPane.add_actor(this.separatorTop.actor);
