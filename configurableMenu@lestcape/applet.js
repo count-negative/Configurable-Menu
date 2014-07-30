@@ -9616,6 +9616,10 @@ MyApplet.prototype = {
 
       this.menu.actor.set_width(this.width);
       this.mainBox.set_height(this.height);
+      if(this.appMenu) {
+         this.appMenu.actor.set_width(this.subMenuWidth);
+         this.appMenu.actor.set_height(this.subMenuHeight);
+      }
 
       if(this.separatorMiddle) {
          this.separatorMiddle.setLineVisible(this.showSeparatorLine);
