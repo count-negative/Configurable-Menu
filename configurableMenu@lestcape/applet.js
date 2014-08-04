@@ -7742,6 +7742,7 @@ MyApplet.prototype = {
       catch(e) {
          global.logError(e);
       }
+      return false;
    },
 
    _updateIconAndLabel: function() {
