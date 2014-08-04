@@ -8321,7 +8321,7 @@ MyApplet.prototype = {
         /* check for a keybinding and quit early, otherwise we get a double hit
            of the keybinding callback */
         let action = global.display.get_keybinding_action(keyCode, modifierState);
-        if((action == Meta.KeyBindingAction.CUSTOM)||(keyCode == this.overlayKey)) {
+        if(action == Meta.KeyBindingAction.CUSTOM) {
            return true;
         }
 
