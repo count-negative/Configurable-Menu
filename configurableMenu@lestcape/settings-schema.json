@@ -63,6 +63,11 @@
         "description": "Text",
         "tooltip": "Enter custom text to show in the panel."
     },
+    "overlay-key" : {
+        "type" : "keybinding",
+        "description" : "Keyboard shortcut to open and close the menu",
+        "default" : "Super_L"
+    },
     "effect": {
         "type": "combobox",
         "description": "Effect on opening and closing:",

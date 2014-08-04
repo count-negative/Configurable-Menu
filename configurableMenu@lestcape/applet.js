@@ -7545,6 +7545,7 @@ MyApplet.prototype = {
                         
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "menu-icon", "menuIcon", this._updateIconAndLabel, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "menu-label", "menuLabel", this._updateIconAndLabel, null);
+         this.settings.bindProperty(Settings.BindingDirection.IN, "overlay-key", "overlayKey", this._updateKeybinding, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "allow-search", "showSearhEntry", this._setSearhEntryVisible, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "effect", "effect", this._onEffectChange, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "effect-time", "effectTime", this._onEffectTimeChange, null);
@@ -7672,19 +7673,8 @@ MyApplet.prototype = {
          //AppFavorites.getAppFavorites().connect('changed', Lang.bind(this, this._refreshFavs));
          AppFavorites.getAppFavorites().connect('changed', Lang.bind(this, this._updateAppFavs));
 
-         global.display.connect('overlay-key', Lang.bind(this, function() {
-            try {
-               global.stage.set_key_focus(this.searchEntry);
-               Mainloop.idle_add(Lang.bind(this, function() {
-                  this.menu.toggle_with_options(false);
-               }));
-               return true;
-            }
-            catch(e) {
-               global.logError(e);
-            }
-            return false;
-         }));
+         this._updateKeybinding();
+
          Main.placesManager.connect('places-updated', Lang.bind(this, this._refreshPlacesAndRecent));
          Main.themeManager.connect('theme-set', Lang.bind(this, this._onChangeCinnamonTheme));//this._updateIconAndLabel));cinnamon 2.2
 
@@ -7720,6 +7710,37 @@ MyApplet.prototype = {
          if(this._applet_icon)
             this._applet_icon.remove_style_pseudo_class('hover');
          this._applet_label.remove_style_pseudo_class('hover');
+      }
+   },
+
+   _updateKeybinding: function() {
+      try {
+         if(!this.overlayKeyID) {
+            this.overlayKeyID = global.display.connect('overlay-key', Lang.bind(this, function() {
+               this._executeKeybinding();
+               return false;
+            }));
+         }
+      } catch(e) {}
+      if(this.lastOverlayKey)
+         Main.keybindingManager.removeHotKey(this.lastOverlayKey);
+      this.lastOverlayKey = this.overlayKey;
+      Main.keybindingManager.addHotKey("overlay-key", this.overlayKey, Lang.bind(this, function() {
+         this._executeKeybinding();
+         return false;
+      }));
+   },
+
+   _executeKeybinding: function() {
+      try {
+         global.stage.set_key_focus(this.searchEntry);
+         Mainloop.idle_add(Lang.bind(this, function() {
+            this.menu.toggle_with_options(false);
+         }));
+         return true;
+      }
+      catch(e) {
+         global.logError(e);
       }
    },
 
@@ -8299,7 +8320,7 @@ MyApplet.prototype = {
         /* check for a keybinding and quit early, otherwise we get a double hit
            of the keybinding callback */
         let action = global.display.get_keybinding_action(keyCode, modifierState);
-        if(action == Meta.KeyBindingAction.CUSTOM) {
+        if((action == Meta.KeyBindingAction.CUSTOM)||(keyCode == this.overlayKey)) {
            return true;
         }
 
