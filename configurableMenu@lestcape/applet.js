@@ -7715,20 +7715,29 @@ MyApplet.prototype = {
 
    _updateKeybinding: function() {
       try {
-         if(!this.overlayKeyID) {
+         let keybinding_menu = new Gio.Settings({ schema: "org.cinnamon.muffin" });
+         if(this.overlayKeyID) {
+             global.display.disconnect(this.overlayKeyID);
+             this.overlayKeyID = null;
+         }
+         if(this.lastOverlayKey) {
+            Main.keybindingManager.removeHotKey(this.lastOverlayKey);
+            this.lastOverlayKey = null;
+         }
+         if(keybinding_menu.get_string("overlay-key") == this.overlayKey) {
             this.overlayKeyID = global.display.connect('overlay-key', Lang.bind(this, function() {
                this._executeKeybinding();
                return false;
             }));
          }
       } catch(e) {}
-      if(this.lastOverlayKey)
-         Main.keybindingManager.removeHotKey(this.lastOverlayKey);
-      this.lastOverlayKey = this.overlayKey;
-      Main.keybindingManager.addHotKey("overlay-key", this.overlayKey, Lang.bind(this, function() {
-         this._executeKeybinding();
-         return false;
-      }));
+      if(!this.overlayKeyID) {
+         Main.keybindingManager.addHotKey("overlay-key", this.overlayKey, Lang.bind(this, function() {
+            this._executeKeybinding();
+            return false;
+         }));
+         this.lastOverlayKey = this.overlayKey;
+      }
    },
 
    _executeKeybinding: function() {
