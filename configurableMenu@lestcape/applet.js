@@ -8334,7 +8334,7 @@ MyApplet.prototype = {
            return true;
         }
 
-        if(global.display.get_is_overlay_key(keyCode, modifierState)) {
+        if((global.display.get_is_overlay_key)&&(global.display.get_is_overlay_key(keyCode, modifierState))) {
            if(this.menu.isOpen) {
               this._disconnectSearch();
               this.menu.close();
