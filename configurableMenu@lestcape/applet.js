@@ -1,5 +1,5 @@
 //Cinnamon Applet: Configurable Menu version v1.4-Beta
-//Release Date: 09 July 2014
+//Release Date: 10 August 2014
 //
 //Authors: Lester Carballo Pérez(https://github.com/lestcape) and Garibaldo(https://github.com/Garibaldo).
 //
@@ -7724,7 +7724,7 @@ MyApplet.prototype = {
             Main.keybindingManager.removeHotKey(this.lastOverlayKey);
             this.lastOverlayKey = null;
          }
-         if(keybinding_menu.get_string("overlay-key") == this.overlayKey) {
+         if(this.overlayKey.indexOf(keybinding_menu.get_string("overlay-key")) != -1) {
             this.overlayKeyID = global.display.connect('overlay-key', Lang.bind(this, function() {
                this._executeKeybinding();
                return false;
@@ -7810,25 +7810,28 @@ MyApplet.prototype = {
          let _shareFolder = GLib.get_home_dir() + "/.local/share/";
          let _localeFolder = Gio.file_new_for_path(_shareFolder + "locale/");
          let _moFolder = Gio.file_new_for_path(_shareFolder + "cinnamon/applets/" + this.uuid + "/locale/mo/");
-
-         let children = _moFolder.enumerate_children('standard::name,standard::type',
-                                          Gio.FileQueryInfoFlags.NONE, null);
-         let info, child, _moFile, _moLocale, _moPath;
-                   
-         while ((info = children.next_file(null)) != null) {
-            let type = info.get_file_type();
-            if (type == Gio.FileType.REGULAR) {
+         let children = _moFolder.enumerate_children('standard::name,standard::type,time::modified',
+                                                     Gio.FileQueryInfoFlags.NONE, null);
+         let info, child, _moFile, _moLocale, _moPath, _src, _dest, _modified, _destModified;
+         while((info = children.next_file(null)) != null) {
+            _modified = info.get_modification_time().tv_sec;
+            if (info.get_file_type() == Gio.FileType.REGULAR) {
                _moFile = info.get_name();
                if (_moFile.substring(_moFile.lastIndexOf(".")) == ".mo") {
                   _moLocale = _moFile.substring(0, _moFile.lastIndexOf("."));
                   _moPath = _localeFolder.get_path() + "/" + _moLocale + "/LC_MESSAGES/";
-                  let src = Gio.file_new_for_path(String(_moFolder.get_path() + "/" + _moFile));
-                  let dest = Gio.file_new_for_path(String(_moPath + this.uuid + ".mo"));
+                  _src = Gio.file_new_for_path(String(_moFolder.get_path() + "/" + _moFile));
+                  _dest = Gio.file_new_for_path(String(_moPath + this.uuid + ".mo"));
                   try {
-                     //if(!this.equalsFile(dest.get_path(), src.get_path())) {
-                        this._makeDirectoy(dest.get_parent());
-                        src.copy(dest, Gio.FileCopyFlags.OVERWRITE, null, null);
-                     //}
+                     if(_dest.query_exists(null)) {
+                        _destModified = _dest.query_info('time::modified', Gio.FileQueryInfoFlags.NONE, null).get_modification_time().tv_sec;
+                        if((_modified > _destModified)) {
+                           _src.copy(_dest, Gio.FileCopyFlags.OVERWRITE, null, null);
+                        }
+                     } else {
+                         this._makeDirectoy(_dest.get_parent());
+                         _src.copy(_dest, Gio.FileCopyFlags.OVERWRITE, null, null);
+                     }
                   } catch(e) {
                      Main.notify("Error", e.message);
                   }

@@ -1,6 +1,6 @@
 Cinnamon Applet: Configurable Menu Version: v1.4-Beta
 
-Last version release date: 09 July 2014
+Last version release date: 10 August 2014
 ***
 Authors: [Lester Carballo Pérez](https://github.com/lestcape) and [Garibaldo](https://github.com/Garibaldo).
 
@@ -79,9 +79,13 @@ See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/C
 
 1.4-Beta
    - Was added German language(DE_DE) thanks Uli.
-   - Partially implemented the resize options to be more consistent(need more work).
-   - Fixed, the problem with the menu icon highlighted in the cinnamon theme.
+   - Partially reimplemented the resize options to be more consistent(need more work).
+   - Fixed the problem of the menu icon in the cinnamon standard theme.
    - Changed the way of close context menu, to recover the menu size in more cases.
+   - Solved the problem of set the size of submenu when cinnamon restart.
+   - Allow a more faster start of cinnamon  now, thanks to a change in the handled mode the language files(thanks to [jake-phy](https://github.com/jake-phy)).
+   - You can configure the keybinding to open the menu using the settings now, to be compatible with the new cinnamon changes.
+   - Used also the super right key by default to open the menu (For conflicts of keybindings visit: https://github.com/linuxmint/Cinnamon/issues/630).
 
 1.3-Beta
    - Was added Slovak language(Sk_SK) thanks Benji.
