@@ -7714,17 +7714,20 @@ MyApplet.prototype = {
    },
 
    _updateKeybinding: function() {
+      if(this.lastOverlayKey) {
+         Main.keybindingManager.removeHotKey(this.lastOverlayKey);
+         this.lastOverlayKey = null;
+      }
+      let muffin_overlay_key;
       try {
          let keybinding_menu = new Gio.Settings({ schema: "org.cinnamon.muffin" });
+         muffin_overlay_key = keybinding_menu.get_string("overlay-key");
          if(this.overlayKeyID) {
              global.display.disconnect(this.overlayKeyID);
              this.overlayKeyID = null;
          }
-         if(this.lastOverlayKey) {
-            Main.keybindingManager.removeHotKey(this.lastOverlayKey);
-            this.lastOverlayKey = null;
-         }
-         if(this.overlayKey.indexOf(keybinding_menu.get_string("overlay-key")) != -1) {
+         
+         if(this.overlayKey.indexOf(muffin_overlay_key) != -1) {
             this.overlayKeyID = global.display.connect('overlay-key', Lang.bind(this, function() {
                this._executeKeybinding();
                return false;
@@ -7737,6 +7740,22 @@ MyApplet.prototype = {
             return false;
          }));
          this.lastOverlayKey = this.overlayKey;
+      } else {
+         let array = this.overlayKey.split("::");
+         let newOverlayKey = "";
+         for(pos in array) {
+            if(array[pos] != muffin_overlay_key) {
+               newOverlayKey += array[pos] + "::";
+            }
+         }
+         if(newOverlayKey != "") {
+            newOverlayKey = newOverlayKey.substring(0, newOverlayKey.length - 2);
+            Main.keybindingManager.addHotKey("overlay-key", newOverlayKey, Lang.bind(this, function() {
+               this._executeKeybinding();
+               return false;
+            }));
+            this.lastOverlayKey = newOverlayKey;
+         }
       }
    },
 
@@ -9040,21 +9059,23 @@ MyApplet.prototype = {
    },
 
    _update_autoscroll: function() {
-      this.applicationsScrollBox.setAutoScrolling(this.autoscroll_enabled);
-      this.categoriesScrollBox.setAutoScrolling(this.autoscroll_enabled);
-      this.favoritesScrollBox.setAutoScrolling(this.autoscroll_enabled);
-      if(this.accessibleBox)
-         this.accessibleBox.setAutoScrolling(this.autoscroll_enabled);
-      if(this.gnoMenuBox)
-         this.gnoMenuBox.setAutoScrolling(this.autoscroll_enabled);
+      this._set_autoscroll(this.autoscroll_enabled);
    },
 
-   _stopAutoscroll: function() {
+   _set_autoscroll: function(enabled) {
+      this.applicationsScrollBox.setAutoScrolling(enabled);
+      this.categoriesScrollBox.setAutoScrolling(enabled);
+      this.favoritesScrollBox.setAutoScrolling(enabled);
+      if(this.accessibleBox)
+         this.accessibleBox.setAutoScrolling(enabled);
+      if(this.gnoMenuBox)
+         this.gnoMenuBox.setAutoScrolling(enabled);
+   },
+
+   _restartAutoscroll: function() {
       if(this.autoscroll_enabled) {
-         this.autoscroll_enabled = false;
-         this._update_autoscroll();
-         this.autoscroll_enabled = true;
-         this._update_autoscroll();
+         this._set_autoscroll(false);
+         this._set_autoscroll(true);
       }
    },
 
@@ -12840,7 +12861,7 @@ MyApplet.prototype = {
             this.categoriesScrollBox.scrollToActor(this._allAppsCategoryButton.actor);
             this.destroyVectorBox();
             this.menuManager._onMenuOpenState(menu, open);
-            this._stopAutoscroll();
+            this._restartAutoscroll();
          }));
       }
       return true;
