@@ -1,5 +1,5 @@
-//Cinnamon Applet: Configurable Menu version v1.4-Beta
-//Release Date: 10 August 2014
+//Cinnamon Applet: Configurable Menu version v1.5-Beta
+//Release Date: 15 August 2014
 //
 //Authors: Lester Carballo Pérez(https://github.com/lestcape) and Garibaldo(https://github.com/Garibaldo).
 //
@@ -88,7 +88,6 @@ function _(str) {
    return Gettext.gettext(str);
 };
 
-
 function SettingComboHandler(settings, comboName) {
    this._init(settings, comboName);
 }
@@ -125,12 +124,12 @@ SettingComboHandler.prototype = {
       } catch(e) {
          this.showErrorMessage(e.message);
       }
+   },
 
-      _reloadData: function() {
-         Mainloop.source_remove(this.file_changed_timeout);
-         this.file_changed_timeout = 0;
-         this.settings._maybe_update_settings_file();
-      }
+   _reloadData: function() {
+      Mainloop.source_remove(this.file_changed_timeout);
+      this.file_changed_timeout = 0;
+      this.settings._maybe_update_settings_file();
    }
 };
 
@@ -473,7 +472,7 @@ PackageInstallerWrapper.prototype = {
             let query = this.pythonVer + " " + this.pathToPKG + " --qpackage ";
             let patternList = pattern.toLowerCase().split(" ");
             let patternQuery = "";
-            for(patt in patternList)
+            for(let patt in patternList)
                patternQuery += patternList[patt] + ",";
             this.activeSearch = (patternQuery.length > 3);
             if(this.activeSearch) {
@@ -1814,7 +1813,7 @@ AccessibleBox.prototype = {
    },
 /*
    closeContextMenus: function(excludeApp, animate) {
-      for(var app in this._staticButtons) {
+      for(let app in this._staticButtons) {
          if((app!=excludeApp)&&(this._staticButtons[app].menu)&&(this._staticButtons[app].menu.isOpen)) {
             if(animate)
                this._staticButtons[app].toggleMenu();
@@ -2583,7 +2582,7 @@ PowerBox.prototype = {
    },
 
    indexOf: function(actor) {
-      for(sysB in this._powerButtons)
+      for(let sysB in this._powerButtons)
          if(this._powerButtons[sysB].actor == actor)
             return sysB;
       return -1;
@@ -7232,7 +7231,7 @@ ConfigurableAppletMenu.prototype = {
    },
 
    disconnectCategories: function() {
-     /* for(keyActor in this.categoriesSignals)
+     /* for(let keyActor in this.categoriesSignals)
           keyActor.disconnect(this.categoriesSignals[keyActor]);*/
    },
 
@@ -7743,7 +7742,7 @@ MyApplet.prototype = {
       } else {
          let array = this.overlayKey.split("::");
          let newOverlayKey = "";
-         for(pos in array) {
+         for(let pos in array) {
             if(array[pos] != muffin_overlay_key) {
                newOverlayKey += array[pos] + "::";
             }
@@ -7875,7 +7874,7 @@ MyApplet.prototype = {
    _updateValues: function() {
        let newSettingsThemes = this._readDefaultSettings();
        let newThemeConfig, oldPropTheme, settingPropTheme;
-       for(theme in this.themes) {
+       for(let theme in this.themes) {
            settingPropTheme = this._getThemeProperties(newSettingsThemes[theme]);
            oldPropTheme = this._getThemeProperties(this.themes[theme]);
            for(let keyPropSetting in settingPropTheme) {
@@ -8113,7 +8112,7 @@ MyApplet.prototype = {
 
    getPlacesNamesList: function() {
       let newPlacesNames = new Array();
-      for(id in this.placesNames) {
+      for(let id in this.placesNames) {
          if(this.places.indexOf(id) != -1)
             newPlacesNames[id] = this.placesNames[id];
       }
@@ -8141,7 +8140,7 @@ MyApplet.prototype = {
          }
          else {
             let newPlaces = new Array();
-            for(id in this.placesNames) {
+            for(let id in this.placesNames) {
                if(id != placeId)
                  newPlaces[id] = this.placesNames[id];
             }
@@ -8152,7 +8151,7 @@ MyApplet.prototype = {
 
    getAppsNamesList: function() {
       let newAppsNames = new Array();
-      for(id in this.appsNames) {
+      for(let id in this.appsNames) {
          if(this.apps.indexOf(id) != -1)
             newAppsNames[id] = this.appsNames[id];
       }
@@ -8180,7 +8179,7 @@ MyApplet.prototype = {
          }
          else {
             let newApps = new Array();
-            for(id in this.appsNames) {
+            for(let id in this.appsNames) {
                if(id != appId)
                  newApps[id] = this.appsNames[id];
             }
@@ -12043,7 +12042,7 @@ MyApplet.prototype = {
 
       if(this._transientButtons.length > 0) {
          let parentTrans;
-         for(indexT in this._transientButtons) {
+         for(let indexT in this._transientButtons) {
             parentTrans = this._transientButtons[indexT].actor.get_parent();
             if(parentTrans)
                parentTrans.remove_actor(this._transientButtons[indexT].actor);
@@ -12153,10 +12152,10 @@ MyApplet.prototype = {
       var appResults = this._listApplications(null, pattern);
       var placesResults = new Array();
       var bookmarks = this._listBookmarks(pattern);
-      for(var i in bookmarks)
+      for(let i in bookmarks)
          placesResults.push(bookmarks[i].name);
       var devices = this._listDevices(pattern);
-      for(var i in devices)
+      for(let i in devices)
          placesResults.push(devices[i].name);
       var recentResults = new Array();
       for(let i = 0; i < this._recentButtons.length; i++) {
@@ -12328,7 +12327,7 @@ MyApplet.prototype = {
     //  }
       let trees = [appsys.get_tree()];
 
-      for(var i in trees) {
+      for(let i in trees) {
          let tree = trees[i];
          let root = tree.get_root_directory();
             
@@ -12758,7 +12757,7 @@ MyApplet.prototype = {
                   applicationButton.category.push(top_dir.get_menu_id());
                   this._applicationsButtonFromApp[app_key] = applicationButton;
                   var app_is_known = false;
-                  for(var i = 0; i < this._knownApps.length; i++) {
+                  for(let i = 0; i < this._knownApps.length; i++) {
                      if(this._knownApps[i] == app_key) {
                         app_is_known = true;
                      }

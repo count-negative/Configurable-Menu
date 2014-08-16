@@ -1,11 +1,12 @@
 const Applet = imports.ui.applet;
 const Mainloop = imports.mainloop;
-const CMenu;
+var APIMenu;
 try {
-   CMenu = imports.gi.CMenu;
+   APIMenu = imports.gi.CMenu;
 } catch(e) {
-   CMenu = imports.gi.GMenu;
+   APIMenu = imports.gi.GMenu;
 }
+const CMenu = APIMenu;
 const Lang = imports.lang;
 const Cinnamon = imports.gi.Cinnamon;
 const St = imports.gi.St;
