@@ -770,7 +770,7 @@ PackageItem.prototype = {
 
    setTextMaxWidth: function(maxWidth) {
       if(this.textWidth != maxWidth) {
-         this.textBox.style="max-width: "+maxWidth+"px;";
+         this.textBox.style = "max-width: "+maxWidth+"px;";
          this.textWidth = maxWidth;
       }
    },
@@ -918,7 +918,7 @@ SearchItem.prototype = {
 
    setTextMaxWidth: function(maxWidth) {
       //this.textBox.set_width(maxWidth);
-      this.textBox.style="max-width: "+maxWidth+"px;";
+      this.textBox.style = "max-width: "+maxWidth+"px;";
       this.textWidth = maxWidth;
    },
 
@@ -1670,8 +1670,8 @@ AccessibleBox.prototype = {
       
       this.placeName = new St.Label({ style_class: 'menu-selected-app-title', text: _("Places"), visible: false });
       this.systemName = new St.Label({ style_class: 'menu-selected-app-title', text: _("System"), visible: false });
-      this.placeName.style="font-size: " + 10 + "pt";
-      this.systemName.style="font-size: " + 10 + "pt";
+      this.placeName.style = "font-size: " + 10 + "pt";
+      this.systemName.style = "font-size: " + 10 + "pt";
       this.hoverBox = new St.BoxLayout({ vertical: false });
       this.internalBox.add_actor(this.hoverBox);
       this.controlBox = new St.BoxLayout({ vertical: false });
@@ -1911,7 +1911,7 @@ AccessibleBox.prototype = {
             item = new PlaceButtonAccessibleExtended(this.parent, this.scrollActor, currBookmark, placesName[placesList[i]], false,
                                                      this.iconSize, this.textButtonWidth, this.appButtonDescription);
             item.actor.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
-            item.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
+            //item.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
             item.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, item));
             this.itemsPlaces.add_actor(item.actor);
             //if(item.menu)
@@ -1955,7 +1955,7 @@ AccessibleBox.prototype = {
          let item = new FavoritesButtonExtended(this.parent, this.scrollActor, this.vertical, true, app, appsName[app.get_id()],
                                                 4, this.iconSize, true, this.textButtonWidth, this.appButtonDescription, this._applicationsBoxWidth);
          item.actor.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
-         item.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
+         //item.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
          item.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, item));
          item.actor.set_style_class_name('menu-application-button');
          this.itemsSystem.add_actor(item.actor);
@@ -2120,13 +2120,13 @@ SelectedAppBox.prototype = {
 
    setTitleSize: function(size) {
       this.appTitleSize = size;
-      this.appTitle.style="font-size: " + this.appTitleSize + "pt";
+      this.appTitle.style = "font-size: " + this.appTitleSize + "pt";
       this._validateVisible();
    },
 
    setDescriptionSize: function(size) {
       this.appDescriptionSize = size;
-      this.appDescription.style="font-size: " + this.appDescriptionSize + "pt";
+      this.appDescription.style = "font-size: " + this.appDescriptionSize + "pt";
       this._validateVisible();
    },
 
@@ -3407,7 +3407,7 @@ GenericApplicationButtonExtended.prototype = {
          this.toggleMenu();
          return true;
       }*/
-      return PopupBaseMenuItem.prototype._onKeyPressEvent.call(this, actor, event);
+      return PopupMenu.PopupBaseMenuItem.prototype._onKeyPressEvent.call(this, actor, event);
    }
 };
 
@@ -3717,7 +3717,7 @@ HoverIcon.prototype = {
          return true;
       }
 
-      return PopupBaseMenuItem.prototype._onKeyPressEvent.call(this, actor, event);
+      return PopupMenu.PopupBaseMenuItem.prototype._onKeyPressEvent.call(this, actor, event);
     },
 
    _putFocus: function() {
@@ -3762,7 +3762,7 @@ HoverIcon.prototype = {
    activate: function(event) {
       //this.parent.menu.close();
       //Main.notify("close");
-      //PopupBaseMenuItem.prototype.activate.call(this, event, true);
+      //PopupMenu.PopupBaseMenuItem.prototype.activate.call(this, event, true);
    },
 
    closeMenu: function() {
@@ -4646,7 +4646,7 @@ TransientButtonExtended.prototype = {
 
    setTextMaxWidth: function(maxWidth) {
       //this.textBox.set_width(maxWidth);
-      this.textBox.style="max-width: "+maxWidth+"px;";
+      this.textBox.style = "max-width: "+maxWidth+"px;";
       this.textWidth = maxWidth;
    },
 
@@ -4937,7 +4937,7 @@ ApplicationButtonExtended.prototype = {
 
    setTextMaxWidth: function(maxWidth) {
       //this.textBox.set_width(maxWidth);
-      this.textBox.style="max-width: "+maxWidth+"px;";
+      this.textBox.style = "max-width: "+maxWidth+"px;";
       this.textWidth = maxWidth;
    },
 
@@ -5129,7 +5129,7 @@ PlaceButtonAccessibleExtended.prototype = {
 
    setTextMaxWidth: function(maxWidth) {
       //this.textBox.set_width(maxWidth);
-      this.textBox.style="max-width: "+maxWidth+"px;";
+      this.textBox.style = "max-width: "+maxWidth+"px;";
       this.textWidth = maxWidth;
    },
 
@@ -5394,7 +5394,7 @@ RecentButtonExtended.prototype = {
 
    setTextMaxWidth: function(maxWidth) {
       //this.textBox.set_width(maxWidth);
-      this.textBox.style="max-width: "+maxWidth+"px;";
+      this.textBox.style = "max-width: "+maxWidth+"px;";
       this.textWidth = maxWidth;
    },
 
@@ -5492,7 +5492,7 @@ RecentClearButtonExtended.prototype = {
 
    setTextMaxWidth: function(maxWidth) {
       //this.textBox.set_width(maxWidth);
-      this.textBox.style="max-width: "+maxWidth+"px;";
+      this.textBox.style = "max-width: "+maxWidth+"px;";
       this.textWidth = maxWidth;
    },
 
@@ -5658,7 +5658,7 @@ FavoritesButtonExtended.prototype = {
 
    setTextMaxWidth: function(maxWidth) {
       //this.textBox.set_width(maxWidth);
-      this.textBox.style="max-width: "+maxWidth+"px;";
+      this.textBox.style = "max-width: "+maxWidth+"px;";
       this.textWidth = maxWidth;
    },
 
@@ -10514,9 +10514,9 @@ MyApplet.prototype = {
          this._previousSearchPattern = "";
 
          this.searchName = new St.Label({ style_class: 'menu-selected-app-title', text: _("Filter:"), visible: false });
-         this.searchName.style="font-size: " + 10 + "pt";
+         this.searchName.style = "font-size: " + 10 + "pt";
          this.panelAppsName = new St.Label({ style_class: 'menu-selected-app-title', text: _("Favorites"), visible: false });
-         this.panelAppsName.style="font-size: " + 10 + "pt";
+         this.panelAppsName.style = "font-size: " + 10 + "pt";
 
          this.searchBox.add(this.searchName, {x_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, y_fill: false, expand: false });
          this.searchBox.add(this.searchEntry, {x_fill: true, x_align: St.Align.START, y_align: St.Align.MIDDLE, y_fill: false, expand: true });
@@ -11571,10 +11571,10 @@ MyApplet.prototype = {
          this.categoriesBox.set_style('padding: 0px; border-left: none; border-right: none; border-top: none; border-bottom: none;');
          this.favoritesBox.set_style('padding: 0px; border-left: none; border-right: none; border-top: none; border-bottom: none;');
       } else {
-         this.menu.actor.set_style('');
-         this.menu.box.set_style('');
-         this.categoriesBox.set_style('');
-         this.favoritesBox.set_style('');
+         this.menu.actor.set_style(' ');
+         this.menu.box.set_style(' ');
+         this.categoriesBox.set_style(' ');
+         this.favoritesBox.set_style(' ');
       }
       } catch(e) {
          Main.notify("Application Menu error", e.message);
@@ -11875,7 +11875,7 @@ MyApplet.prototype = {
    },
 
    makeVectorBox: function(actor) {
-      this.destroyVectorBox(actor);
+      this.destroyVectorBox();
       let [catbox_x, catbox_y] = this.categoriesBox.get_transformed_position();
       let [catbox_w, catbox_h] = this.categoriesBox.get_transformed_size();
       let [appbox_x, appbox_y] = this.applicationsBox.get_transformed_position();
@@ -11892,7 +11892,7 @@ MyApplet.prototype = {
             this.vectorOrientation = St.Side.LEFT;
          }
          this.current_motion_actor = actor;
-         this.actor_motion_id = actor.connect("motion-event", Lang.bind(this, this.maybeUpdateVectorBox));
+         this.actor_motion_id = this.current_motion_actor.connect("motion-event", Lang.bind(this, this.maybeUpdateVectorBox));
       }
    },
 
@@ -11900,19 +11900,24 @@ MyApplet.prototype = {
       try {
         if(this.vector_update_loop) {
            Mainloop.source_remove(this.vector_update_loop);
+           this.vector_update_loop = null;
         }
         if(this.isInsideVectorBox())
            this.vector_update_loop = Mainloop.timeout_add(35, Lang.bind(this, this.updateVectorBox));
         else {
            this.updateVectorBox();
-        } 
+        }
       } catch(e) {
          Main.notify("error", e.message);
       }
    },
 
    updateVectorBox: function(actor) {
-      if(this.current_motion_actor._delegate.isHovered) {
+      if(this.vector_update_loop) {
+         Mainloop.source_remove(this.vector_update_loop);
+         this.vector_update_loop = null;
+      }
+      if((this.current_motion_actor) && (this.current_motion_actor._delegate.isHovered)) {
          if((!this.catShow)&&(this.current_motion_actor)) {
             if(this.lastedCategoryShow) {
                this._previousTreeSelectedActor = null;
@@ -11927,19 +11932,15 @@ MyApplet.prototype = {
          this.mouseVectorX = mx;
          this.mouseVectorY = my;
       } else {
-         this.destroyVectorBox(actor);
+         this.destroyVectorBox();
       }
    },
 
-   destroyVectorBox: function(actor) {
+   destroyVectorBox: function() {
       if(this.actor_motion_id > 0 && this.current_motion_actor != null) {
          this.current_motion_actor.disconnect(this.actor_motion_id);
          this.actor_motion_id = 0;
          this.current_motion_actor = null;
-      }
-      if(this.vector_update_loop) {
-         Mainloop.source_remove(this.vector_update_loop);
-         this.vector_update_loop = null;
       }
    },
 
