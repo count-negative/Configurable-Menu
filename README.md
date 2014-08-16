@@ -77,6 +77,10 @@ Change log
 --------------
 See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/Change-Log).
 
+1.5-Beta
+   - Fixed an error that do not allow start the menu.
+   - Removed some new warnings in Cinnnamon 2.3.
+
 1.4-Beta
    - Was added German language(DE_DE) thanks Uli.
    - Partially reimplemented the resize options to be more consistent(need more work).
