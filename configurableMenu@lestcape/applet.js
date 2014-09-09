@@ -1364,7 +1364,7 @@ GnoMenuBox.prototype = {
       this.actor.connect('key-focus-out', Lang.bind(this, function(actor, event) {
          this.disableSelected();
       }));
-      this._onEnterEvent(this._actionButtons[this._gnoMenuSelected].actor);
+      //this._onEnterEvent(this._actionButtons[this._gnoMenuSelected].actor);
    },
 
    destroy: function() {
@@ -1981,21 +1981,13 @@ AccessibleBox.prototype = {
       let app = appSys.lookup_app(appName);
       let appsName = this.parent.getAppsNamesList();
       if(app) {
-         //Main.notify("Fue:" + appsName[app.get_id()]);
          let item = new FavoritesButtonExtended(this.parent, this.scrollActor, this.vertical, true, app, appsName[app.get_id()],
                                                 4, this.iconSize, true, this.textButtonWidth, this.appButtonDescription, this._applicationsBoxWidth);
          item.actor.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
-         //item.connect('enter-event', Lang.bind(this, this._appEnterEvent, item));
          item.actor.connect('leave-event', Lang.bind(this, this._appLeaveEvent, item));
          item.actor.set_style_class_name('menu-application-button');
          this.itemsSystem.add_actor(item.actor);
-         //if(item.menu)
-            this.itemsSystem.add_actor(item.menu.actor);
-         /*else {//Remplace menu actor by a hide false actor.
-            falseActor = new St.BoxLayout();
-            falseActor.hide();
-            this.itemsSystem.add_actor(falseActor);
-         }*/
+         this.itemsSystem.add_actor(item.menu.actor);
          this._staticButtons.push(item);
       }
    },
@@ -2129,7 +2121,11 @@ SelectedAppBox.prototype = {
 
    destroy: function() {
       this.setDateTimeVisible(false);
-      this.actor.destroy();      
+      if(this.timeOutDateTime > 0) {
+         Mainloop.source_remove(this.timeOutDateTime);
+         this.timeOutDateTime = 0;
+      }
+      this.actor.destroy();
    },
 
    setAlign: function(align) {
@@ -2179,31 +2175,21 @@ SelectedAppBox.prototype = {
    },
 
    setDateTimeVisible: function(visible) {
-      try {
       this.activeDateTime = visible;
-      this.appTitle.set_text("");
-      this.appDescription.set_text("");
-      if((!this.activeDateTime)&&(this.timeOutDateTime > 0)) {
-         Mainloop.source_remove(this.timeOutDateTime);
-         this.timeOutDateTime = 0;
-      }
-      else if((this.activeDateTime)&&(this.timeOutDateTime == 0)&&(this.appTitle.get_text() == "")&&(this.appDescription.get_text() == "")) {
-         this._refrech();
-      }
-      } catch(e) {Main.notify("listo", e.message);}
+      this.setSelectedText("", "");
    },
 
    setSelectedText: function(title, description) {
       this.appTitle.set_text(title);
       this.appDescription.set_text(description);
-      if((this.activeDateTime)&&(this.timeOutDateTime == 0)&&(title == "")&&(description == "")) {
-         this._refrech();
-      }
-      else {
-         if(this.timeOutDateTime > 0) {
-            Mainloop.source_remove(this.timeOutDateTime);
-            this.timeOutDateTime = 0;
+      if((this.activeDateTime)&&(title == "")&&(description == "")) {
+         if(this.timeOutDateTime == 0) {
+            this.showTime();
+            this.timeOutDateTime = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._refrech));
          }
+      } else if(this.timeOutDateTime > 0) {
+         Mainloop.source_remove(this.timeOutDateTime);
+         this.timeOutDateTime = 0;
       }
    },
 
@@ -2232,11 +2218,16 @@ SelectedAppBox.prototype = {
       }
    },
 
+   showTime: function() {
+      let displayDate = new Date();
+      this.appTitle.set_text(displayDate.toLocaleFormat(this.timeFormat));
+      this.appDescription.set_text(displayDate.toLocaleFormat(this.dateFormat));
+   },
+
    _refrech: function() {
-      if(this.timeOutDateTime == 0) {
-         let displayDate = new Date();
-         this.appTitle.set_text(displayDate.toLocaleFormat(this.timeFormat));
-         this.appDescription.set_text(displayDate.toLocaleFormat(this.dateFormat));
+      if(this.timeOutDateTime > 0) {
+         Mainloop.source_remove(this.timeOutDateTime);
+         this.showTime();
          this.timeOutDateTime = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._refrech));
       }
    }
@@ -6051,10 +6042,12 @@ ConfigurablePointer.prototype = {
             }
          }
 
-         if(this._arrowSide == St.Side.TOP) {
-            this._yOffset = -this.themeNode.get_length('border-top') - gap + borderWidth;
+         if(this._arrowSide == St.Side.TOP) {//kicker warning
+            let borderTop = this.themeNode.get_length('border-top');
+            this._yOffset = -borderTop - gap + borderWidth;
          } else if(this._arrowSide == St.Side.BOTTOM) {
-            this._yOffset = this.themeNode.get_length('border-bottom') + gap;
+            let borderBottom = this.themeNode.get_length('border-bottom');
+            this._yOffset = borderBottom + gap;
             if(this.fixScreen)
                this._yOffset += 3;
          }
@@ -6412,7 +6405,8 @@ function ConfigurableMenu(launcher, orientation, subMenu) {
 }
 
 ConfigurableMenu.prototype = {
-   __proto__: PopupMenu.PopupMenuBase.prototype,
+   //__proto__: PopupMenu.PopupMenuBase.prototype,
+     __proto__: Applet.AppletPopupMenu.prototype,
 
    _init: function(launcher, orientation, subMenu) {
       PopupMenu.PopupMenuBase.prototype._init.call (this, launcher.actor, 'popup-menu-content');
@@ -6451,14 +6445,8 @@ ConfigurableMenu.prototype = {
    },
 
    on_paint: function(actor) {
-      if(this.paint_count < 2 || this.animating) {
-         this.paint_count++;
-         return;
-      }
-
-      this.actor.disconnect(this.paint_id);
-      this.paint_count = 0;
-      Main.popup_rendering = false;
+      if(Main.popup_rendering)
+         Main.popup_rendering = false;
    },
 
    setEffect: function(effect) {
@@ -7779,18 +7767,19 @@ MyApplet.prototype = {
       }
       let muffin_overlay_key;
       try {
-         let keybinding_menu = new Gio.Settings({ schema: "org.cinnamon.muffin" });
-         muffin_overlay_key = keybinding_menu.get_string("overlay-key");
          if(this.overlayKeyID) {
              global.display.disconnect(this.overlayKeyID);
              this.overlayKeyID = null;
          }
-         
-         if(this.overlayKey.indexOf(muffin_overlay_key) != -1) {
-            this.overlayKeyID = global.display.connect('overlay-key', Lang.bind(this, function() {
-               this._executeKeybinding();
-               return false;
-            }));
+         let keybinding_menu = new Gio.Settings({ schema: "org.cinnamon.muffin" });
+         if(keybinding_menu.list_keys().indexOf("overlay-key") != -1) {
+            muffin_overlay_key = keybinding_menu.get_string("overlay-key");
+            if(this.overlayKey.indexOf(muffin_overlay_key) != -1) {
+               this.overlayKeyID = global.display.connect('overlay-key', Lang.bind(this, function() {
+                  this._executeKeybinding();
+                  return false;
+               }));
+            }
          }
       } catch(e) {}
       if(!this.overlayKeyID) {
@@ -8385,8 +8374,10 @@ MyApplet.prototype = {
          this.actor.add_style_class_name('menu-applet-panel-top-box');
       else
          this.actor.add_style_class_name('menu-applet-panel-bottom-box');
-      this._updateMenuSection();
-      this._updateComplete();
+      Mainloop.idle_add(Lang.bind(this, function() {
+         this._updateMenuSection();
+         this._updateComplete();
+      }));
       return true;
    },
 
@@ -9754,6 +9745,7 @@ MyApplet.prototype = {
       this.selectedAppBox.setTitleSize(this.appTitleSize);
       this.selectedAppBox.setDescriptionSize(this.appDescriptionSize);
       this._setCategoriesIconsVisible(this.showCategoriesIcons);
+
       this._updateTimeDateFormat();
       this._update_autoscroll();
       this._updateActivateOnHover();
@@ -9829,14 +9821,16 @@ MyApplet.prototype = {
          this.appMenu.open();
       }
       Mainloop.idle_add(Lang.bind(this, function() {
-         if(this.bttChanger) 
-            this.bttChanger.activateSelected(_("Favorites"));
+         if(this.bttChanger)
+           this.bttChanger.activateSelected(_("Favorites"));
          if(this.gnoMenuBox)
             this.gnoMenuBox.setSelected(_("All Applications"));
-         this.menu.closeClean();
-         this.menu.actor.x = 0;
-         if(this.appMenu)
-            this.appMenu.actor.x = 0;
+         Mainloop.idle_add(Lang.bind(this, function() {
+            this.menu.closeClean();
+            this.menu.actor.x = 0;
+            if(this.appMenu)
+               this.appMenu.actor.x = 0;
+         }));
       }));
    },
 
@@ -11045,7 +11039,6 @@ MyApplet.prototype = {
       this.mainBox.add(this.extendedBox, { x_fill: true, y_fill: true, y_align: St.Align.START, expand: true });
       this.extendedBox.add(this.endVerticalBox, { x_fill: true, y_fill: false, y_align: St.Align.END, expand: false });
       this.endHorizontalBox.add(this.searchBox, { x_fill: true, y_fill: false, x_align: St.Align.START, y_align: St.Align.MIDDLE, expand: true });
-      this.endHorizontalBox.add(this.selectedAppBox.actor, { x_fill: true, y_fill: false, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: true });
       this.endHorizontalBox.add(this.powerBox.actor, { x_fill: false, x_align: St.Align.END, expand: false });
       this.endVerticalBox.add_actor(this.separatorBottom.actor);
       this.endVerticalBox.add(this.endBox, { x_fill: true, y_fill: true, expand: true });
@@ -11556,15 +11549,14 @@ MyApplet.prototype = {
       this.categoriesWrapper.add(this.categoriesSpaceDown, {x_fill: true, y_fill: true, y_align: St.Align.START, expand: true});
       this.operativePanelExpanded.add(this.favBoxWrapper, { x_fill: false, y_fill: false, y_align: St.Align.START, expand: false });
       this.operativePanelExpanded.add(this.powerBox.actor, { x_fill: false, y_fill: false, y_align: St.Align.END, expand: true });
-      //this.standardBox.add(this.operativePanelExpanded, { y_align: St.Align.END, y_fill: true, expand: false });
-      //this.standardBox.add(this.rightPane, { x_fill: true, y_fill: true, expand: true });
+      this.standardBox.add(this.operativePanelExpanded, { y_align: St.Align.END, y_fill: true, expand: false });
+      this.standardBox.add(this.rightPane, { x_fill: true, y_fill: true, expand: true });
       Mainloop.idle_add(Lang.bind(this, function() {
          let [cx, cy] = this.actor.get_transformed_position();
          let monitor = Main.layoutManager.primaryMonitor;
-         if(cx < (monitor.x + monitor.width/2)) {
-            this.standardBox.add(this.operativePanelExpanded, { y_align: St.Align.END, y_fill: true, expand: false });
-            this.standardBox.add(this.rightPane, { x_fill: true, y_fill: true, expand: true });
-         } else {
+         if(cx > (monitor.x + monitor.width/2)) {
+            this.standardBox.remove_actor(this.operativePanelExpanded);
+            this.standardBox.remove_actor(this.rightPane);
             this.standardBox.add(this.rightPane, { x_fill: true, y_fill: true, expand: true });
             this.standardBox.add(this.operativePanelExpanded, { y_align: St.Align.END, y_fill: true, expand: false });
          }
