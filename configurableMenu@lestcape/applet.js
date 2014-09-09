@@ -2371,8 +2371,8 @@ PowerBox.prototype = {
       this.selectedAppBox = selectedAppBox;
       this.hover = hover;
       this.powerSelected = 0;
-      this._session //= new GnomeSession.SessionManager();
-      this._screenSaverProxy// = new ScreenSaver.ScreenSaverProxy();
+      this._session = new GnomeSession.SessionManager();
+      this._screenSaverProxy = new ScreenSaver.ScreenSaverProxy();
 
       this.actor = new St.BoxLayout();
       this._powerButtons = new Array();

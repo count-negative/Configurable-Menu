@@ -1,7 +1,11 @@
 {
-    "uuid": "configurableMenu@lestcape", 
-    "icon": "applications-other", 
-    "last-edited": "1407696363", 
-    "name": "Configurable Menu", 
-    "description": "This is a frock of Main Cinnamon menu applet with more configurable options."
+    "uuid": "configurableMenu@lestcape",
+    "icon": "applications-other",
+    "last-edited": "1407696363",
+    "name": "Configurable Menu",
+    "version": "1.6-Beta", 
+    "website": "https://github.com/lestcape/Configurable-Menu",
+    "contributors": "Authors: Lester Carballo P\u00e9rez and Garibaldo",
+    "comments": "Configurable Menu have a lot of cool stuff like, handle web search options, install, uninstall and search for packages.",
+    "description": "Configurable Menu it's an extremely configurable fork of Cinnamon Menu."
 }
