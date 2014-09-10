@@ -3065,23 +3065,44 @@ ApplicationContextMenuItemExtended.prototype = {
       let needClose = false;
       switch (this._action) {
          case "add_to_panel":
-            try {
+            let addedLauncher = false;
+            try {//try to use jake.phy applet old way first, this will be removed(it's deprecate)
                let winListApplet = imports.ui.appletManager.applets['WindowListGroup@jake.phy@gmail.com'];
-               if(winListApplet)
+               if((winListApplet)&&(winListApplet.applet.GetAppFavorites)) {
                   winListApplet.applet.GetAppFavorites().addFavorite(this._appButton.app.get_id());
-            } catch (e) {}
-            
-            let settings = new Gio.Settings({ schema: 'org.cinnamon' });
-            let desktopFiles = settings.get_strv('panel-launchers');
-            desktopFiles.push(this._appButton.app.get_id());
-            settings.set_strv('panel-launchers', desktopFiles);
-            /* if(!Main.AppletManager.get_object_for_uuid("panel-launchers@cinnamon.org")) {
-               var new_applet_id = global.settings.get_int("next-applet-id");
-               global.settings.set_int("next-applet-id", (new_applet_id + 1));
-               var enabled_applets = global.settings.get_strv("enabled-applets");
-               enabled_applets.push("panel1:right:0:panel-launchers@cinnamon.org:" + new_applet_id);
-               global.settings.set_strv("enabled-applets", enabled_applets);
-            }*/
+                  addLauncher = true;
+               }
+            } catch (e) {
+               global.log(e);//could not be create an applet or acceptNewLauncher it's not include.
+            }
+            if(!addedLauncher) {//jake.phy applet fail to add an applet, then try to use the cinnamon old and new way.
+               if(Main.AppletManager.Roles) {//try to use the cinnamon new way first
+                  try {
+                     if(!Main.AppletManager.get_role_provider_exists(Main.AppletManager.Roles.PANEL_LAUNCHER) &&
+                        (!(imports.ui.appletManager.applets['panel-launchers@cinnamon.org']))) {
+                        let new_applet_id = global.settings.get_int("next-applet-id");
+                        global.settings.set_int("next-applet-id", (new_applet_id + 1));
+                        let enabled_applets = global.settings.get_strv("enabled-applets");
+                        enabled_applets.push("panel1:right:0:panel-launchers@cinnamon.org:" + new_applet_id);
+                        global.settings.set_strv("enabled-applets", enabled_applets);
+                     }
+                     let launcherApplet = Main.AppletManager.get_role_provider(Main.AppletManager.Roles.PANEL_LAUNCHER);
+                     if(launcherApplet)
+                        launcherApplet.acceptNewLauncher(this._appButton.app.get_id());
+                     addLauncher = true;
+                  } catch (e) {
+                     global.log(e);//could not be create an applet or acceptNewLauncher it's not include.
+                  }
+               }
+            }
+            if(!addedLauncher) {//Could be that it's the old way of Cinnamon launcher, try old way.
+               let settings = new Gio.Settings({ schema: 'org.cinnamon' });
+               let desktopFiles = settings.get_strv('panel-launchers');
+               if(desktopFiles) {
+                  desktopFiles.push(this._appButton.app.get_id());
+                  settings.set_strv('panel-launchers', desktopFiles);
+               }
+            }
             break;
          case "add_to_desktop":
             try {
