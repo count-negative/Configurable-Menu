@@ -1,5 +1,5 @@
-//Cinnamon Applet: Configurable Menu version v1.5-Beta
-//Release Date: 15 August 2014
+//Cinnamon Applet: Configurable Menu version v1.6-Beta
+//Release Date: 12 September 2014
 //
 //Authors: Lester Carballo Pérez(https://github.com/lestcape) and Garibaldo(https://github.com/Garibaldo).
 //
@@ -597,14 +597,14 @@ PackageInstallerWrapper.prototype = {
    },
 
    _makeVisible: function() {
-      Mainloop.idle_add(Lang.bind(this, function() {
-         for(let i = 0; i < this.pakages.length; i++) {
+      for(let i = 0; i < this.pakages.length; i++) {
+         Mainloop.idle_add(Lang.bind(this, function() {//to not blocked the keyboard event for a while....
             this.listButtons[i].actor.visible = true;
-         }
-         for(let i = this.pakages.length; i < this.listButtons.length; i++) {
-            this.listButtons[i].actor.visible = false;
-         }
-      }));
+         }));
+      }
+      for(let i = this.pakages.length; i < this.listButtons.length; i++) {
+         this.listButtons[i].actor.visible = false;
+      }
    },
 
    clearView: function() {
@@ -3225,24 +3225,54 @@ ApplicationContextMenuItemExtended.prototype = {
    }
 };
 
-function GenericApplicationButtonExtended(parent, parentScroll, app, withMenu) {
-   this._init(parent, parentScroll, app, withMenu);
+function GenericApplicationButtonExtended(parent, parentScroll, app, withMenu, searchTexts) {
+   this._init(parent, parentScroll, app, withMenu, searchTexts);
 }
 
 GenericApplicationButtonExtended.prototype = {
    __proto__: PopupMenu.PopupSubMenuMenuItem.prototype,
     
-   _init: function(parent, parentScroll, app, withMenu) {
+   _init: function(parent, parentScroll, app, withMenu, searchTexts) {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, { hover: false });
       this.app = app;
       this.parent = parent;
       this.parentScroll = parentScroll;
       this.withMenu = withMenu;
+      if((app)&&(searchTexts == null))
+         searchTexts = [app.get_name(), app.get_description(), app.get_id()];
       if(this.withMenu) {
          this.menu = new PopupMenu.PopupSubMenu(this.actor);
          this.menu.actor.set_style_class_name('menu-context-menu');
          this.menu.connect('open-state-changed', Lang.bind(this, this._subMenuOpenStateChanged));
       }
+      if(searchTexts) {
+         this.searchTexts = new Array();
+         for(let i=0; i<searchTexts.length; i++) {
+            let s = searchTexts[i];
+            if(s && typeof(s) == 'string')
+               this.searchTexts.push(s.toLowerCase());
+         }
+      }
+      this.searchScore = 0;
+   },
+
+   search: function(pattern) {
+      if(this.searchTexts) {
+         this.searchScore = 0;
+         // in theory this allows for better sorting
+         let addScore = Math.pow(10, this.searchTexts.length);
+         for(let i=0; i < this.searchTexts.length; i++) {
+            let pos = this.searchTexts[i].indexOf(pattern);
+            if(pos != -1) {
+               this.searchScore += addScore;
+               // extra score for beginning
+               if(pos == 0)
+                  this.searchScore += addScore/2;
+            }
+            addScore /= 10;
+         }
+      }
+      return this.searchScore;
    },
 
    destroy: function() {
@@ -7697,6 +7727,7 @@ MyApplet.prototype = {
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "submenu-height", "subMenuHeight", this._updateSubMenuSize, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "submenu-align", "subMenuAlign", this._alignSubMenu, null);
 
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "search-sorted", "searchSorted", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "search-filesystem", "searchFilesystem", null, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "search-web", "searchWeb", this._onSearchEnginesChanged, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "search-wikipedia", "searchWikipedia", this._onSearchEnginesChanged, null);
@@ -8303,7 +8334,8 @@ MyApplet.prototype = {
       themeProperties["show-recent"] = (themeProperties["show-recent"] === 'true');
       themeProperties["show-places"] = (themeProperties["show-places"] === 'true');
       themeProperties["allow-search"] = (themeProperties["allow-search"] === 'true');
-     // themeProperties["search-filesystem"] = (themeProperties["search-filesystem"] === 'true');
+      //themeProperties["search-sorted"] = (themeProperties["search-sorted"] === 'true');;
+      //themeProperties["search-filesystem"] = (themeProperties["search-filesystem"] === 'true');
       themeProperties["swap-panels"] = (themeProperties["swap-panels"] === 'true');
       themeProperties["activate-on-hover"] = (themeProperties["activate-on-hover"] === 'true');
       themeProperties["categories-hover"] = (themeProperties["categories-hover"] === 'true');
@@ -9567,7 +9599,8 @@ MyApplet.prototype = {
       this.menuIcon = confTheme["menu-icon"];
       this.menuLabel = confTheme["menu-label"];
       this.showSearhEntry = confTheme["allow-search"];
-      this.searchFilesystem = confTheme["search-filesystem"];
+      //this.searchSorted = confTheme["search-sorted"];
+      //this.searchFilesystem = confTheme["search-filesystem"];
       this.swapPanels = confTheme["swap-panels"];
       this.categoriesHover = confTheme["categories-hover"];
       this.hover_delay_ms = confTheme["hover-delay"];
@@ -9635,7 +9668,8 @@ MyApplet.prototype = {
       confTheme["menu-icon"] = this.menuIcon;
       confTheme["menu-label"] = this.menuLabel;
       confTheme["allow-search"] = this.showSearhEntry;
-     // confTheme["search-filesystem"] = this.searchFilesystem;
+      //confTheme["search-sorted"] = this.searchSorted;
+      //confTheme["search-filesystem"] = this.searchFilesystem;
       confTheme["swap-panels"] = this.swapPanels;
       confTheme["categories-hover"] = this.categoriesHover;
       confTheme["hover-delay"] = this.hover_delay_ms;
@@ -12169,6 +12203,11 @@ MyApplet.prototype = {
             this.searchAppSeparator.actor.show();
          else
             this.searchAppSeparator.actor.hide();
+         this._reorderButtons(search);
+         if(this.enablePackageSearch) {
+            this.pkg.updateButtonStatus(this.iconAppSize, this.textButtonWidth, this.appButtonDescription, this.iconView, this._applicationsBoxWidth);
+            this.pkg.executeSearch(search);
+         }
       } else if(this.visibleSearchButtons) {
          for(let i in this._searchItems) {
             this._searchItems[i].actor.hide();
@@ -12176,11 +12215,84 @@ MyApplet.prototype = {
          this.searchAppSeparator.actor.hide();
          this.visibleSearchButtons = null;
       }
-      if(this.enablePackageSearch) {
-         this.pkg.updateButtonStatus(this.iconAppSize, this.textButtonWidth, this.appButtonDescription, this.iconView, this._applicationsBoxWidth);
-         this.pkg.executeSearch(search);
-      }
       this._updateView();
+   },
+
+   _reorderButtons: function(pattern) {
+      switch(this.searchSorted) {
+         case 'name'     :
+            break;
+         case 'relevance':
+            this.visibleAppButtons.sort(function(a, b) {
+               let sr = 0;
+               if(a.search) a.search(pattern);
+               if(b.search) b.search(pattern);
+               sr = b.searchScore - a.searchScore;
+               if(sr == 0)
+                  sr = a.name.toLowerCase() > b.name.toLowerCase();
+               return sr;
+            });
+            break;
+         case 'usage-name':
+            this.visibleAppButtons.sort(Lang.bind(this, function(a, b) {
+               let sr = 0;
+               if(this.appsUsage) {
+                  let bUsage, aUsage;
+                  if(b.app)
+                     bUsage = this.appsUsage[b.app.get_id()];
+                  if(a.app)
+                     aUsage = this.appsUsage[a.app.get_id()];
+                  if(!bUsage) bUsage = 0;
+                  if(!aUsage) aUsage = 0;
+                  sr = bUsage - aUsage;
+               }
+               if(sr == 0) {
+                  let bName, aName;
+                  if(b.app)
+                     bName = b.app.get_name().toLowerCase();
+                  if(a.app)
+                     aName = a.app.get_name().toLowerCase();
+                  if(!bName) bName = "";
+                  if(!aName) aName = "";
+                  sr = aName > bName;
+               }
+               return sr;
+            }));
+            break;
+         case 'usage-relevance':
+            this.visibleAppButtons.sort(Lang.bind(this, function(a, b) {
+               let sr = 0;
+               if(this.appsUsage) {
+                  let bUsage, aUsage;
+                  if(b.app)
+                     bUsage = this.appsUsage[b.app.get_id()];
+                  if(a.app)
+                     aUsage = this.appsUsage[a.app.get_id()];
+                  if(!bUsage) bUsage = 0;
+                  if(!aUsage) aUsage = 0;
+                  sr = bUsage - aUsage;
+               }
+               if(sr == 0) {
+                  if(a.search) a.search(pattern);
+                  if(b.search) b.search(pattern);
+                  sr = b.searchScore - a.searchScore;
+               }
+               if(sr == 0) {
+                  let bName, aName;
+                  if(b.app)
+                     bName = b.app.get_name().toLowerCase();
+                  if(a.app)
+                     aName = a.app.get_name().toLowerCase();
+                  if(!bName) bName = "";
+                  if(!aName) aName = "";
+                  sr = aName > bName;
+               }
+               return sr;
+            }));
+            break;
+         default         :
+            break;
+      }
    },
 
    _onSearchTextChanged: function(se, prop) {
@@ -12238,21 +12350,21 @@ MyApplet.prototype = {
          return false;
       }
 
-      var appResults = this._listApplications(null, pattern);
-      var placesResults = new Array();
-      var bookmarks = this._listBookmarks(pattern);
+      let appResults = this._listApplications(null, pattern);
+      let placesResults = new Array();
+      let bookmarks = this._listBookmarks(pattern);
       for(let i in bookmarks)
          placesResults.push(bookmarks[i].name);
-      var devices = this._listDevices(pattern);
+      let devices = this._listDevices(pattern);
       for(let i in devices)
          placesResults.push(devices[i].name);
-      var recentResults = new Array();
+      let recentResults = new Array();
       for(let i = 0; i < this._recentButtons.length; i++) {
          if(!(this._recentButtons[i] instanceof RecentClearButtonExtended) && this._recentButtons[i].button_name.toLowerCase().indexOf(pattern) != -1)
             recentResults.push(this._recentButtons[i].button_name);
       }
 
-      var acResults = new Array(); // search box autocompletion results
+      let acResults = new Array(); // search box autocompletion results
       if(this.searchFilesystem) {
          // Don't use the pattern here, as filesystem is case sensitive
          acResults = this._getCompletions(this.searchEntryText.get_text());

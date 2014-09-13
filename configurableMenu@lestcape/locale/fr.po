@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-06-06 15:51-0600\n"
+"PO-Revision-Date: 2014-09-12 22:31-0600\n"
 "Last-Translator: Dupo <dupop35@yahoo.fr>\n"
 "Language-Team: Dupo <dupop35@yahoo.fr>\n"
 "MIME-Version: 1.0\n"
@@ -897,6 +897,14 @@ msgstr "Hauteur du sous-menu :"
 #. configurableMenu@lestcape->settings-schema.json->submenu-height->tooltip
 msgid "Set the submenu height."
 msgstr "Définir la hauteur du sous-menu."
+
+#. configurableMenu@lestcape->settings-schema.json->search-sorted->description
+msgid "Search results sorted by:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->search-sorted->tooltip
+msgid "Select a method to sort search results."
+msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->search-web->description
 msgid "Enable web search"

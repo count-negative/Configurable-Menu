@@ -886,6 +886,14 @@ msgstr ""
 msgid "Set the submenu height."
 msgstr ""
 
+#. configurableMenu@lestcape->settings-schema.json->search-sorted->description
+msgid "Search results sorted by:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->search-sorted->tooltip
+msgid "Select a method to sort search results."
+msgstr ""
+
 #. configurableMenu@lestcape->settings-schema.json->search-web->description
 msgid "Enable web search"
 msgstr ""
