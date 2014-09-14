@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-09-12 22:31-0600\n"
+"PO-Revision-Date: 2014-09-14 16:46-0600\n"
 "Last-Translator: Roman Beňo <romanbeno273@gmail.com>\n"
 "Language-Team: Roman Beňo <romanbeno273@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -974,6 +974,14 @@ msgstr "Povoliť vyhľadávanie balíčkov"
 #. configurableMenu@lestcape->settings-schema.json->installer-search->tooltip
 msgid "Allows search for new packages on the repository."
 msgstr "Umožní vyhľadávanie nových balíčkov v repozitári."
+
+#. configurableMenu@lestcape->settings-schema.json->installer-max-search->description
+msgid "Maximum number of packages:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->installer-max-search->tooltip
+msgid "Set the maximum number of packages to show."
+msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-button->description
 msgid "Update the Cinnamon Installer tool"

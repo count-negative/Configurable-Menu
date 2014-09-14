@@ -8,9 +8,9 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-09-13 13:18+0100\n"
+"PO-Revision-Date: 2014-09-14 16:46-0600\n"
 "Last-Translator: Davide Cristini <davcri91@gmail.com>\n"
-"Language-Team: garibaldo and lestcape <lestcape@gmail.com>\n"
+"Language-Team: Davide Cristini <davcri91@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -966,6 +966,14 @@ msgstr "Abilita la ricerca di pacchetti"
 #. configurableMenu@lestcape->settings-schema.json->installer-search->tooltip
 msgid "Allows search for new packages on the repository."
 msgstr "Permette la ricerca di nuovi pacchetti nei repository."
+
+#. configurableMenu@lestcape->settings-schema.json->installer-max-search->description
+msgid "Maximum number of packages:"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->installer-max-search->tooltip
+msgid "Set the maximum number of packages to show."
+msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-button->description
 msgid "Update the Cinnamon Installer tool"

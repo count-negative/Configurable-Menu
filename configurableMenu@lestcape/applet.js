@@ -360,6 +360,7 @@ PackageInstallerWrapper.prototype = {
       this.appDesc = false;
       this.vertical = false;
       this.cacheSize = 30;
+      this.maxSearch = 10;
       this.cacheUpdate = false;
       this.pythonVer = "python3";
       this.kitInstaller = null;
@@ -379,6 +380,10 @@ PackageInstallerWrapper.prototype = {
       for(let i = 0; i < this.listButtons.length; i++) {
          this.listButtons[i].destroy();
       }
+   },
+
+   setMaxSearch: function(maxS) {
+      this.maxSearch = maxS;
    },
 
    enableDefaultInstaller: function(enable) {
@@ -466,7 +471,8 @@ PackageInstallerWrapper.prototype = {
       if(this.kitInstaller) {
          this.activeSearch = ((pattern)&&(pattern.length > 2));
          if(this.activeSearch) {
-            this.kitInstaller.destroy()
+            this.kitInstaller.destroy();
+            this.clearView();
             this.kitInstaller.searchUninstallPackage(pattern, Lang.bind(this, this._doSearchPackageKit));
          }
       } else {
@@ -547,7 +553,7 @@ PackageInstallerWrapper.prototype = {
    _doSearchPackageKit: function(pakagesList) {
       Mainloop.idle_add(Lang.bind(this, function() {
          this.pakages = pakagesList;
-            this.parent._updateView();
+         this.parent._updateView();
       }));
    },
 
@@ -576,11 +582,13 @@ PackageInstallerWrapper.prototype = {
             this._createButtons();
             let viewBox = this.actorSearchBox.get_children();
             let currValue, falseActor;
-            for(let i = 0; i < this.pakages.length; i += viewBox.length) {
+            let maxValue = Math.min(this.pakages.length, this.maxSearch);
+            for(let i = 0; i < maxValue; i += viewBox.length) {
                currValue = i;
                for(let j = 0; j < viewBox.length; j++) {
-                  if(currValue < this.pakages.length) {
+                  if(currValue < maxValue) {
                      viewBox[j].add_actor(this.listButtons[currValue].actor);
+                     this.listButtons[currValue].actor.visible = false;
                      falseActor = new St.BoxLayout();
                      falseActor.hide();
                      viewBox[j].add_actor(falseActor);
@@ -597,12 +605,14 @@ PackageInstallerWrapper.prototype = {
    },
 
    _makeVisible: function() {
-      for(let i = 0; i < this.pakages.length; i++) {
-         Mainloop.idle_add(Lang.bind(this, function() {//to not blocked the keyboard event for a while....
-            this.listButtons[i].actor.visible = true;
-         }));
+      let maxValue = Math.min(this.pakages.length, this.maxSearch);
+      for(let i = 0; i < maxValue; i++) {
+         Mainloop.idle_add(Lang.bind(this, function(pos) {//to not blocked the keyboard event for a while....
+            if(this.listButtons[pos])
+               this.listButtons[pos].actor.visible = true;
+         }, i));
       }
-      for(let i = this.pakages.length; i < this.listButtons.length; i++) {
+      for(let i = maxValue; i < this.listButtons.length; i++) {
          this.listButtons[i].actor.visible = false;
       }
    },
@@ -7743,6 +7753,7 @@ MyApplet.prototype = {
 
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "installer-tools", "enableInstaller", this._packageInstallerChanged, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "installer-search", "enablePackageSearch", this._packageSearchChanged, null);
+         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "installer-max-search", "installerMaxSearch", this._packageMaxSearchChanged, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "installer-update-check", "enableCheckUpdate", this._packageInstallerCheck, null);
          this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "installer-default", "enableDefaultInstaller", this._packageInstallerDefault, null);
 
@@ -7799,6 +7810,7 @@ MyApplet.prototype = {
          this._updateConfig();
          this._packageInstallerCheck();
          this._packageInstallerDefault();
+         this._packageMaxSearchChanged();
          this._updateComplete();
       }
       catch (e) {
@@ -10932,6 +10944,10 @@ MyApplet.prototype = {
          this.pkg.cleanSearch();
    },
 
+   _packageMaxSearchChanged: function() {
+      this.pkg.setMaxSearch(this.installerMaxSearch);
+   },
+
    _packageInstallerCheck: function() {
       if(this.enableCheckUpdate)
          this.pkg.checkForUpdate();
@@ -12354,7 +12370,6 @@ MyApplet.prototype = {
          this._reorderButtons(search);
          if(this.enablePackageSearch) {
             this.pkg.updateButtonStatus(this.iconAppSize, this.textButtonWidth, this.appButtonDescription, this.iconView, this._applicationsBoxWidth);
-            this.pkg.executeSearch(search);
          }
       } else if(this.visibleSearchButtons) {
          for(let i in this._searchItems) {
@@ -12363,6 +12378,7 @@ MyApplet.prototype = {
          this.searchAppSeparator.actor.hide();
          this.visibleSearchButtons = null;
       }
+      this.pkg.executeSearch(search);
       this._updateView();
    },
 
