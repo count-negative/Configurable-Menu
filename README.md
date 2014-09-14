@@ -82,6 +82,7 @@ See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/C
    - Added support for the new general Cinnamon way of used launchers.
    - Fixed several critical errors and warnings.
    - Added support for Cinnamon 2.3 on general.
+   - Configurable Menu not depend any more of the Cinnamon Menu code.
 
 1.5-Beta
    - Fixed an error that do not allow start the menu.

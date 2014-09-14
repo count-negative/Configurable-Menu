@@ -53,7 +53,7 @@ const GLib = imports.gi.GLib;
 const AccountsService = imports.gi.AccountsService;
 const FileUtils = imports.misc.fileUtils;
 const AppletPath = imports.ui.appletManager.applets['configurableMenu@lestcape'];
-const CinnamonMenu = AppletPath.cinnamonMenu;
+//const CinnamonMenu = AppletPath.cinnamonMenu;
 const BoxPointer = imports.ui.boxpointer;
 const Gettext = imports.gettext;
 var APIMenu;
@@ -1131,6 +1131,10 @@ ScrollItemsBox.prototype = {
       }
    }, 
 //horizontalcode
+   set_style_class: function(styleClass) {
+      this.scroll.style_class = styleClass;
+   },
+
    setAutoScrolling: function(autoScroll) {
       if(this.vertical)
          this.scroll.set_auto_scrolling(autoScroll);
@@ -3516,7 +3520,6 @@ function VisibleChildIteratorExtended(parent, container, numberView) {
 }
 
 VisibleChildIteratorExtended.prototype = {
-   __proto__: CinnamonMenu.VisibleChildIterator.prototype,
    _init: function(parent, container, numberView) {
       this.container = container;
       this._parent = parent;
@@ -5520,7 +5523,7 @@ function RecentClearButtonExtended(parent, vertical, iconSize, appWidth, appDesc
 }
 
 RecentClearButtonExtended.prototype = {
-   __proto__: CinnamonMenu.RecentClearButton.prototype,
+   __proto__: PopupMenu.PopupBaseMenuItem.prototype,
 
    _init: function(parent, vertical, iconSize, appWidth, appDesc) {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
@@ -5554,6 +5557,10 @@ RecentClearButtonExtended.prototype = {
          let GtkRecent = new Gtk.RecentManager();
          GtkRecent.purge_items();
       }
+   },
+
+   getName: function() {
+      return this.button_name;
    },
 
    activate: function(event) {
@@ -7552,7 +7559,7 @@ function MyApplet(metadata, orientation, panel_height, instance_id) {
 }
 
 MyApplet.prototype = {
-   __proto__: CinnamonMenu.MyApplet.prototype,
+   __proto__: Applet.TextIconApplet.prototype,
 
    _init: function(metadata, orientation, panel_height, instance_id) {
       Applet.TextIconApplet.prototype._init.call(this, orientation, panel_height, instance_id);
@@ -7798,6 +7805,13 @@ MyApplet.prototype = {
          Main.notify("ErrorMain:", e.message);
          global.logError(e);
       }
+   },
+
+   destroy: function() {
+      this.actor._delegate = null;
+      this.menu.destroy();
+      this.actor.destroy();
+      this.emit('destroy');
    },
 
    _changeHover: function(actor, event, hover) {
@@ -8561,6 +8575,41 @@ MyApplet.prototype = {
       return Clutter.KEY_Right;
    },
 
+   _run: function(input) {
+      let command = input;
+
+      this._commandError = false;
+      if(input) {
+         let path = null;
+         if(input.charAt(0) == '/') {
+            path = input;
+         } else {
+            if(input.charAt(0) == '~')
+               input = input.slice(1);
+            path = GLib.get_home_dir() + '/' + input;
+         }
+
+         if(GLib.file_test(path, GLib.FileTest.EXISTS)) {
+            let file = Gio.file_new_for_path(path);
+            try {
+               Gio.app_info_launch_default_for_uri(file.get_uri(),
+                                                   global.create_app_launch_context());
+            } catch(e) {
+               // The exception from gjs contains an error string like:
+               //     Error invoking Gio.app_info_launch_default_for_uri: No application
+               //     is registered as handling this file
+               // We are only interested in the part after the first colon.
+               //let message = e.message.replace(/[^:]*: *(.+)/, '$1');
+               return false;
+            }
+         } else {
+            return false;
+         }
+      }
+
+      return true;
+   },
+
    _searchFileSystem: function(symbol) {
       if(symbol == Clutter.Return || symbol == Clutter.KP_Enter) {
          if(this._run(this.searchEntry.get_text())) {
@@ -9158,6 +9207,15 @@ MyApplet.prototype = {
          }
          if(i > 0)
             appBox[i].set_width(-1);
+      }
+   },
+
+   _updateVFade: function() { 
+      let mag_on = this.a11y_settings.get_boolean("screen-magnifier-enabled");
+      if(mag_on) {
+         this.applicationsScrollBox.set_style_class("menu-applications-scrollbox");
+      } else {
+         this.applicationsScrollBox.set_style_class("vfade menu-applications-scrollbox");
       }
    },
 
@@ -9935,6 +9993,34 @@ MyApplet.prototype = {
       }
    },
 
+   openMenu: function() {
+      this.menu.open(false);
+   },
+
+   _updateActivateOnHover: function() {
+      if(this._openMenuId) {
+         this.actor.disconnect(this._openMenuId);
+         this._openMenuId = 0;
+      }
+      if(this.activateOnHover) {
+         this._openMenuId = this.actor.connect('enter-event', Lang.bind(this, this.openMenu));
+      }
+   },
+
+   _update_hover_delay: function() {
+      this.hover_delay = this.hover_delay_ms / 1000
+   },
+
+   _recalc_height: function() {
+      let scrollBoxHeight = (this.leftBox.get_allocation_box().y2-this.leftBox.get_allocation_box().y1) -
+                            (this.searchBox.get_allocation_box().y2-this.searchBox.get_allocation_box().y1);
+      this.applicationsScrollBox.style = "height: "+scrollBoxHeight / global.ui_scale +"px;";
+   },
+
+   _launch_editor: function() {
+      Util.spawnCommandLine("cinnamon-menu-editor");
+   },
+
    _activeResize: function() {
       if(this.controlView)
          this.controlView.changeResizeActive(this.controlingSize);
@@ -10203,15 +10289,31 @@ MyApplet.prototype = {
       }
    },
 
-   //on_applet_clicked: function(event) {
-       // let t = new Date().getTime();
-       //global.stage.set_key_focus(this.searchEntry);
-       //Mainloop.idle_add(Lang.bind(this, function() {
-       //   this.menu.toggle_with_options(false);
-       //}));
-       // let f = new Date().getTime();
-       // log("time is: " + (f - t).toString());
-    //},
+   on_applet_clicked: function(event) {
+      // let t = new Date().getTime();
+      //global.stage.set_key_focus(this.searchEntry);
+      this.menu.toggle_with_options(false);
+      // let f = new Date().getTime();
+      // log("time is: " + (f - t).toString());
+   },
+
+   _onSourceKeyPress: function(actor, event) {
+      let symbol = event.get_key_symbol();
+
+      if(symbol == Clutter.KEY_space || symbol == Clutter.KEY_Return) {
+         this.menu.toggle();
+         return true;
+      } else if (symbol == Clutter.KEY_Escape && this.menu.isOpen) {
+         this.menu.close();
+         return true;
+      } else if (symbol == Clutter.KEY_Down) {
+         if(!this.menu.isOpen)
+            this.menu.toggle();
+         this.menu.actor.navigate_focus(this.actor, Gtk.DirectionType.DOWN, false);
+         return true;
+      } else
+         return false;
+   },
 
    _updateMenuSection: function() {
       if(this.menu) {
@@ -11924,6 +12026,37 @@ MyApplet.prototype = {
       return this.specialBookmarks;
    },
 
+   _listDevices: function(pattern){
+      let devices = Main.placesManager.getMounts();
+      let res = new Array();
+      for(let id = 0; id < devices.length; id++) {
+         if(!pattern || devices[id].name.toLowerCase().indexOf(pattern)!=-1) res.push(devices[id]);
+      }
+      return res;
+   },
+
+   _listApplications: function(category_menu_id, pattern){
+      let applist = new Array();
+      if(category_menu_id) {
+         applist = category_menu_id;
+      } else {
+         applist = "all";
+      }
+      let res;
+      if(pattern) {
+         res = new Array();
+         for(let i in this._applicationsButtons) {
+            let app = this._applicationsButtons[i].app;
+            if(app.get_name().toLowerCase().indexOf(pattern)!=-1 || (app.get_description() &&
+               app.get_description().toLowerCase().indexOf(pattern)!=-1) ||
+               (app.get_id() && app.get_id().slice(0, -8).toLowerCase().indexOf(pattern)!=-1))
+               res.push(app.get_name());
+            }
+      } else
+         res = applist;
+      return res;
+   },
+
    _clearAllSelections: function(hide_apps) {
        if(hide_apps) {
           for(let i = 0; i < this._applicationsButtons.length; i++) {
@@ -11968,6 +12101,21 @@ MyApplet.prototype = {
           Main.notify("Categ Erro", e.message)
           global.log(e);
        }
+   },
+
+   resetSearch: function(){
+      this.searchEntry.set_text("");
+      this._previousSearchPattern = "";
+      this.searchActive = false;
+      this._clearAllSelections(true);
+      this._setCategoriesButtonActive(true);
+      global.stage.set_key_focus(this.searchEntry);
+   },
+
+   _clearPrevAppSelection: function(actor) {
+      if(this._previousSelectedActor && this._previousSelectedActor != actor) {
+         this._previousSelectedActor.style_class = "menu-application-button";
+      }
    },
 
    _clearPrevCatSelection: function(actor) {
@@ -12385,6 +12533,26 @@ MyApplet.prototype = {
       return false;
    },
 
+   _getCompletion : function(text) {
+      if(text.indexOf('/') != -1) {
+         if(text.substr(text.length - 1) == '/') {
+            return '';
+         } else {
+            return this._pathCompleter.get_completion_suffix(text);
+         }
+      } else {
+         return false;
+      }
+   },
+
+   _getCompletions : function(text) {
+      if(text.indexOf('/') != -1) {
+         return this._pathCompleter.get_completions(text);
+      } else {
+         return new Array();
+      }
+   },
+
    _selectDisplayLayout: function(actor, event) {
       if((this.bttChanger)&&(this.bttChanger.getSelected() == _("All Applications"))&&(this.searchActive)) {
          this.bttChanger.activateNext();
@@ -12416,12 +12584,7 @@ MyApplet.prototype = {
           child.destroy();
       }));
       this.favoritesObj = new FavoritesBoxExtended(this, true, this.favoritesLinesNumber);
-      this.favoritesBox.add(this.favoritesObj.actor, { x_fill: true, y_fill: true, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: false });
-
-      /*let favoritesBox = new CinnamonMenu.FavoritesBox();
-      this.favoritesBox.add_actor(favoritesBox.actor);*/
-      //this.favoritesScrollBox.set_width(-1)
-      //this.favoritesBox.set_width(-1);
+      this.favoritesBox.add(this.favoritesObj.actor, { x_fill: true, y_fill: true, x_align: St.Align.END, y_align: St.Align.MIDDLE, expand: false });*/
 
       this.favoritesObj.removeAll();
       if(this.favoritesObj.getNumberLines() != this.favoritesLinesNumber)
