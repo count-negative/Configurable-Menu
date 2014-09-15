@@ -4682,7 +4682,7 @@ TransientButtonExtended.prototype = {
          this.icon = new St.Icon({gicon: themedIcon, icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR });
       } catch (e) {
          this.handler = null;
-         let iconName = this.isPath ? 'gnome-folder' : 'unknown';
+         let iconName = this.isPath ? 'folder' : 'unknown';
          this.icon = new St.Icon({icon_name: iconName, icon_size: this.iconSize, icon_type: St.IconType.FULLCOLOR });
          // @todo Would be nice to indicate we don't have a handler for this file.
       }
@@ -4840,7 +4840,7 @@ TransientButtonExtended.prototype = {
                return new St.Icon({gicon: themedIcon, icon_size: appIconSize, icon_type: St.IconType.FULLCOLOR });
             } catch (e) {
                let isPath = pathOrCommand.substr(pathOrCommand.length - 1) == '/';
-               let iconName = isPath ? 'gnome-folder' : 'unknown';
+               let iconName = isPath ? 'folder' : 'unknown';
                return new St.Icon({icon_name: iconName, icon_size: appIconSize, icon_type: St.IconType.FULLCOLOR });
             }
          }
@@ -12150,8 +12150,8 @@ MyApplet.prototype = {
       if(!this.specialBookmarks) {
          this.specialBookmarks = new Array();
          this.specialBookmarks.push(new SpecialBookmarks(_("Computer"), "computer", "computer:///"));
-         this.specialBookmarks.push(new SpecialBookmarks(_("Home"), "folder-home", GLib.get_home_dir()));
-         this.specialBookmarks.push(new SpecialBookmarks(_("Desktop"), "desktop", USER_DESKTOP_PATH));
+         this.specialBookmarks.push(new SpecialBookmarks(_("Home"), "user-home", GLib.get_home_dir()));
+         this.specialBookmarks.push(new SpecialBookmarks(_("Desktop"), "emblem-desktop", USER_DESKTOP_PATH));
          this.specialBookmarks.push(new SpecialBookmarks(_("Networking"), "network", "network:///"));
          this.specialBookmarks.push(new SpecialBookmarks(_("Trash"), "user-trash", "trash:///"));
       }
