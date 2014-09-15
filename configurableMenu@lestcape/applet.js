@@ -3060,24 +3060,36 @@ ControlBox.prototype = {
    }
 };
 
-function ApplicationContextMenuItemExtended(appButton, label, action) {
-   this._init(appButton, label, action);
+function ApplicationContextMenuItemExtended(appButton, action, label, icon, id) {
+   this._init(appButton, action, label, icon, id);
 }
 
 ApplicationContextMenuItemExtended.prototype = {
    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
 
-   _init: function (appButton, label, action) {
+   _init: function (appButton, action, label, icon, id) {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {focusOnHover: false});
       this._appButton = appButton;
       this._action = action;
+      if(id)
+         this.id = id;
+      this.container = new St.BoxLayout();
       this.label = new St.Label({ text: label });
-      this.addActor(this.label);
+      if(icon) {
+         this.icon = icon;
+         this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      }
+      this.container.add(this.label, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+      this.addActor(this.container);
    },
 
    activate: function (event) {
       let needClose = false;
       switch (this._action) {
+         case "open_with":
+            this._appButton.launch(this.id);
+            needClose = true;
+            break;
          case "add_to_panel":
             let addedLauncher = false;
             try {//try to use jake.phy applet old way first, this will be removed(it's deprecate)
@@ -3384,67 +3396,67 @@ GenericApplicationButtonExtended.prototype = {
          }
          let menuItem;
          if(!this.app.isPlace) {
-            menuItem = new ApplicationContextMenuItemExtended(this, _("Add to panel"), "add_to_panel");
+            menuItem = new ApplicationContextMenuItemExtended(this, "add_to_panel", _("Add to panel"));
             this.menu.addMenuItem(menuItem);
             if(USER_DESKTOP_PATH) {
-               menuItem = new ApplicationContextMenuItemExtended(this, _("Add to desktop"), "add_to_desktop");
+               menuItem = new ApplicationContextMenuItemExtended(this, "add_to_desktop", _("Add to desktop"));
                this.menu.addMenuItem(menuItem);
             }
             if(AppFavorites.getAppFavorites().isFavorite(this.app.get_id())) {
-               menuItem = new ApplicationContextMenuItemExtended(this, _("Remove from favorites"), "remove_from_favorites");
+               menuItem = new ApplicationContextMenuItemExtended(this, "remove_from_favorites", _("Remove from favorites"));
                this.menu.addMenuItem(menuItem);
             } else {
-               menuItem = new ApplicationContextMenuItemExtended(this, _("Add to favorites"), "add_to_favorites");
+               menuItem = new ApplicationContextMenuItemExtended(this, "add_to_favorites", _("Add to favorites"));
                this.menu.addMenuItem(menuItem);
             }
             if(this.parent.accessibleBox) {
                if(this.parent.isInAppsList(this.app.get_id())) {
-                  menuItem = new ApplicationContextMenuItemExtended(this, _("Remove from accessible panel"), "remove_from_accessible_panel");
+                  menuItem = new ApplicationContextMenuItemExtended(this, "remove_from_accessible_panel", _("Remove from accessible panel"));
                   this.menu.addMenuItem(menuItem);
                } else {
-                  menuItem = new ApplicationContextMenuItemExtended(this, _("Add to accessible panel"), "add_to_accessible_panel");
+                  menuItem = new ApplicationContextMenuItemExtended(this, "add_to_accessible_panel", _("Add to accessible panel"));
                   this.menu.addMenuItem(menuItem);
                }
             }
             if((this.parent.enableInstaller)||(this.parent.pkg.canCinnamonUninstallApps())) {
-               menuItem = new ApplicationContextMenuItemExtended(this, _("Uninstall"), "uninstall_app");
+               menuItem = new ApplicationContextMenuItemExtended(this, "uninstall_app", _("Uninstall"));
                this.menu.addMenuItem(menuItem);
             }
             if((this instanceof FavoritesButtonExtended)&&(this.parentScroll != this.parent.favoritesScrollBox)) {
                if(this.nameEntry.visible) {
-                  menuItem = new ApplicationContextMenuItemExtended(this, _("Save name"), "save_name");
+                  menuItem = new ApplicationContextMenuItemExtended(this, "save_name", _("Save name"));
                   this.menu.addMenuItem(menuItem);
                } else {
-                  menuItem = new ApplicationContextMenuItemExtended(this, _("Edit name"), "edit_name");
+                  menuItem = new ApplicationContextMenuItemExtended(this, "edit_name", _("Edit name"));
                   this.menu.addMenuItem(menuItem);
                }
                if((this.alterName)&&(this.alterName != "")) {
-                  menuItem = new ApplicationContextMenuItemExtended(this, _("Default name"), "default_name");
+                  menuItem = new ApplicationContextMenuItemExtended(this, "default_name", _("Default name"));
                   this.menu.addMenuItem(menuItem);
                }
             }
          } else {
             if(USER_DESKTOP_PATH) {
-               menuItem = new ApplicationContextMenuItemExtended(this, _("Add to desktop"), "add_to_desktop");
+               menuItem = new ApplicationContextMenuItemExtended(this, "add_to_desktop", _("Add to desktop"));
                this.menu.addMenuItem(menuItem);
             }
             if(this.parent.isInPlacesList(this.app.get_id())) {
-               menuItem = new ApplicationContextMenuItemExtended(this, _("Remove from accessible panel"), "remove_from_accessible_panel");
+               menuItem = new ApplicationContextMenuItemExtended(this, "remove_from_accessible_panel", _("Remove from accessible panel"));
                this.menu.addMenuItem(menuItem);
             } else {
-               menuItem = new ApplicationContextMenuItemExtended(this, _("Add to accessible panel"), "add_to_accessible_panel");
+               menuItem = new ApplicationContextMenuItemExtended(this, "add_to_accessible_panel", _("Add to accessible panel"));
                this.menu.addMenuItem(menuItem);
             }
             if(!(this instanceof PlaceButtonExtended)&&(this instanceof PlaceButtonAccessibleExtended)) {
                if(this.nameEntry.visible) {
-                  menuItem = new ApplicationContextMenuItemExtended(this, _("Save name"), "save_name");
+                  menuItem = new ApplicationContextMenuItemExtended(this, "save_name", _("Save name"));
                   this.menu.addMenuItem(menuItem);
                } else {
-                  menuItem = new ApplicationContextMenuItemExtended(this, _("Edit name"), "edit_name");
+                  menuItem = new ApplicationContextMenuItemExtended(this, "edit_name", _("Edit name"));
                   this.menu.addMenuItem(menuItem);
                }
                if((this.alterName)&&(this.alterName != "")) {
-                  menuItem = new ApplicationContextMenuItemExtended(this, _("Default name"), "default_name");
+                  menuItem = new ApplicationContextMenuItemExtended(this, "default_name", _("Default name"));
                   this.menu.addMenuItem(menuItem);
                }
             }
@@ -5445,7 +5457,6 @@ RecentButtonExtended.prototype = {
       this.setTextMaxWidth(appWidth);
       this.setAppDescriptionVisible(appDesc);
       this.setVertical(vertical);
-
       this.icon = file.createIcon(this.iconSize);
       if(this.icon) {
          this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
@@ -5456,15 +5467,119 @@ RecentButtonExtended.prototype = {
 
       this.labelName.realize();
       this.labelDesc.realize();
+
+      this.menu = new PopupMenu.PopupSubMenu(this.actor);
+      this.menu.actor.set_style_class_name('menu-context-menu');
+      this.menu.connect('open-state-changed', Lang.bind(this, this._subMenuOpenStateChanged));
    },
 
-   _onButtonReleaseEvent: function(actor, event) {
+   _subMenuOpenStateChanged: function() {
+      if(this.menu.isOpen) {
+         //this.parentScroll.scrollToActor(this.menu.actor);
+      }
+   },
+
+   _onKeyPressEvent: function(actor, event) {
+      let symbol = event.get_key_symbol();
+/*
+      if(symbol == Clutter.KEY_space) {
+         if((this.withMenu) && (!this.menu.isOpen)) {
+            this.parent.closeApplicationsContextMenus(true);
+         }
+         this.toggleMenu();
+         return true;
+      }*/
+      return PopupMenu.PopupBaseMenuItem.prototype._onKeyPressEvent.call(this, actor, event);
+   },
+
+   closeMenu: function() {
+      if(this.widthC) {
+         this.parent._clearView();
+         this.parent.menu.actor.set_width(this.widthC);
+         this.parent.width = this.widthC;
+         this.widthC = null;
+         this.parent._updateView();
+      }
+      this.menu.close();
+   },
+
+   toggleMenu: function() {
+      if(!this.menu.isOpen) {
+         let children = this.menu.box.get_children();
+         for(let i in children) {
+            this.menu.box.remove_actor(children[i]);
+         }
+         let menuItem;
+         let appCinMime = this.getAppForMime();
+         for(let app in appCinMime) {
+            menuItem = new ApplicationContextMenuItemExtended(this, "open_with", appCinMime[app].get_name(),
+                                                              appCinMime[app].create_icon_texture(20), appCinMime[app].get_id());
+            this.menu.addMenuItem(menuItem);
+         }
+      }
+      this.menu.toggle();
+   },
+
+   launch: function(id_mime) {
+      try {
+         let appSys = Cinnamon.AppSystem.get_default();
+         let appSysMime = appSys.lookup_app(id_mime);
+         if(appSysMime)
+            appSysMime.launch(global.create_app_launch_context(), [this.file.uri], null);
+      } catch(e) {
+         global.logError(e);
+      }
+   },
+
+   getAppForMime: function() {
+      let appCinMime = new Array();
+      if(this.file.mimeType) {
+         try {
+            let appSysMime = Gio.app_info_get_all_for_type(this.file.mimeType);
+            let appSys = Cinnamon.AppSystem.get_default();
+            for(let app in appSysMime) {
+               appCinMime.push(appSys.lookup_app(appSysMime[app].get_id()));
+            }
+         } catch(e) {
+            global.logError(e);
+         }
+      }
+      return appCinMime;
+   },
+
+   _onButtonReleaseEvent: function (actor, event) {
       if(!this.parent.pressed) {
-         if(event.get_button() == 1) {
+         if(event.get_button()==1) {
             //This is new on 2.2
             //this.file.launch();
             Gio.app_info_launch_default_for_uri(this.file.uri, global.create_app_launch_context());
             this.parent.menu.close();
+         }
+         if(event.get_button()==3) {
+            if(!this.menu.isOpen) {
+               this.parent.closeApplicationsContextMenus(true);
+               let box = this.actor.get_parent();
+               if((this.parent.appMenu)&&(this.parent.applicationsBox == box.get_parent().get_parent())) {
+                  let boxH = box.get_height();
+                  let monitor = Main.layoutManager.findMonitorForActor(box);
+                  if(boxH > monitor.height - 100)
+                     boxH = monitor.height - 100;
+                  box.set_height(boxH);
+                  this.widthC = null;
+                  this.toggleMenu();
+                  if(this.parent.appMenu) {
+                     this.actor.get_parent().set_height(-1);
+                  }
+                  this.parent._updateSubMenuSize();
+               } else {
+                  this.widthC = this.parent.menu.actor.get_width();
+                  this.toggleMenu();
+                  this.parent._updateSize();
+               }
+               this.parent._previousContextMenuOpen = this;
+            } else {
+               this.closeMenu();
+            }
          }
       }
       this.parent._disableResize();
