@@ -5434,18 +5434,19 @@ PlaceButtonExtended.prototype = {
 
 };
 
-function RecentButtonExtended(parent, file, vertical, iconSize, appWidth, appDesc) {
-   this._init(parent, file, vertical, iconSize, appWidth, appDesc);
+function RecentButtonExtended(parent, parentScroll, file, vertical, iconSize, appWidth, appDesc) {
+   this._init(parent, parentScroll, file, vertical, iconSize, appWidth, appDesc);
 }
 
 RecentButtonExtended.prototype = {
    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
 
-   _init: function(parent, file, vertical, iconSize, appWidth, appDesc) {
+   _init: function(parent, parentScroll, file, vertical, iconSize, appWidth, appDesc) {
       PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {hover: false});
       this.iconSize = iconSize;
       this.file = file;
       this.parent = parent;
+      this.parentScroll = parentScroll;
       this.button_name = this.file.name;
       this.actor.set_style_class_name('menu-application-button');
       this.actor._delegate = this;
@@ -5475,7 +5476,7 @@ RecentButtonExtended.prototype = {
 
    _subMenuOpenStateChanged: function() {
       if(this.menu.isOpen) {
-         //this.parentScroll.scrollToActor(this.menu.actor);
+         this.parentScroll.scrollToActor(this.menu.actor);
       }
    },
 
@@ -13109,7 +13110,7 @@ MyApplet.prototype = {
          }
 
          for(let id = 0; id < MAX_RECENT_FILES && id < this.RecentManager._infosByTimestamp.length; id++) {
-            let button = new RecentButtonExtended(this, this.RecentManager._infosByTimestamp[id], this.iconView,
+            let button = new RecentButtonExtended(this, this.applicationsScrollBox, this.RecentManager._infosByTimestamp[id], this.iconView,
                                                   this.iconAppSize, this.textButtonWidth, this.appButtonDescription);
             this._addEnterEvent(button, Lang.bind(this, function() {
                this._clearPrevAppSelection(button.actor);
