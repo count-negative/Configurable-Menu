@@ -6,21 +6,20 @@ Contact: lestcape@gmail.com
 
 --------------
 ![](https://raw.github.com/wiki/lestcape/Configurable-Menu/img/Capture.png)
-
+--------------
 
 Authors:
-***
+--------------
 - [Lester Carballo Pérez](https://github.com/lestcape)
 - [Garibaldo](https://github.com/Garibaldo).
 
 Special thanks to:
-***
-
+--------------
 - [Bernard](https://github.com/zagortenay333) (Help adding support to the Cinnamon themes).
 - Eliermi Cunha Junior(jpegrande@gmail.com) (Help finding errors, promotion and several more things).
 - [mtwebster](https://github.com/mtwebster)  (Help increasing the speed of Configurable Menu in Cinnamon 2.2).
 
---------------
+
 Author of language translation:
 --------------
 - English(En):       [Garibaldo](https://github.com/Garibaldo) and [Lester Carballo Pérez](https://github.com/lestcape)
@@ -31,7 +30,7 @@ Author of language translation:
 - Czech(Cs_Cz):      Satapouch(http://www.linux-mint-czech.cz/)
 - Slovak(sk_SK):     Benji(http://sk.gravatar.com/sawwer/)
 - German(de_DE):     Uli(email@kiot.eu)
-- Italian(it_IT)     [davcri](https://github.com/davcri)
+- Italian(it_IT):    [davcri](https://github.com/davcri)
 - Bulgarian(Bg):     Peyu Yovev (spacy01) (spacy00001@gmail.com)
 
 Description
