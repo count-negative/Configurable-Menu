@@ -1,13 +1,20 @@
 Cinnamon Applet: Configurable Menu Version: v1.6-Beta
 
-Last version release date: 12 September 2014
-***
-Authors: [Lester Carballo Pérez](https://github.com/lestcape) and [Garibaldo](https://github.com/Garibaldo).
+Last version release date: 07 december 2014
 
 Contact: lestcape@gmail.com
 
+--------------
+![](https://raw.github.com/wiki/lestcape/Configurable-Menu/img/Capture.png)
+
+
+Authors:
 ***
+- [Lester Carballo Pérez](https://github.com/lestcape)
+- [Garibaldo](https://github.com/Garibaldo).
+
 Special thanks to:
+***
 
 - [Bernard](https://github.com/zagortenay333) (Help adding support to the Cinnamon themes).
 - Eliermi Cunha Junior(jpegrande@gmail.com) (Help finding errors, promotion and several more things).
@@ -25,9 +32,7 @@ Author of language translation:
 - Slovak(sk_SK):     Benji(http://sk.gravatar.com/sawwer/)
 - German(de_DE):     Uli(email@kiot.eu)
 - Italian(it_IT)     [davcri](https://github.com/davcri)
-
---------------
-![](https://raw.github.com/wiki/lestcape/Configurable-Menu/img/Capture.png)
+- Bulgarian(Bg):     Peyu Yovev (spacy01) (spacy00001@gmail.com)
 
 Description
 --------------
@@ -50,11 +55,6 @@ And much more coming...
 Warning:
 --------------
 After install Configurable Menu 1.1 or higher and if you have installed an older version, please delete the file, /home/USER/.cinnamon/configs/configurableMenu@lestcape  and then restart cinnamon, to allow display correctly the system buttons. This only a thing that need to be done when some key was changed, not always. Sorry for the inconvenients.
-
-
-This applet not longer has support for Arch Linux.
---------------
-The comunity of Arch Linux do not want that I or other Cinnamon developer, publish about Cinnamon, and receive the users feedback (necessary on the developing any app). When the comunity of Arch Linux, want to be open to the free software world, sure that I want to support Arch Linux again...
 
 Help
 --------------

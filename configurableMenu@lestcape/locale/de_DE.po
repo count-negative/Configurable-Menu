@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2014-09-14 16:46-0600\n"
+"PO-Revision-Date: 2014-12-07 01:09-0600\n"
 "Last-Translator: \n"
 "Language-Team: Uli <email@kiot.eu>\n"
 "MIME-Version: 1.0\n"
@@ -765,6 +765,14 @@ msgstr "Symbole für Kategorien anzeigen"
 #. configurableMenu@lestcape->settings-schema.json->categories-icons->tooltip
 msgid "Choose whether or not to have icons on the categories."
 msgstr "Wähle ob Symbole für Kategorien angezeigt werden sollen."
+
+#. configurableMenu@lestcape->settings-schema.json->show-recent->description
+msgid "Show recent files"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->show-recent->tooltip
+msgid "Choose whether or not to show a recent file list in the menu."
+msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. categories->description

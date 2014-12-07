@@ -1,5 +1,4 @@
-//Cinnamon Applet: Configurable Menu version v1.6-Beta
-//Release Date: 12 September 2014
+//Cinnamon Applet: Configurable Menu
 //
 //Authors: Lester Carballo Pérez(https://github.com/lestcape) and Garibaldo(https://github.com/Garibaldo).
 //
@@ -3078,6 +3077,7 @@ ApplicationContextMenuItemExtended.prototype = {
       if(icon) {
          this.icon = icon;
          this.container.add(this.icon, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
+         this.label.style = "padding-left: 4px;";
       }
       this.container.add(this.label, { x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE, x_fill: false, y_fill: false, expand: false });
       this.addActor(this.container);
@@ -5511,12 +5511,25 @@ RecentButtonExtended.prototype = {
             this.menu.box.remove_actor(children[i]);
          }
          let menuItem;
-         let appCinMime = this.getAppForMime();
+         if (GLib.find_program_in_path("nemo-open-with") != null) {
+            menuItem = new ApplicationContextMenuItemExtended(this, "open_with", _("Open with "),//_("Other application..."),
+                                                              null, "nemo-open-with " + this.file.uri);
+            this.menu.addMenuItem(menuItem);
+         }
+         let appCinMimeDef = this.getDefaultAppForMime();
+         if(appCinMimeDef) {
+            menuItem = new ApplicationContextMenuItemExtended(this, "open_with", appCinMimeDef.get_name(),
+                                                              appCinMimeDef.create_icon_texture(20), appCinMimeDef.get_id());
+            menuItem.actor.style = "font-weight: bold";
+            this.menu.addMenuItem(menuItem);
+         }
+         let appCinMime = this.getAppForMime(appCinMimeDef);
          for(let app in appCinMime) {
             menuItem = new ApplicationContextMenuItemExtended(this, "open_with", appCinMime[app].get_name(),
                                                               appCinMime[app].create_icon_texture(20), appCinMime[app].get_id());
             this.menu.addMenuItem(menuItem);
          }
+         //this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
       }
       this.menu.toggle();
    },
@@ -5527,19 +5540,39 @@ RecentButtonExtended.prototype = {
          let appSysMime = appSys.lookup_app(id_mime);
          if(appSysMime)
             appSysMime.launch(global.create_app_launch_context(), [this.file.uri], null);
+         else
+            Util.spawnCommandLine(id_mime);
       } catch(e) {
          global.logError(e);
       }
    },
 
-   getAppForMime: function() {
+   hasLocalPath: function(file) {
+      return file.is_native() || file.get_path() != null;
+   },
+
+   getDefaultAppForMime: function() {
+      let file = Gio.File.new_for_uri(this.file.uri);
+      let default_info = Gio.AppInfo.get_default_for_type(this.file.mimeType, !this.hasLocalPath(file));
+
+      if (default_info) {
+         let appSys = Cinnamon.AppSystem.get_default();
+         return appSys.lookup_app(default_info.get_id())
+      }
+      return null;
+   },
+
+   getAppForMime: function(default_app) {
       let appCinMime = new Array();
       if(this.file.mimeType) {
          try {
             let appSysMime = Gio.app_info_get_all_for_type(this.file.mimeType);
             let appSys = Cinnamon.AppSystem.get_default();
+            let app;
             for(let app in appSysMime) {
-               appCinMime.push(appSys.lookup_app(appSysMime[app].get_id()));
+               app = appSys.lookup_app(appSysMime[app].get_id());
+               if((app)&&(app != default_app))
+                  appCinMime.push(app);
             }
          } catch(e) {
             global.logError(e);

@@ -751,6 +751,14 @@ msgstr ""
 msgid "Choose whether or not to have icons on the categories."
 msgstr ""
 
+#. configurableMenu@lestcape->settings-schema.json->show-recent->description
+msgid "Show recent files"
+msgstr ""
+
+#. configurableMenu@lestcape->settings-schema.json->show-recent->tooltip
+msgid "Choose whether or not to show a recent file list in the menu."
+msgstr ""
+
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. categories->description
 msgid "Show scrolling area of categories"
