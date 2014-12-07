@@ -79,6 +79,7 @@ See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/C
 
 1.6-Beta
    - Was added Italian language(IT_IT) thanks Davcri.
+   - Was added Bulgarian language(Bg) thanks Peyu Yovev.
    - Added support for some sorting methods of search results.
    - Added a limit to the number of packages for not blocking Cinnamon on search.
    - Added support for the new general Cinnamon way of used launchers.
