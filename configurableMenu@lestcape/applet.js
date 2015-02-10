@@ -8337,17 +8337,16 @@ MyApplet.prototype = {
 
    setAppsUsage: function(listAppsUsage) {
       let result = "";
-      this.appsNames = new Array();
+      this.appsUsage = new Array();
       let appSys = Cinnamon.AppSystem.get_default();
       for(let id in listAppsUsage) {
          if((id != "")&&(listAppsUsage[id].toString() != "")&&(appSys.lookup_app(id))) {
-            this.appsNames[id] = listAppsUsage[id].toString();
+            this.appsUsage[id] = listAppsUsage[id].toString();
             result += id+"::"+listAppsUsage[id].toString() + ";;";
          }
       }
       this.stringAppsUsage = result.substring(0, result.length - 2);//commit
    },
-
 
    _isBookmarks: function(bookmark) {
       let listBookmarks = this._listBookmarks();
@@ -12503,7 +12502,7 @@ MyApplet.prototype = {
             button.actor.realize();
          }
       }
-      if(search) {
+      if((search) && (this.enablePackageSearch)) {
          this.visibleSearchButtons = new Array();
          for(let i = 0; i < this._searchItems.length; i++) {
             this._searchItems[i].actor.visible = true;
@@ -12517,9 +12516,8 @@ MyApplet.prototype = {
          else
             this.searchAppSeparator.actor.hide();
          this._reorderButtons(search);
-         if(this.enablePackageSearch) {
-            this.pkg.updateButtonStatus(this.iconAppSize, this.textButtonWidth, this.appButtonDescription, this.iconView, this._applicationsBoxWidth);
-         }
+         this.pkg.updateButtonStatus(this.iconAppSize, this.textButtonWidth, this.appButtonDescription, this.iconView, this._applicationsBoxWidth);
+         this.pkg.executeSearch(search);
       } else if(this.visibleSearchButtons) {
          for(let i in this._searchItems) {
             this._searchItems[i].actor.hide();
@@ -12527,7 +12525,6 @@ MyApplet.prototype = {
          this.searchAppSeparator.actor.hide();
          this.visibleSearchButtons = null;
       }
-      this.pkg.executeSearch(search);
       this._updateView();
    },
 
