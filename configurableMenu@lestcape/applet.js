@@ -6227,11 +6227,40 @@ ConfigurablePointer.prototype = {
       }
    },
 
-
    _maxPanelSize: function() {
-      if(!Main.panel2)
-         return Main.panel.actor.height;
-      return Math.max(Main.panel2.actor.height, Main.panel.actor.height);
+      if(Main.panelManager) {
+         if(this._sourceActor) {
+            let [x, y] = this._sourceActor.get_transformed_position();
+            let i = 0;
+            let monitor;
+            for (; i < global.screen.get_n_monitors(); i++) {
+               monitor = global.screen.get_monitor_geometry(i);
+               if(x >= monitor.x && x < monitor.x + monitor.width &&
+                  x >= monitor.y && y < monitor.y + monitor.height) {
+                  break;
+               }
+            }
+            maxHeightBottom = 0;
+            maxHeightTop = 0;
+            let panels = Main.panelManager.getPanelsInMonitor(i);
+            for(let j in panels) {
+               if(panels[j].bottomPosition)
+                  maxHeightBottom = Math.max(maxHeightBottom, panels[j].actor.height);
+               else
+                  maxHeightTop = Math.max(maxHeightTop, panels[j].actor.height);
+            }
+            return [maxHeightBottom, maxHeightTop];
+         }
+      } else {
+         if(!Main.panel2) {
+            if(this._arrowSide == St.Side.TOP)
+               return [0, Main.panel.actor.height];
+            else
+               return [Main.panel.actor.height, 0];
+         }
+         return [Main.panel2.actor.height, Main.panel.actor.height];
+      }
+      return 0;
    },
 
    _fixCorner: function(x, y, sourceActor, sourceAllocation, monitor, gap, borderWidth) {
@@ -6352,12 +6381,22 @@ try {
       case St.Side.LEFT:
       case St.Side.RIGHT:
          resY = sourceCenterY - (halfMargin + (natHeight - margin) * alignment);
-         resY = Math.max(resY, monitor.y + this._maxPanelSize());
+         let [maxHeightBottom, maxHeightTop] = this._maxPanelSize();
+         let maxPHV = Math.max(maxHeightBottom, maxHeightTop);
+         resY = Math.max(resY, monitor.y + maxPHV);
          let m = this._getTopMenu(sourceActor);
-         if((!Main.panel2)&&(m)&&(m._arrowSide == St.Side.TOP)) {
-            resY = Math.min(resY, monitor.y + monitor.height - (natHeight));
+         if(Main.panelManager) {
+            if(((maxHeightBottom == 0)||(maxHeightTop==0))&&(m)&&(m._arrowSide == St.Side.TOP)) {
+               resY = Math.min(resY, monitor.y + monitor.height - (natHeight));
+            } else {
+               resY = Math.min(resY, monitor.y + monitor.height - (maxPHV + natHeight));
+            }
          } else {
-            resY = Math.min(resY, monitor.y + monitor.height - (this._maxPanelSize() + natHeight));
+            if((!Main.panel2)&&(m)&&(m._arrowSide == St.Side.TOP)) {
+               resY = Math.min(resY, monitor.y + monitor.height - (natHeight));
+            } else {
+               resY = Math.min(resY, monitor.y + monitor.height - (maxPHV + natHeight));
+            }
          }
 
          this.setArrowOrigin(sourceCenterY - resY);
@@ -6715,10 +6754,33 @@ ConfigurableMenu.prototype = {
    // menu is higher then the screen; it's useful if part of the menu is
    // scrollable so the minimum height is smaller than the natural height
    setMaxHeight: function() {
-      let monitor = Main.layoutManager.primaryMonitor;
-      let maxHeight = Math.round(monitor.height - Main.panel.actor.height - this.actor.get_theme_node().get_length('-boxpointer-gap'));
-      if (Main.panel2!=null) maxHeight -= Main.panel2.actor.height;
-         this.actor.style = ('max-height: ' + maxHeight + 'px;');
+      if(Main.panelManager) {
+         let [x, y] = this.sourceActor.get_transformed_position();
+
+         let i = 0;
+         let monitor;
+         for (; i < global.screen.get_n_monitors(); i++) {
+            monitor = global.screen.get_monitor_geometry(i);
+            if(x >= monitor.x && x < monitor.x + monitor.width &&
+               x >= monitor.y && y < monitor.y + monitor.height) {
+               break;
+            }
+         }
+
+         let maxHeight = monitor.height - this.actor.get_theme_node().get_length('-boxpointer-gap');
+
+         let panels = Main.panelManager.getPanelsInMonitor(i);
+         for(let j in panels) {
+            maxHeight -= panels[j].actor.height;
+         }
+
+         this.actor.style = ('max-height: ' + maxHeight / global.ui_scale + 'px;');
+      } else {
+         let monitor = Main.layoutManager.primaryMonitor;
+         let maxHeight = Math.round(monitor.height - Main.panel.actor.height - this.actor.get_theme_node().get_length('-boxpointer-gap'));
+         if (Main.panel2!=null) maxHeight -= Main.panel2.actor.height;
+            this.actor.style = ('max-height: ' + maxHeight + 'px;');
+      }
    },
 
 //*************************************************
@@ -10793,28 +10855,55 @@ MyApplet.prototype = {
       return false;
    },
 
-   _processPanelSize: function(bottomPosition) {
-      let panelHeight = 0;
-      try {
+   _processNewPanelSize: function(bottomPosition) {
+      if(Main.panelManager) {
+         let [x, y] = this.actor.get_transformed_position();
+
+         let i = 0;
+         let monitor;
+         for (; i < global.screen.get_n_monitors(); i++) {
+            monitor = global.screen.get_monitor_geometry(i);
+            if(x >= monitor.x && x < monitor.x + monitor.width &&
+               x >= monitor.y && y < monitor.y + monitor.height) {
+               break;
+            }
+         }
+
+         maxHeight = 0
+         let panels = Main.panelManager.getPanelsInMonitor(i);
+         for(let j in panels) {
+            if(panels[j].bottomPosition == bottomPosition)
+               maxHeight = Math.max(maxHeight, panels[j].actor.height);
+         }
+         return maxHeight;
+      } else {
          if(bottomPosition) {
             if(!Main.panel2) {
                if(this.orientation == St.Side.BOTTOM)
-                  panelHeight = Main.panel.actor.height;
+                  return Main.panel.actor.height;
                else
-                  panelHeight = 0;
+                  return 0;
             } else {
-               panelHeight = Main.panel2.actor.height;
+               return Main.panel2.actor.height;
             }
          } else {
             if(!Main.panel2) {
                if(this.orientation == St.Side.BOTTOM)
-                  panelHeight = 0;
+                  return 0;
                else
-                  panelHeight = Main.panel.actor.height;
+                  return Main.panel.actor.height;
             } else {
-               panelHeight = Main.panel.actor.height;
+               return Main.panel.actor.height;
             }
          }
+      }
+      return 0;
+   },
+
+   _processPanelSize: function(bottomPosition) {
+      let panelHeight = 0;
+      try {
+         panelHeight = this._processNewPanelSize(bottomPosition);
          if(!panelHeight)
             panelHeight = 0;
       } catch(e) {
