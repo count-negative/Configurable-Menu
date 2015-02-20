@@ -34,6 +34,7 @@ const Pango = imports.gi.Pango;
 const DND = imports.ui.dnd;
 const Meta = imports.gi.Meta;
 const Clutter = imports.gi.Clutter;
+//const Atk = imports.gi.Atk; //check if this is supported on old cinnamon versions, and then active it.
 const Applet = imports.ui.applet;
 const ScreenSaver = imports.misc.screenSaver;
 const GnomeSession = imports.misc.gnomeSession;
@@ -6716,7 +6717,7 @@ ConfigurableMenu.prototype = {
    setMaxHeight: function() {
       let monitor = Main.layoutManager.primaryMonitor;
       let maxHeight = Math.round(monitor.height - Main.panel.actor.height - this.actor.get_theme_node().get_length('-boxpointer-gap'));
-      if (Main.panel2!==null) maxHeight -= Main.panel2.actor.height;
+      if (Main.panel2!=null) maxHeight -= Main.panel2.actor.height;
          this.actor.style = ('max-height: ' + maxHeight + 'px;');
    },
 
@@ -10935,6 +10936,7 @@ MyApplet.prototype = {
          this.categoriesApplicationsBox = new CategoriesApplicationsBoxExtended();
 
          this.categoriesBox = new St.BoxLayout({ style_class: 'menu-categories-box', vertical: true });
+         //this.categoriesBox = new St.BoxLayout({ style_class: 'menu-categories-box', vertical: true, accessible_role: Atk.Role.LIST });
          this.categoriesSpaceUp = new St.BoxLayout({ style_class: 'menu-categories-space-' + this.theme });
          this.categoriesSpaceDown = new St.BoxLayout({ style_class: 'menu-categories-space-' + this.theme });
          this.categoriesBox.add_style_class_name('menu-categories-box-' + this.theme);
