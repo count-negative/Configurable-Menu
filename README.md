@@ -1,6 +1,6 @@
-Cinnamon Applet: Configurable Menu Version: v1.6-Beta
+Cinnamon Applet: Configurable Menu Version: v1.7-Beta
 
-Last version release date: 07 december 2014
+Last version release date: 31 May 2015
 
 Contact: lestcape@gmail.com
 
@@ -76,6 +76,10 @@ You can found more information about Cinnamon Installer on the [Cinnamon Install
 Change log
 --------------
 See a complete [Change log](https://github.com/lestcape/Configurable-Menu/wiki/Change-Log).
+
+1.7-Beta
+   - Added support for Cinnamon 2.6.
+   - Fix the applications search.
 
 1.6-Beta
    - Was added Italian language(IT_IT) thanks Davcri.

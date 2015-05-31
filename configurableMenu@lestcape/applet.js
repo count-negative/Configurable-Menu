@@ -6240,8 +6240,8 @@ ConfigurablePointer.prototype = {
                   break;
                }
             }
-            maxHeightBottom = 0;
-            maxHeightTop = 0;
+            let maxHeightBottom = 0;
+            let maxHeightTop = 0;
             let panels = Main.panelManager.getPanelsInMonitor(i);
             for(let j in panels) {
                if(panels[j].bottomPosition)
@@ -10869,7 +10869,7 @@ MyApplet.prototype = {
             }
          }
 
-         maxHeight = 0
+         let maxHeight = 0
          let panels = Main.panelManager.getPanelsInMonitor(i);
          for(let j in panels) {
             if(panels[j].bottomPosition == bottomPosition)
