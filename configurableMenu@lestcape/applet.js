@@ -1206,6 +1206,38 @@ ScrollItemsBox.prototype = {
    }
 };
 
+// This is only a clone for the dalcde update
+// we used it here to support old cinnamon versions.
+function PopupIconMenuItem() {
+   this._init.apply(this, arguments);
+}
+
+PopupIconMenuItem.prototype = {
+   __proto__: PopupMenu.PopupBaseMenuItem.prototype,
+
+   _init: function(text, iconName, iconType, params) {
+      PopupMenu.PopupBaseMenuItem.prototype._init.call(this, params);
+      if(iconType != St.IconType.FULLCOLOR)
+          iconType = St.IconType.SYMBOLIC;
+      this.label = new St.Label({text: text});
+      this._icon = new St.Icon({ style_class: 'popup-menu-icon',
+         icon_name: iconName,
+         icon_type: iconType});
+      this.addActor(this._icon, {span: 0});
+      this.addActor(this.label);
+   },
+
+   setIconSymbolicName: function(iconName) {
+      this._icon.set_icon_name(iconName);
+      this._icon.set_icon_type(St.IconType.SYMBOLIC);
+   },
+
+   setIconName: function(iconName) {
+      this._icon.set_icon_name(iconName);
+      this._icon.set_icon_type(St.IconType.FULLCOLOR);
+   }
+};
+
 function DriveMenu(parent, selectedAppBox, hover, place, iconSize, iconVisible) {
    this._init(parent, selectedAppBox, hover, place, iconSize, iconVisible);
 }
@@ -10567,7 +10599,8 @@ MyApplet.prototype = {
 
          let items = this._applet_context_menu._getMenuItems();
 
-         this.listView = new Applet.MenuItem(_("List View"), 'view-list-symbolic', Lang.bind(this, function() {
+         this.listView = new PopupIconMenuItem(_("List View"), 'view-list-symbolic', St.IconType.SYMBOLIC);
+         this.listView.connect('activate', Lang.bind(this, function() {
             this.iconView = !this.iconView;
             this._changeView();
          }));
@@ -10576,7 +10609,8 @@ MyApplet.prototype = {
             this.listView.setSensitive(this.iconView);
          }
 
-         this.gridView = new Applet.MenuItem(_("Grid View"), 'view-grid-symbolic', Lang.bind(this, function() {
+         this.gridView = new PopupIconMenuItem(_("Grid View"), 'view-grid-symbolic', St.IconType.SYMBOLIC);
+         this.gridView.connect('activate', Lang.bind(this, function() {
             this.iconView = !this.iconView;
             this._changeView();
          }));
