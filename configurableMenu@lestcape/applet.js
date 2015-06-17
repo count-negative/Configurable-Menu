@@ -9443,7 +9443,8 @@ MyApplet.prototype = {
    },
 
    _clearView: function() {
-      this.pkg.clearView();
+      if(this.enablePackageSearch)
+          this.pkg.clearView();
       let appBox = this.standarAppBox.get_children();
       let appItem;
       for(let i = 0; i < appBox.length; i++) {
@@ -12628,10 +12629,13 @@ MyApplet.prototype = {
          }
       }
       if((search) && (this.enablePackageSearch)) {
+         this.packageAppBox.show();
+         this.packageAppSeparator.actor.show();
          this.pkg.updateButtonStatus(this.iconAppSize, this.textButtonWidth, this.appButtonDescription, this.iconView, this._applicationsBoxWidth);
          this.pkg.executeSearch(search);
       } else {
-         this.searchAppSeparator.actor.hide();
+         this.packageAppBox.hide();
+         this.packageAppSeparator.actor.hide();
       }
       if((search) && (this.searchWeb)) {
          this.visibleSearchButtons = new Array();
@@ -12653,7 +12657,8 @@ MyApplet.prototype = {
          this.searchAppSeparator.actor.hide();
          this.visibleSearchButtons = null;
       }
-      this._reorderButtons(search);
+      if(search)
+          this._reorderButtons(search);
       this._updateView();
    },
 
