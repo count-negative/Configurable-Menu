@@ -8,552 +8,551 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2015-06-24 15:20+0100\n"
-"Last-Translator: Dupo <Dupop35@yahoo.fr>\n"
-"Language-Team: Dupo <dupop35@yahoo.fr>\n"
+"PO-Revision-Date: 2015-06-24 16:42+0300\n"
+"Last-Translator: mik09 <mik_09@ukr.net>\n"
+"Language-Team: garibaldo and lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fr\n"
+"Language: uk\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 1.5.4\n"
 
 #: applet.js:83 applet.js:3678 cinnamonMenu.js:536
 msgid "Execution of '%s' failed:"
-msgstr "L'exécution de '%s' a échoué :"
+msgstr "При виконанні '%s' сталася помилка:"
 
 #: applet.js:103 applet.js:3678 cinnamonMenu.js:536
 msgid "Command not found."
-msgstr "Commande non trouvée."
+msgstr "Команду не знайдено"
 
 #: applet.js:133 applet.js:3678 cinnamonMenu.js:536
 msgid "Package %s"
-msgstr "Paquet %s"
+msgstr "Пакунок %s"
 
 #: applet.js:150 applet.js:3678 cinnamonMenu.js:536
 msgid "Package to install %s"
-msgstr "Paquet %s à installer"
+msgstr "Пакунок для інсталяції %s"
 
 #: applet.js:383 applet.js:3678 cinnamonMenu.js:536 applet.js:1452
 msgid "List View"
-msgstr "Sous forme de liste"
+msgstr "Перегляд списком"
 
 #: applet.js:1455
 msgid "Grid View"
-msgstr "Sous forme de grille"
+msgstr "Перегляд таблицею"
 
 #: applet.js:1455
 msgid "Show application entries in list view"
-msgstr "Afficher les applications sous forme de liste"
+msgstr "Показати записи програми у вигляді списку"
 
 #: applet.js:1459
 msgid "Prevent resizing"
-msgstr "Empêcher le redimensionnement"
+msgstr "Запобігати зміні розміру"
 
 #: applet.js:1459
 msgid "Prevent resizing the menu"
-msgstr "Empêcher le redimensionnement du menu"
+msgstr "Запобігати зміні розміру меню"
 
 #: applet.js:1461
 msgid "Allow resizing"
-msgstr "Permettre le redimensionnement"
+msgstr "Змінювати розмір"
 
 #: applet.js:1461
 msgid "Allow resizing the menu"
-msgstr "Permettre le redimensionnement du menu"
+msgstr "Дозволяє зміну розміру меню"
 
 #: applet.js:1465
 msgid "Recover size"
-msgstr "Récupérer la taille"
+msgstr "Відновлення розміру"
 
 #: applet.js:1465
 msgid "Recover the normal menu size"
-msgstr "Mettre le menu en taille normale"
+msgstr "Відновити типовий розмір меню"
 
 #: applet.js:1467
 msgid "Full Screen"
-msgstr "Plein écran"
+msgstr "На увесь екран"
 
 #: applet.js:1467
 msgid "Put the menu in full screen mode"
-msgstr "Mettre le menu en plein écran"
+msgstr "Встановити меню в повноекранний режим"
 
 #: applet.js:1470
 msgid "Configure the menu options"
-msgstr "Configurer les options du menu"
+msgstr "Налаштуйте параметри меню"
 
 #: applet.js:1671 applet.js:1683
 msgid "Remove from accessible panel"
-msgstr "Retirer du panneau accessible"
+msgstr "Видалити з панелі доступності"
 
 #: applet.js:1674 applet.js:1686
 msgid "Add to accessible panel"
-msgstr "Ajouter au panneau accessible"
+msgstr "Додати до панелі доступності"
 
 #: applet.js:1674 applet.js:1686
 msgid "Save name"
-msgstr "Enregistrer le nom"
+msgstr "Зберегти ім'я"
 
 #: applet.js:1674 applet.js:1686
 msgid "Edit name"
-msgstr "Modifier le nom"
+msgstr "Змінити ім’я"
 
 #: applet.js:1674 applet.js:1686
 msgid "Default name"
-msgstr "Nom par défaut"
+msgstr "Ім'я за замовчуванням"
 
 #: applet.js:5815
 msgid "Filter:"
-msgstr "Filtre :"
+msgstr "Фільтр:"
 
 #: applet.js:5817 applet.js:6100 applet.js:6131 applet.js:6165
 msgid "Favorites"
-msgstr "Favoris"
+msgstr "Улюблені"
 
 #: applet.js:6213
 msgid "Search %s for %s"
-msgstr "Rechercher %s pour %s"
+msgstr "Пошук %s для %s"
 
 #. configurableMenu@lestcape->settings-schema.json->header-layouts->description
 msgid "Layouts:"
-msgstr "Agencements :"
+msgstr "Макети:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-menu->description
 msgid "Menu:"
-msgstr "Menu :"
+msgstr "Меню"
 
 #. configurableMenu@lestcape->settings-schema.json->header-size->description
 msgid "Menu Size:"
-msgstr "Taille du menu :"
+msgstr "Розмір меню:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-reaction->description
 msgid "Menu Reaction:"
-msgstr "Comportement du menu :"
+msgstr "Реакції меню:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-categories->description
 msgid "Categories:"
-msgstr "Catégories :"
+msgstr "Категорії:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-apps->description
 msgid "Applications:"
-msgstr "Applications :"
+msgstr "Проґрами:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-favorites->description
 msgid "Favorites:"
-msgstr "Favoris :"
+msgstr "Улюблені:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-hover->description
 msgid "Hover Icon:"
-msgstr "Icône survolée :"
+msgstr "Піктограма наведення:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-system->description
 msgid "System Buttons:"
-msgstr "Boutons système :"
+msgstr "Системні кнопки:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-control->description
 msgid "Control Buttons:"
-msgstr "Boutons de contrôle :"
+msgstr "Кнопки керування:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-separators->description
 msgid "Separators:"
-msgstr "Séparateurs :"
+msgstr "Розділювач:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-information->description
 msgid "Information Panel:"
-msgstr "Panneau d'information :"
+msgstr "Інформаційна панель:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-accessible->description
 msgid "Accessible Panel:"
-msgstr "Panneau accessible :"
+msgstr "Панель доступності:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-gnomenu->description
 msgid "GnoMenu Panel:"
-msgstr "Panneau GnoMenu :"
+msgstr "Панель GnoMenu:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-submenu->description
 msgid "Submenu:"
-msgstr "Sous-menu :"
+msgstr "Підменю:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-search->description
 msgid "General search options:"
-msgstr "Options générales de recherche :"
+msgstr "Загальні параметри пошуку:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-install->description
 msgid "Installer and uninstaller tools:"
-msgstr "Outils d'installation et de désinstallation :"
+msgstr "Інструменти встановлення і видалення:"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->description
 msgid "Effect on opening and closing:"
-msgstr "Effet sur l'ouverture et la fermeture :"
+msgstr "Ефект при відкриванні та закриванні:"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->tooltip
 msgid "Select the effect on the menu opening and closing."
-msgstr "Sélectionnez l'effet sur l'ouverture et la fermeture du menu."
+msgstr "Оберіть ефект при відкриванні та закриванні меню."
 
 #. configurableMenu@lestcape->settings-schema.json->effect->options
 msgid "None"
-msgstr "Aucun"
+msgstr "Немає"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->options
 msgid "Dispel"
-msgstr "Dissiper"
+msgstr "Розсіяти"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->options
 msgid "Hide Horizontal"
-msgstr "Masquer à l'horizontale"
+msgstr "Приховати горизонтально"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->options
 msgid "Hide Vertical"
-msgstr "Masquer à la verticale"
+msgstr "Приховати вертикально"
 
 #. configurableMenu@lestcape->settings-schema.json->effect-time->description
 msgid "Duration of effect:"
-msgstr "Durée de l'effet :"
+msgstr "Тривалість ефекту:"
 
 #. configurableMenu@lestcape->settings-schema.json->effect-time->tooltip
 msgid "The time on seconds to perform the effect(More time is slower)."
-msgstr "Durée en secondes pour exécuter l'effet(Durée longue=effet plus lent)."
+msgstr "Час виконання ефекту у секундах (більше часу повільніше)."
 
 #. configurableMenu@lestcape->settings-schema.json->swap-panels->description
 msgid "Swap the top and bottom panel"
-msgstr "Permuter le panneau du haut et le panneau du bas"
+msgstr "Обміняти місцями верхню і нижню панелі"
 
 #. configurableMenu@lestcape->settings-schema.json->swap-panels->tooltip
 msgid "Choose whether or not to swap the top and bottom panel on the menu."
-msgstr "Permuter ou non le panneau du haut et le panneau du bas dans le menu."
+msgstr "Виберіть, якщо слід поміняти місцями верхню і нижню панелі у меню."
 
 #. configurableMenu@lestcape->settings-schema.json->allow-search->description
 msgid "Show search entry"
-msgstr "Afficher l'entrée de recherche"
+msgstr "Показати поле пошуку"
 
 #. configurableMenu@lestcape->settings-schema.json->allow-search->tooltip
 msgid "Choose whether or not to show search entry on the menu."
-msgstr "Afficher ou non l'entrée de recherche dans le menu."
+msgstr "Виберіть, якщо слід показувати поле вводу для пошуку в меню."
 
 #. configurableMenu@lestcape->settings-schema.json->app-title-
 #. size->description
 msgid "Font size of the selected application name:"
-msgstr "Taille de la police du nom de l'application choisie :"
+msgstr "Розмір шрифту назви виділеної програми:"
 
 #. configurableMenu@lestcape->settings-schema.json->app-title-size->tooltip
 msgid "Set the font size of the selected application name."
-msgstr "Définir la taille de la police du nom de l'application choisie."
+msgstr "Встановлює розмір шрифту виділеної назви програми."
 
 #. configurableMenu@lestcape->settings-schema.json->menu-theme-
 #. save-button->description
 msgid "Save the layout configuration"
-msgstr "Enregistrer la configuration de l'agencement"
+msgstr "Зберегти конфігурацію макета"
 
 #. configurableMenu@lestcape->settings-schema.json->menu-theme-
 #. save-button->tooltip
 msgid "Press this button to save the layout configuration."
-msgstr ""
-"Appuyez sur ce bouton pour enregistrer la configuration de l'agencement."
+msgstr "Натисніть цю кнопку, щоб зберегти конфігурацію макета."
 
 #. configurableMenu@lestcape->settings-schema.json->app-title-size->units
 msgid "points"
-msgstr "points"
+msgstr "пункти"
 
 #. configurableMenu@lestcape->settings-schema.json->favorites-
 #. lines->description
 msgid "Number of favorites lines:"
-msgstr "Nombre de lignes des favoris :"
+msgstr "Кількість ліній у Улюблені:"
 
 #. configurableMenu@lestcape->settings-schema.json->favorites-lines->tooltip
 msgid "Choose the number of favorites lines."
-msgstr "Choisir le nombre de lignes des favoris."
+msgstr "Оберіть скільки ліній буде у Улюблені."
 
 #. configurableMenu@lestcape->settings-schema.json->favorites-lines->units
 msgid "lines"
-msgstr "lignes"
+msgstr "лінії"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->description
 msgid "GnoMenu buttons layout:"
-msgstr "Agencement des boutons de GnoMenu :"
+msgstr "Макет кнопок GnoMenu:"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->tooltip
 msgid "Select a layout of GnoMenu buttons."
-msgstr "Sélectionnez l'agencement des boutons de GnoMenu."
+msgstr "Виберіть розкладку кнопок GnoMenu."
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
 msgid "Only Icons"
-msgstr "Icônes uniquement"
+msgstr "Лише піктограми"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
 msgid "Only Text"
-msgstr "Texte uniquement"
+msgstr "Лише текст"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
 msgid "Grid"
-msgstr "Grille"
+msgstr "Сітка"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-buttons-theme->options
 msgid "List"
-msgstr "Liste"
+msgstr "Список"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->description
 msgid "System buttons layout:"
-msgstr "Agencement des boutons système :"
+msgstr "Макет системних кнопок:"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->tooltip
 msgid "Select a layout of system buttons."
-msgstr "Sélectionnez l'agencement des boutons système."
+msgstr "Виберіть макет системних кнопок."
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Retractable Text"
-msgstr "Texte rétractable"
+msgstr "Висування тексту"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Vertical Text"
-msgstr "Texte vertical"
+msgstr "Вертикальний текст"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Horizontal Grid"
-msgstr "Grille horizontale"
+msgstr "Горизонтальна сітка"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Vertical Icon"
-msgstr "À la verticale"
+msgstr "Вертикальні піктограми"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Horizontal Text"
-msgstr "Texte horizontal"
+msgstr "Горизонтальний текст"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Vertical List"
-msgstr "Liste verticale"
+msgstr "Вертикальний список"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Vertical Grid"
-msgstr "Grille verticale"
-
-#. configurableMenu@lestcape->settings-schema.json->power-theme->options
-msgid "Horizontal List"
-msgstr "Liste Horizontale"
-
-#. configurableMenu@lestcape->settings-schema.json->power-theme->options
-msgid "Retractable"
-msgstr "Rétractable"
+msgstr "Вертикальна сітка"
 
 #. configurableMenu@lestcape->settings-schema.json->power-theme->options
 msgid "Horizontal Icon"
-msgstr "À l'horizontale"
+msgstr "Горизонтальні піктограми"
+
+#. configurableMenu@lestcape->settings-schema.json->power-theme->options
+msgid "Horizontal List"
+msgstr "Горизонтальний список"
+
+#. configurableMenu@lestcape->settings-schema.json->power-theme->options
+msgid "Retractable"
+msgstr "Висування"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. favorites->description
 msgid "Show scrolling area of favorites"
-msgstr "Afficher la zone de défilement des favoris"
+msgstr "Показувати область прокрутки у Улюблені"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-favorites->tooltip
 msgid "Choose whether or not to show the scrolling area of favorites."
-msgstr "Afficher ou non la zone de défilement des favoris."
+msgstr "Вибрати, чи показувати область прокручування у Улюблені."
 
 #. configurableMenu@lestcape->settings-schema.json->activate-on-
 #. press->description
 msgid "Open the menu when I press my mouse over it"
-msgstr "Ouvrir le menu lorsque j'appuie dessus avec ma souris"
+msgstr "Відкривати меню при клацанні по ньому мишею"
 
 #. configurableMenu@lestcape->settings-schema.json->activate-on-press->tooltip
 msgid "Enable opening the menu when the mouse press over the applet."
-msgstr "Activer l'ouverture du menu lors d'un clic sur l'applet."
+msgstr "Дозволити відкриття меню при клацанні мишею по аплеті."
 
 #. configurableMenu@lestcape->settings-schema.json->height->description
 msgid "Menu height:"
-msgstr "Hauteur du menu :"
+msgstr "Висота меню:"
 
 #. configurableMenu@lestcape->settings-schema.json->height->tooltip
 msgid "Height of the menu."
-msgstr "Hauteur du menu."
+msgstr "Висота меню."
 
 #. configurableMenu@lestcape->settings-schema.json->app-
 #. description->description
 msgid "Application entries have description"
-msgstr "Les applications disposent d'une description"
+msgstr "Програми мають опис"
 
 #. configurableMenu@lestcape->settings-schema.json->app-description->tooltip
 msgid "Choose whether or not to have description on application entries."
-msgstr "Disposer ou non d'une description au niveau des applications."
+msgstr "Вибрати, чи показувати додаткове поле з описом програми."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-control-
 #. size->description
 msgid "Control icon size:"
-msgstr "Taille de l'icône de contrôle :"
+msgstr "Розмір піктограм кнопок керування:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-control-size->tooltip
 msgid "Set the control icon size."
-msgstr "Définir la taille de l'icône de contrôle."
+msgstr "Встановіть розмір піктограм керування."
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. applications->description
 msgid "Show scrolling area of applications"
-msgstr "Afficher la zone de défilement des applications"
+msgstr "Показувати область прокрутки у Програми"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. applications->tooltip
 msgid "Choose whether or not to show the scrolling area of applications."
-msgstr "Afficher ou non la zone de défilement des applications."
+msgstr "Вибрати, чи показувати область прокрутки для Програми."
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. accessible->description
 msgid "Show scrolling area of accessible panel"
-msgstr "Afficher la zone de défilement du panneau accessible"
+msgstr "Показувати область прокрутки у панелі доступності"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-accessible->tooltip
 msgid "Choose whether or not to show the scrolling area of accessible panel."
-msgstr "Afficher ou non la zone de défilement du panneau accessible."
+msgstr "Вибрати, чи показувати область прокручування у панелі доступності."
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. gnomenu->description
 msgid "Show scrolling area of GnoMenu panel"
-msgstr "Afficher la zone de défilement du panneau GnoMenu"
+msgstr "Показувати область прокрутки у панелі GnoMenu"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-gnomenu->tooltip
 msgid "Choose whether or not to show the scrolling area of GnoMenu panel."
-msgstr "Afficher ou non la zone de défilement du panneau GnoMenu."
+msgstr "Вибрати, чи показувати область прокручування у панелі GnoMenu."
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. title->description
 msgid "Show name of the selected application"
-msgstr "Afficher le nom de l'application choisie"
+msgstr "Показувати назву вибраної програми"
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-title->tooltip
 msgid ""
 "Choose whether or not to show the selected application name on the menu."
-msgstr "Afficher ou non le nom de l'application choisie dans le menu."
+msgstr "Вибрати, чи показувати назву вибраної програми в меню."
 
 #. configurableMenu@lestcape->settings-schema.json->full-screen->description
 msgid "Full screen"
-msgstr "Plein écran"
+msgstr "На увесь екран"
 
 #. configurableMenu@lestcape->settings-schema.json->full-screen->tooltip
 msgid "Choose whether or not to put the menu in full screen mode."
-msgstr "Mettre ou non le menu en plein écran."
+msgstr "Вибрати, якщо слід встановити меню в повноекранний режим."
 
 #. configurableMenu@lestcape->settings-schema.json->control-symbolic->description
 msgid "Show symbolic icons on the control buttons"
-msgstr "Afficher les icônes sur les boutons de contrôle"
+msgstr "Показувати символьні значки на кнопках керування"
 
 #. configurableMenu@lestcape->settings-schema.json->control-symbolic->tooltip
 msgid ""
 "Enable this option to show symbolic icons, on the control buttons and "
 "disable to show full color."
 msgstr ""
-"Activer cette option pour afficher les icônes, sur les boutons de contrôle "
-"et désactiver afin d'afficher toutes les couleurs."
+"Ввімкніть цю опцію для показу символьних значків на кнопках керування "
+"замість піктограм."
 
 #. configurableMenu@lestcape->settings-schema.json->show-view-
 #. item->description
 msgid "Show control buttons"
-msgstr "Afficher les boutons de contrôle"
+msgstr "Показати кнопки керування"
 
 #. configurableMenu@lestcape->settings-schema.json->show-view-item->tooltip
 msgid "Choose whether or not to show control buttons."
-msgstr "Afficher ou non les boutons de contrôle."
+msgstr "Вибрати, чи показувати кнопки керування."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-app-size->description
 msgid "Application icon size:"
-msgstr "Taille de l'icône de l'application :"
+msgstr "Розмір піктограм у \"Програми\":"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-app-size->tooltip
 msgid "Set the application icon size."
-msgstr "Définir la taille de l'icône de l'application."
+msgstr "Встановити розмір піктограм програм."
 
 #. configurableMenu@lestcape->settings-schema.json->hover-box->description
 msgid "Hover icon have a box"
-msgstr "Afficher un cadre autour de l'icône survolée"
+msgstr "Піктограма наведення має рамку"
 
 #. configurableMenu@lestcape->settings-schema.json->hover-box->tooltip
 msgid "Choose whether or not to have a box on the hover icon."
-msgstr "Afficher ou non un cadre autour de l'icône survolée."
+msgstr "Виберіть, чи слід до піктограми наведення додавати рамку."
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-
 #. box->description
 msgid "Accessible panel has a box"
-msgstr "Afficher un cadre autour du panneau accessible"
+msgstr "Панель доступності має рамку"
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-box->tooltip
 msgid "Choose whether or not to have a box on the accessible panel."
-msgstr "Afficher ou non un cadre autour du panneau accessible."
+msgstr "Виберіть, чи слід додавати рамку до панелі доступності."
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-box->description
 msgid "GnoMenu buttons have a box"
-msgstr "Afficher un cadre autour des boutons de GnoMenu"
+msgstr "Кнопки GnoMenu мають рамку"
 
 #. configurableMenu@lestcape->settings-schema.json->gnomenu-box->tooltip
 msgid "Choose whether or not to have a box on the GnoMenu buttons."
-msgstr "Afficher ou non un cadre autour des boutons de GnoMenu."
+msgstr "Виберіть, чи слід додавати рамку до кнопок GnoMenu."
 
 #. configurableMenu@lestcape->settings-schema.json->spacer-size->description
 msgid "Separator size:"
-msgstr "Taille du séparateur :"
+msgstr "Розмір розділювача:"
 
 #. configurableMenu@lestcape->settings-schema.json->spacer-size->tooltip
 msgid "Choose the size of separator."
-msgstr "Choisir la taille du séparateur."
+msgstr "Вибрати розмір розділювача."
 
 #. configurableMenu@lestcape->settings-schema.json->time-format->description
 msgid "Time format:"
-msgstr "Format de l'heure :"
+msgstr "Формат часу:"
 
 #. configurableMenu@lestcape->settings-schema.json->time-format->tooltip
 msgid "Choose the time format to show time on the menu."
-msgstr "Choisissez le format de l'heure afin d'afficher l'heure dans le menu."
+msgstr "Виберіть формат часу для показувати в меню."
 
 #. configurableMenu@lestcape->settings-schema.json->width->description
 msgid "Menu width:"
-msgstr "Largeur du menu :"
+msgstr "Ширина меню:"
 
 #. configurableMenu@lestcape->settings-schema.json->width->tooltip
 msgid "Width of the menu."
-msgstr "Largeur du menu."
+msgstr "Ширина меню."
 
 #. configurableMenu@lestcape->settings-schema.json->theme->description
 msgid "Menu layout:"
-msgstr "Agencement du menu :"
+msgstr "Макет меню:"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->tooltip
 msgid "Select a layout of menu."
-msgstr "Sélectionner un agencement du menu."
+msgstr "Виберіть макет меню."
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Accessible"
-msgstr "Accessible"
+msgstr "Доступність"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Classic"
-msgstr "Classique"
+msgstr "Класичний"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Classic Gnome"
-msgstr "Gnome classique"
+msgstr "Класичний Gnome"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Whisker"
-msgstr "Whisker"
+msgstr "Ниткоподібний"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Kicker"
-msgstr "Kicker"
+msgstr "Кікер"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Dragon"
-msgstr "Dragon"
+msgstr "Дракон"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Stylized"
-msgstr "Stylisé"
+msgstr "Стилізований"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Accessible Inverted"
-msgstr "Accessible inversé"
+msgstr "Доступність перевернутий"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Dragon Inverted"
-msgstr "Dragon inversé"
+msgstr "Дракон перевернутий"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Luz Helena"
-msgstr "Luz Helena"
+msgstr "Луз Єлена"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Windows 7"
@@ -561,11 +560,11 @@ msgstr "Windows 7"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Mint"
-msgstr "Mint"
+msgstr "М'ята"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Vampire"
-msgstr "Vampire"
+msgstr "Вампір"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "Garibaldo"
@@ -573,447 +572,440 @@ msgstr "Garibaldo"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "GnoMenu Left"
-msgstr "GnoMenu à gauche"
+msgstr "GnoMenu ліве"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "GnoMenu Right"
-msgstr "GnoMenu à droite"
+msgstr "GnoMenu праве"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "GnoMenu Top"
-msgstr "GnoMenu en haut"
+msgstr "GnoMenu верх"
 
 #. configurableMenu@lestcape->settings-schema.json->theme->options
 msgid "GnoMenu Bottom"
-msgstr "GnoMenu en bas"
+msgstr "GnoMenu низ"
 
 #. configurableMenu@lestcape->settings-schema.json->show-hover-
 #. icon->description
 msgid "Show hover icon"
-msgstr "Afficher l'icône survolée"
+msgstr "Показати піктограму наведення"
 
 #. configurableMenu@lestcape->settings-schema.json->show-hover-icon->tooltip
 msgid "Choose whether or not to show hover icon on the menu."
-msgstr "Afficher ou non l'icône survolée."
+msgstr "Вибрати, чи показувати піктограму наведення у меню."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-hover-
 #. size->description
 msgid "Hover icon size:"
-msgstr "Taille de l'icône survolée :"
+msgstr "Розмір піктограми наведення:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-hover-size->tooltip
 msgid "Set the hover icon size."
-msgstr "Définir la taille de l'icône survolée."
+msgstr "Встановити розмір піктограми наведення."
 
 #. configurableMenu@lestcape->settings-schema.json->view-item->description
 msgid "Show application entries in grid view"
-msgstr "Afficher les applications sous forme de grille"
+msgstr "Показати записи програм у вигляді сітки"
 
 #. configurableMenu@lestcape->settings-schema.json->view-item->tooltip
 msgid ""
 "Enable show application entries in grid(icon) view and disable show "
 "application entries in list view."
 msgstr ""
-"Afficher les applications sous forme de grille(icônes) plutôt que sous forme "
-"de liste."
+"При увімкненні записи про програми буде показано сіткою або списком при "
+"вимкненні."
 
 #. configurableMenu@lestcape->settings-schema.json->app-button-
 #. width->description
 msgid "Maximum width of the application entry text:"
-msgstr "Largeur maximale du titre de l'application :"
+msgstr "Максимальна ширина текстовового поля програми:"
 
 #. configurableMenu@lestcape->settings-schema.json->app-button-width->tooltip
 msgid "Set the maximum width of the application entry text."
-msgstr "Définir la largeur maximale du titre de l'application."
+msgstr "Встановлює максимальну ширину текстового поля програми."
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-
 #. icons->description
 msgid "Show icons on the accessible panel"
-msgstr "Afficher les icônes du panneau accessible"
+msgstr "Показувати піктограми на панелі доступності"
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-icons->tooltip
 msgid "Choose whether or not to have icons on the accessible panel."
-msgstr "Afficher ou non les icônes du panneau accessible."
+msgstr "Виберіть, чи слід показувати піктограми на панелі доступності."
 
 #. configurableMenu@lestcape->settings-schema.json->fix-menu-
 #. corner->description
 msgid "Menu bordering screen edge"
-msgstr "Bord de l'écran du menu limitrophe"
+msgstr "Меню прилягає до краю екрана"
 
 #. configurableMenu@lestcape->settings-schema.json->fix-menu-corner->tooltip
 msgid "Choose whether or not the menu bordering the screen edge."
-msgstr "Bord de l'écran du menu limitrophe ou non."
+msgstr "Вибирати, мати чи ні відступ меню від краю екрана з яким воно межує."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-accesible-
 #. size->description
 msgid "Accessible icons size:"
-msgstr "Taille des icônes accessibles :"
+msgstr "Розмір піктограм панелі доступності:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-accesible-
 #. size->tooltip
 msgid "Set the accessible icons size."
-msgstr "Définir la taille des icônes accessibles."
+msgstr "Встановити розмір піктограм панелі доступності."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-gnomenu-
 #. size->description
 msgid "GnoMenu icons size:"
-msgstr "Taille des icônes de GnoMenu :"
+msgstr "Розмір піктограм GnoMenu:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-gnomenu-
 #. size->tooltip
 msgid "Set the GnoMenu icons size."
-msgstr "Définir la taille des icônes de GnoMenu."
+msgstr "Встановити розмір піктограм GnoMenu."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-max-fav-
 #. size->description
 msgid "Maximum favorites icon size:"
-msgstr "Taille maximale des icônes des favoris :"
+msgstr "Максимальний розмір піктограм у Улюблені:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-max-fav-size->tooltip
 msgid "Set the maximum size of the favorites icon."
-msgstr "Définir la taille maximale des icônes des favoris."
+msgstr "Встановити максимальний розмір піктограм у підменю Улюблені"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-cat-size->description
 msgid "Category icon size:"
-msgstr "Taille des icônes des catégories :"
+msgstr "Розмір піктограм категорій:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-cat-size->tooltip
 msgid "Set the category icon size."
-msgstr "Définir la taille des icônes des catégories."
+msgstr "Встановити розмір піктограм категорій."
 
 #. configurableMenu@lestcape->settings-schema.json->show-time-
 #. date->description
 msgid "Show time and date"
-msgstr "Afficher l'heure et la date"
+msgstr "Показувати час і дату"
 
 #. configurableMenu@lestcape->settings-schema.json->show-time-date->tooltip
 msgid "Choose whether or not to show time and date on the menu."
-msgstr "Afficher ou non l'heure et la date dans le menu."
+msgstr "Вибрати, якщо слід показати час і дату у меню."
 
 #. configurableMenu@lestcape->settings-schema.json->automatic-
 #. size->description
 msgid "Automatic size"
-msgstr "Taille automatique"
+msgstr "Автоматичний розмір"
 
 #. configurableMenu@lestcape->settings-schema.json->allow-resizing->tooltip
 msgid "Choose whether or not to allow resizing the menu."
-msgstr "Permet ou non le redimensionnement du menu."
+msgstr "Вибрати, якщо слід дозволити зміну розмірів меню."
 
 #. configurableMenu@lestcape->settings-schema.json->automatic-size->tooltip
 msgid "Choose whether or not to automatic adjust of the menu size."
-msgstr "Ajuster automatiquement ou non la taille du menu."
+msgstr "Вибирати, чи слід автоматично підлаштовувати розмір меню."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-power-
 #. size->description
 msgid "System icons size:"
-msgstr "Taille des icônes du système :"
+msgstr "Розмір піктограм системних кнопок:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-power-size->tooltip
 msgid "Set the system icons size."
-msgstr "Définir la taille des icônes du système."
+msgstr "Встановити розмір системних піктограм."
 
 #. configurableMenu@lestcape->settings-schema.json->enable-
 #. autoscroll->description
 msgid "Enable autoscrolling"
-msgstr "Activer le défilement automatique"
+msgstr "Увімкнути автопрокрутку"
 
 #. configurableMenu@lestcape->settings-schema.json->enable-autoscroll->tooltip
 msgid "Choose whether or not to enable smooth autoscrolling on the menu."
-msgstr "Activer ou non le défilement naturel automatique dans le menu."
+msgstr "Вибрати, якщо слід увімкнути плавну автопрокрутку меню."
 
 #. configurableMenu@lestcape->settings-schema.json->show-
 #. favorites->description
 msgid "Show favorites"
-msgstr "Afficher les favoris"
+msgstr "Показати підменю Улюблені"
 
 #. configurableMenu@lestcape->settings-schema.json->show-favorites->tooltip
 msgid "Choose whether or not to show favorites on the menu."
-msgstr "Afficher ou non les favoris dans le menu."
+msgstr "Вибрати, чи показувати підменю Улюблені у меню."
 
 #. configurableMenu@lestcape->settings-schema.json->control-box->description
 msgid "Control buttons have a box"
-msgstr "Afficher un cadre autour des boutons de contrôle"
+msgstr "Кнопки керування у рамці"
 
 #. configurableMenu@lestcape->settings-schema.json->control-box->tooltip
 msgid "Choose whether or not to have a box on the control buttons."
-msgstr "Afficher ou non un cadre autour des boutons de contrôle."
+msgstr "Виберіть, чи слід додавати рамку до кнопок керування"
 
 #. configurableMenu@lestcape->settings-schema.json->categories-hover->description
 msgid "Open the category when I move my mouse over it"
-msgstr "Ouvrir la catégorie lorsque je déplace ma souris dessus"
+msgstr "Відкривати категорію, під час переміщення миші над нею"
 
 #. configurableMenu@lestcape->settings-schema.json->categories-hover->tooltip
 msgid ""
 "Choose whether or not to open the category when the mouse move over it, "
 "otherwise need the mouse click."
 msgstr ""
-"Ouvrir ou non la catégorie lorsque la souris se déplace dessus, sinon en "
-"utilisant le clic de souris."
+"Вибирати, чи слід відкривати категорії, коли миша переміщається над ними, в "
+"іншому випадку потрібно буде клацати по обраній категорії."
 
 #. configurableMenu@lestcape->settings-schema.json->categories-
 #. icons->description
 msgid "Show icons on the categories"
-msgstr "Afficher les icônes des catégories"
+msgstr "Показувати піктограми категорій"
 
 #. configurableMenu@lestcape->settings-schema.json->categories-icons->tooltip
 msgid "Choose whether or not to have icons on the categories."
-msgstr "Afficher ou non les icônes des catégories."
+msgstr "Вибрати, якщо слід показувати піктограми в категоріях."
 
 #. configurableMenu@lestcape->settings-schema.json->show-recent->description
 msgid "Show recent files"
-msgstr "Afficher les documents récents"
+msgstr "Показати останні файли"
 
 #. configurableMenu@lestcape->settings-schema.json->show-recent->tooltip
 msgid "Choose whether or not to show a recent file list in the menu."
-msgstr "Afficher ou non la liste des documents récents dans le menu."
+msgstr "Вибрати, чи показувати список недавно використовуваних файлів у меню."
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. categories->description
 msgid "Show scrolling area of categories"
-msgstr "Afficher la zone de défilement des catégories"
+msgstr "Показувати область прокрутки категорій"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-categories->tooltip
 msgid "Choose whether or not to show the scrolling area of categories."
-msgstr "Afficher ou non la zone de défilement des catégories."
+msgstr "Виберіть, чи слід показувати область прокрутки категорій."
 
 #. configurableMenu@lestcape->settings-schema.json->arrow-categories->description
 msgid "Show arrow on the categories"
-msgstr "Afficher la flèche sur les catégories"
+msgstr "Показувати стрілки в категоріях"
 
 #. configurableMenu@lestcape->settings-schema.json->arrow-categories->tooltip
 msgid "Choose whether or not to show the arrow on the categories."
-msgstr "Afficher ou non la flèche sur les catégories."
+msgstr "Виберіть, чи слід показувати стрілки на категоріях."
 
 #. configurableMenu@lestcape->settings-schema.json->arrow-categories-selected->description
 msgid "Only show arrow when selected category"
-msgstr "Afficher uniquement la flèche lorsque la catégorie est sélectionnée"
+msgstr "Показувати стрілку тільки на виділеній категорії"
 
 #. configurableMenu@lestcape->settings-schema.json->arrow-categories-selected->tooltip
 msgid ""
 "Choose whether or not to only show the arrow when selected the category."
-msgstr ""
-"Afficher uniquement ou non la flèche lorsque la catégorie est sélectionnée."
+msgstr "Виберіть, чи слід показувати стрілку лише коли вибрали категорію."
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. description->description
 msgid "Show description of the selected application"
-msgstr "Afficher la description de l'application choisie"
+msgstr "Показати опис обраної програми"
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. description->tooltip
 msgid ""
 "Choose whether or not to show the selected application description on the "
 "menu."
-msgstr "Afficher ou non la description de l'application choisie dans le menu."
+msgstr "Виберіть, чи слід показувати опис обраної програми в меню."
 
 #. configurableMenu@lestcape->settings-schema.json->show-box-
 #. pointer->description
 msgid "Show menu box pointer"
-msgstr "Afficher le cadre autour de l'entrée de menu courante"
+msgstr "Показати покажчик меню"
 
 #. configurableMenu@lestcape->settings-schema.json->show-box-pointer->tooltip
 msgid "Choose whether or not to show the menu box pointer."
-msgstr "Afficher ou non le cadre autour de l'entrée de menu courante."
+msgstr "Виберіть, чи потрібно показувати покажчик на полі головного меню."
 
 #. configurableMenu@lestcape->settings-schema.json->date-format->description
 msgid "Date format:"
-msgstr "Format de la date :"
+msgstr "Формат дати:"
 
 #. configurableMenu@lestcape->settings-schema.json->date-format->tooltip
 msgid "Choose the date format to show time on the menu."
-msgstr "Choisissez le format d'affichage de la date."
+msgstr "Виберіть формат дати, який буде показано в меню."
 
 #. configurableMenu@lestcape->settings-schema.json->spacer-line->description
 msgid "Show separator line"
-msgstr "Afficher la ligne de séparation"
+msgstr "Показувати лінію розділювача"
 
 #. configurableMenu@lestcape->settings-schema.json->spacer-line->tooltip
 msgid "Choose whether or not to show a line on separator."
-msgstr "Afficher ou non la ligne de séparation."
+msgstr "Виберіть, чи слід показувати лінію розділювача"
 
 #. configurableMenu@lestcape->settings-schema.json->app-description-
 #. size->description
 msgid "Font size of the selected application description:"
-msgstr "Taille de la police de la description de l'application choisie :"
+msgstr "Розмір шрифту опису виділеної програми:"
 
 #. configurableMenu@lestcape->settings-schema.json->app-description-
 #. size->tooltip
 msgid "Set the font size of the selected application description."
-msgstr ""
-"Définir la taille de la police de la description de l'application choisie."
+msgstr "Встановити розмір шрифту опису виділеної програми."
 
 #. configurableMenu@lestcape->settings-schema.json->show-power-
 #. buttons->description
 msgid "Show system buttons"
-msgstr "Afficher les boutons système"
+msgstr "Показати системні кнопки"
 
 #. configurableMenu@lestcape->settings-schema.json->show-power-
 #. buttons->tooltip
 msgid "Choose whether or not to show system buttons on the menu."
-msgstr "Afficher ou non les boutons système dans le menu."
+msgstr "Виберіть, чи слід показувати системні кнопки в меню."
 
 #. configurableMenu@lestcape->settings-schema.json->show-removable-
 #. drives->description
 msgid "Show removable drives on the accessible panel"
-msgstr "Afficher les lecteurs amovibles sur le panneau accessible"
+msgstr "Показувати знімні диски на панелі доступності"
 
 #. configurableMenu@lestcape->settings-schema.json->show-removable-
 #. drives->tooltip
 msgid "Choose whether or not to show removable drives on the accessible panel."
-msgstr "Afficher ou non les lecteurs amovibles sur le panneau accessible."
+msgstr "Виберіть, чи слід показувати знімні диски на панелі доступності."
 
 #. configurableMenu@lestcape->settings-schema.json->power-box->description
 msgid "System buttons have a box"
-msgstr "Afficher un cadre autour des boutons système"
+msgstr "Системні кнопки у рамці"
 
 #. configurableMenu@lestcape->settings-schema.json->power-box->tooltip
 msgid "Choose whether or not to have a box on the system buttons."
-msgstr "Afficher ou non un cadre autour des boutons système."
+msgstr "Виберіть, чи слід показувати рамку навколо системних кнопок."
 
 #. configurableMenu@lestcape->settings-schema.json->power-symbolic->description
 msgid "Show symbolic icons on the system buttons"
-msgstr "Afficher les icônes sur les boutons système"
+msgstr "Показати символічні значки на системних кнопках"
 
 #. configurableMenu@lestcape->settings-schema.json->power-symbolic->tooltip
 msgid ""
 "Enable this option to show symbolic icons, on the system buttons and disable "
 "to show full color."
 msgstr ""
-"Activer cette option pour afficher les icônes, sur les boutons système et "
-"désactiver afin d'afficher toutes les couleurs."
+"Ввімкніть цю опцію для показу символьних значків на системних кнопках "
+"замість піктограм."
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-align->description
 msgid "Align the submenu with the parent"
-msgstr "Aligner le sous-menu avec le parent"
+msgstr "Показувати підменю не біля батьківського меню"
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-align->tooltip
 msgid "Choose whether or not to align the submenu with the parent."
-msgstr "Aligner ou non le sous-menu avec le parent."
+msgstr "Виберіть, якщо не слід вирівнювати підменю з батьківським меню"
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-width->description
 msgid "Submenu width:"
-msgstr "Largeur du sous-menu :"
+msgstr "Ширина підменю:"
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-width->tooltip
 msgid "Set the submenu width."
-msgstr "Définir la largeur du sous-menu."
+msgstr "Встановіть ширину підменю."
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-height->description
 msgid "Submenu height:"
-msgstr "Hauteur du sous-menu :"
+msgstr "Висота підменю:"
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-height->tooltip
 msgid "Set the submenu height."
-msgstr "Définir la hauteur du sous-menu."
+msgstr "Встановіть висоту підміню."
 
 #. configurableMenu@lestcape->settings-schema.json->search-sorted->description
 msgid "Search results sorted by:"
-msgstr "Résultats de la recherche triés par :"
+msgstr "Результати пошуку упорядковано:"
 
 #. configurableMenu@lestcape->settings-schema.json->search-sorted->tooltip
 msgid "Select a method to sort search results."
-msgstr "Sélectionnez une méthode pour trier les résultats de la recherche."
+msgstr "Виберіть спосіб сортування результатів пошуку."
 
 #. configurableMenu@lestcape->settings-schema.json->search-web->description
 msgid "Enable web search"
-msgstr "Recherche sur le web"
+msgstr "Увімкнути веб-пошук"
 
 #. configurableMenu@lestcape->settings-schema.json->search-web->tooltip
 msgid "Allows the web search with the selected search engines."
-msgstr ""
-"Permet la recherche sur le web via les moteurs de recherche sélectionnés."
+msgstr "Дозволяє веб-пошук у вибраних пошукових системах."
 
 #. configurableMenu@lestcape->settings-schema.json->search-wikipedia->description
 msgid "Enable web search with wikipedia"
-msgstr "Recherche sur le web via wikipedia"
+msgstr "Увімкнути веб-пошук у Вікіпедії"
 
 #. configurableMenu@lestcape->settings-schema.json->search-wikipedia->tooltip
 msgid "Allows web search to the wikipedia search engine."
-msgstr "Permet la recherche sur le web via le moteur de recherche wikipédia."
+msgstr "Дозволяє веб-пошук в пошуковій системі Вікіпедії."
 
 #. configurableMenu@lestcape->settings-schema.json->search-google->description
 msgid "Enable web search with google"
-msgstr "Recherche sur le web via google"
+msgstr "Увімкнути веб-пошук у Google"
 
 #. configurableMenu@lestcape->settings-schema.json->search-google->tooltip
 msgid "Allows web search to the google search engine."
-msgstr "Permet la recherche sur le web via le moteur de recherche google."
+msgstr "Дозволити веб-пошук у пошуковій системі Google."
 
 #. configurableMenu@lestcape->settings-schema.json->search-duckduckgo->description
 msgid "Enable web search with duckduckgo"
-msgstr "Recherche sur le web via duckduckgo"
+msgstr "Увімкнути веб-пошук DuckDuckGo"
 
 #. configurableMenu@lestcape->settings-schema.json->search-duckduckgo->tooltip
 msgid "Allows web search to the duckduckgo search engine."
-msgstr "Permet la recherche sur le web via le moteur de recherche duckduckgo."
+msgstr "Дозволяє веб-пошук з пошуковою системою DuckDuckGo."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-tools->description
 msgid "Enable the Cinnamon Installer tool"
-msgstr "Activer l'outil d'installation de Cinnamon"
+msgstr "Дозволити інструмент Cinnamon-Installer"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-tools->tooltip
 msgid ""
 "Allows install, uninstall and search for programs and packages(need internet "
 "connection to be download)."
 msgstr ""
-"Permet d'installer, de désinstaller et de rechercher les programmes et les "
-"paquets (connexion internet requise pour télécharger)."
+"Дозволити встановлення, видалення і пошук програм та пакетів (потрібне "
+"підключення до Інтернету для завантаження)."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-search->description
 msgid "Enable to search for packages"
-msgstr "Rechercher des paquets"
+msgstr "Увімкнути для пошуку пакунків"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-search->tooltip
 msgid "Allows search for new packages on the repository."
-msgstr "Permet de rechercher de nouveaux paquets dans le dépôt."
+msgstr "Дозволяє пошук нових пакунків у репозиторії."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-max-search->description
 msgid "Maximum number of packages:"
-msgstr "Nombre maximal de paquets :"
+msgstr "Максимальна кількість пакунків:"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-max-search->tooltip
 msgid "Set the maximum number of packages to show."
-msgstr "Définissez le nombre maximal de paquets à afficher."
+msgstr "Встановіть максимальне число пакунків, що будуть показані."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-button->description
 msgid "Update the Cinnamon Installer tool"
-msgstr "Mise à jour de l'outil d'installation de Cinnamon"
+msgstr "Оновити інструмент Cinnamon-Installer"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-button->tooltip
 msgid "Press this button to update the Cinnamon Installer tool."
-msgstr ""
-"Appuyez sur ce bouton pour mettre à jour l'outil d'installation de Cinnamon."
+msgstr "Натисніть цю кнопку для оновлення інструменту Cinnamon-Installer."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-check->description
 msgid ""
 "Enable to check for a new version of Cinnamon Installer when the menu started"
-msgstr ""
-"Vérifier si une nouvelle version de l'installateur de Cinnamon est "
-"disponible lorsque le menu est lancé"
+msgstr "Увімкнути перевірку нових версій Cinnamon-Installer при запуску меню"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-check->tooltip
 msgid ""
 "Allows to check for a new version of Cinnamon Installer when the menu "
 "started."
 msgstr ""
-"Permet de vérifier si une nouvelle version de l'installateur de Cinnamon est "
-"disponible lorsque le menu est lancé."
+"Дозволяє перевірити наявність нової версії Cinnamon-Installer, коли меню "
+"запущено."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-uninstall-button->description
 msgid "Uninstall the Cinnamon Installer tool"
-msgstr "Désinstaller l'outil d'installation de Cinnamon"
+msgstr "Видалити інструмент Cinnamon-Installer"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-uninstall-button->tooltip
 msgid "Press this button to uninstall the Cinnamon Installer tool."
-msgstr ""
-"Appuyez sur ce bouton pour désinstaller l'outil d'installation de Cinnamon."
+msgstr "Натисніть цю кнопку, щоб видалити інструмент Cinnamon-Installer."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-default->description
 msgid "Enable the default Cinnamon packages manager tools"
-msgstr "Activer les outils du gestionnaire de paquets de Cinnamon par défaut"
+msgstr "Увімкнути типовий менеджер програм Cinnamon"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-default->tooltip
 msgid "Allows the use of the default packages manager(only if it's available)."
 msgstr ""
-"Permet l'utilisation du gestionnaire de paquets par défaut (uniquement s'il "
-"est disponible)."
+"Дозволяє використовувати менеджер програм за замовчуванням (тільки якщо він "
+"доступний)."
