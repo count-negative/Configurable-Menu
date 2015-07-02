@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Configurable Menu 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-10 14:06-0600\n"
-"PO-Revision-Date: 2015-06-24 16:42+0300\n"
+"PO-Revision-Date: 2015-07-01 11:14+0300\n"
 "Last-Translator: mik09 <mik_09@ukr.net>\n"
 "Language-Team: garibaldo and lestcape <lestcape@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -32,7 +32,7 @@ msgstr "Пакунок %s"
 
 #: applet.js:150 applet.js:3678 cinnamonMenu.js:536
 msgid "Package to install %s"
-msgstr "Пакунок для інсталяції %s"
+msgstr "Пакунок для встановлення %s"
 
 #: applet.js:383 applet.js:3678 cinnamonMenu.js:536 applet.js:1452
 msgid "List View"
@@ -40,11 +40,11 @@ msgstr "Перегляд списком"
 
 #: applet.js:1455
 msgid "Grid View"
-msgstr "Перегляд таблицею"
+msgstr "Перегляд сіткою"
 
 #: applet.js:1455
 msgid "Show application entries in list view"
-msgstr "Показати записи програми у вигляді списку"
+msgstr "Показати записи проґрами у вигляді списку"
 
 #: applet.js:1459
 msgid "Prevent resizing"
@@ -84,7 +84,7 @@ msgstr "Налаштуйте параметри меню"
 
 #: applet.js:1671 applet.js:1683
 msgid "Remove from accessible panel"
-msgstr "Видалити з панелі доступності"
+msgstr "Вилучити з панелі доступності"
 
 #: applet.js:1674 applet.js:1686
 msgid "Add to accessible panel"
@@ -100,7 +100,7 @@ msgstr "Змінити ім’я"
 
 #: applet.js:1674 applet.js:1686
 msgid "Default name"
-msgstr "Ім'я за замовчуванням"
+msgstr "Типове ім’я"
 
 #: applet.js:5815
 msgid "Filter:"
@@ -180,7 +180,7 @@ msgstr "Загальні параметри пошуку:"
 
 #. configurableMenu@lestcape->settings-schema.json->header-install->description
 msgid "Installer and uninstaller tools:"
-msgstr "Інструменти встановлення і видалення:"
+msgstr "Засоби встановлення і вилучення:"
 
 #. configurableMenu@lestcape->settings-schema.json->effect->description
 msgid "Effect on opening and closing:"
@@ -233,11 +233,11 @@ msgstr "Виберіть, якщо слід показувати поле вво
 #. configurableMenu@lestcape->settings-schema.json->app-title-
 #. size->description
 msgid "Font size of the selected application name:"
-msgstr "Розмір шрифту назви виділеної програми:"
+msgstr "Розмір шрифту назви виділеної проґрами:"
 
 #. configurableMenu@lestcape->settings-schema.json->app-title-size->tooltip
 msgid "Set the font size of the selected application name."
-msgstr "Встановлює розмір шрифту виділеної назви програми."
+msgstr "Встановлює розмір шрифту виділеної назви проґрами."
 
 #. configurableMenu@lestcape->settings-schema.json->menu-theme-
 #. save-button->description
@@ -367,11 +367,11 @@ msgstr "Висота меню."
 #. configurableMenu@lestcape->settings-schema.json->app-
 #. description->description
 msgid "Application entries have description"
-msgstr "Програми мають опис"
+msgstr "Проґрами мають опис"
 
 #. configurableMenu@lestcape->settings-schema.json->app-description->tooltip
 msgid "Choose whether or not to have description on application entries."
-msgstr "Вибрати, чи показувати додаткове поле з описом програми."
+msgstr "Вибрати, чи показувати додаткове поле з описом проґрами."
 
 #. configurableMenu@lestcape->settings-schema.json->icon-control-
 #. size->description
@@ -385,12 +385,12 @@ msgstr "Встановіть розмір піктограм керування.
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. applications->description
 msgid "Show scrolling area of applications"
-msgstr "Показувати область прокрутки у Програми"
+msgstr "Показувати область прокрутки у проґрами"
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. applications->tooltip
 msgid "Choose whether or not to show the scrolling area of applications."
-msgstr "Вибрати, чи показувати область прокрутки для Програми."
+msgstr "Вибрати, чи показувати область прокрутки для проґрами."
 
 #. configurableMenu@lestcape->settings-schema.json->scroll-
 #. accessible->description
@@ -413,12 +413,12 @@ msgstr "Вибрати, чи показувати область прокруч�
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. title->description
 msgid "Show name of the selected application"
-msgstr "Показувати назву вибраної програми"
+msgstr "Показувати назву вибраної проґрами"
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-title->tooltip
 msgid ""
 "Choose whether or not to show the selected application name on the menu."
-msgstr "Вибрати, чи показувати назву вибраної програми в меню."
+msgstr "Вибрати, чи показувати назву вибраної проґрами в меню."
 
 #. configurableMenu@lestcape->settings-schema.json->full-screen->description
 msgid "Full screen"
@@ -451,11 +451,11 @@ msgstr "Вибрати, чи показувати кнопки керуванн�
 
 #. configurableMenu@lestcape->settings-schema.json->icon-app-size->description
 msgid "Application icon size:"
-msgstr "Розмір піктограм у \"Програми\":"
+msgstr "Розмір піктограм у Проґрами:"
 
 #. configurableMenu@lestcape->settings-schema.json->icon-app-size->tooltip
 msgid "Set the application icon size."
-msgstr "Встановити розмір піктограм програм."
+msgstr "Встановити розмір піктограм проґрам."
 
 #. configurableMenu@lestcape->settings-schema.json->hover-box->description
 msgid "Hover icon have a box"
@@ -606,24 +606,24 @@ msgstr "Встановити розмір піктограми наведенн�
 
 #. configurableMenu@lestcape->settings-schema.json->view-item->description
 msgid "Show application entries in grid view"
-msgstr "Показати записи програм у вигляді сітки"
+msgstr "Показати записи проґрам у вигляді сітки"
 
 #. configurableMenu@lestcape->settings-schema.json->view-item->tooltip
 msgid ""
 "Enable show application entries in grid(icon) view and disable show "
 "application entries in list view."
 msgstr ""
-"При увімкненні записи про програми буде показано сіткою або списком при "
+"При увімкненні записи про проґрами буде показано сіткою або списком при "
 "вимкненні."
 
 #. configurableMenu@lestcape->settings-schema.json->app-button-
 #. width->description
 msgid "Maximum width of the application entry text:"
-msgstr "Максимальна ширина текстовового поля програми:"
+msgstr "Максимальна ширина текстовового поля проґрами:"
 
 #. configurableMenu@lestcape->settings-schema.json->app-button-width->tooltip
 msgid "Set the maximum width of the application entry text."
-msgstr "Встановлює максимальну ширину текстового поля програми."
+msgstr "Встановлює максимальну ширину текстового поля проґрами."
 
 #. configurableMenu@lestcape->settings-schema.json->accessible-
 #. icons->description
@@ -795,14 +795,14 @@ msgstr "Виберіть, чи слід показувати стрілку ли
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. description->description
 msgid "Show description of the selected application"
-msgstr "Показати опис обраної програми"
+msgstr "Показати опис обраної проґрами"
 
 #. configurableMenu@lestcape->settings-schema.json->show-app-
 #. description->tooltip
 msgid ""
 "Choose whether or not to show the selected application description on the "
 "menu."
-msgstr "Виберіть, чи слід показувати опис обраної програми в меню."
+msgstr "Виберіть, чи слід показувати опис обраної проґрами в меню."
 
 #. configurableMenu@lestcape->settings-schema.json->show-box-
 #. pointer->description
@@ -832,12 +832,12 @@ msgstr "Виберіть, чи слід показувати лінію розд
 #. configurableMenu@lestcape->settings-schema.json->app-description-
 #. size->description
 msgid "Font size of the selected application description:"
-msgstr "Розмір шрифту опису виділеної програми:"
+msgstr "Розмір шрифту опису виділеної проґрами:"
 
 #. configurableMenu@lestcape->settings-schema.json->app-description-
 #. size->tooltip
 msgid "Set the font size of the selected application description."
-msgstr "Встановити розмір шрифту опису виділеної програми."
+msgstr "Встановити розмір шрифту опису виділеної проґрами."
 
 #. configurableMenu@lestcape->settings-schema.json->show-power-
 #. buttons->description
@@ -901,7 +901,7 @@ msgstr "Висота підменю:"
 
 #. configurableMenu@lestcape->settings-schema.json->submenu-height->tooltip
 msgid "Set the submenu height."
-msgstr "Встановіть висоту підміню."
+msgstr "Встановіть висоту підменю."
 
 #. configurableMenu@lestcape->settings-schema.json->search-sorted->description
 msgid "Search results sorted by:"
@@ -945,14 +945,14 @@ msgstr "Дозволяє веб-пошук з пошуковою системо�
 
 #. configurableMenu@lestcape->settings-schema.json->installer-tools->description
 msgid "Enable the Cinnamon Installer tool"
-msgstr "Дозволити інструмент Cinnamon-Installer"
+msgstr "Дозволити засіб Cinnamon-Installer"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-tools->tooltip
 msgid ""
 "Allows install, uninstall and search for programs and packages(need internet "
 "connection to be download)."
 msgstr ""
-"Дозволити встановлення, видалення і пошук програм та пакетів (потрібне "
+"Дозволити встановлення, вилучення і пошук проґрам та пакунків (потрібне "
 "підключення до Інтернету для завантаження)."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-search->description
@@ -973,11 +973,11 @@ msgstr "Встановіть максимальне число пакунків,
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-button->description
 msgid "Update the Cinnamon Installer tool"
-msgstr "Оновити інструмент Cinnamon-Installer"
+msgstr "Оновити засіб Cinnamon-Installer"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-button->tooltip
 msgid "Press this button to update the Cinnamon Installer tool."
-msgstr "Натисніть цю кнопку для оновлення інструменту Cinnamon-Installer."
+msgstr "Натисніть цю кнопку для оновлення засобу Cinnamon-Installer."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-update-check->description
 msgid ""
@@ -994,18 +994,18 @@ msgstr ""
 
 #. configurableMenu@lestcape->settings-schema.json->installer-uninstall-button->description
 msgid "Uninstall the Cinnamon Installer tool"
-msgstr "Видалити інструмент Cinnamon-Installer"
+msgstr "Вилучити засіб Cinnamon-Installer"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-uninstall-button->tooltip
 msgid "Press this button to uninstall the Cinnamon Installer tool."
-msgstr "Натисніть цю кнопку, щоб видалити інструмент Cinnamon-Installer."
+msgstr "Натисніть цю кнопку, щоб вилучити засіб Cinnamon-Installer."
 
 #. configurableMenu@lestcape->settings-schema.json->installer-default->description
 msgid "Enable the default Cinnamon packages manager tools"
-msgstr "Увімкнути типовий менеджер програм Cinnamon"
+msgstr "Увімкнути типовий менеджер проґрам Cinnamon"
 
 #. configurableMenu@lestcape->settings-schema.json->installer-default->tooltip
 msgid "Allows the use of the default packages manager(only if it's available)."
 msgstr ""
-"Дозволяє використовувати менеджер програм за замовчуванням (тільки якщо він "
+"Дозволяє використовувати типовий менеджер проґрам (тільки якщо він "
 "доступний)."
