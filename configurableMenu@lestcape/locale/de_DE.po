@@ -36,7 +36,7 @@ msgstr "Paket %s installieren"
 
 #: applet.js:383 applet.js:3678 cinnamonMenu.js:536 applet.js:1452
 msgid "List View"
-msgstr "Listensansicht"
+msgstr "Listenansicht"
 
 #: applet.js:1455
 msgid "Grid View"
